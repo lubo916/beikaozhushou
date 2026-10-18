@@ -1,0 +1,165 @@
+# 交接包内容规定（ADR-030）：每种包带哪些文件、网页版 Claude 交回什么、结果能写哪些位置。scripts/handoff.py 只按本文件组包。
+# 改包的内容先改这里，再运行 python scripts/handoff.py selftest。
+#
+# 原则（doc-system 第 1、2、6 章）：给网页版 Claude 的是“最小而充分”的事实。
+#   - 内容由本闭环或本功能的登记机械推导：功能的领域与依赖、覆盖条目、规格的 refs、闭环的切片与任务；不按经验堆文件。
+#   - 一事一址：任务包里已有的契约切片、页面登记切片与 ADR 决定，不再附整份原文；大文件只摘需要的章节（computed）。
+#   - 包里缺的不靠猜：网页版 Claude 在结果的“需要补充的文件”一节点名，handoff.py 下一轮自动补上；反复要的，补进本文件。
+#   - 必读与依据中不带 ? 的路径缺一个，handoff.py 就拒绝出包；每个包内的 context/SOURCES.md 列出全部文件、读法与理由。
+#
+# 写法：字符串项为“路径 — 理由”；带条件的项写成 {path, why, when}，when 取下面 conditions 中的名字。
+#   路径相对仓库根；以 / 结尾是目录（递归，排除 node_modules、dist、缓存）；可以用 * 通配；末尾带 ? 的可以不存在。
+#   占位符：{loop} 闭环编号；{phase} 所在期；{id} 功能 ID；{domain} 该功能的领域名（与 {id} 成对展开；单独出现时按领域去重展开）；
+#   {dep_domain} 本闭环领域直接依赖的领域（docs/product/domain-map.yaml）。
+# 读法：must 必读（先完整读）；basis 依据（按需查阅）；computed 由 handoff.py 计算或摘取的内容。
+# 写入：writable 结果包可以写的位置；writable_confirm 可以写，但 Codex 必须在大白话概况里逐条列给产品负责人确认；
+#   proposal_only 只能提议：网页版 Claude 在结果的“给负责人确认的规划改动”一节写明改哪处、改成什么、为什么，
+#   负责人确认后由 Codex 落地。新 ADR、跨功能待定问题（OQ-<三位数>）与约定变更同样由 Codex 在主干编号后落地。
+#
+# 有意不放进任何包的（及理由）：深化来源原型、深化清单与旧模块文档（页面深化与分拣暂缓，ADR-023）；分期规划与实施步骤表原件
+#   （种子已转写进 loops/ 与 phases.yaml）；技术选型定稿原件（以 ADR-025 为准）；roadmap.md、progress.md 等生成视图；
+#   calibration.yaml（推进记录，不是规格依据）；.claude/ 与 .agents/（工具配置）。冻结原型不常规附带，按需见 write-specs 的 computed。
+
+conditions:
+  has_tasks: 本闭环有闭环级任务（phases.yaml 的 tasks）
+  ui: 本闭环涉及页面：覆盖条目所在页，或闭环切片、闭环文件、规格草稿中点名的页
+  ai: 本闭环领域拥有 AI 场景，或规格草稿引用了 AI 场景
+  learning: 本闭环领域或其直接依赖中有“学习核心”组的领域，或本闭环有闭环级任务（探针与工程任务要用算法规格）
+  exam_data: 领域或其直接依赖中有“学习核心”或“内容”组的领域（测试约定第 3 条：领域测试用演示考试）
+  schema: 规格引用了表（计划编写包）
+  models: 规格引用了算法规格（计划编写包）
+
+write-specs:
+  title: 规格编写包（P1，每个闭环一次；同包写本闭环的闭环级任务计划）
+  key: L{loop}-write
+  command: python scripts/handoff.py write-specs <闭环> [--notes <复核意见>]
+  template: task-write-specs.md
+  result: MANIFEST.md 与 files/（格式见 templates/claude-project.md 与 TASK.md）
+  doc_system_sections: ["5.3 ", "5.6 ", "5.7 ", "5.8 ", "5.9 ", "5.10 ", "5.12 ", "5.13 ", "6.1 ", "6.2 ", "6.3 ", "8.1 ", "10 预算", "13 写作约定", "附录 B", "附录 D", "附录 K"]
+  must:
+    - AGENTS.md — 红线、权威来源与工作方式
+    - docs/meta/plan/loops/{loop}.md — 一句话演示、步骤、本闭环不做与每个功能的规格种子
+    - docs/meta/plan/phase-{phase}.md — 本期的假设、进入与出口条件、关键判断
+    - docs/conventions/ — 全部约定原文（规格只写相对约定的例外，必须知道约定）
+    - docs/product/glossary.yaml — 术语、取值与禁用同义词
+    - scripts/spec_tool.toml — 体量上限、历史性措辞与禁用编号模式
+    - docs/domains/{domain}/README.md — 本闭环各领域的职责与边界
+    - docs/domains/{domain}/features/{id}.md? — 本闭环功能已有的规格草稿
+  basis:
+    - contracts/ — 全部契约：登记的名字全局唯一，新增条目前要查重，跨领域引用要查原文
+    - docs/product/invariants.yaml — 不变量与合规义务（规格第 7 节引用）
+    - docs/product/open-questions.yaml — 跨功能待定问题与已拍板的决定
+    - docs/product/domain-map.yaml — 领域划分与依赖方向
+    - docs/product/variation-points.md — 考试差异由谁承载（核心规则不按考试写分支）
+    - docs/product/brief.md — 产品简介
+    - docs/product/journeys.md — 用户旅程
+    - docs/domains/{dep_domain}/README.md? — 直接依赖领域的职责与边界
+    - {path: "design/tokens.json", when: ui, why: 设计令牌（界面规则只引用令牌）}
+    - {path: "design/tokens.resolver.json", when: ui, why: 主题修饰器}
+    - {path: "docs/models/", when: learning, why: 算法规格（学习核心的口径与公式）}
+    - {path: "tests/models/", when: learning, why: 算法规格的金标与模拟场景}
+    - {path: "fixtures/exams/", when: exam_data, why: 演示考试（验收测试数据的来源）}
+    - {path: "package.json", when: has_tasks, why: 根工作区与脚本（闭环级任务计划用）}
+    - {path: "pnpm-workspace.yaml", when: has_tasks, why: 工作区与依赖观察期}
+    - {path: "tsconfig.base.json", when: has_tasks, why: 编译基线}
+    - {path: "apps/*/package.json?", when: has_tasks, why: 各应用的依赖与脚本}
+    - {path: "packages/*/package.json?", when: has_tasks, why: 各共享包的依赖与导出}
+    - {path: "packages/domains/*/package.json?", when: has_tasks, why: 各领域包的依赖与导出}
+    - {path: ".github/", when: has_tasks, why: CI 流水线}
+    - {path: ".githooks/", when: has_tasks, why: 提交检查}
+    - {path: ".gitignore", when: has_tasks, why: 不进仓库的文件}
+    - {path: ".env.example?", when: has_tasks, why: 环境变量清单}
+    - {path: "deploy/?", when: has_tasks, why: 部署、发布与回滚}
+    - {path: "scripts/", when: has_tasks, why: 检查、生成与交接工具的实际行为}
+  computed:
+    - context/loop.yaml — phases.yaml 中本闭环及所在期的原文切片
+    - context/writing-rules.md — 从 doc-system 摘取 doc_system_sections 列出的章节（规格格式、契约、refs、通道、预算、写作约定、模板、检查规则）
+    - context/adr-decisions.md — 全部 ADR 的状态与“决定”一节；整份被取代的只留状态行
+    - context/boundaries.md — 本闭环涉及页面的条目归属、全部闭环与功能、全部页面（判断边界与越界）
+    - packs/<ID>.spec-mode.md — 每个功能的写规格任务包；已有规格的另附 packs/<ID>.md（开发者将拿到的任务包）
+    - 相关规格 — 依赖闭包中的功能与覆盖同一页面的功能的已有规格
+    - 页面资料 — 本闭环涉及页面的登记、原型切片与截图；这些页所在端的 apps/<端>/AGENTS.md
+    - AI 资料 — 相关 AI 场景的 evals/<场景>/ 与 packages/ai/<场景>/（条件 ai）
+    - 已有计划 — docs/meta/plan/work/ 下的写法说明、本闭环闭环级任务计划与功能计划预写稿
+    - context/tree.txt — 仓库全部已跟踪文件（条件 has_tasks）
+    - 按需补充 — 上一轮“需要补充的文件”列出的路径；写 prototype 即附冻结原型（ADR-030 的按需例外）
+    - 修改轮 — 第 2 轮起的 REVISE.md 与 context/PREVIOUS.md
+  writable:
+    - docs/domains/{domain}/features/{id}.md — 本闭环功能的规格
+    - contracts/ — 规格需要的契约登记
+    - docs/product/glossary.yaml — 新术语
+    - docs/meta/plan/work/ — 闭环级任务计划与功能计划预写稿
+  writable_confirm:
+    - docs/models/ — 算法规格（属于重型通道）
+  proposal_only:
+    - docs/product/roadmap.yaml — 功能依赖与覆盖条目
+    - docs/product/phases.yaml — 切片、验收句与不做
+    - docs/meta/plan/loops/ — 闭环文件的步骤与种子
+    - docs/meta/plan/steps.md — 总步骤表
+
+write-plan:
+  title: 计划编写包（P2，每个功能一次；随后的实现回到同一个对话）
+  key: "{id}-plan"
+  command: python scripts/handoff.py write-plan <ID> [--notes <复核意见>]
+  template: task-write-plan.md
+  result: PLAN.md（handoff.py 把它写进 work/<ID>.md 的“计划”一节）
+  doc_system_sections: ["5.14 ", "附录 G"]
+  must:
+    - AGENTS.md — 红线、权威来源与工作方式
+    - docs/meta/plan/loops/{loop}.md — 本闭环的步骤与执行顺序
+    - docs/adr/ADR-025-tech-stack-baseline.md — 依赖与版本（任务包只带引用的 ADR）
+    - docs/adr/ADR-026-frontend-backend-layout.md — 仓库结构与依赖方向
+    - docs/adr/ADR-029-multi-end-and-reach.md — 多端与断点
+  basis:
+    - docs/product/domain-map.yaml — 领域依赖方向（代码依赖不能反向）
+    - docs/product/variation-points.md — 考试差异由谁承载（核心代码不按考试写分支）
+    - scripts/spec_tool.toml — verify 的各步命令、测试结果文件与体量上限
+    - {path: "docs/adr/ADR-028-tenant-isolation-two-lines.md", when: schema, why: 数据访问与租户隔离}
+    - {path: "tests/models/", when: models, why: 算法规格的金标与模拟场景}
+    - {path: "fixtures/exams/", when: exam_data, why: 演示考试（测试数据）}
+  computed:
+    - pack.md — 本功能的任务包（规格全文、适用规则、契约切片、页面、不变量、依赖接口、术语、ADR 决定、待定问题、AC 现状）；超出预算即拒绝出包
+    - work.md — work/<ID>.md 的当前内容
+    - 规格原文 — 含 refs 与待定问题
+    - 算法规格原文 — refs.models 指向的 docs/models/ 文件（任务包只列引用）
+    - 依赖功能的规格 — refs.features
+    - 页面资料 — 任务包第 6 节页面的完整原型切片与截图（任务包里的切片会截断）
+    - 已有计划 — 写法说明、本功能的预写稿与本闭环的闭环级任务计划
+    - context/tree.txt — 仓库全部已跟踪文件
+    - 代码现状 — 任务包“涉及路径”下的已跟踪文件、全部 package.json 与 tsconfig、根目录配置、各工作区包的入口；单个文件超过上限的只列路径
+    - context/work-rules.md — 从 doc-system 摘取 work 文件的用途与模板
+    - 按需补充、修改轮 — 同规格编写包
+  writable: []
+
+implement:
+  title: 实现包与修复包（P2、P3）
+  key: "{id}"
+  command: python scripts/handoff.py out <ID> [--notes <复查意见>]
+  template: task-implement.md（第 2 轮起 task-fix.md）
+  result: MANIFEST.md 与 files/
+  always:
+    - package.json
+    - pnpm-workspace.yaml
+    - tsconfig.base.json
+    - tsconfig.json
+    - packages/params/index.ts
+    - docs/adr/ADR-025-tech-stack-baseline.md
+    - docs/adr/ADR-026-frontend-backend-layout.md
+    - docs/adr/ADR-029-multi-end-and-reach.md
+  computed:
+    - pack.md — 任务包
+    - work.md — 已确认的计划
+    - 计划列出的文件 — “改动文件”“参考文件”
+    - 修复轮 — 第 2 轮起分支上已改文件的当前版本与 FIX.md
+  writable: 计划的“改动文件”与测试文件（handoff.py 的范围检查）
+
+review-specs:
+  title: 规格冷启动复核包（重型通道，网页版 Claude 新开对话复核）
+  key: L{loop}-specs
+  command: python scripts/handoff.py specs <闭环>
+  template: task-review-specs.md
+  result: REVIEW.md
+  computed:
+    - packs/<ID>.md — 只给任务包，检验开发者拿到的包是否足够
+    - plans/<切片>.md — 本闭环的闭环级任务计划（工程前置，复核时不算规格缺口）
+  writable: []

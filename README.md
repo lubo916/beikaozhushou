@@ -11,4 +11,4 @@ python3 scripts/spec_tool.py doctor
 python3 scripts/spec_tool.py status
 ```
 
-归档材料（原型 v1.0、深化来源、旧模块文档、分期规划与实施步骤表）放在同级目录 ../exam-prep-archive，开发会话不读。
+归档材料（原型 v1.0、深化来源、旧模块文档、分期规划与实施步骤表）放在同级目录 ../exam-prep-archive，开发会话不读；冻结原型是唯一例外：网页版 Claude 写明需要时，随规格编写包送达（ADR-030）。

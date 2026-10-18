@@ -12,7 +12,7 @@ metadata:
 
 1. 交接。如果 work/<ID>.md 存在，完整阅读它，从“下一步”继续；不存在就运行 `python scripts/spec_tool.py work start <ID>` 创建。
 2. 任务包。运行 `python scripts/spec_tool.py pack <ID>`，完整阅读它输出的包文件。包里的规则就是本任务适用的全部规则。只有包确实缺信息时才读包外文件，并在 work 文件“包外读取”一节记一行原因。
-3. 计划。在 work 文件“计划”一节写出要改的文件、契约变更、AC 到测试的映射、风险，然后停下来请用户确认。用户确认之前不改代码和契约。
+3. 计划。work 文件“计划”一节由网页版 Claude（或代替它的 Claude Code）按 docs/meta/plan/templates/task-write-plan.md 编写，Codex 用 review-plan 复核，用户确认（ADR-030）。“确认”一行为空时停下，不改代码和契约，也不由 Codex 起草计划。
 4. 实现。先写测试（标题带 [<ID>-AC<n>]），再按计划修改。规格或契约需要变时，与代码在同一次提交里一起改，并在 work 文件“决定”一节记一行。遇到规格没覆盖的情形，用待定问题的临时默认；没有临时默认就停下来问。
 5. 验证。运行 `python scripts/spec_tool.py verify`，直到全部通过。涉及 AI 场景时，确认相关场景的回归评测达到阈值且不低于基线。
 6. 交接。更新 work 文件的进度、决定、交接记录（写明执行这一步的工具）和下一步。

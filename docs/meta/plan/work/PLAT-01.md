@@ -11,7 +11,6 @@ started: （由 work start 填写）
 - Codex 先做（出包前提交在本分支；这些文件 Claude 不改）：
   1. 确认 0.1b 的样式字面量检查覆盖 apps/learner 与 packages/ui 的 CSS、className 与 style；没有覆盖就先补上并写反例测试。
   2. 确认任务包仍在预算内（当前约 12,900 字符，上限 15,000）。
-  3. 确认 scripts/handoff.py 回包时，写入的文件命中 design/tokens.json 或 design/tokens.resolver.json 会运行 gen（0.1b.md 第 2 节 C9）；否则回包后 tokens.css 不更新，verify 必然失败。
 - 改动文件：
   - design/tokens.json（外壳尺寸、间距、遮罩与阴影令牌）
   - design/tokens.resolver.json（深色修饰器）
@@ -87,7 +86,7 @@ started: （由 work start 填写）
 （会话中做的取舍，一行一条，行尾写去向：→ 规格 R<n> / → ADR-<nnn> / → 不保留。）
 
 ## 进度
-- [ ] Codex：先做三项
+- [ ] Codex：先做两项
 - [ ] 出包第 1 轮
 - [ ] 回包、verify、按 review-change 复查；负责人看截图基线
 - [ ] work close、PR、CI 全绿后合并

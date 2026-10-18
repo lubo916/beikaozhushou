@@ -1,6 +1,6 @@
 # V3 日常操作卡
 
-> 配套《AI开发文档体系规范》V3.2（docs/meta/doc-system.md）。日常只看这一页；规则的出处写在括号里。所有命令都在仓库根执行，`st` 代表 `python scripts/spec_tool.py`，`ho` 代表 `python scripts/handoff.py`。
+> 配套《AI开发文档体系规范》V3.3（docs/meta/doc-system.md）。日常只看这一页；规则的出处写在括号里。所有命令都在仓库根执行，`st` 代表 `python scripts/spec_tool.py`，`ho` 代表 `python scripts/handoff.py`。
 
 ## 迁移现状
 
@@ -8,10 +8,11 @@
 
 ## 开工前
 
-- Codex 从仓库根启动；网页版 Claude 在 claude.ai 的「备考助手·实现」项目里，只看交接包。（ADR-024）
+- Codex 从仓库根启动；网页版 Claude 在 claude.ai 的「备考助手·实现」项目里，只看交接包，负责写规格、写计划和写代码；Codex 不起草规格与计划，只出包、机检、复核并用大白话汇报。（ADR-024、ADR-030）
+- Claude 项目里只粘贴 docs/meta/plan/templates/claude-project.md 的全文，不上传任何文件；对话里只贴 `ho` 给出的那一句话，要求都写在包里。（ADR-030）
 - 一个会话只推进一步。会话之间清空上下文，状态只靠 work 文件、docs/product/calibration.yaml 和 git 传递。（8.3）
 - 新机器、新成员、升级工具之后：先跑 `st doctor`；在 Codex 里打开 `/hooks` 信任项目 hooks；装了 Claude Code 的，在里面用 `/memory` 确认看得到 AGENTS.md。（14.1）
-- Windows 电脑在 WSL2 里开发，Codex 也在 WSL2 里启动；结果包下载到 Windows 的“下载”文件夹即可，`ho in --latest` 会去那里找。（ADR-025）
+- Windows 电脑在 WSL2 里开发，Codex 也在 WSL2 里启动；结果包下载到 Windows 的“下载”文件夹即可，`ho in --latest` 会去那里找；也可以放进 handoff\inbox。结果包不解压、不改名。（ADR-025、ADR-030）
 
 ## 先判断走哪条通道
 
@@ -27,9 +28,9 @@
 
 1. **登记**：功能已在 `roadmap.yaml`（有 `release` 和 `covers`）。新功能用 `st new feature …`，只在主干运行。功能条目不删除，不做的写 `withdrawn: <理由>` 并清空 `covers`。（5.5）
 2. **开卡**：open-loop 技能核对在制品与依赖，在 calibration.yaml 的 loops 记开卡。（ADR-008）
-3. **规格**：Codex 用 write-spec 技能写规格，`st check` 通过，状态 `draft`。
-4. **冷启动复核**：`ho specs <闭环>` 出复核包，网页版 Claude 只看包提问题；问题清零、你确认业务摘要后改为 `ready`。
-5. **实现**：Codex 在 `feat/<ID>-<短名>` 分支 `st work start <ID>`，写计划等你确认；`ho out <ID>` 出包，网页版 Claude 实现，`ho in --latest <ID>` 应用结果并跑 verify。
+3. **规格**：`ho write-specs <闭环>` 按 packages.yaml 出编写包，网页版 Claude 写规格与闭环级任务计划；`ho in --latest L<闭环>-write` 回收，自动跑 gen 与 check，状态 `draft`。
+4. **复核**：Codex 用 review-spec 复核，有意见就 `ho write-specs <闭环> --notes <文件>` 退回同一个对话；重型通道再用 `ho specs <闭环>` 请网页版 Claude 新开对话冷启动复核。问题清零后 Codex 写大白话概况，你确认后改为 `ready`。
+5. **计划与实现**：在 `feat/<ID>-<短名>` 分支 `st work start <ID>` → 有预写稿用 `ho adopt-plan <ID>` 换入，没有就 `ho write-plan <ID>` 请网页版 Claude 写、`ho in --latest <ID>-plan` 回收 → review-plan 复核 → 你看计划概况回“确认计划” → `ho out <ID>` 出实现包（回到写计划的对话）→ `ho in --latest <ID>` 应用结果并跑 verify。
 6. **复查**：Codex 用 review-change 技能对照任务包复查；不过就出修复包（README 的 P3）。
 7. **收尾**：`st work close <ID>` → 提交 → CI 全绿后合并。闭环的最后一个功能合并后，close-loop 技能核对完成定义并记实际轮次。功能状态由 CI 推导，不手改。
 
@@ -72,7 +73,10 @@
 | `st budget --tool claude` / `--tool codex` | 预算报告 |
 | `st work start <ID>` / `st work close <ID>` | work 文件开始与收尾 |
 | `st doctor` | 本地环境检查 |
-| `ho out <ID>` / `ho specs <闭环>` / `ho in --latest <键>` | 出实现包、出规格复核包、应用结果包 |
+| `ho write-specs <闭环>` / `ho write-plan <ID>` | 出规格编写包、计划编写包（ADR-030；内容见 packages.yaml） |
+| `ho adopt-plan <ID>` | 换入网页版 Claude 的预写计划（docs/meta/plan/work/<ID>.md），检查与回收 PLAN.md 相同 |
+| `ho where` | 列出出包位置、结果包的查找位置与记录位置 |
+| `ho out <ID>` / `ho specs <闭环>` / `ho in --latest <键>` | 出实现包、出规格冷启动复核包、回收结果包（键：`L<闭环>-write`、`<ID>-plan`、`<ID>`、`L<闭环>-specs`） |
 | `ho selftest` | 交接工具自检 |
 
 ## 红线
@@ -97,6 +101,7 @@
 | 两个工具表现不一样 | 把规则移到两边都看得见的载体 |
 | 同一错误第二次出现 | 写进 AGENTS.md 易错点（一行），能机检就改成检查 |
 | 网页版 Claude 反复犯同一个错 | 写进 docs/meta/plan/templates/claude-project.md，能机检就改成检查 |
+| 网页版 Claude 写的规格或计划缺依据、靠猜 | 补 docs/meta/plan/packages.yaml，重新出包；不在对话里零散补发 |
 | 记忆里出现项目知识 | 提升进仓库，清掉记忆 |
 | 实现时发现页面交互细节缺失 | 按“页面深化”一节补该页，同一次提交更新规格 |
 | 仓库里出现深化来源的编号或叫法 | 翻译或删除；把漏掉的模式补进 `[deep_source].forbidden_patterns` |
