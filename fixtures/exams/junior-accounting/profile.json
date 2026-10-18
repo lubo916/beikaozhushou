@@ -1,0 +1,116 @@
+{
+  "exam_id": "junior-accounting",
+  "name": "初级会计职称",
+  "short_name": "初级会计",
+  "aliases": [],
+  "kind": "official",
+  "evaluation_rule": {
+    "type": "pass_line",
+    "description": "两科均不低于 60 分",
+    "pass_line": 60,
+    "per_subject": true
+  },
+  "full_score": 100,
+  "structure": [
+    {
+      "subject": "初级会计实务",
+      "sections": [
+        {
+          "name": "会计概述",
+          "knowledge_point_count": 18
+        },
+        {
+          "name": "会计基础",
+          "knowledge_point_count": 30
+        },
+        {
+          "name": "资产",
+          "knowledge_point_count": 46
+        },
+        {
+          "name": "负债",
+          "knowledge_point_count": 28
+        },
+        {
+          "name": "所有者权益",
+          "knowledge_point_count": 14
+        },
+        {
+          "name": "收入、费用和利润",
+          "knowledge_point_count": 32
+        },
+        {
+          "name": "财务报告",
+          "knowledge_point_count": 22
+        },
+        {
+          "name": "管理会计基础",
+          "knowledge_point_count": 22
+        }
+      ]
+    },
+    {
+      "subject": "经济法基础",
+      "sections": []
+    }
+  ],
+  "question_types": [
+    {
+      "type": "single_choice",
+      "label": "单选",
+      "response_form": "choice",
+      "count": 20,
+      "subjective": false
+    },
+    {
+      "type": "multi_choice",
+      "label": "多选",
+      "response_form": "choice",
+      "count": 10,
+      "subjective": false
+    },
+    {
+      "type": "true_false",
+      "label": "判断",
+      "response_form": "choice",
+      "count": 10,
+      "subjective": false
+    },
+    {
+      "type": "indefinite_choice",
+      "label": "不定项",
+      "response_form": "choice",
+      "count": 15,
+      "subjective": false
+    }
+  ],
+  "scoring": {
+    "target_default": 70,
+    "target_basis": "两科各 70 分",
+    "rubrics": []
+  },
+  "duration_minutes": 120,
+  "key_dates": [
+    {
+      "kind": "exam",
+      "date": "2027-05-16",
+      "status": "estimated",
+      "basis": "按近 3 年考期推算，官方公告后核对"
+    }
+  ],
+  "readiness": {
+    "map": {
+      "level": 3,
+      "note": "官方审定"
+    },
+    "questions": {
+      "level": 3,
+      "note": "审定题 4,260 道"
+    },
+    "exam_intel": {
+      "level": 3,
+      "note": "近 6 年真题档案"
+    }
+  },
+  "variation_extensions": []
+}

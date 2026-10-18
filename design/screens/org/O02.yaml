@@ -1,0 +1,61 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: O02
+end: org
+title: 招生与线索
+mode: standard
+purpose: 机构的第一痛点是招生。把摸底诊断做成带机构品牌的获客工具，线索自带水平与差距，沟通从推销变成解读报告。
+states: [loading, empty, error, offline, restricted, insufficient_data]
+data:
+  read_writes: [线索, 跟进, 订单与协议。手机号默认脱敏, 查看留痕]
+ai:
+  - role: 线索评分与沟通要点；宣传文案合规检查。
+entries: []
+exits: []
+unresolved_links: [O01, O03, O12]
+items:
+  - id: O02-01
+    name: 宣传合规检测
+    text: 拦截保过类表述与无依据的通过率宣传
+    page_priority: P0
+  - id: O02-02
+    name: 品牌化诊断测评
+    text: 带机构标识的摸底，报告页引导留资
+    page_priority: P1
+  - id: O02-03
+    name: 线索池与评分
+    text: 来源、意向、水平、跟进状态，按成交可能性排序
+    page_priority: P1
+  - id: O02-04
+    name: 跟进任务
+    text: 超时未跟进的线索自动提醒
+    page_priority: P1
+  - id: O02-05
+    name: 试听与体验班
+    text: 试听课与体验营的报名、到课与转化跟踪
+    page_priority: P1
+  - id: O02-06
+    name: 报名、协议与收款
+    text: 线上报名、电子协议、收款登记，与权益开通联动
+    page_priority: P1
+  - id: O02-07
+    name: 退费办理
+    text: 按协议公式试算、审批、原路退回，结果同步学员端
+    page_priority: P1
+  - id: O02-08
+    name: 转化漏斗与渠道分析
+    text: 各渠道的留资、试听、成交
+    page_priority: P1
+  - id: O02-09
+    name: 公开模板引流
+    text: 机构发布的公开模板可带品牌与咨询入口
+    page_priority: P2
+  - id: O02-10
+    name: 咨询助手
+    text: 非工作时间应答，明示身份；涉及价格与承诺转人工
+    page_priority: P2
+  - id: O02-11
+    name: 线索沟通要点
+    text: 基于诊断报告生成与线索沟通的要点
+    page_priority: P1
+slice: design/screens/slices/O02.html
+shots: design/screens/shots/O02/

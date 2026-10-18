@@ -1,0 +1,48 @@
+# 角色与动作词表：人类角色与 AI 执行者共用同一套动作（contracts/ai/actors.yaml）。服务端按动作、角色与数据范围校验。
+roles:
+  guest: {name: 游客, end: learner}
+  learner: {name: 学员, end: learner}
+  org_owner: {name: 负责人, end: org}
+  campus_manager: {name: 校区主管, end: org}
+  academic_admin: {name: 教务, end: org}
+  head_teacher: {name: 班主任, end: org}
+  lecturer: {name: 讲师, end: org}
+  researcher: {name: 教研, end: org}
+  advisor: {name: 顾问, end: org}
+  platform_ops: {name: 运营, end: admin}
+  content_reviewer: {name: 内容审核, end: admin}
+  compliance_officer: {name: 合规, end: admin}
+  ai_governor: {name: AI 治理, end: admin}
+  support_agent: {name: 客服, end: admin}
+  system_admin: {name: 系统管理员, end: admin}
+actions:
+  - id: exam.profile.read
+    roles: [guest, learner, org_owner, academic_admin, lecturer, researcher, platform_ops, content_reviewer]
+    data_scope: public
+  - id: map.knowledge_point.read
+    roles: [guest, learner, org_owner, academic_admin, lecturer, researcher, platform_ops, content_reviewer]
+    data_scope: public
+  - id: content.question.read
+    roles: [guest, learner, lecturer, researcher, content_reviewer]
+    data_scope: public_or_own
+  - id: practice.answer.submit
+    roles: [guest, learner]
+    data_scope: self
+  - id: learner.evidence.record
+    roles: []
+    callers: [practice, grading, content]
+    data_scope: self
+    note: 只由领域服务代表学员调用，不对端开放
+  - id: learner.mastery.read
+    roles: [guest, learner]
+    data_scope: self
+  - id: plan.items.write
+    roles: []
+    actors: [planner]
+    data_scope: self
+  - id: platform.params.read
+    roles: [guest, learner, org_owner, academic_admin, head_teacher, lecturer, researcher, advisor, platform_ops, system_admin]
+    data_scope: public
+  - id: metrics.event.track
+    roles: [guest, learner]
+    data_scope: self

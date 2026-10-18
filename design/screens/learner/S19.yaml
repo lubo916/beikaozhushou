@@ -1,0 +1,108 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S19
+end: learner
+title: 错题本
+mode: standard
+purpose: 错一次，改一类；一条流水线从收录走到毕业。
+refine: pending
+states: [loading, empty, error, offline, restricted, insufficient_data]
+state_overrides:
+  empty: 没有待处理的错题：今天的回炉都做完了；主按钮“去练习”（去 S17）
+  offline: 错题可离线重做
+  restricted: AI 错题分析每次消耗 3 点，事前告知
+  insufficient_data: 错题少于 10 道时不做聚类
+layout_notes:
+  - 页头：错题本；毕业标准一句；动作“拍照导入”“导出打印”。
+  - 四个统计，带副说明。
+  - 标签：今日｜全部｜洞察（聚类、根因、陷阱画像、错因分布、AI 分析）。
+  - 今日：列表 → 详情（生命周期、错因与陷阱、回炉次数、四步订正、盲做重做、变式验收、生成辨析卡）。
+data:
+  read_writes: [错题状态, 订正文字, 回炉结果]
+ai:
+  - role: 错因建议、聚类、根因追溯、陷阱归类。
+entries: [S06, S23, S24, S28]
+exits: [S10, S14, S18]
+unresolved_links: [S15]
+items:
+  - id: S19-01
+    name: 全场景自动收录
+    text: 练习、模考、片内检测、拍照、导入；诊断错题除外
+    page_priority: P0
+  - id: S19-02
+    name: 今日待处理
+    text: 默认只看今天到期的
+    page_priority: P0
+  - id: S19-03
+    name: 四个状态
+    text: 新增、回炉中、待验收、已毕业
+    page_priority: P0
+  - id: S19-04
+    name: 间隔回炉
+    text: 盲做后判对错并选把握度，据此安排下次时间
+    page_priority: P0
+  - id: S19-05
+    name: 毕业标准
+    text: 间隔做对多次，并做对一道变式题；没有可用变式时提高做对次数
+    page_priority: P0
+  - id: S19-06
+    name: 错因第一层
+    text: 按统一的错因分类归因，每类对应一种补救动作
+    page_priority: P0
+  - id: S19-07
+    name: 多维筛选与按知识点视图
+    text: 科目、知识点、错因、来源、状态、时间
+    page_priority: P0
+  - id: S19-08
+    name: 错因第二层
+    text: 客观题标出掉了哪种坑，汇成陷阱画像
+    page_priority: P1
+  - id: S19-09
+    name: 三步订正
+    text: 当时怎么想、错在哪一步、下次的警觉信号；只有用户自己写的进入聚类
+    page_priority: P1
+  - id: S19-10
+    name: 顽固题
+    text: 回炉多次失败的单列，引向攻坚包或根因追溯
+    page_priority: P1
+  - id: S19-11
+    name: 手动标记与移出
+    text: 可手动加入易错题；毕业自动归档，也可手动移出
+    page_priority: P1
+  - id: S19-12
+    name: 聚类洞察
+    text: 从订正中找规律，例如「审题失误多出在含否定词的题干」
+    page_priority: P1
+  - id: S19-13
+    name: 根因追溯
+    text: 沿前置关系找到真正没掌握的上游知识点
+    page_priority: P1
+  - id: S19-14
+    name: 批量分析
+    text: 选一批错题让导师归纳共性，后台完成后通知
+    page_priority: P1
+  - id: S19-15
+    name: 由错题制卡
+    text: 一键生成辨析卡或提醒卡
+    page_priority: P1
+  - id: S19-16
+    name: 陷阱画像
+    text: 各类干扰项的中招率、最常掉的坑、对应错题与针对性重做
+    page_priority: P1
+  - id: S19-17
+    name: 导出打印
+    text: 按知识点或错因导出，可隐藏答案、留订正空白
+    page_priority: P1
+  - id: S19-18
+    name: 纸质错题拍照导入
+    text: 识别题干、选项与手写批注
+    page_priority: P1
+  - id: S19-19
+    name: 攻坚包入口
+    text: 反复不达标的知识点进入攻坚包
+    page_priority: P1
+  - id: S19-20
+    name: 错题周报
+    text: 本周新增、毕业、顽固错题
+    page_priority: P2
+slice: design/screens/slices/S19.html
+shots: design/screens/shots/S19/

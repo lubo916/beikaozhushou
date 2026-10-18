@@ -1,0 +1,16 @@
+# 埋点事件（产品分析用）。业务事件见 domain-events.yaml。有效学习只按证据计，不按在场时长（S24-08）。
+- name: app_opened
+  owner: platform
+  trigger: 学员端启动或回到前台
+  properties: {entry: string, guest: bool}
+  status: active
+- name: practice_question_answered
+  owner: practice
+  trigger: 学员提交一道题并揭晓
+  properties: {question_id: uuid, knowledge_point_id: uuid, correct: bool, confidence: string, duration_ms: int, mode: string, credibility: string}
+  status: active
+- name: today_item_completed
+  owner: plan
+  trigger: 今日清单中的一项按证据判定为完成
+  properties: {item_id: uuid, segment: string, task_source: string, est_minutes: int, actual_minutes: int}
+  status: active

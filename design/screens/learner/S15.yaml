@@ -1,0 +1,114 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S15
+end: learner
+title: 复习与卡片
+mode: standard
+purpose: 唯一到期队列的家：在忘之前复习，先回忆再翻面。
+refine: pending
+views:
+  - id: home
+    when: 落地页
+  - id: session
+    when: 复习会话
+    mode: immersive
+states: [loading, empty, error, offline, restricted, insufficient_data]
+state_overrides:
+  empty: 今天没有到期的复习：明天第一批是 22 项；可以先学新内容；主按钮“去今日”（去 S06）
+  offline: 复习可完全离线，评分联网后同步
+  restricted: 到期复习永远免费，不受额度限制
+  insufficient_data: 新卡少于 20 张时，用默认记忆参数
+layout_notes:
+  - 落地页：页头（AI 制卡、设置）；标签“今日、卡组、待确认、日历”。
+  - 今日标签：队列构成、新卡数、预计用时、主按钮“开始复习”；记忆概况。
+  - 会话（沉浸）：进度、卡面、翻面、四档评分、报错与回到出处；到期错题切到做题界面后自动回来。
+  - 手机上四档评分放在拇指区，点卡面任意位置翻面。
+data:
+  writes: [每次回忆结果, 更新记忆稳定度并记回知识点证据]
+ai:
+  - role: 制卡时挖关键区分词；生成口诀与对比卡。
+entries: [S06, S07, S10, S28]
+exits: [S12, S33]
+unresolved_links: [S09, S16]
+items:
+  - id: S15-01
+    name: 今日队列
+    text: 到期数、新卡数、按个人速度估算的用时
+    page_priority: P0
+  - id: S15-02
+    name: 先回忆再翻面
+    text: 翻面前不出现评级；翻面后四级自评，不设默认
+    page_priority: P0
+  - id: S15-03
+    name: 知识点回忆卡
+    text: 每个在学知识点自动有一张“看名称回忆要点”的卡，无需手动制作
+    page_priority: P0
+  - id: S15-04
+    name: 多种卡型
+    text: 问答、挖空、辨析对比、数字、排序、图示、语境、音频、口诀
+    page_priority: P0
+  - id: S15-05
+    name: 五个制卡入口
+    text: 知识点、讲解、选中文字、笔记、错题
+    page_priority: P0
+  - id: S15-06
+    name: 待确认区
+    text: 生成的卡先收下、修改或丢弃，确认后才入队；自动去重与低质过滤
+    page_priority: P0
+  - id: S15-07
+    name: 目标日感知调度
+    text: 以目标日的可提取度为目标，分值高的复习更密
+    page_priority: P0
+  - id: S15-08
+    name: 负荷平滑与积压保护
+    text: 每日复习有上限；超出时按考频与遗忘风险取最要紧的一批，其余顺延不删
+    page_priority: P0
+  - id: S15-09
+    name: 卡片报错与溯源
+    text: 每张卡能回到出处；有误可暂停并反馈
+    page_priority: P0
+  - id: S15-10
+    name: 复习日历
+    text: 按日看未来到期量与过去完成量，过载日提前提示
+    page_priority: P1
+  - id: S15-11
+    name: 防误触与秒评识别
+    text: 翻面后短暂禁用按钮；用时过短的评级不计入
+    page_priority: P1
+  - id: S15-12
+    name: 卡组管理
+    text: 按知识点分组，看状态分布；可暂停、埋藏、编辑
+    page_priority: P1
+  - id: S15-13
+    name: 辨析卡自动生成
+    text: 发现反复混淆两个概念时生成对比卡
+    page_priority: P1
+  - id: S15-14
+    name: 记忆数据
+    text: 保持率实测、遗忘预警；显示目标保持率对每日复习量的影响，调整在设置里
+    page_priority: P1
+  - id: S15-15
+    name: 考前保温
+    text: 目标日前一段时间，把已稳定的高频卡快速过一遍
+    page_priority: P1
+  - id: S15-16
+    name: 离线复习
+    text: 无网可复习，联网后同步
+    page_priority: P1
+  - id: S15-17
+    name: 待重学
+    text: 选「忘了」的项当天稍后再出现
+    page_priority: P1
+  - id: S15-18
+    name: 复习会话沉浸
+    text: 开始复习后进入沉浸界面：进度、卡面、翻面、四档评分；到期错题切到做题后自动回来
+    page_priority: P1
+  - id: S15-19
+    name: 换种复习方式
+    text: 对一张卡改用口述讲述
+    page_priority: P2
+  - id: S15-20
+    name: 晨读推送
+    text: 每天固定时间推几张到期卡，可关可改时间
+    page_priority: P2
+slice: design/screens/slices/S15.html
+shots: design/screens/shots/S15/

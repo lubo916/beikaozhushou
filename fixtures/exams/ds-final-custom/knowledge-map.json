@@ -1,0 +1,134 @@
+{
+  "exam_id": "ds-final-custom",
+  "map_version": 1,
+  "source": "custom",
+  "note": "演示数据：章节与知识点数量取自原型，sample_points 为每章的示例知识点",
+  "chapters": [
+    {
+      "name": "绪论与复杂度",
+      "knowledge_point_count": 6,
+      "sample_points": [
+        {
+          "name": "时间复杂度分析",
+          "knowledge_types": [
+            "procedure"
+          ],
+          "default_target_level": 4
+        }
+      ]
+    },
+    {
+      "name": "线性表",
+      "knowledge_point_count": 10,
+      "sample_points": [
+        {
+          "name": "线性表的顺序存储",
+          "knowledge_types": [
+            "concept"
+          ],
+          "default_target_level": 3
+        },
+        {
+          "name": "链表的插入与删除",
+          "knowledge_types": [
+            "procedure"
+          ],
+          "default_target_level": 4
+        }
+      ]
+    },
+    {
+      "name": "栈、队列与串",
+      "knowledge_point_count": 12,
+      "sample_points": [
+        {
+          "name": "栈与队列的应用",
+          "knowledge_types": [
+            "procedure"
+          ],
+          "default_target_level": 4
+        },
+        {
+          "name": "串的模式匹配（KMP）",
+          "knowledge_types": [
+            "procedure"
+          ],
+          "default_target_level": 3
+        }
+      ]
+    },
+    {
+      "name": "树与二叉树",
+      "knowledge_point_count": 16,
+      "sample_points": [
+        {
+          "name": "二叉树的遍历",
+          "knowledge_types": [
+            "procedure"
+          ],
+          "default_target_level": 4
+        },
+        {
+          "name": "哈夫曼树与编码",
+          "knowledge_types": [
+            "procedure"
+          ],
+          "default_target_level": 4
+        }
+      ]
+    },
+    {
+      "name": "图",
+      "knowledge_point_count": 14,
+      "sample_points": [
+        {
+          "name": "图的存储结构",
+          "knowledge_types": [
+            "fact"
+          ],
+          "default_target_level": 2
+        },
+        {
+          "name": "最短路径（Dijkstra）",
+          "knowledge_types": [
+            "procedure"
+          ],
+          "default_target_level": 4
+        }
+      ]
+    },
+    {
+      "name": "查找",
+      "knowledge_point_count": 10,
+      "sample_points": [
+        {
+          "name": "哈希表",
+          "knowledge_types": [
+            "concept"
+          ],
+          "default_target_level": 3
+        },
+        {
+          "name": "B 树与 B+ 树",
+          "knowledge_types": [
+            "concept"
+          ],
+          "default_target_level": 2
+        }
+      ]
+    },
+    {
+      "name": "排序",
+      "knowledge_point_count": 10,
+      "sample_points": [
+        {
+          "name": "排序算法比较",
+          "knowledge_types": [
+            "concept"
+          ],
+          "default_target_level": 3
+        }
+      ]
+    }
+  ]
+}

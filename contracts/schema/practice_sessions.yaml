@@ -1,0 +1,14 @@
+table: practice_sessions
+owner: practice
+description: 一次练习、诊断或模考会话；记录模式与当时的档位快照（S17-09）
+tenant_scoped: true
+fields:
+  - {name: id, type: uuid, pk: true, x-data-class: personal_learning}
+  - {name: tenant_id, type: uuid, ref: tenants.id, x-data-class: operational}
+  - {name: learner_id, type: uuid, ref: users.id, x-data-class: personal_learning}
+  - {name: kind, type: "enum[practice, diagnosis, mock, retry, variant]", x-data-class: personal_learning}
+  - {name: mode, type: "enum[in_class, quick, timed, assessment]", x-data-class: personal_learning}
+  - {name: scope, type: json, x-data-class: personal_learning}
+  - {name: mastery_snapshot, type: json, nullable: true, x-data-class: inferred}
+  - {name: started_at, type: timestamptz, x-data-class: personal_learning}
+  - {name: ended_at, type: timestamptz, nullable: true, x-data-class: personal_learning}

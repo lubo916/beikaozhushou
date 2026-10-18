@@ -1,0 +1,8 @@
+{
+  "name": "@exam-prep/evals",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "eval": "echo \"评测执行器在第一个 AI 场景登记时实现（见 docs/conventions/ai-output.md）\" && exit 1"
+  }
+}

@@ -1,0 +1,110 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S09
+end: learner
+title: 知识地图
+mode: standard
+purpose: 一张图看完整场考试，并把“看”变成“做”。
+refine: pending
+states: [loading, empty, error, offline, restricted, insufficient_data, locked]
+state_overrides:
+  empty: 还没有知识地图：选一个考试启用官方地图，或由资料生成；主按钮“由资料生成”（去 S11）
+  offline: 方格与大纲树可离线查看；编辑需要联网
+  restricted: 官方节点只读；可在个人扩展层增加知识点
+  insufficient_data: 证据不足的格子画成虚线，与“未学”分开显示
+  locked: 地图体检不通过时，预测类区块显示原因与“去修复”，学习照常
+layout_notes:
+  - 页头：知识地图、读图说明；动作“补充诊断”“新建知识点”。
+  - 左栏：视图切换、着色、常用筛选；按章分行的方格与图例。
+  - 右栏：已学与已达标两数；选中知识点迷你卡；需要你注意；地图来源与体检。
+  - 手机：顶部两数→需要你注意→大纲树。
+data:
+  reads: [掌握档, 记忆稳定度, 考情, 资料覆盖]
+  writes: [地图结构, 类型, 关系, 范围]
+ai:
+  - role: 综合证据估计每个知识点的档位；生成地图初稿、类型标注与关联候选。
+entries: [S05, S06, S07, S08, S11, S12, S13, S24]
+exits: [S04, S10, S11, S18]
+unresolved_links: [S17]
+items:
+  - id: S09-01
+    name: 四种视图
+    text: 方格全景、大纲树、关系图、列表
+    page_priority: P0
+  - id: S09-02
+    name: 六种着色
+    text: 掌握档、目标达成、考频、遗忘风险、性价比阶梯、资料覆盖
+    page_priority: P0
+  - id: S09-03
+    name: 筛选
+    text: 重要度、掌握档、是否达标、待复习、有错题、无资料、证据不足、范围外
+    page_priority: P0
+  - id: S09-04
+    name: 证据不足与范围外的区分
+    text: 证据不足用虚线格，范围外用斜纹格，都不等于“不会”
+    page_priority: P0
+  - id: S09-05
+    name: 三种来源与扩展层
+    text: 官方、模板、自建可混用；在底图上加个人扩展层，底图升级不丢个人内容
+    page_priority: P0
+  - id: S09-06
+    name: 从大纲或教材生成
+    text: 上传大纲得到骨架，或按教材标题层级提取，规则可调并实时预览
+    page_priority: P0
+  - id: S09-07
+    name: 知识点类型标注
+    text: 每个知识点标一至两个类型，决定默认学法、卡型、题型与目标档
+    page_priority: P0
+  - id: S09-08
+    name: 知识点管理
+    text: 新建、改名、合并、拆分、移动、划线成点；合并拆分保留学习记录
+    page_priority: P0
+  - id: S09-09
+    name: 统计常驻
+    text: 已学、已达标、范围内、地图总数四个数同屏
+    page_priority: P0
+  - id: S09-10
+    name: 锁定态着色
+    text: 体检不通过时“性价比”着色置灰并写明原因与“去修复”
+    page_priority: P0
+  - id: S09-11
+    name: 关系编辑
+    text: 前置、易混、上下位、并列、因果、案例、边界、例外八类，带强度与来源
+    page_priority: P1
+  - id: S09-12
+    name: 导师建议关联
+    text: 给出候选关联与置信度，用户采纳或忽略；可一键采纳高置信
+    page_priority: P1
+  - id: S09-13
+    name: 地图体检
+    text: 检查粒度、题量覆盖、缺目标档、孤立点与疑似重复；分阻断项与提示项，逐项给修复建议。有阻断项即为不通过
+    page_priority: P1
+  - id: S09-14
+    name: 版本与迁移
+    text: 底图更新时掌握记录按映射迁移，被拆分的点标“证据不足”而不清零
+    page_priority: P1
+  - id: S09-15
+    name: 批量范围操作
+    text: 框选或按筛选结果批量加入、移出范围
+    page_priority: P1
+  - id: S09-16
+    name: 一键行动
+    text: 从任意一格进入学、练、背或加入今日
+    page_priority: P1
+  - id: S09-17
+    name: 前置与学习路径
+    text: 显示先学什么再学什么，拦住「白学」
+    page_priority: P1
+  - id: S09-18
+    name: 手机默认大纲树
+    text: 手机上默认显示每章一行的达标进度，方格只作缩略总览
+    page_priority: P1
+  - id: S09-19
+    name: 章节折叠
+    text: 知识点很多的考试按章折叠，展开后再显示格子
+    page_priority: P1
+  - id: S09-20
+    name: 跨目标重叠
+    text: 多目标并行时显示重叠的知识点
+    page_priority: P2
+slice: design/screens/slices/S09.html
+shots: design/screens/shots/S09/

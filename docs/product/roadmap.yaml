@@ -1,0 +1,1244 @@
+# 功能清单：功能、首发批次（release）、依赖与覆盖的页面条目的唯一来源（docs/meta/doc-system.md 5.5）。
+# 状态不写在这里，由 CI 推导；所属的期与闭环见 phases.yaml；release 与分期的对应见 ADR-008。
+# 编号只在主干用 python scripts/spec_tool.py new feature 分配；功能条目不删除，不做的写 withdrawn 并清空 covers。
+- id: PLAT-01
+  title: 学员端外壳与通用状态组件
+  domain: platform
+  release: R1
+  depends: []
+  covers: []
+- id: PLAT-02
+  title: 参数注册与运行时访问器
+  domain: platform
+  release: R1
+  depends: []
+  covers: []
+- id: METR-01
+  title: 埋点事件表与有效学习口径
+  domain: metrics
+  release: R1
+  depends: []
+  covers: []
+- id: EXM-01
+  title: 考试画像结构与评价规则
+  domain: exam
+  release: R1
+  depends: []
+  covers: []
+- id: MAP-01
+  title: 知识地图模型：稳定 ID、版本与扩展层
+  domain: map
+  release: R1
+  depends: [EXM-01]
+  covers: []
+- id: CONT-01
+  title: 题目模型：作答形态与四级可信度
+  domain: content
+  release: R1
+  depends: [MAP-01]
+  covers: []
+- id: LRN-01
+  title: 证据账本与掌握档派生
+  domain: learner
+  release: R1
+  depends: [MAP-01, CONT-01]
+  covers: []
+- id: CONT-02
+  title: 种子导入器与主考试、对照考试种子
+  domain: content
+  release: R1
+  depends: [EXM-01, MAP-01, CONT-01]
+  covers: []
+- id: PRAC-01
+  title: 行走骨架：知识点页做一题到方格变色
+  domain: practice
+  release: R1
+  depends: [PLAT-01, LRN-01, CONT-02]
+  covers: []
+- id: PRAC-02
+  title: 作答流程、把握度与分层揭晓
+  domain: practice
+  release: R1
+  depends: [PRAC-01]
+  covers: [S18-03, S18-04, S18-01, S18-06, S18-07]
+- id: LRN-02
+  title: 证据入账、档位依据与待验证
+  domain: learner
+  release: R1
+  depends: [PRAC-02, LRN-01]
+  covers: [S10-06, S17-05, S18-09]
+- id: MAP-02
+  title: 方格全景与知识点主页最小版
+  domain: map
+  release: R1
+  depends: [LRN-02]
+  covers: [S09-01, S09-02, S09-04, S09-09, S10-01, S10-11, S10-12]
+- id: PRAC-03
+  title: 练习入口、纸笔动作、小结与记录
+  domain: practice
+  release: R1
+  depends: [PRAC-02]
+  covers: [S17-02, S18-02, S18-05, S18-15, S17-09]
+- id: PLAN-01
+  title: 最小建档与任务生成器 v0
+  domain: plan
+  release: R1
+  depends: [MAP-02, PRAC-03]
+  covers: [S02-06, S02-07, S03-03, S06-02, S06-05, S17-01]
+- id: PLAN-02
+  title: 今日页骨架、串联、完成判定与夜间顺延
+  domain: plan
+  release: R1
+  depends: [PLAN-01]
+  covers: [S06-01, S06-03, S06-14, S06-06, S06-07, S06-16, S07-06]
+- id: PRAC-04
+  title: 错题自动收录与错因确认
+  domain: practice
+  release: R1
+  depends: [PRAC-02]
+  covers: [S19-01, S19-03, S18-08, S19-06]
+- id: PLAN-03
+  title: 到期队列接口与今日巩固段
+  domain: plan
+  release: R1
+  depends: [PLAN-02, PRAC-04]
+  covers: [S06-13]
+- id: PRAC-05
+  title: 错题间隔回炉与毕业
+  domain: practice
+  release: R1
+  depends: [PLAN-03]
+  covers: [S19-04, S19-05, S18-11]
+- id: PRAC-06
+  title: 错题本页
+  domain: practice
+  release: R1
+  depends: [PRAC-05]
+  covers: [S19-02, S19-07]
+- id: LRN-03
+  title: 记忆状态与目标日感知调度
+  domain: learner
+  release: R1
+  depends: [LRN-02]
+  covers: [S15-07]
+- id: PRAC-07
+  title: 知识点回忆卡与复习会话
+  domain: practice
+  release: R1
+  depends: [LRN-03, PLAN-03]
+  covers: [S15-03, S15-01, S15-02, S15-17, S15-18, S15-11]
+- id: PRAC-08
+  title: 手动制卡、待确认区与溯源
+  domain: practice
+  release: R1
+  depends: [PRAC-07]
+  covers: [S15-04, S15-05, S15-06, S15-09]
+- id: PLAN-04
+  title: 每日复习上限、积压保护与统一排序
+  domain: plan
+  release: R1
+  depends: [PRAC-07, PRAC-05]
+  covers: [S15-08, S06-24, S33-04, S06-04]
+- id: LRN-04
+  title: 快速定位
+  domain: learner
+  release: R1
+  depends: [LRN-02]
+  covers: [S04-03]
+- id: PLAN-05
+  title: 掌握方格、时间可行性与轮次路线
+  domain: plan
+  release: R1
+  depends: [LRN-04, PLAN-04]
+  covers: [S05-02, S05-05, S07-02, S07-03]
+- id: PLAN-06
+  title: 学习范围三态、周分配与缓冲顺延
+  domain: plan
+  release: R1
+  depends: [PLAN-05]
+  covers: [S05-06, S07-04, S10-10, S07-08, S05-08, S33-02, S10-09]
+- id: PLAN-07
+  title: 提议卡、重排记录与计划三层视图
+  domain: plan
+  release: R1
+  depends: [PLAN-06]
+  covers: [S06-10, S07-10, S07-01]
+- id: ACCT-01
+  title: 手机号登录、协议同意与老用户直达
+  domain: account
+  release: R1
+  depends: [PLAN-02]
+  covers: [S01-03, S01-04, S01-12, S01-05]
+- id: PLAN-08
+  title: 断连恢复与今天不可学
+  domain: plan
+  release: R1
+  depends: [PLAN-07]
+  covers: [S06-11, S06-17]
+- id: COMP-01
+  title: 学习数据导出
+  domain: compliance
+  release: R1
+  depends: [PRAC-06, PRAC-08]
+  covers: [S32-08]
+- id: SUPP-01
+  title: 题目报错与帮助反馈入口
+  domain: support
+  release: R1
+  depends: [PRAC-02]
+  covers: [S18-14, S35-03]
+- id: ACCT-02
+  title: 欢迎页两态、游客先体验与登录后合并
+  domain: account
+  release: R2
+  depends: [ACCT-01]
+  covers: [S01-06, S01-07, S01-01, S01-13]
+- id: PLAN-09
+  title: 引导流步骤条与周时间格
+  domain: plan
+  release: R2
+  depends: [ACCT-02]
+  covers: [S03-08, S03-11, S03-01, S03-02, S03-04, S03-12, S03-10]
+- id: EXM-02
+  title: 确认画像面板与目标页两态
+  domain: exam
+  release: R2
+  depends: [PLAN-09]
+  covers: [S02-10, S02-11]
+- id: ACCT-03
+  title: 登录时机、新手引导与上手清单
+  domain: account
+  release: R2
+  depends: [EXM-02]
+  covers: [S05-09, S01-10, S06-20]
+- id: LRN-05
+  title: 摸底开始页、测评态与沉浸界面
+  domain: learner
+  release: R2
+  depends: [ACCT-02]
+  covers: [S04-09, S04-10, S04-04, S04-05]
+- id: LRN-06
+  title: 自适应选题与分模块估计
+  domain: learner
+  release: R2
+  depends: [LRN-05]
+  covers: [S04-01, S04-02, S04-06, S04-08]
+- id: LRN-07
+  title: 断点续做、只升不降与诊断错题去向
+  domain: learner
+  release: R2
+  depends: [LRN-06]
+  covers: [S04-07, S04-12, S04-13]
+- id: LRN-08
+  title: 预测 v0：区间、差额与差距归因
+  domain: learner
+  release: R2
+  depends: [LRN-06]
+  covers: [S05-01, S05-03, S05-04]
+- id: PLAN-10
+  title: 三档方案、边际收益与轮次草案
+  domain: plan
+  release: R2
+  depends: [LRN-08, PLAN-05]
+  covers: [S05-07, S05-13, S05-11, S05-12]
+- id: CONT-03
+  title: 阅读器与考点标注层
+  domain: content
+  release: R2
+  depends: [PLAN-02]
+  covers: [S12-01, S12-02, S12-12]
+- id: CONT-04
+  title: 标注、阅读模式与读后即测
+  domain: content
+  release: R2
+  depends: [CONT-03]
+  covers: [S12-03, S12-05, S12-15, S12-06, S33-18, S12-14]
+- id: CONT-05
+  title: 有效阅读计时、双进度与资料定位
+  domain: content
+  release: R2
+  depends: [CONT-04]
+  covers: [S12-19, S11-08, S10-05]
+- id: CONT-06
+  title: 划选工具条与侧栏笔记
+  domain: content
+  release: R2
+  depends: [CONT-03]
+  covers: [S12-04, S12-11, S12-09, S14-03, S14-04]
+- id: CONT-07
+  title: 笔记归位、知识点主页三板块与转卡转题
+  domain: content
+  release: R2
+  depends: [CONT-06]
+  covers: [S14-01, S14-02, S10-07, S12-13, S14-05]
+- id: CONT-08
+  title: 笔记本页
+  domain: content
+  release: R2
+  depends: [CONT-07]
+  covers: [S14-06, S14-07, S18-18]
+- id: MAP-03
+  title: 知识点建议学法与自评检验
+  domain: map
+  release: R2
+  depends: [MAP-02]
+  covers: [S10-03, S10-08]
+- id: AIGOV-01
+  title: AI 网关：调用、降级、标识与计量
+  domain: aigov
+  release: R2
+  depends: [PLAN-02]
+  covers: [S28-10, S28-11, S28-12, P10-04, S06-19]
+- id: TUTOR-01
+  title: 讲一下：带上下文、学情与出处的讲解
+  domain: tutor
+  release: R2
+  depends: [AIGOV-01]
+  covers: [S28-01, S28-02, S28-03, S28-04, S12-07, S18-13, S12-21]
+- id: TUTOR-02
+  title: 追问五键与讲法切换
+  domain: tutor
+  release: R2
+  depends: [TUTOR-01]
+  covers: [S12-08, S28-06]
+- id: TUTOR-03
+  title: 导师边界、拒答与危机处置
+  domain: tutor
+  release: R2
+  depends: [TUTOR-01]
+  covers: [S28-05, S28-09, P11-05, P17-05]
+- id: TUTOR-04
+  title: 导师写操作走待确认与回答反馈
+  domain: tutor
+  release: R2
+  depends: [TUTOR-01, PLAN-07]
+  covers: [S28-07, P11-04, S28-08, P12-01]
+- id: PRAC-09
+  title: 组卷、开考确认与严格计时
+  domain: practice
+  release: R2
+  depends: [PRAC-02]
+  covers: [S17-08, S22-01, S17-24, S17-17, S22-07, S22-04, S22-02]
+- id: PRAC-10
+  title: 过程记录、断点续考与试卷快照
+  domain: practice
+  release: R2
+  depends: [PRAC-09]
+  covers: [S22-03, S22-05, S22-08]
+- id: PRAC-11
+  title: 测评报告：成绩、失分归因与分析
+  domain: practice
+  release: R2
+  depends: [PRAC-10]
+  covers: [S23-01, S23-02, S23-03, S23-04, S23-05, S23-07, S23-12]
+- id: PLAN-11
+  title: 补强清单以提议加入计划
+  domain: plan
+  release: R2
+  depends: [PRAC-11, PLAN-07]
+  covers: [S23-08]
+- id: METR-02
+  title: 完成度与健康度口径
+  domain: metrics
+  release: R2
+  depends: [PLAN-05]
+  covers: [S24-01, S24-02, S07-17]
+- id: LRN-09
+  title: 预测 v1：融合模考的三值与各科对比
+  domain: learner
+  release: R2
+  depends: [LRN-08, PRAC-11]
+  covers: [S24-03, S24-11]
+- id: LRN-10
+  title: 性价比阶梯、推荐路径与无考情降级
+  domain: learner
+  release: R2
+  depends: [LRN-09]
+  covers: [S24-04, S24-05, S24-10, S24-18, S09-03, S24-06, S10-04, P05-05]
+- id: METR-03
+  title: 三个数常驻、有效学习时长与学情导出
+  domain: metrics
+  release: R2
+  depends: [METR-02, LRN-09]
+  covers: [S06-12, S24-08, S24-09]
+- id: PLAN-12
+  title: 固定结构周报与只改一件事
+  domain: plan
+  release: R2
+  depends: [METR-03]
+  covers: [S08-01, S08-02, S08-03, S08-05, S08-08, S08-09, S08-12, S08-04, S08-06, S06-25]
+- id: PLAN-13
+  title: 声明与实测校准、压缩与放弃
+  domain: plan
+  release: R2
+  depends: [PLAN-12]
+  covers: [S03-05, S07-05, S07-07, S07-11, S07-18]
+- id: PLAN-14
+  title: 请假与忙季、轮次总结与报告反馈
+  domain: plan
+  release: R2
+  depends: [PLAN-13]
+  covers: [S07-09, S07-12, S08-14]
+- id: EXM-03
+  title: 个人考试日历与倒计时
+  domain: exam
+  release: R2
+  depends: [EXM-02]
+  covers: [S25-01, S25-02, S25-03, S25-05]
+- id: ENG-01
+  title: 递进提醒、通知中心与通道
+  domain: engagement
+  release: R2
+  depends: [EXM-03, ACCT-01]
+  covers: [S25-04, S06-23, S35-01, P15-01]
+- id: ENG-02
+  title: 触达纪律、免打扰与推送授权
+  domain: engagement
+  release: R2
+  depends: [ENG-01]
+  covers: [S35-02, S35-05, S33-03, P15-02, S35-06]
+- id: PLAN-15
+  title: 冲刺提议、今日三件事与考前保温
+  domain: plan
+  release: R2
+  depends: [LRN-10, ENG-02]
+  covers: [S27-01, S07-15, S22-06, S27-02, S15-15, S27-07, S14-13, S27-06]
+- id: PLAN-16
+  title: 考试当天静默与考务清单
+  domain: plan
+  release: R2
+  depends: [PLAN-15]
+  covers: [S27-03, S27-09, S25-09, S27-08, S27-12]
+- id: LRN-11
+  title: 登记成绩、预测校准与考后分流
+  domain: learner
+  release: R2
+  depends: [PLAN-16]
+  covers: [S27-04, S27-10, S27-05, S27-11]
+- id: PLAN-17
+  title: 短时重组与三档降级
+  domain: plan
+  release: R2
+  depends: [PLAN-07]
+  covers: [S06-08, S06-09]
+- id: PLAN-18
+  title: 中断回归、补充诊断与单项剔除
+  domain: plan
+  release: R2
+  depends: [PLAN-08, LRN-06]
+  covers: [S06-18, S04-14, S06-21]
+- id: PRAC-12
+  title: 复习加厚
+  domain: practice
+  release: R2
+  depends: [PRAC-07]
+  covers: [S15-10, S15-12, S15-14]
+- id: PRAC-13
+  title: 练习加厚
+  domain: practice
+  release: R2
+  depends: [PRAC-03]
+  covers: [S17-14, S17-18, S17-19, S17-20, S18-19, S18-21, S18-22, S19-11]
+- id: ACCT-04
+  title: 第三方与密码登录、换绑与补绑手机号
+  domain: account
+  release: R3
+  depends: [ACCT-01]
+  covers: [S01-14, S01-15, S01-16, S01-17, S01-18, S33-01, S33-14, S33-15, S33-16]
+- id: ACCT-05
+  title: 设备管理、下线与登录提醒
+  domain: account
+  release: R3
+  depends: [ACCT-01]
+  covers: [S01-19, S01-21, S32-01, S32-18, S32-22, S32-23, S32-29, S32-30]
+- id: ACCT-06
+  title: 封禁、申诉与冷静期登录
+  domain: account
+  release: R3
+  depends: [ACCT-01]
+  covers: [S01-08, S01-20, P13-11, P13-12, P13-13, P13-16]
+- id: COMP-02
+  title: 年龄段确认与未成年人模式
+  domain: compliance
+  release: R3
+  depends: [ACCT-02]
+  covers: [S01-02, S32-10, P18-06]
+- id: COMP-03
+  title: 数据总览、授权与自动化开关
+  domain: compliance
+  release: R3
+  depends: [ACCT-01]
+  covers: [S32-02, S32-04, S32-05, S32-06, S32-07, S32-17]
+- id: COMP-04
+  title: 注销、导出选项、回收站与高危确认
+  domain: compliance
+  release: R3
+  depends: [COMP-01]
+  covers: [S32-09, S32-13, S32-14, S32-15, S32-16]
+- id: COMP-05
+  title: 合规中心：个人信息请求、协议版本、授权记录与审计
+  domain: compliance
+  release: R3
+  depends: [COMP-03]
+  covers: [P18-01, P18-02, P18-03, P18-09, P18-10]
+- id: COMP-06
+  title: 备案台账、生成内容标识检查与宣传用语
+  domain: compliance
+  release: R3
+  depends: [AIGOV-01]
+  covers: [P18-04, P10-06, P18-05, P07-04, P18-07, P15-04, P18-08, S12-20]
+- id: BILL-01
+  title: 档位、额度与核心闭环不设限
+  domain: billing
+  release: R3
+  depends: [ACCT-01]
+  covers: [S31-01, S31-02, S31-05, S31-06, S31-07, S31-12]
+- id: BILL-02
+  title: 购买、支付、订单、发票与退款
+  domain: billing
+  release: R3
+  depends: [BILL-01]
+  covers: [S31-03, S31-25, S31-08, S31-17, S31-15, S31-16]
+- id: BILL-03
+  title: 自动续费与扣款宽限
+  domain: billing
+  release: R3
+  depends: [BILL-02]
+  covers: [S31-04, S31-09, S31-18, S31-19]
+- id: BILL-04
+  title: 后台：用户、订单、套餐与权益
+  domain: billing
+  release: R3
+  depends: [BILL-02]
+  covers: [P13-01, P13-02, P13-03, P13-04, P13-05, P13-06, P13-07]
+- id: SUPP-02
+  title: 工单、人工客服、系统公告与满意度
+  domain: support
+  release: R3
+  depends: [SUPP-01]
+  covers: [S35-04, S35-07, S35-08, S35-10, S35-11, S35-12, P16-01, P16-04]
+- id: MOD-01
+  title: 内容报错处理与下架修订
+  domain: moderation
+  release: R3
+  depends: [SUPP-02]
+  covers: [P16-02, P08-04, P08-05]
+- id: LRN-12
+  title: 证据回溯重算
+  domain: learner
+  release: R3
+  depends: [MOD-01]
+  covers: [S18-26]
+- id: AIGOV-02
+  title: 导师回答纠错闭环
+  domain: aigov
+  release: R3
+  depends: [SUPP-02, TUTOR-04]
+  covers: [P16-03, P12-07]
+- id: ACCT-07
+  title: 员工登录、二次验证与会话安全
+  domain: account
+  release: R3
+  depends: []
+  covers: [P19-09, P19-10, P19-11, P19-12, P19-13, P19-14, P19-15]
+- id: ACCT-08
+  title: 后台角色权限与敏感操作分档确认
+  domain: account
+  release: R3
+  depends: [ACCT-07]
+  covers: [P19-01, P19-08]
+- id: PLAT-03
+  title: 操作审计与发布记录
+  domain: platform
+  release: R3
+  depends: [ACCT-08]
+  covers: [P19-04, P19-07]
+- id: PLAT-04
+  title: 参数中心、功能开关与灰度
+  domain: platform
+  release: R3
+  depends: [PLAT-02, ACCT-08]
+  covers: [P19-02, P19-03, P19-05]
+- id: METR-04
+  title: 运营驾驶舱与指标字典
+  domain: metrics
+  release: R3
+  depends: [METR-01]
+  covers: [P01-01, P01-02, P01-03, P01-04, P01-10, P02-01]
+- id: AIGOV-03
+  title: 场景注册、模型路由与额度限流
+  domain: aigov
+  release: R3
+  depends: [AIGOV-01]
+  covers: [P10-01, P10-02, P10-03]
+- id: AIGOV-04
+  title: 行为体台账、角色与提示词模板
+  domain: aigov
+  release: R3
+  depends: [AIGOV-03]
+  covers: [P11-01, P11-02, P11-03]
+- id: AIGOV-05
+  title: 发布阻断、幻觉溯源与 AI 监控
+  domain: aigov
+  release: R3
+  depends: [AIGOV-03]
+  covers: [P12-02, P12-03, P12-05, P12-06]
+- id: MOD-02
+  title: 内容安全审核与危机响应
+  domain: moderation
+  release: R3
+  depends: [TUTOR-03]
+  covers: [P17-01, P17-03, P17-04, P17-06, P17-07]
+- id: PRAC-14
+  title: 离线复习、离线作答与多端互斥
+  domain: practice
+  release: R3
+  depends: [PRAC-07, PRAC-10]
+  covers: [S15-16, S18-27, S18-28, S22-09]
+- id: ACCT-09
+  title: 学习、导师、阅读、外观与无障碍偏好
+  domain: account
+  release: R3
+  depends: [ACCT-01]
+  covers: [S33-05, S33-06, S33-07, S33-08, S33-09, S33-10, S33-11]
+- id: PLAT-05
+  title: 容量预案与核心闭环保底
+  domain: platform
+  release: R3
+  depends: [PLAT-03]
+  covers: [P19-06]
+- id: EXM-04
+  title: 官方考试库、就绪度与自然语言选考
+  domain: exam
+  release: later
+  depends: [EXM-02]
+  covers: [S02-01, S02-09, S02-15, P03-01, P03-05]
+- id: EXM-05
+  title: 自建目标、画像编辑与评价规则
+  domain: exam
+  release: later
+  depends: [EXM-04]
+  covers: [S02-03, S02-04, S02-05, P03-02]
+- id: EXM-06
+  title: 目标主页、成绩有效期与证书路径
+  domain: exam
+  release: later
+  depends: [EXM-04]
+  covers: [S02-08, S02-16, S02-17, S02-18, S25-08, S25-10, S34-02]
+- id: EXM-07
+  title: 考试日历维护与公告核验
+  domain: exam
+  release: later
+  depends: [EXM-03]
+  covers: [P03-03, P03-04]
+- id: CONT-09
+  title: 我的资料、导入向导与十类资料
+  domain: content
+  release: later
+  depends: [CONT-03]
+  covers: [S11-01, S11-02, S11-03, S11-04, S11-11, S11-12, S03-06, S03-07]
+- id: CONT-10
+  title: 任务中心、资产搬运与快速捕获
+  domain: content
+  release: later
+  depends: [CONT-09]
+  covers: [S32-11, S32-12, S32-21, S11-17, S11-23, S06-22]
+- id: CONT-11
+  title: 生成或对齐、对齐审核与资料体检
+  domain: content
+  release: later
+  depends: [CONT-09]
+  covers: [S11-05, S11-06, S11-07, S11-13, S11-15, S11-16, S03-09]
+- id: CONT-12
+  title: 纸书影子书与外部课程伴学
+  domain: content
+  release: later
+  depends: [CONT-11]
+  covers: [S11-09, S11-10, S12-10, S07-14]
+- id: MAP-04
+  title: 地图三种来源、生成与类型标注
+  domain: map
+  release: later
+  depends: [CONT-11]
+  covers: [S09-05, S09-06, S09-07, S09-12]
+- id: MAP-05
+  title: 知识点管理、关系编辑与版本迁移
+  domain: map
+  release: later
+  depends: [MAP-04]
+  covers: [S09-08, S09-11, S09-14, S09-17]
+- id: MAP-06
+  title: 地图批量操作、一键行动与手机视图
+  domain: map
+  release: later
+  depends: [MAP-05]
+  covers: [S09-15, S09-16, S09-18, S09-19, S10-02]
+- id: MAP-07
+  title: 后台地图编辑、类型库与发布
+  domain: map
+  release: later
+  depends: [MAP-05]
+  covers: [P04-01, P04-02, P04-03, P04-04, P04-05, P04-06, P04-07, P04-08]
+- id: MAP-08
+  title: 地图体检与锁定
+  domain: map
+  release: later
+  depends: [MAP-05]
+  covers: [S09-10, S09-13, S05-10, S24-07, S17-15]
+- id: CONT-13
+  title: 我的题库、批量导入与题目编辑
+  domain: content
+  release: later
+  depends: [CONT-09]
+  covers: [S17-03, S17-04, S17-06, S17-07, S17-21, S17-23]
+- id: CONT-14
+  title: 拍照识题与导师出题
+  domain: content
+  release: later
+  depends: [CONT-13, AIGOV-01]
+  covers: [S17-10, S17-11, S19-18]
+- id: PRAC-15
+  title: 异题印证与生成题先做后核
+  domain: practice
+  release: later
+  depends: [CONT-14]
+  covers: [S18-10, S18-12]
+- id: MOD-03
+  title: 题库审核、生成题质检与可信度升级
+  domain: moderation
+  release: later
+  depends: [CONT-14]
+  covers: [P08-01, P08-02, P08-03, P08-06]
+- id: CONT-15
+  title: 模板大厅、扩展包挂载与整包导出
+  domain: content
+  release: later
+  depends: [EXM-05]
+  covers: [S02-02, S02-14, S11-21]
+- id: CONT-16
+  title: 模板发布、作者中心与官方学习包
+  domain: content
+  release: later
+  depends: [CONT-15]
+  covers: [S11-18, S11-19, P04-11]
+- id: MOD-04
+  title: 模板审核、质量画像、举报下架与推荐
+  domain: moderation
+  release: later
+  depends: [CONT-16]
+  covers: [P09-01, P09-02, P09-03, P09-09, P09-10, P17-02]
+- id: COMP-07
+  title: 内容来源、授权合同、真题规范与侵权处理
+  domain: compliance
+  release: later
+  depends: [CONT-16]
+  covers: [P09-04, P09-05, P09-06, P09-07, P09-08]
+- id: PLAN-19
+  title: 多目标并行与跨目标重叠
+  domain: plan
+  release: later
+  depends: [EXM-05, PLAN-05]
+  covers: [S02-12, S09-20]
+- id: GRADE-01
+  title: 主观题提交、三种评分方式与消耗告知
+  domain: grading
+  release: later
+  depends: [AIGOV-01]
+  covers: [S20-01, S20-02, S20-03, S20-16, S18-23, S04-11]
+- id: GRADE-02
+  title: 得分点对照、分数区间与评分细则
+  domain: grading
+  release: later
+  depends: [GRADE-01]
+  covers: [S20-04, S20-05, S20-06, S23-06, P12-04]
+- id: GRADE-03
+  title: 逐句批注、升格示范、重写再批与追问
+  domain: grading
+  release: later
+  depends: [GRADE-02]
+  covers: [S20-07, S20-08, S20-09, S20-13, S20-14]
+- id: GRADE-04
+  title: 问题模式追踪、规范表述与限时写作
+  domain: grading
+  release: later
+  depends: [GRADE-03]
+  covers: [S20-10, S20-11, S20-12]
+- id: PRAC-16
+  title: 渐进挖空、逐级比对与统一调度
+  domain: practice
+  release: later
+  depends: [PRAC-07]
+  covers: [S16-01, S16-02, S16-03, S16-06, S16-07, S15-19]
+- id: PRAC-17
+  title: 要点背诵、口述、默写与讲给导师听
+  domain: practice
+  release: later
+  depends: [PRAC-16]
+  covers: [S16-04, S16-05, S16-08, S16-09, S16-10]
+- id: PRAC-18
+  title: 对比记忆、口诀、听背、数字专项与收尾段
+  domain: practice
+  release: later
+  depends: [PRAC-16]
+  covers: [S16-11, S16-12, S16-13, S16-14, S06-15]
+- id: CONT-17
+  title: 统一播放器、知识点时间轴与片内检测
+  domain: content
+  release: later
+  depends: [CONT-04]
+  covers: [S13-01, S13-02, S13-03, S13-04, S13-08, S13-14]
+- id: CONT-18
+  title: 问这一刻、打点笔记、逐字稿与续听
+  domain: content
+  release: later
+  depends: [CONT-17]
+  covers: [S13-05, S13-06, S13-12, S13-11]
+- id: CONT-19
+  title: 外部课伴学、教材音频化与讲解风格
+  domain: content
+  release: later
+  depends: [CONT-17]
+  covers: [S13-07, S13-09, S13-10, S13-13, S12-17]
+- id: GRADE-05
+  title: 口头表达仿真与追问
+  domain: grading
+  release: later
+  depends: [GRADE-02]
+  covers: [S21-01, S21-02, S21-03, S21-04, S21-05]
+- id: GRADE-06
+  title: 多维评估、逐字稿批注与重答对比
+  domain: grading
+  release: later
+  depends: [GRADE-05]
+  covers: [S21-06, S21-07, S21-08, S21-09, S21-10]
+- id: CONT-20
+  title: 统一搜索、速查表与拍照搜题
+  domain: content
+  release: later
+  depends: [CONT-09]
+  covers: [S29-01, S29-02, S29-03, S29-04, S29-05, S29-06]
+- id: PRAC-19
+  title: 错因第二层、三步订正、顽固题与陷阱画像
+  domain: practice
+  release: later
+  depends: [PRAC-06]
+  covers: [S19-08, S19-09, S19-10, S19-15, S19-16]
+- id: PRAC-20
+  title: 聚类洞察、根因追溯与攻坚包
+  domain: practice
+  release: later
+  depends: [PRAC-19]
+  covers: [S19-12, S19-13, S19-14, S19-19, S10-17, S10-16]
+- id: MAP-09
+  title: 关联知识、易混对比与错误模式归纳
+  domain: map
+  release: later
+  depends: [PRAC-19]
+  covers: [S10-13, S10-14, S10-15, S15-13]
+- id: PRAC-21
+  title: 提示阶梯、引导式纠错与分步判分
+  domain: practice
+  release: later
+  depends: [PRAC-02]
+  covers: [S18-16, S18-17, S18-20, S17-22]
+- id: LRN-13
+  title: 把握度校准与策略模拟
+  domain: learner
+  release: later
+  depends: [PRAC-11]
+  covers: [S23-09, S23-10]
+- id: TUTOR-05
+  title: 导师多模式、快捷提示与按环节的能力
+  domain: tutor
+  release: later
+  depends: [TUTOR-02]
+  covers: [S28-13, S28-14, S28-15, S28-16, S28-18, S28-21, S28-22]
+- id: TUTOR-06
+  title: 导师长期记忆可管理
+  domain: tutor
+  release: later
+  depends: [TUTOR-05]
+  covers: [S28-17, S32-19]
+- id: CONT-21
+  title: 笔记整理、收藏、导图与个人一本通
+  domain: content
+  release: later
+  depends: [CONT-08]
+  covers: [S14-08, S14-09, S14-10, S14-11, S14-12, S14-14]
+- id: TUTOR-07
+  title: 对话式调整、一句话组卷、教练点评与报告解读
+  domain: tutor
+  release: later
+  depends: [TUTOR-05, PLAN-12]
+  covers: [S07-16, S17-12, S08-10, S23-11]
+- id: ORG-01
+  title: 机构入驻、合同、租户隔离与不可移除标识
+  domain: org
+  release: later
+  depends: [ACCT-08]
+  covers: [P14-01, P14-02, P14-03, P14-04, O14-01]
+- id: ORG-02
+  title: 组织架构、角色矩阵、数据范围与审计
+  domain: org
+  release: later
+  depends: [ORG-01]
+  covers: [O15-01, O15-02, O15-03, O15-04, O15-05]
+- id: ACCT-10
+  title: 机构员工登录与安全基线
+  domain: account
+  release: later
+  depends: [ORG-02, ACCT-07]
+  covers: [O15-10, O15-11, O15-12, O15-13, O15-14, O15-16]
+- id: BILL-05
+  title: 机构套餐、席位与账单
+  domain: billing
+  release: later
+  depends: [ORG-01, BILL-02]
+  covers: [O16-01, O16-02, O16-03]
+- id: ORG-03
+  title: 班级、学员导入与加入邀请
+  domain: org
+  release: later
+  depends: [ORG-02]
+  covers: [O03-01, O03-02, O03-11, S01-09, S31-11]
+- id: COMP-08
+  title: 学员对机构的逐项授权
+  domain: compliance
+  release: later
+  depends: [ORG-03, COMP-03]
+  covers: [S32-03]
+- id: ORG-04
+  title: 分层列表、调班转班与批量操作
+  domain: org
+  release: later
+  depends: [ORG-03]
+  covers: [O03-03, O03-04, O03-05, O03-06, O03-08, O03-09, O03-10]
+- id: ORG-05
+  title: 教学计划模板与作业布置
+  domain: org
+  release: later
+  depends: [ORG-03]
+  covers: [O06-01, O06-02, O06-03, O06-04, O06-05, O06-06, O06-08]
+- id: PLAN-20
+  title: 机构任务与课表进入学员今日
+  domain: plan
+  release: later
+  depends: [ORG-05, PLAN-07]
+  covers: [O05-01, S07-19, S20-15]
+- id: ORG-06
+  title: 角色化工作台与班级健康度
+  domain: org
+  release: later
+  depends: [ORG-04]
+  covers: [O01-01, O01-02, O01-03, O01-04, O01-05, O01-06]
+- id: ORG-07
+  title: 学员 360 与可见范围说明
+  domain: org
+  release: later
+  depends: [COMP-08]
+  covers: [O04-01, O04-02, O04-03, O04-04, O04-05, O04-06]
+- id: ORG-08
+  title: 风险名单、联系清单与减负建议
+  domain: org
+  release: later
+  depends: [ORG-07]
+  covers: [O08-01, O08-02, O08-03, O08-04, O08-10]
+- id: ORG-09
+  title: 批改工作台：预批改、分流与抽检
+  domain: org
+  release: later
+  depends: [GRADE-02, ORG-03]
+  covers: [O09-01, O09-02, O09-03, O09-04, O09-05]
+- id: ORG-10
+  title: 班级考试与讲评
+  domain: org
+  release: later
+  depends: [PRAC-09, ORG-03]
+  covers: [O07-01, O07-02, O07-03, O07-04, O07-05]
+- id: ORG-11
+  title: 机构内容库、地图挂接与分发
+  domain: org
+  release: later
+  depends: [ORG-03, MAP-05]
+  covers: [O11-01, O11-02, O11-03, O11-04, O11-05, O11-06, O11-07]
+- id: ORG-12
+  title: 机构答疑与学员数据带走
+  domain: org
+  release: later
+  depends: [ORG-11, TUTOR-03]
+  covers: [O10-01, O10-02, O10-03, O12-01]
+- id: ORG-13
+  title: 招生与线索
+  domain: org
+  release: later
+  depends: [ORG-06]
+  covers: [O02-01, O02-02, O02-03, O02-04, O02-05, O02-06, O02-07, O02-08, O02-09, O02-10, O02-11]
+- id: ORG-14
+  title: 排课、考勤与直播
+  domain: org
+  release: later
+  depends: [PLAN-20]
+  covers:
+    - O05-02
+    - O05-03
+    - O05-04
+    - O05-05
+    - O05-06
+    - O05-07
+    - O05-08
+    - O05-09
+    - O05-10
+    - O05-11
+    - O05-12
+    - O05-13
+    - O05-14
+    - O05-15
+    - O05-16
+- id: ORG-15
+  title: 工作台、学员 360 与督学加厚
+  domain: org
+  release: later
+  depends: [ORG-08]
+  covers:
+    - O01-07
+    - O01-08
+    - O01-09
+    - O01-10
+    - O01-11
+    - O03-07
+    - O04-07
+    - O04-08
+    - O04-09
+    - O04-10
+    - O08-05
+    - O08-06
+    - O08-07
+    - O08-08
+    - O08-09
+    - O08-11
+- id: ORG-16
+  title: 作业、考试与批改加厚
+  domain: org
+  release: later
+  depends: [ORG-09, ORG-10]
+  covers:
+    - O06-07
+    - O06-09
+    - O07-06
+    - O07-07
+    - O07-08
+    - O07-09
+    - O07-10
+    - O09-06
+    - O09-07
+    - O09-08
+    - O09-09
+    - O09-10
+    - O09-11
+    - O09-12
+- id: ORG-17
+  title: 机构助教
+  domain: org
+  release: later
+  depends: [ORG-12]
+  covers: [O10-04, O10-05, O10-06, O10-07, O10-08, O10-09, O10-10]
+- id: ORG-18
+  title: 教研与机构内容加厚
+  domain: org
+  release: later
+  depends: [ORG-11]
+  covers:
+    - O11-08
+    - O11-09
+    - O11-10
+    - O11-11
+    - O11-12
+    - O11-13
+    - O11-14
+    - O11-15
+    - O11-16
+    - O11-17
+    - O11-18
+    - O11-19
+    - O11-20
+    - O11-21
+- id: ORG-19
+  title: 结业、认证与续报
+  domain: org
+  release: later
+  depends: [ORG-06]
+  covers: [O12-02, O12-03, O12-04, O12-05, O12-06, O12-07, O12-08]
+- id: ORG-20
+  title: 机构数据中心
+  domain: org
+  release: later
+  depends: [ORG-06]
+  covers: [O13-01, O13-02, O13-03, O13-04, O13-05, O13-06, O13-07, O13-08, O13-09]
+- id: ORG-21
+  title: 品牌、多端与开放接口
+  domain: org
+  release: later
+  depends: [ORG-01]
+  covers: [O14-02, O14-03, O14-04, O14-05, O14-06, O14-07, O15-06, O15-07, O15-08, O15-09, O15-15]
+- id: BILL-06
+  title: 机构用量、预算与续约
+  domain: billing
+  release: later
+  depends: [BILL-05]
+  covers: [O16-04, O16-05, O16-06, O16-07]
+- id: ORG-22
+  title: 机构健康度、品牌与内容抽检
+  domain: org
+  release: later
+  depends: [ORG-01]
+  covers: [P14-05, P14-06, P14-07]
+- id: EXM-08
+  title: 考情分析与画像数据加厚
+  domain: exam
+  release: later
+  depends: [EXM-04]
+  covers: [P05-01, P05-02, P05-03, P05-04, P05-06, P05-07, P03-06, P03-07, P03-08]
+- id: MAP-10
+  title: 变更影响分析与跨考试映射
+  domain: map
+  release: later
+  depends: [MAP-07]
+  covers: [P06-01, P06-02, P06-03, P06-04, P06-05, P06-06, P06-07, P04-09, P04-10, P04-12]
+- id: CONT-22
+  title: 内容生产流水线
+  domain: content
+  release: later
+  depends: [CONT-09]
+  covers: [P07-01, P07-02, P07-03, P07-05, P07-06, P07-07]
+- id: MOD-05
+  title: 题库线上质量监控与难度标定
+  domain: moderation
+  release: later
+  depends: [MOD-03]
+  covers: [P08-07, P08-08]
+- id: CONT-23
+  title: 作者激励、结算与反刷量
+  domain: content
+  release: later
+  depends: [CONT-16]
+  covers: [P09-11, P09-12, P09-13, S11-20, S11-22]
+- id: AIGOV-06
+  title: 缓存复用、灰度对照、调用复盘与高风险加严
+  domain: aigov
+  release: later
+  depends: [AIGOV-05]
+  covers: [P10-05, P11-06, P11-07, P12-08, P12-09, P12-10]
+- id: ENG-03
+  title: 分群触发、资讯公告与活动
+  domain: engagement
+  release: later
+  depends: [ENG-02]
+  covers: [P15-03, P15-05, P15-06, P15-07, P15-08]
+- id: BILL-07
+  title: 码的发放、推广渠道与核销防刷
+  domain: billing
+  release: later
+  depends: [BILL-04]
+  covers: [P13-08, P13-09, P13-10, P13-14, P13-15, P13-17, P13-18]
+- id: BILL-08
+  title: 加量包、续学权益、升级补差与优惠券
+  domain: billing
+  release: later
+  depends: [BILL-03]
+  covers: [S31-10, S31-13, S31-14, S31-20, S31-21, S31-22, S31-23, S31-24]
+- id: LRN-14
+  title: 成长档案、里程碑与下一站推荐
+  domain: learner
+  release: later
+  depends: [LRN-11]
+  covers: [S34-01, S34-03, S34-04, S34-05, S34-06, S34-07]
+- id: ENG-04
+  title: 自习室、学习搭子与社区治理
+  domain: engagement
+  release: later
+  depends: [ENG-01]
+  covers: [S30-01, S30-02, S30-03, S30-04, S30-05, S30-06, S30-07, S30-08, S30-09, S30-10, S30-11, S30-12]
+- id: EXM-09
+  title: 报考决策与我该考什么
+  domain: exam
+  release: later
+  depends: [EXM-04]
+  covers: [S26-01, S26-02, S26-03, S26-04, S26-05, S26-06, S26-07, S26-08, S26-09, S02-19, S02-20]
+- id: GRADE-07
+  title: 口试题库、真人模拟与主观题人工复评
+  domain: grading
+  release: later
+  depends: [GRADE-06]
+  covers: [S21-11, S21-12, S20-17]
+- id: PRAC-22
+  title: 形式仿真、纸笔模式、切屏记录与联考
+  domain: practice
+  release: later
+  depends: [PRAC-10]
+  covers: [S22-10, S22-11, S22-12, S22-13, S22-14]
+- id: EXM-10
+  title: 公告监测、变化解读与日历同步
+  domain: exam
+  release: later
+  depends: [EXM-03]
+  covers: [S25-06, S25-07, S25-11, S25-12]
+- id: ACCT-11
+  title: 免费工具、备用验证与账号安全加厚
+  domain: account
+  release: later
+  depends: [ACCT-05]
+  covers: [S01-11, S01-22, S32-24, S32-25, S32-28, S33-12, S33-13, S33-17]
+- id: COMP-09
+  title: 分享链接、导出加密与导入取消
+  domain: compliance
+  release: later
+  depends: [COMP-04]
+  covers: [S32-20, S32-26, S32-27]
+- id: PLAN-21
+  title: 计划沙盘、复盘与报告加厚
+  domain: plan
+  release: later
+  depends: [PLAN-12]
+  covers: [S02-13, S07-13, S08-07, S08-11, S08-13, S08-15, S05-14, S27-13]
+- id: LRN-15
+  title: 学情洞察加厚
+  domain: learner
+  release: later
+  depends: [LRN-10]
+  covers: [S24-12, S24-13, S24-14, S24-15, S24-16, S24-17, S24-19, S24-20, S24-21, S24-22, S23-13]
+- id: CONT-24
+  title: 资料、阅读与直播课堂加厚
+  domain: content
+  release: later
+  depends: [CONT-05]
+  covers: [S11-14, S12-16, S12-18, S12-22, S12-23, S13-15]
+- id: PRAC-23
+  title: 练习、错题与晨读加厚
+  domain: practice
+  release: later
+  depends: [PRAC-13]
+  covers: [S15-20, S17-13, S17-16, S17-25, S18-24, S18-25, S19-17, S19-20]
+- id: TUTOR-08
+  title: 清空对话与学业转人工
+  domain: tutor
+  release: later
+  depends: [TUTOR-05]
+  covers: [S28-19, S28-20]
+- id: CONT-25
+  title: 条文速查、重复搜索提醒与没找到的反馈
+  domain: content
+  release: later
+  depends: [CONT-20]
+  covers: [S29-07, S29-08, S29-09]
+- id: SUPP-03
+  title: 产品反馈、智能客服、满意度调查与排障视图
+  domain: support
+  release: later
+  depends: [SUPP-02]
+  covers: [P16-05, P16-06, P16-07, P16-08, P16-09, S35-09]
+- id: METR-05
+  title: 运营与数据中台加厚
+  domain: metrics
+  release: later
+  depends: [METR-04]
+  covers: [P01-05, P01-06, P01-07, P01-08, P01-09, P01-11, P02-02, P02-03, P02-04, P02-05]

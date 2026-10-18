@@ -1,0 +1,26 @@
+table: evidence_events
+owner: learner
+description: 学习证据账本；只追加，撤回写 revoke 事件，掌握档由此重算（ADR-005）
+append_only: true
+tenant_scoped: true
+fields:
+  - {name: id, type: uuid, pk: true, x-data-class: personal_learning}
+  - {name: tenant_id, type: uuid, ref: tenants.id, x-data-class: operational}
+  - {name: learner_id, type: uuid, ref: users.id, x-data-class: personal_learning}
+  - {name: event_type, type: "enum[record, revoke]", x-data-class: personal_learning}
+  - {name: revokes_event_id, type: uuid, nullable: true, ref: evidence_events.id, x-data-class: personal_learning}
+  - {name: knowledge_point_id, type: uuid, ref: knowledge_points.id, x-data-class: personal_learning}
+  - {name: source, type: "enum[practice, review, reading_quiz, mock, diagnosis, grading, self_check]", x-data-class: personal_learning}
+  - {name: source_ref, type: uuid, nullable: true, x-data-class: personal_learning, note: 产生证据的作答、复习或测验记录}
+  - {name: question_id, type: uuid, nullable: true, ref: questions.id, x-data-class: personal_learning}
+  - {name: question_version, type: int, nullable: true, x-data-class: personal_learning}
+  - {name: credibility, type: "enum[reviewed, own, generated_confirmed, generated_instant]", nullable: true, x-data-class: personal_learning}
+  - {name: correct, type: bool, nullable: true, x-data-class: personal_learning}
+  - {name: confidence, type: "enum[sure, vague, guess, off, none]", x-data-class: personal_learning}
+  - {name: duration_ms, type: int, x-data-class: personal_learning}
+  - {name: hint_level, type: int, x-data-class: personal_learning}
+  - {name: strength, type: "enum[strong, medium, weak, negative, pending]", x-data-class: inferred}
+  - {name: rule_version, type: string, x-data-class: inferred}
+  - {name: occurred_at, type: timestamptz, x-data-class: personal_learning}
+  - {name: recorded_at, type: timestamptz, x-data-class: personal_learning}
+  - {name: idempotency_key, type: string, unique: true, x-data-class: personal_learning}

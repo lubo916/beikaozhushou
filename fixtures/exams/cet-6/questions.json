@@ -1,0 +1,83 @@
+{
+  "exam_id": "cet-6",
+  "note": "演示数据，取自原型脚本；题目与解析的正式来源见 OQ-010",
+  "questions": [
+    {
+      "id": "cet-6-q0001",
+      "question_type": "writing",
+      "response_form": "choice",
+      "credibility": "reviewed",
+      "knowledge_points": [
+        "形近词辨析：mitigate 与 militate"
+      ],
+      "stem": "The new subsidy is intended to ______ the impact of rising costs on low-income families.",
+      "options": [
+        "mitigate",
+        "militate",
+        "migrate",
+        "mediate"
+      ],
+      "answer": [
+        0
+      ],
+      "common_wrong_option": 1,
+      "explanation": {
+        "conclusion": "mitigate the impact 是固定搭配，意为“减轻影响”。"
+      },
+      "option_notes": {
+        "1": {
+          "note": "militate 常与 against 连用，意为“妨碍、不利于”，后面不能直接跟 the impact 作宾语。",
+          "trap": "形近词（语言类干扰）"
+        }
+      },
+      "group_miss_rate": 0.27,
+      "hints": [
+        "空格后直接跟宾语，需要一个及物动词。",
+        "哪个词常与 impact、risk、effects 搭配？"
+      ]
+    },
+    {
+      "id": "cet-6-q0002",
+      "question_type": "writing",
+      "response_form": "written",
+      "credibility": "reviewed",
+      "knowledge_points": [
+        "形近词辨析：mitigate 与 militate"
+      ],
+      "stem": "以“终身学习的重要性”为题写一篇 150 至 200 词的议论文。",
+      "scoring_points": [
+        {
+          "point": "切题并有明确观点",
+          "sample_answer_hit": 1
+        },
+        {
+          "point": "两到三个分论点并展开",
+          "sample_answer_hit": 2
+        },
+        {
+          "point": "衔接与段落结构",
+          "sample_answer_hit": 2
+        },
+        {
+          "point": "词汇与句式多样",
+          "sample_answer_hit": 0
+        },
+        {
+          "point": "语法准确",
+          "sample_answer_hit": 1
+        }
+      ],
+      "sample_answer": "Lifelong learning is very important in modern society. First, technology changes fast. Second, it makes people happy. So we should keep learning.",
+      "label": "写作"
+    }
+  ],
+  "cards": [
+    {
+      "id": "cet-6-card0001",
+      "card_type": "语境卡",
+      "front": "______ the impact（减轻影响）",
+      "back": "mitigate　v. 减轻，缓和。常见搭配：mitigate the impact / risk / effects。易混：militate against（不利于）。",
+      "knowledge_point": "形近词辨析：mitigate 与 militate"
+    }
+  ]
+}

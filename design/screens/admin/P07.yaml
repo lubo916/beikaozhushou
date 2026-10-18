@@ -1,0 +1,45 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: P07
+end: admin
+title: 内容生产流水线
+mode: standard
+purpose: 导师负责量，人负责对。真题拆解沉淀出的考点档案是性价比与预测的数据基础，每年只需增量投入。
+states: [loading, empty, error, offline, restricted, insufficient_data]
+data:
+  writes: [公共内容, 考点档案]
+ai:
+  - role: 起草、拆解、挂载、查重；未经人审不进公共库。
+entries: []
+exits: []
+unresolved_links: [P04, P08]
+items:
+  - id: P07-01
+    name: 教材与讲义处理
+    text: 版面分析、切片、知识点挂载
+    page_priority: P0
+  - id: P07-02
+    name: 解析与卡片生产
+    text: 分层解析、官方卡组，审核后发布
+    page_priority: P0
+  - id: P07-03
+    name: 审核工作台
+    text: 按置信度排序、差异高亮
+    page_priority: P0
+  - id: P07-04
+    name: 生成内容标识
+    text: 显式标识与文件标识
+    page_priority: P0
+  - id: P07-05
+    name: 音视频处理
+    text: 转写、切片、打点、检测题生成
+    page_priority: P1
+  - id: P07-06
+    name: 产能与质量看板
+    text: 产量、积压、一次通过率
+    page_priority: P1
+  - id: P07-07
+    name: 来源与授权登记
+    text: 生产前登记来源与授权
+    page_priority: P1
+slice: design/screens/slices/P07.html
+shots: design/screens/shots/P07/

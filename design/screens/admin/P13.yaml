@@ -1,0 +1,90 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: P13
+end: admin
+title: 用户、会员与订单
+mode: standard
+purpose: 用户、订单、权益是最基础的经营数据。原则是查得到、退得清、看得少。
+refine: pending
+states: [loading, empty, error, offline, restricted, insufficient_data]
+data:
+  read_writes: [用户, 订单, 权益]
+ai:
+  - role: 异常订单与薅额度识别。
+entries: []
+exits: []
+unresolved_links: [P16, P18]
+items:
+  - id: P13-01
+    name: 用户查询
+    text: 默认脱敏，查看明细须填事由并留痕
+    page_priority: P0
+  - id: P13-02
+    name: 订单与退款
+    text: 按公示公式自动计算，超出规则由主管审批
+    page_priority: P0
+  - id: P13-03
+    name: 套餐与定价配置
+    text: 考期通行证与时长订阅
+    page_priority: P0
+  - id: P13-04
+    name: 自动续费管理
+    text: 签约、扣款、失败重试与解约记录；监控扣款前提醒的到达率
+    page_priority: P0
+  - id: P13-05
+    name: 额度配置
+    text: 各档位各能力的额度，改动先灰度
+    page_priority: P0
+  - id: P13-06
+    name: 权益调整与补偿
+    text: 须填原因并留痕
+    page_priority: P0
+  - id: P13-07
+    name: 发票
+    text: 开具、红冲与重开
+    page_priority: P0
+  - id: P13-08
+    name: 码的生成与批量发放
+    text: 兑换码、优惠码、推广渠道码的生成与批量发放
+    page_priority: P1
+  - id: P13-09
+    name: 成绩回收
+    text: 只用于校准，不用于宣传
+    page_priority: P1
+  - id: P13-10
+    name: 手动开通
+    text: 特殊情况下人工开通权益
+    page_priority: P1
+  - id: P13-11
+    name: 封禁与解封
+    text: 临时或永久封禁，选原因并写说明；永久封禁须双人复核；临时封禁到期自动解封；全程留痕
+    page_priority: P0
+  - id: P13-12
+    name: 强制全端下线
+    text: 让该用户所有设备立即退出，但不阻止重新登录；界面写明与封禁的区别，二次确认并留痕
+    page_priority: P1
+  - id: P13-13
+    name: 协助重置密码
+    text: 核验身份后，生成一次性临时密码（只显示一次，首次登录须改密），或触发用户自助重设；两种都留痕
+    page_priority: P1
+  - id: P13-14
+    name: 退款风控看板
+    text: 退款率、高用量后退款、邀请奖励后退款等异常集中查看
+    page_priority: P1
+  - id: P13-15
+    name: 支付争议冻结
+    text: 渠道拒付或申诉期间冻结相关权益，处理后恢复或转为退款
+    page_priority: P2
+  - id: P13-16
+    name: 封禁申诉处理
+    text: 受理封禁申诉；申诉成立则解封，并按误封时长补偿权益
+    page_priority: P1
+  - id: P13-17
+    name: 推广渠道码与效果统计
+    text: 为推广渠道生成专属码，统计各渠道的领取、核销与转化
+    page_priority: P1
+  - id: P13-18
+    name: 核销规则与防刷
+    text: 各类码共用的核销条件、适用人群（如首次付费专享）与防刷限制
+    page_priority: P1
+slice: design/screens/slices/P13.html
+shots: design/screens/shots/P13/

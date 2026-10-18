@@ -1,0 +1,79 @@
+{
+  "exam_id": "teacher-qualification",
+  "note": "演示数据，取自原型脚本；题目与解析的正式来源见 OQ-010",
+  "questions": [
+    {
+      "id": "teacher-qualification-q0001",
+      "question_type": "single_choice",
+      "response_form": "choice",
+      "credibility": "own",
+      "knowledge_points": [
+        "最近发展区"
+      ],
+      "stem": "教师在教学中常说“跳一跳，摘桃子”，这主要体现了下列哪一理论的要求？",
+      "options": [
+        "最近发展区",
+        "先行组织者",
+        "观察学习",
+        "有意义接受学习"
+      ],
+      "answer": [
+        0
+      ],
+      "common_wrong_option": 1,
+      "explanation": {
+        "conclusion": "“跳一跳”说的是任务难度要略高于现有水平、在帮助下够得着，对应维果茨基的最近发展区。"
+      },
+      "option_notes": {
+        "1": {
+          "note": "先行组织者是奥苏贝尔提出的、先于学习任务呈现的引导性材料，解决的是新旧知识如何挂钩，不是难度该定多高。",
+          "trap": "偷换概念（用相邻理论替换）"
+        }
+      },
+      "group_miss_rate": 0.22,
+      "hints": [
+        "题干强调的是“难度”还是“新旧知识的联系”？",
+        "哪位学者讨论过“现有水平”与“可能达到的水平”？"
+      ]
+    },
+    {
+      "id": "teacher-qualification-q0002",
+      "question_type": "discrimination",
+      "response_form": "written",
+      "credibility": "own",
+      "knowledge_points": [
+        "最近发展区"
+      ],
+      "stem": "简述如何培养与激发学生的学习动机。",
+      "scoring_points": [
+        {
+          "point": "创设问题情境，实施启发式教学",
+          "sample_answer_hit": 1
+        },
+        {
+          "point": "根据作业难度，恰当控制动机水平",
+          "sample_answer_hit": 2
+        },
+        {
+          "point": "充分利用反馈信息，妥善进行奖惩",
+          "sample_answer_hit": 1
+        },
+        {
+          "point": "正确指导结果归因，促使学生继续努力",
+          "sample_answer_hit": 0
+        }
+      ],
+      "sample_answer": "要创设问题情境，引起学生的兴趣；作业不能太难也不能太简单；多表扬学生，及时反馈。",
+      "label": "简答题"
+    }
+  ],
+  "cards": [
+    {
+      "id": "teacher-qualification-card0001",
+      "card_type": "问答卡",
+      "front": "最近发展区是哪两种水平之间的差距？",
+      "back": "现有发展水平（独立解决问题）与即将达到的发展水平（在指导或合作下）之间的差距。提出者：维果茨基。",
+      "knowledge_point": "最近发展区"
+    }
+  ]
+}

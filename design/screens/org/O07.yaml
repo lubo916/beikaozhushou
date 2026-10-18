@@ -1,0 +1,57 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: O07
+end: org
+title: 班级考试与讲评
+mode: standard
+purpose: 班级考试是教学的验收点。出分之后最有价值的是讲评：全班错在哪、先讲哪道题。
+states: [loading, empty, error, offline, restricted, insufficient_data]
+data:
+  writes: [班级考试与成绩（机构任务数据）]
+ai:
+  - role: 讲评提纲；主观题预批改。
+entries: []
+exits: []
+unresolved_links: [O06, O09, O12]
+items:
+  - id: O07-01
+    name: 组卷
+    text: 手动、智能或从模板；按考试画像的题型与分值
+    page_priority: P0
+  - id: O07-02
+    name: 定时与答案公布
+    text: 开考、收卷、答案与解析的公布时间
+    page_priority: P0
+  - id: O07-03
+    name: 考试纪律
+    text: 考试期间参考学员的导师、搜索与提示自动暂停；切屏记录按机构规则开启并事先告知
+    page_priority: P0
+  - id: O07-04
+    name: 成绩与分布
+    text: 平均分、分布、及格率、进步幅度
+    page_priority: P0
+  - id: O07-05
+    name: 试卷分析
+    text: 每题正确率与区分度、共性错题；区分度异常的题提示复核
+    page_priority: P0
+  - id: O07-06
+    name: 线下考试录入
+    text: 纸笔考试的成绩与答题卡拍照导入
+    page_priority: P1
+  - id: O07-07
+    name: 讲评准备
+    text: 自动生成讲评提纲、共性错因与典型作答
+    page_priority: P1
+  - id: O07-08
+    name: 成绩发布与申诉
+    text: 成绩发布、查卷与申诉处理
+    page_priority: P1
+  - id: O07-09
+    name: 成绩册
+    text: 按课程汇总多次成绩，可设权重
+    page_priority: P1
+  - id: O07-10
+    name: 认证考试
+    text: 上岗或合规认证：通过线与补考规则
+    page_priority: P1
+slice: design/screens/slices/O07.html
+shots: design/screens/shots/O07/

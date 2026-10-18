@@ -1,0 +1,693 @@
+# 术语表：术语、定义、代码标识与禁用同义词的唯一来源。values 为枚举的取值（界面文字与代码标识一一对应）。
+# 合并前各产品的旧叫法在旧文档分拣时补入 forbidden；category: banned_copy 的条目为宣传禁用语（E-TERM-02）。
+- term: 掌握档
+  code: mastery_level
+  definition: 学习者模型由证据派生的知识点掌握程度，共六档；只由 learner 领域写入
+  values:
+    - label: 未学
+      code: unlearned
+      rank: 0
+    - label: 已了解
+      code: aware
+      rank: 1
+    - label: 已熟悉
+      code: familiar
+      rank: 2
+    - label: 已掌握
+      code: mastered
+      rank: 3
+    - label: 能应用
+      code: applying
+      rank: 4
+    - label: 能迁移
+      code: transferring
+      rank: 5
+  forbidden: []
+- term: 目标档
+  code: target_level
+  definition: 学员对某知识点要达到的掌握档；默认按知识类型给出，个人可改
+  forbidden: []
+- term: 自评
+  code: self_assessment
+  definition: 学员自报的掌握档，与系统判定并列显示；自评“已掌握”须通过随即出的检验题才作为证据生效
+  forbidden: []
+- term: 证据
+  code: evidence
+  definition: 一次可被学习者模型使用的学习行为记录，只追加、可撤回、可重算；在场时长与番茄钟不是证据
+  forbidden: []
+- term: 证据强度
+  code: evidence_strength
+  definition: 单条证据对掌握档的作用等级，由作答结果、把握度、用时、提示与题目可信度共同决定
+  values:
+    - label: 强
+      code: strong
+    - label: 中
+      code: medium
+    - label: 弱
+      code: weak
+    - label: 负
+      code: negative
+    - label: 待验证
+      code: pending
+  forbidden: []
+- term: 把握度
+  code: confidence
+  definition: 学员揭晓前对本次作答的把握，必选、无默认；可关闭，关闭后正确作答最高计中证据
+  values:
+    - label: 确定
+      code: sure
+    - label: 模糊
+      code: vague
+    - label: 蒙的
+      code: guess
+  forbidden: []
+- term: 待验证
+  code: pending_verification
+  definition: 蒙对或用时过短的正确作答不升档，稍后换问法再考；复考通过才计入证据
+  forbidden: []
+- term: 题目可信度
+  code: question_credibility
+  definition: 题目来源的可信等级，决定作答能记多强的证据
+  values:
+    - label: 审定题
+      code: reviewed
+      rank: 1
+    - label: 自有题
+      code: own
+      rank: 2
+    - label: 已确认的生成题
+      code: generated_confirmed
+      rank: 3
+    - label: 未确认的即时题
+      code: generated_instant
+      rank: 4
+  forbidden: []
+- term: 知识类型
+  code: knowledge_type
+  definition: 知识点的学习性质，决定默认的学、记、练、测方式与默认目标档；一个知识点标一至两个类型
+  values:
+    - label: 概念原理型
+      code: concept
+    - label: 事实数据型
+      code: fact
+    - label: 条文原文型
+      code: statute
+    - label: 方法程序型
+      code: procedure
+    - label: 综合应用型
+      code: application
+    - label: 论述写作型
+      code: essay
+    - label: 口头表达型
+      code: oral
+    - label: 实操技能型
+      code: practical
+    - label: 积累拓展型
+      code: accumulation
+  forbidden: []
+- term: 错因
+  code: error_cause
+  definition: 统一的错因分类（第一层），每类对应一种补救动作；揭晓后选择，无默认，可跳过。第二层为陷阱类型；整卷测评的“失分归因”是另一套分类，不与错因混用（ADR-017）。
+  values:
+    - label: 没学过
+      code: not_learned
+    - label: 学过忘了
+      code: forgot
+    - label: 概念没懂
+      code: concept_unclear
+    - label: 方法不会
+      code: method_unknown
+    - label: 审题失误
+      code: misread
+    - label: 计算或书写失误
+      code: slip
+    - label: 时间不够
+      code: time_short
+  forbidden: []
+- term: 陷阱类型
+  code: trap_type
+  definition: 干扰项的设计模式；通用十二类，另有计算类与语言类分组。错因的第二层；平台类型库中称“干扰模式”（ADR-017）。
+  values:
+    - label: 偷换概念
+      code: concept_swap
+    - label: 扩大范围
+      code: scope_widen
+    - label: 缩小范围
+      code: scope_narrow
+    - label: 绝对化
+      code: absolutize
+    - label: 时间混淆
+      code: time_confusion
+    - label: 主体混淆
+      code: subject_confusion
+    - label: 因果颠倒
+      code: cause_reversal
+    - label: 局部正确
+      code: partially_true
+    - label: 正确但无关
+      code: true_but_irrelevant
+    - label: 过度推断
+      code: over_inference
+    - label: 边界突破
+      code: boundary_break
+    - label: 忽略例外
+      code: ignore_exception
+  forbidden: []
+- term: 作答形态
+  code: response_form
+  definition: 题目的作答方式，共九种
+  values:
+    - label: 选择
+      code: choice
+    - label: 填空
+      code: fill
+    - label: 匹配排序
+      code: match_order
+    - label: 计算分步
+      code: stepwise
+    - label: 简答论述
+      code: written
+    - label: 材料组合
+      code: material
+    - label: 听力
+      code: listening
+    - label: 口述
+      code: oral
+    - label: 实操自评
+      code: practical_self
+  forbidden: []
+- term: 练习模式
+  code: practice_mode
+  definition: 一次练习的揭晓方式
+  values:
+    - label: 随堂
+      code: in_class
+    - label: 快刷
+      code: quick
+    - label: 限时
+      code: timed
+    - label: 测评态
+      code: assessment
+  forbidden: []
+- term: 今日清单
+  code: today_list
+  definition: 计划引擎每天生成的任务列表，分巩固、推进、收尾三段，给指令不给选择
+  forbidden: []
+- term: 巩固段
+  code: consolidate_segment
+  definition: 推迟就有损失的任务（到期复习、错题回炉、待验证复核），有保底占比，不被新学挤占
+  forbidden: []
+- term: 推进段
+  code: advance_segment
+  definition: 推迟无损失的任务（新学、练习、主观题与口头训练、机构作业与直播），按提分性价比与计划排序
+  forbidden: []
+- term: 收尾段
+  code: closing_segment
+  definition: 当天最后的短任务，如睡前回顾、口述回顾
+  forbidden: []
+- term: 任务来源
+  code: task_source
+  definition: 今日清单中任务的八类来源
+  values:
+    - label: 到期复习
+      code: due_review
+    - label: 错题回炉
+      code: mistake_retry
+    - label: 待验证复核
+      code: verify_recheck
+    - label: 补到目标
+      code: to_target
+    - label: 新学
+      code: new_learning
+    - label: 练习
+      code: practice
+    - label: 机构或自定任务
+      code: org_or_custom
+    - label: 睡前回顾
+      code: bedtime_review
+  forbidden: []
+- term: 到期队列
+  code: due_queue
+  definition: 推迟就有损失的到期项的统一队列，由 plan 领域定义接口，错题、卡片、背诵等各自实现
+  forbidden: []
+- term: 错题状态
+  code: mistake_status
+  definition: 错题从收录到毕业的四个状态
+  values:
+    - label: 新增
+      code: new
+    - label: 回炉中
+      code: retrying
+    - label: 待验收
+      code: awaiting_check
+    - label: 已毕业
+      code: graduated
+  forbidden: []
+- term: 回炉
+  code: retry
+  definition: 错题按间隔盲做，判对错并选把握度，据此安排下次时间
+  forbidden: []
+- term: 毕业
+  code: graduate
+  definition: 错题间隔做对达到规定次数并做对一道变式题后离开到期队列；没有可用变式时提高做对次数
+  forbidden: []
+- term: 变式题
+  code: variant
+  definition: 同一知识点、换问法或换数据的题；先取审定题池或个人题库
+  forbidden: []
+- term: 知识点回忆卡
+  code: recall_card
+  definition: 每个在学知识点自动生成的“看名称回忆要点”的卡，无需手动制作
+  forbidden: []
+- term: 待确认区
+  code: pending_area
+  definition: 生成的卡与题先收下、修改或丢弃，确认后才入队
+  forbidden: []
+- term: 记忆稳定度
+  code: memory_stability
+  definition: 记忆状态中描述遗忘速度的量，由调度器根据每次回忆结果更新
+  forbidden: []
+- term: 目标保持率
+  code: target_retention
+  definition: 调度器在目标日希望达到的可提取概率；学员只能在平台允许的区间内调
+  forbidden: []
+- term: 轮次
+  code: round
+  definition: 按目标日划分的学习阶段，默认为打基础、攻重点、刷题冲刺、考前七天；换轮不清零掌握档
+  forbidden: []
+- term: 学习范围
+  code: scope_state
+  definition: 知识点在计划中的三态；移出不删数据、仍可学，只是不进工作量与今日推荐
+  values:
+    - label: 跟随默认
+      code: default
+    - label: 我加入
+      code: added
+    - label: 我移出
+      code: removed
+  forbidden: []
+- term: 提议
+  code: proposal
+  definition: 对学员状态的待确认变更，写明改什么、为什么、代价与不改会怎样；确认后执行，可在撤销期内撤销
+  forbidden: []
+- term: 自动顺延
+  code: auto_carryover
+  definition: 计划引擎夜间把没做完的任务在近几天内找空位顺延，次日告知、可撤销；排不下则生成提议
+  forbidden: []
+- term: 重排记录
+  code: replan_log
+  definition: 计划每次变动的原因与代价，可查、可撤销
+  forbidden: []
+- term: 时间预算
+  code: time_budget
+  definition: 学员可用于学习的时间，来自时间格或每日目标时长；被各目标、机构作业与课表共享
+  forbidden: []
+- term: 考试画像
+  code: exam_profile
+  definition: 描述一门考试的数据：结构、题型、评价规则、关键日期与就绪程度；考试差异只进这里或登记的扩展点
+  forbidden: []
+- term: 评价规则
+  code: evaluation_rule
+  definition: 考试判定结果的方式，四选一
+  values:
+    - label: 合格线型
+      code: pass_line
+    - label: 择优型
+      code: selective
+    - label: 分数段型
+      code: score_band
+    - label: 自定型
+      code: custom
+  forbidden: []
+- term: 知识点
+  code: knowledge_point
+  definition: 知识地图中的叶子节点，有稳定 ID 与版本；合并、拆分按映射迁移学习记录
+  forbidden: []
+- term: 扩展层
+  code: extension_layer
+  definition: 官方或模板底图之上由个人或机构增加的节点；官方节点只读
+  forbidden: []
+- term: 地图体检
+  code: map_health_check
+  definition: 对知识地图质量的阻断性检查；不通过时预测类区块锁定，学习照常
+  forbidden: []
+- term: 有效学习
+  code: effective_learning
+  definition: 产生证据的学习片段；有效学习时长只计这些片段，在场时长并列显示
+  forbidden: []
+- term: 数据类别
+  code: data_class
+  definition: 学员数据的四分类：机构任务数据、个人学习数据、敏感数据、推断数据；另有非学员数据类别，见 contracts/data-classes.yaml
+  forbidden: []
+- term: 游客
+  code: guest
+  definition: 未登录即可体验的临时身份；登录后其目标、摸底结果与学习记录并入正式账号
+  forbidden: []
+- term: 未成年人模式
+  code: minor_mode
+  definition: 未成年人自动开启、本人不能关闭的模式；年龄线按法规要求设定
+  forbidden: []
+- term: AI 执行者
+  code: actor
+  definition: 能代表系统读写学员数据的 AI 能力或计划引擎；读写范围登记在 contracts/ai/actors.yaml，原型称“行为体”
+  forbidden: []
+- term: AI 场景
+  code: scenario
+  definition: 一个 AI 能力的登记单元：用途、输入输出结构、降级、计量、标识与评测
+  forbidden: []
+- term: 计划引擎
+  code: planner
+  definition: 生成与重排学习计划的确定性算法，不依赖大模型；唯一能自动顺延的执行者
+  forbidden: []
+- term: 生成内容标识
+  code: ai_label
+  definition: AI 生成内容的显式与隐式标识，展示与导出时都要带
+  forbidden: []
+- term: 受众环
+  code: audience_ring
+  definition: 分期规划中逐步扩大的用户范围，写作 ring-0 至 ring-4，与 release 取值无关
+  forbidden: []
+- term: 闭环
+  code: loop
+  definition: 分期规划的工作单元：用户能完整走完的一小段旅程，只引入一个新的核心实体或算法，有黄金路径测试
+  forbidden: []
+- term: 宣传禁用语
+  code: banned_copy
+  category: banned_copy
+  definition: 界面与宣传文案中不得出现的结果保证类用语（INV-11）
+  forbidden: [保过, 必过, 包过, 稳过, 押题必中, 百分百通过, 押题]
+- term: 失分归因
+  definition: 一次整卷测评的分差来源分类，用于测评报告，与题目级的错因不同。
+  code: loss_attribution
+  values:
+    - label: 没学过
+      code: not_learned
+    - label: 学过忘了
+      code: forgot
+    - label: 会但做错
+      code: careless
+    - label: 没做完
+      code: unfinished
+    - label: 蒙错
+      code: wrong_guess
+    - label: 表达扣分
+      code: expression_loss
+  forbidden: []
+- term: 知识地图
+  definition: 一场考试的知识点、层级与关系；来源有官方、模板、自建三种，可在底图上加个人扩展层。
+  code: knowledge_map
+  values:
+    - label: 官方
+      code: official
+    - label: 模板
+      code: template
+    - label: 自建
+      code: custom
+  forbidden: [知识图谱]
+- term: 重要度
+  definition: 知识点对这场考试的重要程度，1–4 级，4 最重要；两层：官方或模板给默认值，学员可覆盖。考情数据成熟前，排序与估算按重要度。
+  code: importance
+  values:
+    - label: "1"
+      rank: 1
+    - label: "2"
+      rank: 2
+    - label: "3"
+      rank: 3
+    - label: "4"
+      rank: 4
+  forbidden: []
+- term: 考情级
+  definition: 由真题档案推出的考频等级，1–4 级，与重要度同一刻度；数据成熟后才参与性价比与预测。
+  code: exam_frequency_level
+  forbidden: []
+- term: 数据成熟度
+  definition: 考情数据的可信程度，决定学员端显示什么。
+  code: data_maturity
+  values:
+    - label: 冷启动
+      code: cold
+    - label: 成熟中
+      code: maturing
+    - label: 可参考
+      code: usable
+    - label: 成熟
+      code: mature
+  forbidden: []
+- term: 性价比阶梯
+  definition: 每个知识点按预期提分与所需时间排出的五级阶梯。
+  code: roi_tier
+  values:
+    - label: S
+      code: s
+    - label: A
+      code: a
+    - label: B
+      code: b
+    - label: C
+      code: c
+    - label: D
+      code: d
+  forbidden: []
+- term: 就绪程度
+  definition: 一个考试在平台上的数据齐备程度，如实标注。
+  code: readiness
+  values:
+    - label: 地图、题库、考情齐备
+      code: full
+    - label: 仅地图
+      code: map_only
+    - label: 仅考试信息
+      code: info_only
+    - label: 仅模板
+      code: template_only
+    - label: 暂无
+      code: none
+  forbidden: []
+- term: 扩展包
+  definition: 按考试画像挂载的页面能力，登记在 docs/product/variation-points.md。
+  code: extension_pack
+  forbidden: []
+- term: 备考目标
+  definition: 学员要考的一场考试及其目标分、目标日、主次。
+  code: goal
+  forbidden: []
+- term: 配比模式
+  definition: 今日清单在三段之间分配时间的偏好。
+  code: mix_mode
+  values:
+    - label: 按性价比
+      code: roi
+    - label: 复习优先
+      code: review_first
+    - label: 新学优先
+      code: new_first
+  forbidden: []
+- term: 三个数
+  definition: 常驻显示的预测与差额、完成度、健康度，各答一问；口径见 contracts/metrics.yaml。
+  code: three_numbers
+  values:
+    - label: 预测与差额
+      code: forecast_gap
+    - label: 完成度
+      code: completion
+    - label: 健康度
+      code: health
+  forbidden: []
+- term: 顽固题
+  definition: 回炉多次仍失败的错题，单列并引向攻坚包或根因追溯。
+  code: stubborn_question
+  forbidden: []
+- term: 先做后核
+  definition: 导师生成的题先盲答，揭晓后由学员确认题目有无问题，确认无误才计证据。
+  code: blind_then_verify
+  forbidden: []
+- term: 题型
+  definition: 题库与组卷使用的题型清单；各考试的题型名经画像映射到这里。
+  code: question_type
+  values:
+    - label: 单选
+      code: single
+    - label: 多选
+      code: multiple
+    - label: 不定项
+      code: indefinite
+    - label: 判断
+      code: true_false
+    - label: 填空
+      code: fill
+    - label: 排序
+      code: ordering
+    - label: 配对
+      code: matching
+    - label: 材料题
+      code: material
+    - label: 计算与分步
+      code: calculation
+    - label: 简答
+      code: short_answer
+    - label: 论述写作
+      code: essay
+    - label: 口头作答
+      code: oral
+    - label: 实操提交
+      code: practical
+  forbidden: []
+- term: 卡型
+  definition: 复习卡片的形式。
+  code: card_type
+  values:
+    - label: 问答
+      code: qa
+    - label: 挖空
+      code: cloze
+    - label: 辨析对比
+      code: contrast
+    - label: 数字
+      code: number
+    - label: 排序
+      code: ordering
+    - label: 图示
+      code: diagram
+    - label: 语境
+      code: context
+    - label: 音频
+      code: audio
+    - label: 口诀
+      code: mnemonic
+  forbidden: []
+- term: 笔记类型
+  definition: 笔记的内容分类；对比与图示归卡型，不作笔记类型。
+  code: note_type
+  values:
+    - label: 综合
+      code: general
+    - label: 口诀
+      code: mnemonic
+    - label: 释义
+      code: definition
+    - label: 要点
+      code: key_points
+    - label: 易错
+      code: pitfall
+  forbidden: [综述]
+- term: 资料
+  definition: 学员接入的书、课、题、文件与链接；按权利边界有三种接入方式。
+  code: material
+  values:
+    - label: 可解析
+      code: parsable
+    - label: 只映射
+      code: mapped_only
+    - label: 只外链
+      code: link_only
+  forbidden: []
+- term: 学习收件箱
+  definition: 拍题、语音、粘贴、存链接等碎片的暂存处，由导师预处理并建议去向。
+  code: inbox
+  forbidden: []
+- term: 读后即测
+  definition: 每节读完或看完后的一组短题，通过才计为有效学习。
+  code: post_read_check
+  forbidden: []
+- term: 模板
+  definition: 他人或机构发布的考试包或科目包；学习包是打包分发的地图、题库与卡组。
+  code: template
+  forbidden: []
+- term: 摸底诊断
+  definition: 用尽量少的题估出整张地图掌握分布的测评。
+  code: diagnosis
+  forbidden: [入学诊断, 入学测评]
+- term: 报考决策
+  definition: 选岗、择校、选证书路径时的信息支持，只提供信息，不替用户决定。
+  code: application_decision
+  forbidden: [目标决策]
+- term: AI 导师
+  definition: 学员端的对话式 AI，三种形态共用一份上下文；对学员状态只能提议。
+  code: tutor
+  forbidden: []
+- term: 导师面板
+  definition: AI 导师在各页的共享界面组件，契约归 tutor 领域（ADR-019）。
+  code: tutor_panel
+  forbidden: []
+- term: 机构助教
+  definition: 按本机构讲义与口径首答的 AI，对机构可见；与个人导师严格分开。
+  code: org_assistant
+  forbidden: []
+- term: AI 点数
+  definition: 高成本 AI 能力的计量单位；执行前告知消耗。
+  code: ai_points
+  forbidden: []
+- term: 高成本 AI
+  definition: 按 AI 点数计量的能力，如导师批改、错题分析、即时出题；额度用完只暂停这一类。
+  code: high_cost_ai
+  forbidden: []
+- term: 核心闭环
+  definition: 今日清单、计划、到期复习、错题回炉；任何档位都不限量（INV-18）。
+  code: core_loop
+  forbidden: []
+- term: 考期通行证
+  definition: 有效至目标日后一段时间的一次性购买，不自动续费。
+  code: exam_pass
+  forbidden: []
+- term: 时长订阅
+  definition: 按周期计费的会员，可选自动续费。
+  code: subscription
+  forbidden: []
+- term: 冷静期
+  definition: 申请注销后可撤销的期限；期满后删除。
+  code: cooling_period
+  forbidden: []
+- term: 机构任务
+  definition: 机构布置并进入学员今日清单的作业、考试、课表与直播。
+  code: org_task
+  forbidden: []
+- term: 督学预警
+  definition: 基于机构任务数据与已授权数据的掉队风险提示；没有情绪类预警。
+  code: supervision_alert
+  forbidden: []
+- term: 敏感操作分档
+  definition: 后台与机构端敏感操作的三档确认方式（INV-14）。
+  code: sensitive_tier
+  values:
+    - label: 不可逆
+      code: irreversible
+    - label: 可回滚
+      code: rollbackable
+    - label: 只读敏感
+      code: read_sensitive
+  forbidden: []
+- term: 页面模式
+  definition: 页面的外壳形态。
+  code: page_mode
+  values:
+    - label: 引导页
+      code: guided
+    - label: 沉浸页
+      code: immersive
+    - label: 独立页
+      code: standalone
+    - label: 标准页
+      code: standard
+  forbidden: []
+- term: 页面状态
+  definition: 每页适用的状态集合：七态加个别页的锁定态，通用表现见 docs/conventions/ui-states.md。
+  code: page_state
+  values:
+    - label: 正常
+      code: normal
+    - label: 加载
+      code: loading
+    - label: 空
+      code: empty
+    - label: 出错
+      code: error
+    - label: 离线
+      code: offline
+    - label: 受限
+      code: restricted
+    - label: 数据不足
+      code: insufficient_data
+    - label: 锁定
+      code: locked
+  forbidden: []

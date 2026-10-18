@@ -1,0 +1,18 @@
+table: proposals
+owner: plan
+description: 提议：对学员状态的待确认变更，计划、复盘、测评、导师都经此改计划（ADR-013）
+tenant_scoped: true
+fields:
+  - {name: id, type: uuid, pk: true, x-data-class: personal_learning}
+  - {name: tenant_id, type: uuid, ref: tenants.id, x-data-class: operational}
+  - {name: learner_id, type: uuid, ref: users.id, x-data-class: personal_learning}
+  - {name: proposer, type: string, x-data-class: personal_learning, note: 执行者 id 或系统组件}
+  - {name: kind, type: "enum[carryover, scope, rounds, goal, reinforcement, sprint, other]", x-data-class: personal_learning}
+  - {name: change, type: json, x-data-class: personal_learning, note: 改什么}
+  - {name: reason, type: json, x-data-class: personal_learning, note: 为什么；数字只来自算法字段（INV-02）}
+  - {name: cost, type: json, x-data-class: personal_learning, note: 代价}
+  - {name: if_declined, type: json, x-data-class: personal_learning, note: 不改会怎样}
+  - {name: status, type: "enum[pending, accepted, declined, auto_applied, undone, expired]", x-data-class: personal_learning}
+  - {name: undo_until, type: timestamptz, nullable: true, x-data-class: personal_learning}
+  - {name: decided_at, type: timestamptz, nullable: true, x-data-class: personal_learning}
+  - {name: created_at, type: timestamptz, x-data-class: personal_learning}

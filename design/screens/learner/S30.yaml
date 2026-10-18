@@ -1,0 +1,72 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S30
+end: learner
+title: 自习室与小组
+mode: standard
+purpose: 同伴在场，没有信息流；判断标准是“它让你更多地学，还是更多地刷手机”。
+states: [loading, empty, error, offline, restricted, insufficient_data]
+state_overrides:
+  empty: 还没加入小组：同目标的 6 人小组，可关闭排名、隐藏数据；主按钮“找小组”
+  offline: 自习室需要联网；番茄钟可离线
+  restricted: 未成年人模式下只保留自习室与番茄钟
+  insufficient_data: 人数不足时合并房间
+layout_notes: [左栏：自习室（房间卡、绑定任务、番茄钟）→ 小组（契约、排名开关、隐藏开关）→ 经验与问答。, 右栏：今天感觉怎么样 → 有效学习日历 → 社区规则。未成年人模式下整页只保留自习室与番茄钟。]
+data:
+  writes: [专注时长（不作证据）]
+  notes: [情绪打卡仅本人可见]
+ai:
+  - role: 小组匹配。
+entries: []
+exits: []
+unresolved_links: [S06, S33]
+items:
+  - id: S30-01
+    name: 内容治理
+    text: 举报、屏蔽、反引流、反焦虑营销
+    page_priority: P0
+  - id: S30-02
+    name: 在线自习室
+    text: 进入即开始专注计时；无聊天房、冲刺房等
+    page_priority: P1
+  - id: S30-03
+    name: 任务绑定番茄钟
+    text: 专注前选今日清单；只记专注时长，不算完成
+    page_priority: P1
+  - id: S30-04
+    name: 学习搭子与小组
+    text: 按目标匹配，匿名昵称
+    page_priority: P1
+  - id: S30-05
+    name: 有效学习日历
+    text: 近期哪些天有有效学习；不设断签惩罚与补签
+    page_priority: P1
+  - id: S30-06
+    name: 情绪打卡
+    text: 只有本人可见；连续低落时提议减量，须本人确认
+    page_priority: P1
+  - id: S30-07
+    name: 组内排行
+    text: 只按有效学习与进步幅度，可关闭、可隐藏自己
+    page_priority: P2
+  - id: S30-08
+    name: 学习契约
+    text: 与监督伙伴约定每周目标，不涉及金钱
+    page_priority: P2
+  - id: S30-09
+    name: 环境音
+    text: 白噪音等专注背景音
+    page_priority: P2
+  - id: S30-10
+    name: 经验与问答
+    text: AI 先给带出处的回答，人工补充；只推荐与当前阶段相关的内容
+    page_priority: P2
+  - id: S30-11
+    name: 摄像头陪伴
+    text: 默认关闭，开启也不录制、不存储
+    page_priority: P2
+  - id: S30-12
+    name: 分心拦截
+    text: 学习期间屏蔽非必要通知
+    page_priority: P2
+slice: design/screens/slices/S30.html
+shots: design/screens/shots/S30/

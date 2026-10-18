@@ -1,0 +1,55 @@
+# 数据类别与可见规则（ADR-006）。前四类为原型 P18-10、S32-03、O04-01 定义的学员数据四分类；其余为非学员数据，供字段标注。
+# visibility 取值：always | by_consent | masked | never。schema 中每个字段用 x-data-class 引用这里的 id。
+- id: org_task
+  name: 机构任务数据
+  examples: [机构布置的作业与提交, 班级考试成绩, 考勤]
+  visibility: {learner: always, org: always, platform_ops: masked}
+  consent: {scope: per_org, basis: 入班约定, revocable: false}
+  forbidden_purposes: [renewal_marketing]
+  export: allowed
+- id: personal_learning
+  name: 个人学习数据
+  examples: [作答记录, 证据, 错题与错因, 复习卡片, 学习节奏, 计划与今日清单]
+  visibility: {learner: always, org: by_consent, platform_ops: masked}
+  consent: {scope: per_org_per_item, default: off, revocable: true, purge_copies_after_revoke: compliance.revoke.purge_days}
+  forbidden_purposes: [renewal_marketing, model_training_without_consent]
+  export: allowed
+- id: inferred
+  name: 推断数据
+  examples: [掌握档, 记忆稳定度, 预测分与区间, 风险分级]
+  visibility: {learner: always, org: by_consent, platform_ops: masked}
+  consent: {scope: per_org_per_item, default: off, revocable: true, purge_copies_after_revoke: compliance.revoke.purge_days}
+  forbidden_purposes: [renewal_marketing]
+  export: allowed
+- id: sensitive
+  name: 敏感数据
+  examples: [个人笔记, 情绪打卡, 导师对话, 录音录像, 危机记录]
+  visibility: {learner: always, org: never, platform_ops: never}
+  consent: {scope: none, revocable: false}
+  forbidden_purposes: [renewal_marketing, model_training_without_consent, org_access]
+  export: allowed
+  storage: 危机记录单独存储，只有平台值守按流程访问（INV-10）
+- id: account_info
+  name: 账号与联系信息
+  examples: [手机号, 邮箱, 登录与设备记录, 年龄段]
+  visibility: {learner: always, org: masked, platform_ops: masked}
+  consent: {scope: none, revocable: false}
+  forbidden_purposes: [renewal_marketing]
+  export: allowed
+  note: 机构端查看完整联系方式须填事由并留痕（INV-13）
+- id: public_content
+  name: 公共内容
+  examples: [官方考试画像, 官方知识地图, 审定题]
+  visibility: {learner: always, org: always, platform_ops: always}
+  export: by_license
+- id: org_content
+  name: 机构内容
+  examples: [机构讲义, 机构题库, 机构扩展层]
+  visibility: {learner: always, org: always, platform_ops: masked}
+  forbidden_purposes: [public_library, model_training]
+  export: by_license
+- id: operational
+  name: 运营与系统数据
+  examples: [租户信息, 审计日志, 参数变更记录]
+  visibility: {learner: never, org: masked, platform_ops: always}
+  export: none

@@ -1,0 +1,126 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S01
+end: learner
+title: 欢迎与登录
+mode: standalone
+purpose: 第一屏确认年龄段、讲清数据用途，让人先拿到价值再注册。
+refine: pending
+views:
+  - id: first
+    when: 首次进入
+  - id: back
+    when: 回访登录
+  - id: abn
+    when: 账号异常
+states: [loading, empty, error, offline, restricted]
+state_overrides:
+  empty: 欢迎：首次进入不会是空态
+  offline: 离线时可以先看数据用途说明；登录与“先体验”需要联网
+  restricted: 账号受限、注销冷静期、被下线（三种原因）、登录设备已达上限时单独成屏，说明原因与出路
+layout_notes:
+  - 版式：独立页，单栏居中约 560px
+  - 标题“先看看它对你有没有用”加一句说明。
+  - 步骤条：欢迎、备考目标、时间与资料、摸底、起点报告。
+  - 年龄段单选卡片与未成年人说明。
+  - 主按钮“先体验，不注册”，次按钮“登录或注册”，文字链接“我有机构邀请码”。
+  - 可折叠的“你的数据会被怎么用”，首次展开。
+  - 页脚：四个免费小工具。
+  - 手机首屏只放标题、年龄段和两个按钮，登录表单不进首屏。
+data:
+  writes: [账号, 设备, 渠道来源, 各项授权的时间与版本]
+ai:
+  - role: 识别异常注册与刷取免费额度的行为。
+entries: [S02]
+exits: [S02, S06, S32, S33]
+unresolved_links: [S04]
+items:
+  - id: S01-01
+    name: 游客先体验
+    text: 不注册即可选目标、做摸底、试用拍照录题；要保存结果时才要求登录
+    page_priority: P0
+  - id: S01-02
+    name: 年龄段确认
+    text: 第一屏先选年龄段，不设默认；未确认按未成年人处理；未到最低年龄不提供服务，未成年人进入未成年人模式，年龄线按法规要求设定
+    page_priority: P0
+  - id: S01-03
+    name: 手机验证码登录
+    text: 主登录方式；新号码验证后即完成注册
+    page_priority: P0
+  - id: S01-04
+    name: 协议与隐私单独同意
+    text: 协议与隐私政策不默认勾选，单独确认
+    page_priority: P0
+  - id: S01-05
+    name: 老用户直达
+    text: 已有目标的用户登录后直接进入今日清单，并恢复上次的学习位置
+    page_priority: P0
+  - id: S01-06
+    name: 数据用途说明
+    text: 第一屏用三句话讲清：学习数据用来做什么、不给会怎样、随时可导出与删除
+    page_priority: P0
+  - id: S01-07
+    name: 首次进入与回访两态
+    text: 首次进入走年龄段、价值说明与“先体验”；回访直接出登录表单，登录后进今日并恢复上次位置
+    page_priority: P0
+  - id: S01-08
+    name: 封禁与申诉提示
+    text: 账号受限时说明原因、期限与申诉入口，数据导出不受影响
+    page_priority: P1
+  - id: S01-09
+    name: 机构邀请加入
+    text: 邀请码或链接入班，加入前按四类数据明示机构能看到什么
+    page_priority: P1
+  - id: S01-10
+    name: 新手引导
+    text: 按目标类型给几步简短引导（今日清单、划选操作、把握度、复习评分），可跳过，可在帮助中重看
+    page_priority: P1
+  - id: S01-11
+    name: 免费工具
+    text: 考后估分、报考条件自测、拍照录题、资料体检，不依赖学习功能即可使用
+    page_priority: P1
+  - id: S01-12
+    name: 登录为独立页
+    text: 登录、注册与协议勾选单独成页，只有标志与“返回”；首屏不并排表单，保证“先体验”是主路径
+    page_priority: P1
+  - id: S01-13
+    name: 游客数据合并
+    text: 游客期间的目标、摸底结果与学习记录，登录后并入正式账号
+    page_priority: P0
+  - id: S01-14
+    name: 微信登录
+    text: 微信授权登录；授权失败时回落到手机号；授权后是否必须绑定手机号待定（见 S33-16）
+    page_priority: P0
+  - id: S01-15
+    name: Apple 登录
+    text: Apple 授权登录；授权失败时回落到手机号
+    page_priority: P0
+  - id: S01-16
+    name: 密码登录
+    text: 手机号加密码登录
+    page_priority: P0
+  - id: S01-17
+    name: 权限按需申请
+    text: 相机、麦克风、通知等系统权限用到时再申请，并说明用途
+    page_priority: P0
+  - id: S01-18
+    name: 忘记密码
+    text: 在登录页用手机验证码重设密码，不必先进设置；重设后其他设备下线；失败提示不透露手机号是否已注册
+    page_priority: P0
+  - id: S01-19
+    name: 设备超限时登录
+    text: 在线设备已达上限时列出各设备，选一台下线后继续登录；取消则不登录
+    page_priority: P1
+  - id: S01-20
+    name: 冷静期内登录
+    text: 注销冷静期内登录时，说明剩余天数与将删除的范围，可一键撤销注销；登录本身不自动撤销
+    page_priority: P1
+  - id: S01-21
+    name: 被下线说明
+    text: 区分被其他设备顶下线、后台强制下线、改密后下线；被顶下线时可直达改密；未提交的作答与笔记先暂存，重新登录后恢复
+    page_priority: P1
+  - id: S01-22
+    name: 备用验证
+    text: 短信不可用时，已绑定邮箱的用户改收邮箱验证码；都不可用时转人工核验身份
+    page_priority: P2
+slice: design/screens/slices/S01.html
+shots: design/screens/shots/S01/

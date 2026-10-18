@@ -1,0 +1,38 @@
+# 业务事件：领域之间的事件契约（区别于 events.yaml 的埋点）。payload 字段的数据类别见 schema。
+- name: evidence.recorded
+  owner: learner
+  version: 1
+  payload:
+    evidence_id: uuid
+    learner_id: uuid
+    knowledge_point_id: uuid
+    source: enum[practice, review, reading_quiz, mock, diagnosis, grading, self_check]
+    strength: enum[strong, medium, weak, negative, pending]
+    credibility: enum[reviewed, own, generated_confirmed, generated_instant]
+    confidence: enum[sure, vague, guess, off, none]
+    duration_ms: int
+    question_id: uuid?
+    occurred_at: datetime
+  consumers: [plan, metrics]
+  not_evidence: [在场时长, 自习室专注时长, 手动勾选完成]
+- name: evidence.revoked
+  owner: learner
+  version: 1
+  payload:
+    evidence_id: uuid
+    learner_id: uuid
+    reason: enum[question_corrected, generated_reported, duplicate]
+    occurred_at: datetime
+  consumers: [plan, metrics]
+- name: mastery.changed
+  owner: learner
+  version: 1
+  payload:
+    learner_id: uuid
+    knowledge_point_id: uuid
+    from_level: int
+    to_level: int
+    sufficiency: enum[sufficient, insufficient]
+    rule_version: string
+    occurred_at: datetime
+  consumers: [plan, map, metrics]

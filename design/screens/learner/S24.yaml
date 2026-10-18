@@ -1,0 +1,118 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S24
+end: learner
+title: 进度与预测
+mode: standard
+purpose: 三个数各答一问；先学什么最划算；预测准不准公开可查。提分地图是本页的一个标签。
+refine: pending
+states: [loading, empty, error, offline, restricted, insufficient_data, locked]
+state_overrides:
+  empty: 还没有进度数据：完成摸底后出现三个数；主按钮“去摸底”（去 S04）
+  offline: 显示上次计算的结果与时间
+  restricted: 地图体检不通过时，预测、分值地图与性价比阶梯锁定
+  insufficient_data: 证据不足时预测区间变宽，标“低置信”
+  locked: 地图体检不通过时，预测类区块显示原因与“去修复”，学习照常
+layout_notes:
+  - 页头：进度与预测；动作“情景模拟”（跳沙盘）、“导出”。
+  - 标签“总览”：三个数 → 预测走势 → 各科进度与已过线 → 有效与在场摘要。
+  - 标签“提分地图”：分值四段、提分地图表、推荐路径。
+  - 标签“诊断”：差距从哪来、薄弱点雷达、信心校准、四层学情、状态体检。
+  - 标签“校准”：全站三数、个人往期、登记成绩入口。
+data:
+  reads: [全部证据]
+  writes: [预测记录（供事后校准）]
+ai:
+  - role: 综合档位、记忆、模考与剩余时间做预测；生成带依据的洞察。
+entries: [S06]
+exits: [S07, S09, S18, S19, S27]
+items:
+  - id: S24-01
+    name: 完成度
+    text: 范围内各知识点从当前档爬到目标档的总工作量完成了多少；可切换按分值口径
+    page_priority: P0
+  - id: S24-02
+    name: 健康度
+    text: 近期日均完成量与按期完成所需日均之比，附判词
+    page_priority: P0
+  - id: S24-03
+    name: 预测分区间与差额
+    text: 保守、最可能、乐观三值与离目标线的差；标明按今天还是到目标日
+    page_priority: P0
+  - id: S24-04
+    name: 性价比五级阶梯
+    text: 每个知识点的预期分、考察概率、当前档、个人难度、预计用时与评分；相邻两次重算的跳档幅度有限制
+    page_priority: P0
+  - id: S24-05
+    name: 推荐路径
+    text: 按阶梯与轮次策略排出的下一批知识点，每个可看排位理由
+    page_priority: P0
+  - id: S24-06
+    name: 无考情时的降级
+    text: 没有分值与概率数据时改按重要度估算并标注
+    page_priority: P0
+  - id: S24-07
+    name: 体检不通过时锁定预测
+    text: 自建地图有阻断项时，不显示预测、性价比阶梯与分值地图，改为说明原因与修复入口；完成度、健康度与今日清单不受影响
+    page_priority: P0
+  - id: S24-08
+    name: 有效学习时长
+    text: 只计产生证据的片段；并列显示在场时长，补做检测可转为有效
+    page_priority: P0
+  - id: S24-09
+    name: 数据导出
+    text: 学情原始数据通用格式导出
+    page_priority: P0
+  - id: S24-10
+    name: 分值地图
+    text: 每个知识点的预期贡献分，掌握提升即总分提升
+    page_priority: P1
+  - id: S24-11
+    name: 各科进度对比
+    text: 多科目并列，标出已过线与未过线
+    page_priority: P1
+  - id: S24-12
+    name: 四层学情
+    text: 投入、掌握、记忆、应用，均可下钻并看口径
+    page_priority: P1
+  - id: S24-13
+    name: 建议与实际投入
+    text: 各科建议时长与已投入对比
+    page_priority: P1
+  - id: S24-14
+    name: 薄弱点雷达
+    text: 按章节、题型、错因模式找出最弱处，给出几条行动，可加入今日
+    page_priority: P1
+  - id: S24-15
+    name: 学习方式与时段效率
+    text: 哪种方式、哪个时段最有效
+    page_priority: P1
+  - id: S24-16
+    name: 元认知报告
+    text: 自以为会与其实会但不自信的区域
+    page_priority: P1
+  - id: S24-17
+    name: 预测校准公示
+    text: 往期预测与回填成绩的吻合度公开可查
+    page_priority: P1
+  - id: S24-18
+    name: 差距分解
+    text: 差距按来源与性价比排序，一键生成计划提议
+    page_priority: P1
+  - id: S24-19
+    name: 过线概率
+    text: 基于历史线估计过线概率，不作承诺
+    page_priority: P1
+  - id: S24-20
+    name: 状态体检
+    text: 随时问“我现在怎么样”，给全景诊断
+    page_priority: P2
+  - id: S24-21
+    name: 题型覆盖
+    text: 各题型练习量与正确率，提示没练过的题型
+    page_priority: P2
+  - id: S24-22
+    name: 对标上岸者
+    text: 只用单独同意用户的匿名统计，样本不足不显示，默认不使用你的数据
+    page_priority: P2
+slice: design/screens/slices/S24.html
+shots: design/screens/shots/S24/

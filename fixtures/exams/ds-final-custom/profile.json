@@ -1,0 +1,106 @@
+{
+  "exam_id": "ds-final-custom",
+  "name": "《数据结构》期末考",
+  "short_name": "数据结构",
+  "aliases": [],
+  "kind": "custom",
+  "evaluation_rule": {
+    "type": "custom",
+    "description": "自设目标 85 分（满分 100）"
+  },
+  "full_score": 100,
+  "structure": [
+    {
+      "subject": "数据结构",
+      "sections": [
+        {
+          "name": "绪论与复杂度",
+          "knowledge_point_count": 6
+        },
+        {
+          "name": "线性表",
+          "knowledge_point_count": 10
+        },
+        {
+          "name": "栈、队列与串",
+          "knowledge_point_count": 12
+        },
+        {
+          "name": "树与二叉树",
+          "knowledge_point_count": 16
+        },
+        {
+          "name": "图",
+          "knowledge_point_count": 14
+        },
+        {
+          "name": "查找",
+          "knowledge_point_count": 10
+        },
+        {
+          "name": "排序",
+          "knowledge_point_count": 10
+        }
+      ]
+    }
+  ],
+  "question_types": [
+    {
+      "type": "choice",
+      "label": "选择",
+      "response_form": "choice",
+      "count": 15,
+      "subjective": false
+    },
+    {
+      "type": "fill_blank",
+      "label": "填空",
+      "response_form": "fill",
+      "count": 10,
+      "subjective": false
+    },
+    {
+      "type": "short_answer",
+      "label": "简答",
+      "response_form": "written",
+      "count": 4,
+      "subjective": true
+    },
+    {
+      "type": "algorithm_design",
+      "label": "算法设计",
+      "response_form": "written",
+      "count": 2,
+      "subjective": true
+    }
+  ],
+  "scoring": {
+    "target_default": 85,
+    "target_basis": "85 分",
+    "rubrics": []
+  },
+  "duration_minutes": 120,
+  "key_dates": [
+    {
+      "kind": "target",
+      "date": "2027-01-08",
+      "status": "custom",
+      "basis": "按教务处期末考试周安排，你自己设定"
+    }
+  ],
+  "readiness": {
+    "map": {
+      "level": 2,
+      "note": "由课件拆解，你已校准 86%"
+    },
+    "questions": {
+      "level": 1,
+      "note": "自有题 61 道，已确认的生成题 36 道"
+    },
+    "exam_intel": {
+      "level": 1,
+      "note": "由 3 套往年卷推算，参考性有限"
+    }
+  },
+  "variation_extensions": []
+}

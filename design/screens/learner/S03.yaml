@@ -1,0 +1,79 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S03
+end: learner
+title: 时间与资料
+mode: guided
+purpose: 让计划排在真实的时间和手头的资料上。
+views:
+  - id: time
+    when: 3a 时间
+  - id: res
+    when: 3b 资料
+states: [loading, empty, error, offline, restricted, insufficient_data]
+state_overrides:
+  empty: 还没填时间：只填每天学多久也可以，系统按典型分布展开；主按钮“只填每天学多久”
+  offline: 时间格可离线填写，联网后同步；资料上传需要联网
+  restricted: 单个文件超过解析额度时排队，不阻塞建档
+  insufficient_data: 跳过的项用同类考生的典型值，两周后用实测校准
+layout_notes:
+  - 3a 时间：身份模板；时间格（桌面）或工作日 / 周末模板（手机）；“只填每天学多久”；不可学日；合计说明。
+  - 3b 资料：资料清单（接入方式加状态）；添加资料（弹窗内说明三种接入方式）；地图从哪来（每个目标一行）。
+  - 底部：跳过，下一步。跳过的项用典型值，并在起点报告里标注。
+data:
+  writes: [时间预算, 资料清单, 学习偏好]
+ai:
+  - role: 识别不合理的时间声明；由资料目录匹配已有的地图与课程目录。
+entries: [S02, S04]
+exits: [S02, S04]
+unresolved_links: [S11]
+items:
+  - id: S03-01
+    name: 身份模板
+    text: 在职、全职备考、在校、带娃四种，一键带出典型时间结构
+    page_priority: P0
+  - id: S03-02
+    name: 周时间格
+    text: 标注可用时段及场景：深度块、碎片、通勤可听；不同时间块排不同任务
+    page_priority: P0
+  - id: S03-03
+    name: 每日目标时长兜底
+    text: 不想填时间格时只填每天学多久，系统按典型分布展开
+    page_priority: P0
+  - id: S03-04
+    name: 不可学日与忙季
+    text: 提前标记出差、加班季等日期
+    page_priority: P0
+  - id: S03-05
+    name: 声明与实测校准
+    text: 实测数据积累到一定时长后，对比声明与实测，三选一：按实测重排、提高投入、缩小范围
+    page_priority: P0
+  - id: S03-06
+    name: 资料盘点
+    text: 登记教材、课程、题库、往年卷、笔记；按权利边界标成可解析、只映射、只外链三类
+    page_priority: P0
+  - id: S03-07
+    name: 快速导入入口
+    text: 文件、拍照、网盘、链接、书号、模板六种方式，转到我的资料完成
+    page_priority: P0
+  - id: S03-08
+    name: 可跳过与稍后补充
+    text: 每步可跳过，跳过处使用同类人群典型值并明确告知
+    page_priority: P0
+  - id: S03-09
+    name: 地图来源确认
+    text: 有官方地图：直接启用，资料对齐上去；没有：由导入资料生成「我的地图」草案或套用学习包；两者可并存，官方为主、个人扩展
+    page_priority: P0
+  - id: S03-10
+    name: 建议投入对照
+    text: 显示考试画像里的建议备考时长与声明总投入之差
+    page_priority: P1
+  - id: S03-11
+    name: 时间与资料分两屏
+    text: 第 3 步拆为 3a 时间、3b 资料；跳过的项用典型值，并在起点报告里标注
+    page_priority: P1
+  - id: S03-12
+    name: 手机时间模板
+    text: 手机上用“工作日 / 周末”两行模板代替 7 列格子，点开某天再细调
+    page_priority: P1
+slice: design/screens/slices/S03.html
+shots: design/screens/shots/S03/

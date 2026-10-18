@@ -1,0 +1,49 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: P08
+end: admin
+title: 题库审核与质量
+mode: standard
+purpose: 一道错题会摧毁对整个题库的信任。题目上线才是质量管理的开始。
+states: [loading, empty, error, offline, restricted, insufficient_data]
+data:
+  read_writes: [审定题池, 报错记录]
+ai:
+  - role: 生成题质检、歧义检测。
+entries: []
+exits: []
+unresolved_links: [P07, P16]
+items:
+  - id: P08-01
+    name: 审核队列
+    text: 新入库与被修改的题双人审核，答案与解析分别核对
+    page_priority: P0
+  - id: P08-02
+    name: 生成题七道质检
+    text: 答案唯一、是否超纲、与真题重复、表述歧义、干扰项合理、难度预估、内容合规；同一套质检也用于学员侧即时生成的题，结果决定证据上限
+    page_priority: P0
+  - id: P08-03
+    name: 变式题池管理
+    text: 每道母题的变式数量、质量与曝光
+    page_priority: P0
+  - id: P08-04
+    name: 用户报错处理
+    text: 有时限、有结论回复
+    page_priority: P0
+  - id: P08-05
+    name: 下架与修订
+    text: 通知做过的用户并重新计分
+    page_priority: P0
+  - id: P08-06
+    name: 可信度升级
+    text: 用户自有题或已确认的生成题经审核可升为审定题
+    page_priority: P1
+  - id: P08-07
+    name: 线上质量监控
+    text: 正确率、区分度、选项分布异常
+    page_priority: P1
+  - id: P08-08
+    name: 难度标定回流
+    text: 用真实作答修正难度
+    page_priority: P1
+slice: design/screens/slices/P08.html
+shots: design/screens/shots/P08/

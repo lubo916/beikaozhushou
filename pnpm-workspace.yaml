@@ -1,0 +1,8 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "packages/domains/*"
+  - "packages/ai/*"
+  - "evals"
+# 新发布的依赖至少观察 7 天再安装（分钟）
+minimumReleaseAge: 10080

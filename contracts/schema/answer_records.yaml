@@ -1,0 +1,18 @@
+table: answer_records
+owner: practice
+description: 作答记录；揭晓后锁定（INV-24）；由 practice 调用 learner 的 recordEvidence 产生证据
+tenant_scoped: true
+fields:
+  - {name: id, type: uuid, pk: true, x-data-class: personal_learning}
+  - {name: tenant_id, type: uuid, ref: tenants.id, x-data-class: operational}
+  - {name: session_id, type: uuid, ref: practice_sessions.id, x-data-class: personal_learning}
+  - {name: learner_id, type: uuid, ref: users.id, x-data-class: personal_learning}
+  - {name: question_id, type: uuid, ref: questions.id, x-data-class: personal_learning}
+  - {name: question_version, type: int, x-data-class: personal_learning}
+  - {name: response, type: json, x-data-class: personal_learning}
+  - {name: correct, type: bool, nullable: true, x-data-class: personal_learning}
+  - {name: confidence, type: "enum[sure, vague, guess, off, none]", x-data-class: personal_learning}
+  - {name: duration_ms, type: int, x-data-class: personal_learning}
+  - {name: hint_level, type: int, x-data-class: personal_learning}
+  - {name: revealed_at, type: timestamptz, nullable: true, x-data-class: personal_learning}
+  - {name: submitted_at, type: timestamptz, x-data-class: personal_learning}

@@ -1,0 +1,28 @@
+# srs 金标用例：given → expect；算法实现须全部通过（见 docs/models/srs.md#acceptance）。
+- id: SR-01
+  desc: 评“忘了”的项当天稍后再出现
+  given:
+    rating: 忘了
+  expect:
+    due_again_today: true
+- id: SR-02
+  desc: 用时过短的评级不计入
+  given:
+    rating: 记得
+    seconds: 0.3
+  expect:
+    counted: false
+- id: SR-03
+  desc: 超出每日上限的项顺延不删
+  given:
+    due: 150
+    cap: 80
+  expect:
+    today: 80
+    deleted: 0
+- id: SR-04
+  desc: 新卡不足时使用默认记忆参数
+  given:
+    cards: 10
+  expect:
+    params: default

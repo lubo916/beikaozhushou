@@ -1,0 +1,80 @@
+[paths]
+# 原型冻结（ADR-001）：首次导入后页面登记为源，原型只归档；截图仍从归档原型生成。
+prototype_source = "../exam-prep-archive/prototype/prototype-v1.0.html"
+prototype_mode = "frozen"          # frozen | editing
+archive = "../exam-prep-archive"
+merge_history = "../exam-prep-archive/merge-history/import-markers.yaml"
+merge_markers = ['（来自[^）]{1,12}）', '【[^】]{0,8}来源[^】]{0,12}】']
+
+[deep_source]              # 页面深化来源（见 5.17），只由 refine-page 读取
+prototype = "../exam-prep-archive/deep-source/prototype.html"
+refine_list = "../exam-prep-archive/deep-source/refine-list.md"
+# E-REFINE-03 扫描的外部编号模式：深化来源的页面号、数据表号、决定号、问题号、章节号与产品名，
+# 以及旧模块文档的模块编号与旧项目名（4.1：归档材料不进仓库）。
+forbidden_patterns = [
+  '(?<![A-Za-z0-9-])[ABCDEFG]-\d+[a-z]?(?![0-9])',
+  '(?<![A-Za-z0-9-])(?:ADM|AI-O)-[A-Z0-9_]+',
+  '(?<![A-Za-z0-9])L[0-9]-[A-Z0-9]+',
+  '(?<![A-Za-z0-9])T\d{2}(?![0-9])',
+  '(?<![A-Za-z0-9])D-\d{3}(?![0-9])',
+  'T-AI-\d+',
+  'ISS-\d+',
+  '§\s?\d',
+  '(?<![A-Za-z0-9])R1[0-9](?![0-9])',
+  '考必[过]',
+  '(?<![A-Za-z0-9-])(?:ACC|ACH|AI|CS|EXAM|FSRS|IO|MKT|NOTE|NOTIF|ONB|PAY|QB|QUO|REL|SEARCH|SYS|TREE|TXT)-\d{2}[ab]?(?![0-9])',
+]
+
+[budgets]
+root_agents_kib = 8
+end_agents_kib = 3
+pkg_agents_kib = 2
+codex_chain_kib = 12
+claude_resident_kib = 10
+skill_desc_total_chars = 3000
+skill_desc_max_chars = 300
+rules_concurrent_warn = 60
+rules_concurrent_error = 80
+convention_rules_max = 15
+spec_body_chars = 6000
+pack_chars = 15000
+pack_slice_chars = 2500
+
+[shots]                    # 各端截图宽度
+learner = [375, 1280]
+org = [1280]
+admin = [1280]
+height = 900
+quantize = true             # 装有 Pillow 时压成 256 色 PNG
+
+[verify]                   # 按技术栈替换；缺 stack_marker 时跳过这些命令
+lint = "pnpm lint"
+lint_files = "pnpm exec eslint {files}"
+typecheck = "pnpm typecheck"
+test = "pnpm test"
+e2e_smoke = "pnpm e2e:smoke"
+results = ".test-results/results.json"
+stack_marker = "node_modules/.modules.yaml"   # 依赖装好后才跑 pnpm 命令
+
+[eval]                     # 评测执行器：可用 {scenario} {suite} {out} 占位；首个 AI 场景接入时填写
+runner = ""
+records = ".eval"
+
+[git]
+main = "main"
+
+[tools]
+claude_min_version = "2.1.283"
+codex_min_version = "0.124"
+
+[check]
+direct_writers = ["planner"]
+history_words = ["原来", "改为", "之前", "原方案", "已调整", "调整为", "此前"]
+term_scan = ["docs/**/*.md", "apps/**", "packages/ui/**", "design/screens/**/*.yaml"]
+term_exclude = ["docs/meta/**", "docs/product/glossary.yaml", "docs/adr/**"]
+copy_scan = ["apps/**", "packages/ui/**", "design/screens/**/*.yaml", "docs/product/brief.md"]
+
+[gen]
+params_out = "packages/params/index.ts"
+roadmap_out = "docs/product/roadmap.md"
+progress_out = "docs/product/progress.md"

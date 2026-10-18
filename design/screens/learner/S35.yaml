@@ -1,0 +1,70 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S35
+end: learner
+title: 消息与帮助
+mode: standard
+purpose: 提醒有用、反馈有回音。
+refine: pending
+states: [loading, empty, error, offline, restricted]
+state_overrides:
+  empty: 没有新消息：提醒每天最多 2 条，深夜不推；主按钮“去设置提醒”（去 S33）
+  offline: 显示已缓存的消息
+  restricted: 推送权限未开启时只在站内显示
+layout_notes: [左栏通知（类别筛选、免打扰延后说明）；右栏客服（AI 先答、转人工规则、人工客服的工作时间与联系方式、订单号带入）→ 我的工单与反馈（进度与回复只读，处理完可评价满意度）→ 帮助。]
+data:
+  writes: [通知状态, 反馈与工单]
+ai:
+  - role: 智能客服首答；涉及费用、投诉、账号安全转人工。
+entries: [S31, S34]
+exits: [S06, S25]
+items:
+  - id: S35-01
+    name: 通知中心
+    text: 复习提醒、节点、任务完成、账号安全等分类；点一条直达要处理的事
+    page_priority: P0
+  - id: S35-02
+    name: 触达纪律
+    text: 学习类提醒有每日上限；连续被忽略自动降频；不出现「落后」「欠」等字样
+    page_priority: P0
+  - id: S35-03
+    name: 帮助与反馈
+    text: 常见问题；反馈自动带当前页面上下文，可查处理进度
+    page_priority: P0
+  - id: S35-04
+    name: 报错闭环
+    text: 题目、解析、导师回答的报错有结论回复
+    page_priority: P0
+  - id: S35-05
+    name: 免打扰与延后送达
+    text: 静默时段的提醒次日送达并说明
+    page_priority: P1
+  - id: S35-06
+    name: 推送授权引导
+    text: 先说明价值再申请系统权限，拒绝后节制地再问
+    page_priority: P1
+  - id: S35-07
+    name: 系统公告
+    text: 横幅与详情
+    page_priority: P1
+  - id: S35-08
+    name: 工单进度与回复
+    text: 查看工单的处理进度与回复（只读）
+    page_priority: P1
+  - id: S35-09
+    name: 意见调查
+    text: 低频的满意度调查，可跳过
+    page_priority: P2
+  - id: S35-10
+    name: 人工客服入口
+    text: 显示工作时间与联系方式，非工作时间留言转工单；支付失败页、订阅页、支付成功页可直达
+    page_priority: P1
+  - id: S35-11
+    name: 订单号带入
+    text: 从订单、退款或支付失败处进入客服或反馈时，自动带上订单号
+    page_priority: P1
+  - id: S35-12
+    name: 满意度评价
+    text: 工单处理完成后可评价满意度
+    page_priority: P1
+slice: design/screens/slices/S35.html
+shots: design/screens/shots/S35/

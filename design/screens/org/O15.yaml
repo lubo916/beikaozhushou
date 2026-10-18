@@ -1,0 +1,84 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: O15
+end: org
+title: 组织、权限与开放接口
+mode: standard
+purpose: 数据要按最小权限流动。组织越大，越需要把“谁能看什么、谁能改什么”定清楚。
+states: [loading, empty, error, offline, restricted, insufficient_data]
+layout_notes:
+  - 视图「组织与权限」：标准页；角色与数据范围、员工账号安全（平台基线与本机构）、接口与事件订阅、审计日志、单点登录。
+  - 视图「员工登录」（O15#login）：独立页，只有标志、没有导航；入口是退出登录（顶栏右侧）与会话失效，出口是 O01 机构工作台。
+data:
+  read_writes: [组织, 角色与审计记录]
+ai:
+  - role: 权限配置的风险提示。
+entries: []
+exits: [O01]
+unresolved_links: [O14, O16]
+items:
+  - id: O15-01
+    name: 组织架构
+    text: 多级组织：集团、校区或部门、班级
+    page_priority: P0
+  - id: O15-02
+    name: 角色权限矩阵
+    text: 预置角色，可自定义；最小权限
+    page_priority: P0
+  - id: O15-03
+    name: 数据范围
+    text: 按校区、班级隔离；班主任默认只看自己带的学员
+    page_priority: P0
+  - id: O15-04
+    name: 敏感操作复核
+    text: 导出、批量删除、改成绩等先重验身份，再按档位处理：不可逆的经二级审批，可回滚的保存前后快照，只读敏感的留痕
+    page_priority: P0
+  - id: O15-05
+    name: 审计日志
+    text: 权限变更、数据导出、敏感信息查看
+    page_priority: P0
+  - id: O15-06
+    name: 单点登录
+    text: 对接企业或学校的统一身份
+    page_priority: P1
+  - id: O15-07
+    name: 开放接口与回调
+    text: 学员、班级、成绩的同步；只同步机构任务数据与学员单独同意的字段
+    page_priority: P1
+  - id: O15-08
+    name: 员工离职交接
+    text: 所带班级与待办转交给接手的老师
+    page_priority: P1
+  - id: O15-09
+    name: 与外部系统对接
+    text: 学校教务、企业人事与学习系统的数据回传
+    page_priority: P2
+  - id: O15-10
+    name: 离职即失效
+    text: 员工停用或离职时，账号与全部会话立即失效
+    page_priority: P1
+  - id: O15-11
+    name: 员工登录
+    text: 机构员工用账号和密码登录；已接单点登录的走 O15-06
+    page_priority: P0
+  - id: O15-12
+    name: 登录失败锁定
+    text: 连续失败到阈值即锁定一段时间；阈值由机构在平台基线上设定，只能更严
+    page_priority: P1
+  - id: O15-13
+    name: 二次验证
+    text: 机构可要求员工在密码之后再过一道动态验证码
+    page_priority: P0
+  - id: O15-14
+    name: 单会话
+    text: 机构可要求同一员工只保留一个活跃会话
+    page_priority: P1
+  - id: O15-15
+    name: 定期改密
+    text: 机构可设改密周期，到期须改密后才能继续使用
+    page_priority: P2
+  - id: O15-16
+    name: 安全基线只紧不松
+    text: 机构可在平台基线上收紧员工账号安全策略（失败锁定、二次验证、单会话、改密周期），不能放宽
+    page_priority: P1
+slice: design/screens/slices/O15.html
+shots: design/screens/shots/O15/

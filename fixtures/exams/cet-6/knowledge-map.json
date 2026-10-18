@@ -1,0 +1,122 @@
+{
+  "exam_id": "cet-6",
+  "map_version": 1,
+  "source": "official",
+  "note": "演示数据：章节与知识点数量取自原型，sample_points 为每章的示例知识点",
+  "chapters": [
+    {
+      "name": "词汇与语法",
+      "knowledge_point_count": 40,
+      "sample_points": [
+        {
+          "name": "高频学术词汇 A 组",
+          "knowledge_types": [
+            "fact"
+          ],
+          "default_target_level": 3
+        },
+        {
+          "name": "形近词辨析：mitigate 与 militate",
+          "knowledge_types": [
+            "concept"
+          ],
+          "default_target_level": 3
+        },
+        {
+          "name": "长难句：非谓语结构",
+          "knowledge_types": [
+            "procedure"
+          ],
+          "default_target_level": 4
+        },
+        {
+          "name": "让步状语从句",
+          "knowledge_types": [
+            "concept"
+          ],
+          "default_target_level": 3
+        }
+      ]
+    },
+    {
+      "name": "听力",
+      "knowledge_point_count": 34,
+      "sample_points": [
+        {
+          "name": "听力：数字与时间",
+          "knowledge_types": [
+            "procedure"
+          ],
+          "default_target_level": 4
+        },
+        {
+          "name": "听力：态度与转折",
+          "knowledge_types": [
+            "procedure"
+          ],
+          "default_target_level": 4
+        }
+      ]
+    },
+    {
+      "name": "阅读理解",
+      "knowledge_point_count": 38,
+      "sample_points": [
+        {
+          "name": "阅读：主旨题定位",
+          "knowledge_types": [
+            "procedure"
+          ],
+          "default_target_level": 4
+        },
+        {
+          "name": "阅读：推断题",
+          "knowledge_types": [
+            "procedure"
+          ],
+          "default_target_level": 4
+        }
+      ]
+    },
+    {
+      "name": "写作",
+      "knowledge_point_count": 28,
+      "sample_points": [
+        {
+          "name": "写作：议论文结构",
+          "knowledge_types": [
+            "essay"
+          ],
+          "default_target_level": 4
+        },
+        {
+          "name": "写作：高级替换表达",
+          "knowledge_types": [
+            "essay"
+          ],
+          "default_target_level": 3
+        }
+      ]
+    },
+    {
+      "name": "翻译",
+      "knowledge_point_count": 28,
+      "sample_points": [
+        {
+          "name": "翻译：文化主题词",
+          "knowledge_types": [
+            "fact"
+          ],
+          "default_target_level": 2
+        },
+        {
+          "name": "翻译：长句拆分",
+          "knowledge_types": [
+            "procedure"
+          ],
+          "default_target_level": 4
+        }
+      ]
+    }
+  ]
+}

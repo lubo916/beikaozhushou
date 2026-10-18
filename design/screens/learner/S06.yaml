@@ -1,0 +1,144 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S06
+end: learner
+title: 今日
+mode: standard
+purpose: 每天打开就知道做什么，给指令不给选择。
+refine: pending
+views:
+  - id: normal
+    when: 正常
+  - id: first
+    when: 首次进入
+  - id: done
+    when: 全部完成
+  - id: "off"
+    when: 今天不可学
+  - id: back
+    when: 中断回归
+  - id: noai
+    when: 导师不可用
+states: [loading, empty, error, offline, restricted, insufficient_data, locked]
+state_overrides:
+  empty: 今天没有安排：目标日已过或还没生成计划；主按钮“生成计划”（去 S05）
+  offline: 清单与到期复习已缓存，可离线完成；证据联网后补记
+  restricted: 额度用完时，到期复习、错题回炉与新学照常；只暂停高成本 AI
+  insufficient_data: 前两周按同类考生的典型节奏排；你的实测足够后改用你的数据
+  locked: 地图体检不通过时，预测类区块显示原因与“去修复”，学习照常
+layout_notes:
+  - 桌面左栏：英雄区（日期、轮次与周、一句话、继续、我只有 15 分钟、倒计时）；今日清单三段，底部换档与完成口径。
+  - 桌面右栏：三个数；计划调整（自动顺延加撤销、待确认提议）；节点提醒（按条件出现）。
+  - 手机：英雄区 → 待确认提议（若有，置顶一行）→ 清单 → 三个数折叠成一行摘要。
+  - 首屏控件从简：第一项任务要在首屏出现，右栏只留必要的卡片。
+  - 上手清单放在英雄区上方，完成几项后自动收起。
+data:
+  reads: [计划, 到期队列, 掌握档与目标档, 时间预算]
+  writes: [完成证据, 实际用时, 剔除原因]
+ai:
+  - role: 计划引擎每日生成任务并随完成情况重排；理由文案可润色但不得改动数字，AI 不可用时显示模板句。
+entries: [S01, S05, S23, S28, S35]
+exits: [S07, S08, S09, S10, S11, S12, S15, S16, S18, S19, S20, S24, S25]
+unresolved_links: [S13]
+items:
+  - id: S06-01
+    name: 倒计时与轮次
+    text: 距目标日天数、当前轮次与周次；多目标可切换
+    page_priority: P0
+  - id: S06-02
+    name: 时间预算与配比
+    text: 当日可用时间来自时间格，在巩固、推进、收尾三段之间分配；配比模式（按性价比、复习优先、新学优先）在学习计划里设置
+    page_priority: P0
+  - id: S06-03
+    name: 八类任务来源
+    text: 到期复习、错题回炉、待验证复核、补到目标、新学、练习、机构或自定任务、睡前回顾
+    page_priority: P0
+  - id: S06-04
+    name: 排序规则
+    text: 先做推迟有损失的，再做推迟无损失的
+    page_priority: P0
+  - id: S06-05
+    name: 每项任务的理由
+    text: 用考频、分值、档位差、到期时间等具体数字说明；数字只来自算法
+    page_priority: P0
+  - id: S06-06
+    name: 一键开始与自动串联
+    text: 直达具体位置，完成后自动接下一项
+    page_priority: P0
+  - id: S06-07
+    name: 完成看证据
+    text: 做对、答出、背出才算；手动勾选只记“看过”
+    page_priority: P0
+  - id: S06-08
+    name: 短时重组
+    text: 用户说明今天只有很短的时间时，即时重组出做得完的短任务
+    page_priority: P0
+  - id: S06-09
+    name: 三档降级
+    text: 完整、精简、保底，保住连续性
+    page_priority: P0
+  - id: S06-10
+    name: 调整告知与待确认提议
+    text: 自动顺延次日告知，一段时间内可撤销；改目标、范围、轮次的调整以待确认提议出现
+    page_priority: P0
+  - id: S06-11
+    name: 断连恢复
+    text: 按中断时长分档处理；回来不展示累计未完成量，先给一个很短的启动任务
+    page_priority: P0
+  - id: S06-12
+    name: 三个数常驻
+    text: 预测与差额、完成度、健康度，各答一问
+    page_priority: P0
+  - id: S06-13
+    name: 巩固段
+    text: 推迟就有损失的任务：到期复习（要点回顾、卡片、背诵）、错题回炉、待验证复核；有保底占比，冲刺期提高，不被新学挤占
+    page_priority: P0
+  - id: S06-14
+    name: 推进段
+    text: 推迟无损失的任务：新学（阅读或视听加读后即测）、练习、主观题与口头训练、机构作业与直播；按提分性价比与计划排序
+    page_priority: P0
+  - id: S06-15
+    name: 收尾段
+    text: 简短口述回顾，讲不出来的部分进入明天；整理收件箱
+    page_priority: P0
+  - id: S06-16
+    name: 全部完成态
+    text: 清单做完后给“明天第一件事”预览与可选加练，不留空白
+    page_priority: P0
+  - id: S06-17
+    name: 今天不可学态
+    text: 不可学日只保留到期复习的最小版，其余自动顺延，不出现“落后”
+    page_priority: P0
+  - id: S06-18
+    name: 中断回归态
+    text: 中断一段时间后回来的页面状态：先给启动任务，并以提议给出重组方案；规则见 S06-11
+    page_priority: P0
+  - id: S06-19
+    name: 导师不可用态
+    text: 理由改用模板句，“问导师”入口说明暂停范围；清单与复习照常
+    page_priority: P0
+  - id: S06-20
+    name: 上手清单
+    text: 定目标、接资料、摸底、看今日、做一次标注、问一次导师，逐项打勾；完成几项后自动收起，可跳过，可在设置中重开
+    page_priority: P1
+  - id: S06-21
+    name: “今天不想学这个”
+    text: 单项剔除仅当日有效并记录原因，用于改进推荐
+    page_priority: P1
+  - id: S06-22
+    name: 快速捕获
+    text: 拍题、语音、粘贴、存链接，进入学习收件箱
+    page_priority: P1
+  - id: S06-23
+    name: 节点提醒条
+    text: 与我相关的报名、公告节点
+    page_priority: P1
+  - id: S06-24
+    name: 到期过多保护
+    text: 到期量超过每日上限时，只给最要紧的一批（考频乘遗忘风险），其余顺延，不显示积压数
+    page_priority: P1
+  - id: S06-25
+    name: 周复盘入口
+    text: 每周固定时间在清单末尾出现一项简短的周复盘，指向复盘与报告
+    page_priority: P1
+slice: design/screens/slices/S06.html
+shots: design/screens/shots/S06/

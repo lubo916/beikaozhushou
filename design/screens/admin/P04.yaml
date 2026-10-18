@@ -1,0 +1,65 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: P04
+end: admin
+title: 知识地图与类型库
+mode: standard
+purpose: 知识地图是唯一的坐标系，类型库决定“不同知识怎么学”。两者的质量决定所有智能功能的上限。
+states: [loading, empty, error, offline, restricted, insufficient_data]
+data:
+  writes: [官方地图, 类型库, 干扰模式库]
+ai:
+  - role: 地图初稿、类型标注建议。
+entries: []
+exits: []
+unresolved_links: [P03, P07]
+items:
+  - id: P04-01
+    name: 地图编辑
+    text: 增删改、层级、编码
+    page_priority: P0
+  - id: P04-02
+    name: 属性维护
+    text: 考频、分值、重要度、建议目标档、难度
+    page_priority: P0
+  - id: P04-03
+    name: 关系编辑
+    text: 八类关系与强度
+    page_priority: P0
+  - id: P04-04
+    name: 知识点类型库
+    text: 九类类型的定义与默认学法矩阵，可扩展
+    page_priority: P0
+  - id: P04-05
+    name: 干扰模式库
+    text: 通用十二类加计算类、语言类等分组，可扩展
+    page_priority: P0
+  - id: P04-06
+    name: 题型映射
+    text: 各考试的题型名映射到九种作答形态与计分规则
+    page_priority: P0
+  - id: P04-07
+    name: 版本管理与迁移
+    text: 新旧知识点映射，掌握记录随版本迁移
+    page_priority: P0
+  - id: P04-08
+    name: 审核发布
+    text: 导师不直接发布任何改动
+    page_priority: P0
+  - id: P04-09
+    name: 导师初稿
+    text: 由大纲与教材目录生成骨架，专家审定
+    page_priority: P1
+  - id: P04-10
+    name: 群体统计回流
+    text: 真实难度、常见错误回写到属性
+    page_priority: P1
+  - id: P04-11
+    name: 官方学习包发布
+    text: 地图、题库、卡组打包，完整度校验后上架
+    page_priority: P1
+  - id: P04-12
+    name: 跨考试映射
+    text: 等价或相近知识点的映射
+    page_priority: P2
+slice: design/screens/slices/P04.html
+shots: design/screens/shots/P04/

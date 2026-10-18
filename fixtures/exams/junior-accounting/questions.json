@@ -1,0 +1,83 @@
+{
+  "exam_id": "junior-accounting",
+  "note": "演示数据，取自原型脚本；题目与解析的正式来源见 OQ-010",
+  "questions": [
+    {
+      "id": "junior-accounting-q0001",
+      "question_type": "single_choice",
+      "response_form": "choice",
+      "credibility": "reviewed",
+      "knowledge_points": [
+        "交易性金融资产的后续计量"
+      ],
+      "stem": "甲公司购入一项交易性金融资产，支付价款 206 万元，其中包含已宣告但尚未发放的现金股利 6 万元；另支付交易费用 1 万元。该资产的入账金额为（　）万元。",
+      "options": [
+        "200",
+        "201",
+        "206",
+        "207"
+      ],
+      "answer": [
+        0
+      ],
+      "common_wrong_option": 1,
+      "explanation": {
+        "conclusion": "入账金额 ＝ 206 − 6 ＝ 200。已宣告未发放的股利记“应收股利”，交易费用记“投资收益”借方，两者都不进成本。"
+      },
+      "option_notes": {
+        "1": {
+          "note": "你把交易费用也算进了成本。那是“债权投资、其他权益工具投资”的做法；交易性金融资产的交易费用不进成本。",
+          "trap": "偷换概念（把相邻规则的适用条件套了过来）"
+        }
+      },
+      "group_miss_rate": 0.31,
+      "hints": [
+        "先分清：哪些钱买的是资产本身，哪些不是。",
+        "已宣告未发放的股利、交易费用，各自去哪个科目？"
+      ]
+    },
+    {
+      "id": "junior-accounting-q0002",
+      "question_type": "short_answer",
+      "response_form": "written",
+      "credibility": "reviewed",
+      "knowledge_points": [
+        "交易性金融资产的后续计量"
+      ],
+      "stem": "编制甲公司购入该资产、以及月末公允价值上升 12 万元时的会计分录。",
+      "scoring_points": [
+        {
+          "point": "借：交易性金融资产—成本 200",
+          "sample_answer_hit": 1
+        },
+        {
+          "point": "借：应收股利 6",
+          "sample_answer_hit": 1
+        },
+        {
+          "point": "借：投资收益 1",
+          "sample_answer_hit": 0
+        },
+        {
+          "point": "贷：其他货币资金 207",
+          "sample_answer_hit": 1
+        },
+        {
+          "point": "月末：借记“公允价值变动”明细 12，贷记公允价值变动损益 12",
+          "sample_answer_hit": 2
+        }
+      ],
+      "sample_answer": "借：交易性金融资产—成本 200，应收股利 6；贷：其他货币资金 207。月末：借：交易性金融资产 12；贷：公允价值变动损益 12。",
+      "label": "分录题"
+    }
+  ],
+  "cards": [
+    {
+      "id": "junior-accounting-card0001",
+      "card_type": "辨析卡",
+      "front": "交易性金融资产取得时的交易费用，计入哪里？",
+      "back": "计入投资收益（借方），不进成本。对照：债权投资、其他权益工具投资的交易费用计入成本。",
+      "knowledge_point": "交易性金融资产的后续计量"
+    }
+  ]
+}

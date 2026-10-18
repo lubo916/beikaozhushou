@@ -1,0 +1,50 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S34
+end: learner
+title: 成长档案
+mode: standard
+purpose: 把一次备考延展成长期关系；同时是“我的”标签的首页。
+refine: pending
+states: [loading, empty, error, offline, insufficient_data]
+state_overrides:
+  empty: 还没有备考记录：完成一次备考后，这里会留下档案；主按钮“去今日”（去 S06）
+  offline: 可查看档案；导出需要联网
+  insufficient_data: 只有一次备考时不显示跨次对比
+layout_notes: [个人卡（身份、会员状态）→ 常用入口（带状态）→ 左栏备考目标、里程碑；右栏下一站、我的学习包、历次备考。]
+data:
+  notes: [读历次归档, 写目标与学习包]
+ai:
+  - role: 生成跨次备考的对比与下一站建议；可迁移比例按知识地图重叠计算。
+entries: [S27]
+exits: [S02, S08, S11, S31, S32, S33, S35]
+items:
+  - id: S34-01
+    name: 成长档案
+    text: 历次目标、成绩、里程碑与能力画像
+    page_priority: P1
+  - id: S34-02
+    name: 备考目标管理
+    text: 新增、暂停、归档目标；新增目标时重走入门
+    page_priority: P1
+  - id: S34-03
+    name: 里程碑
+    text: 只认真实进步：错题毕业数、知识点达标数、阶段完成、模考过线、有效学习周；不设经验值、等级与连续打卡
+    page_priority: P1
+  - id: S34-04
+    name: 能力画像
+    text: 跨考试的知识与技能分布
+    page_priority: P1
+  - id: S34-05
+    name: 我的学习包
+    text: 我创建与分享的学习包：审核状态、被导入次数、更新与下架
+    page_priority: P1
+  - id: S34-06
+    name: 档案导出
+    text: 通用格式
+    page_priority: P1
+  - id: S34-07
+    name: 下一站推荐
+    text: 考完后适合的下一个目标与可迁移比例
+    page_priority: P2
+slice: design/screens/slices/S34.html
+shots: design/screens/shots/S34/

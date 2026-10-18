@@ -1,0 +1,97 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S13
+end: learner
+title: 视听课堂
+mode: immersive
+purpose: 把看和听变成学：按知识点切段，只看没掌握的，看完听完当场检验。
+refine: pending
+views:
+  - id: video
+    when: 视频
+  - id: audio
+    when: 听单
+    mode: standard
+  - id: ext
+    when: 外部课
+    mode: standard
+states: [loading, empty, error, offline, restricted, insufficient_data]
+state_overrides:
+  empty: 还没有课程：接入自己的视频、音频，或登记外部网课；主按钮“接入课程”（去 S11）
+  offline: 已下载的听单可离线播放；片内检测联网后计入
+  restricted: 外部平台的课只能外链播放，不在本站缓存
+  insufficient_data: 公式、图表多的章节不做音频化，并说明原因
+layout_notes:
+  - 标签：视频｜听单｜外部课。
+  - 视频（沉浸）：播放器（按档分段、当前知识点、问这一刻、打点、跳过已掌握）→ 片段检测 → 逐字稿；右栏本讲知识点与换个讲法。
+  - 听单：完整界面，手机支持锁屏控制。
+  - 外部课：表格，每个标签底部一行版权说明。
+data:
+  writes: [有效观看与收听, 片段检测结果]
+ai:
+  - role: 转写、打点、口语化改写与合成；理解暂停处在问什么。
+entries: [S29, S33]
+exits: [S09, S18]
+unresolved_links: [S10, S14, S28]
+items:
+  - id: S13-01
+    name: 统一播放器
+    text: 播放平台授权课程、机构课程与本人上传的音视频
+    page_priority: P0
+  - id: S13-02
+    name: 知识点时间轴
+    text: 进度条按知识点切段并按档位着色
+    page_priority: P0
+  - id: S13-03
+    name: 双向定位
+    text: 从知识点跳到视频时刻，播放时显示当前知识点；时间戳可校准
+    page_priority: P0
+  - id: S13-04
+    name: 片内检测与听完即测
+    text: 每段后几道短题，通过才计为有效学习
+    page_priority: P0
+  - id: S13-05
+    name: 问这一刻
+    text: 暂停提问时自动带入前后讲解文字
+    page_priority: P0
+  - id: S13-06
+    name: 打点笔记
+    text: 笔记带时间戳，点击跳回
+    page_priority: P0
+  - id: S13-07
+    name: 外部课伴学
+    text: 第三方平台课程只外链、记进度与时段映射，看完回来做题
+    page_priority: P0
+  - id: S13-08
+    name: 跳过已掌握
+    text: 测一测通过即可跳过该段
+    page_priority: P1
+  - id: S13-09
+    name: 教材音频化
+    text: 把适合听的知识点改写成口语并合成音频；公式图表多的标“仅文本”
+    page_priority: P1
+  - id: S13-10
+    name: 三种讲解风格
+    text: 通俗教学、有趣讲师、严肃冲刺
+    page_priority: P1
+  - id: S13-11
+    name: 播放队列与续听
+    text: 按今日清单自动编排，跨设备续听，可离线
+    page_priority: P1
+  - id: S13-12
+    name: 课堂笔记与逐字稿
+    text: 自动生成结构化笔记，可按概念搜索片段（限有权使用的内容）
+    page_priority: P1
+  - id: S13-13
+    name: 换个讲法
+    text: 同一知识点在其他课程里的讲解片段
+    page_priority: P1
+  - id: S13-14
+    name: 时间戳校准
+    text: 锚点有偏差时用户可拖动校正
+    page_priority: P1
+  - id: S13-15
+    name: 直播课堂
+    text: 随堂答题、字幕、回放切片（机构场景）
+    page_priority: P2
+slice: design/screens/slices/S13.html
+shots: design/screens/shots/S13/

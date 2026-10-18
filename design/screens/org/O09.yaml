@@ -1,0 +1,65 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: O09
+end: org
+title: 批改工作台
+mode: standard
+purpose: 主观题批改最吃人力。导师先批、老师复核，把老师的时间集中在拿不准的地方。
+states: [loading, empty, error, offline, restricted, insufficient_data]
+data:
+  reads: [机构作业与考试作答, 评分细则]
+ai:
+  - role: 预批改。最终分数由老师确认。
+entries: [O01]
+exits: []
+unresolved_links: [O06, O07, O10]
+items:
+  - id: O09-01
+    name: 预批改
+    text: 按细则逐点批改，给区间、批注与把握度
+    page_priority: P0
+  - id: O09-02
+    name: 按把握度分流
+    text: 把握低与评分离散大的优先给老师
+    page_priority: P0
+  - id: O09-03
+    name: 对照界面
+    text: 原文、得分点、批注、老师修改并排
+    page_priority: P0
+  - id: O09-04
+    name: 批量发布前强制抽检
+    text: 不通过则整批退回人工
+    page_priority: P0
+  - id: O09-05
+    name: 评分细则管理
+    text: 机构自有细则与口径，版本可追溯
+    page_priority: P0
+  - id: O09-06
+    name: 评语模板
+    text: 常用评语与升格示范，可按题型调用
+    page_priority: P1
+  - id: O09-07
+    name: 一致性监控
+    text: 老师之间、老师与导师之间的评分偏差
+    page_priority: P1
+  - id: O09-08
+    name: 共性问题汇总
+    text: 自动成讲评提纲与典型例句
+    page_priority: P1
+  - id: O09-09
+    name: 双评与仲裁
+    text: 重要考试两人独立评分，分差超限进入仲裁
+    page_priority: P1
+  - id: O09-10
+    name: 老师修改回流
+    text: 只用于本机构评分校准
+    page_priority: P1
+  - id: O09-11
+    name: 批改任务分配
+    text: 按题、按班分配给老师，可匿名批改，进度可见
+    page_priority: P1
+  - id: O09-12
+    name: 匿名与按题批改
+    text: 减少印象分
+    page_priority: P1
+slice: design/screens/slices/O09.html
+shots: design/screens/shots/O09/

@@ -1,0 +1,107 @@
+{
+  "$description": "主题解析（DTCG Resolver）。基础令牌为 tokens.json；机构白标、色觉友好配色、大字号为修饰器，按顺序叠加。",
+  "version": "2025.10",
+  "sets": [
+    {
+      "sources": [
+        {
+          "$ref": "tokens.json"
+        }
+      ]
+    }
+  ],
+  "modifiers": [
+    {
+      "name": "brand",
+      "default": "platform",
+      "contexts": {
+        "platform": [],
+        "org": [
+          {
+            "color": {
+              "brand": {
+                "primary": {
+                  "$type": "color",
+                  "$value": "{org.brand.primary}"
+                },
+                "primary-ink": {
+                  "$type": "color",
+                  "$value": "{org.brand.primary-ink}"
+                }
+              }
+            },
+            "$description": "机构白标：主色由机构配置（O14），AI 生成标识与“技术支持”不可移除"
+          }
+        ]
+      }
+    },
+    {
+      "name": "vision",
+      "default": "default",
+      "contexts": {
+        "default": [],
+        "cvd": [
+          {
+            "color": {
+              "status": {
+                "success": {
+                  "$type": "color",
+                  "$value": "#1F6FB2"
+                },
+                "success-soft": {
+                  "$type": "color",
+                  "$value": "#E1EEF8"
+                },
+                "danger": {
+                  "$type": "color",
+                  "$value": "#B35A00"
+                },
+                "danger-soft": {
+                  "$type": "color",
+                  "$value": "#FCEBDC"
+                }
+              },
+              "$description": "色觉友好：对错不靠红绿区分，改用蓝橙；掌握档本身为单色相明度阶梯，保持不变"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "text",
+      "default": "default",
+      "contexts": {
+        "default": [],
+        "large": [
+          {
+            "font": {
+              "size": {
+                "body": {
+                  "$type": "dimension",
+                  "$value": {
+                    "value": 17,
+                    "unit": "px"
+                  }
+                },
+                "small": {
+                  "$type": "dimension",
+                  "$value": {
+                    "value": 15,
+                    "unit": "px"
+                  }
+                },
+                "title": {
+                  "$type": "dimension",
+                  "$value": {
+                    "value": 26,
+                    "unit": "px"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S08
+end: learner
+title: 复盘与报告
+mode: standard
+purpose: 每周十分钟，看投入换来了什么，只改一件事。
+refine: pending
+states: [loading, empty, error, offline, restricted, insufficient_data, locked]
+state_overrides:
+  empty: 本周还没有可复盘的数据：至少有 3 天学习记录后生成周报；主按钮“先去学习”（去 S06）
+  offline: 显示已生成的报告；“只改一件事”写回计划需要联网
+  restricted: 教练点评属于导师功能，额度用完时只显示数据部分
+  insufficient_data: 有效学习不足 2 小时时，只给数据，不给结论
+  locked: 地图体检不通过时，预测类区块显示原因与“去修复”，学习照常
+layout_notes:
+  - 页头：标题；动作“分享与导出”；标签“本周、本月、轮次总结”。
+  - 本周左栏：一句话与三个统计；亮点与待改进；投入换来了什么；提分来源；错题三数。
+  - 本周右栏：教练点评（带依据）；两个问题；下周只改一件事（单选、确认写回）；报告准不准。
+  - 月与轮次：同一结构，周期更长；轮次总结加“与上一轮对比”。
+data:
+  reads: [一周全部证据]
+  writes: [复盘记录, 经确认的计划调整]
+ai:
+  - role: 归纳一周数据并给出具体可执行的建议。
+entries: [S06, S34]
+exits: [S09]
+unresolved_links: [S07, S24]
+items:
+  - id: S08-01
+    name: 固定结构周报
+    text: 一句话总结、三个亮点、一个待改进；下周怎么改只在“下周只改一件事”里决定（S08-06）
+    page_priority: P0
+  - id: S08-02
+    name: 投入产出对照
+    text: 有效学习时长换来多少档位提升与预测变化
+    page_priority: P0
+  - id: S08-03
+    name: 掌握度变化
+    text: 期初到期末各档位知识点数的迁移
+    page_priority: P0
+  - id: S08-04
+    name: 下周只改一件事
+    text: 单选且无默认，确认后写回计划
+    page_priority: P0
+  - id: S08-05
+    name: 只与自己比
+    text: 默认不展示排名
+    page_priority: P0
+  - id: S08-06
+    name: 唯一决定点
+    text: 整页只有“下周只改一件事”一个会写回计划的决定；导师建议是其中一个选项，也可“自己写一条”转成提议
+    page_priority: P0
+  - id: S08-07
+    name: 学习方式效率
+    text: 读、看、听、练、背各自每小时的档位增量
+    page_priority: P1
+  - id: S08-08
+    name: 错题趋势
+    text: 新增、毕业、顽固
+    page_priority: P1
+  - id: S08-09
+    name: 三问复盘
+    text: 最有效的、最浪费的、下周改什么
+    page_priority: P1
+  - id: S08-10
+    name: 教练点评
+    text: 从一周数据找出一件值得说的事，注明样本量，禁止空泛鼓励
+    page_priority: P1
+  - id: S08-11
+    name: 月报与轮次总结
+    text: 周期更长的同结构报告
+    page_priority: P1
+  - id: S08-12
+    name: 本周节奏
+    text: 有效学习时长柱状图与本周有效学习日数
+    page_priority: P1
+  - id: S08-13
+    name: 提分来源拆解
+    text: 本周预测变化分别来自哪些模块与动作
+    page_priority: P1
+  - id: S08-14
+    name: 报告反馈
+    text: 「这份报告准吗」一键反馈，进入 AI 质量评测
+    page_priority: P1
+  - id: S08-15
+    name: 导出与分享
+    text: 导出文档；可分享给监督伙伴，范围自定
+    page_priority: P2
+slice: design/screens/slices/S08.html
+shots: design/screens/shots/S08/

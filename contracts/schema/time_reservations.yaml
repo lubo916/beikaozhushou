@@ -1,0 +1,12 @@
+table: time_reservations
+owner: plan
+description: 对时间预算的占用：目标的学习任务、机构作业与课表都以占用表达，个人任务自动避让
+tenant_scoped: true
+fields:
+  - {name: id, type: uuid, pk: true, x-data-class: personal_learning}
+  - {name: tenant_id, type: uuid, ref: tenants.id, x-data-class: operational}
+  - {name: learner_id, type: uuid, ref: users.id, x-data-class: personal_learning}
+  - {name: date, type: date, x-data-class: personal_learning}
+  - {name: minutes, type: int, x-data-class: personal_learning}
+  - {name: source_kind, type: "enum[goal, org_task, class_schedule, custom]", x-data-class: personal_learning}
+  - {name: source_ref, type: uuid, x-data-class: personal_learning}

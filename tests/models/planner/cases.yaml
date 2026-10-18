@@ -1,0 +1,43 @@
+# planner 金标用例：given → expect；算法实现须全部通过（见 docs/models/planner.md#acceptance）。
+- id: PL-01
+  desc: 巩固段不低于下限
+  given:
+    available_minutes: 60
+    due_minutes: 10
+  expect:
+    consolidate_ratio_min: plan.consolidate.min_ratio
+- id: PL-02
+  desc: 到期量超过每日上限时只取最要紧的一批，不显示积压数
+  given:
+    due_items: 200
+  expect:
+    taken: plan.review.daily_cap
+    show_backlog: false
+- id: PL-03
+  desc: 不可学日只保留到期复习的最小版
+  given:
+    day: 不可学日
+  expect:
+    segments:
+    - 巩固段
+    postponed_rest: true
+- id: PL-04
+  desc: 中断回归先给启动任务
+  given:
+    gap_days: 5
+  expect:
+    first_task_minutes: plan.disconnect.start_task_minutes
+    proposal: true
+- id: PL-05
+  desc: 改变范围的调整只生成提议
+  given:
+    time_short: true
+  expect:
+    proposal: true
+    auto_applied: false
+- id: PL-06
+  desc: 学员锁定的安排不被自动重排覆盖
+  given:
+    locked_item: true
+  expect:
+    moved: false

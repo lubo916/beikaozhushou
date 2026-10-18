@@ -1,0 +1,125 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S31
+end: learner
+title: 会员与权益
+mode: standard
+purpose: 买的是“这一次备考”或持续的学习服务；核心闭环不设限，到期不锁数据。
+refine: pending
+states: [loading, empty, error, offline, restricted]
+state_overrides:
+  empty: 还没有订单：核心闭环免费，不需要购买也能完整备考；主按钮“看档位对比”
+  offline: 可查看权益；购买与退款需要联网
+  restricted: 人工服务就绪后才上架人工档
+layout_notes:
+  - 左栏：当前权益（类型、有效期、待生效清单与最终到期日、续费状态与下次扣款日、关闭自动续费、设备上限与“管理设备”入口、人工客服入口）→ 用量与额度（含加量包）→ 档位对比表 → 两种买法（含按端的支付方式说明）。
+  - 右栏：续学权益进度 → 订单与退款试算（发票、带订单号联系人工客服）→ 优惠与邀请 → 这里没有的东西。
+data:
+  reads: [用量]
+  writes: [订单与权益]
+ai:
+  - role: 按用量与目标日推荐合适的档位，不推荐超出需要的方案。
+entries: [S34]
+exits: [S32, S35]
+items:
+  - id: S31-01
+    name: 三档对比
+    text: 免费、会员、会员加人工服务
+    page_priority: P0
+  - id: S31-02
+    name: 核心闭环不设限
+    text: 今日清单、计划、到期复习、错题回炉在任何档位都不限量
+    page_priority: P0
+  - id: S31-03
+    name: 两种购买方式
+    text: 考期通行证（有效至目标日后一段时间，不自动续费）与时长订阅（适合多目标，可选自动续费），可互转
+    page_priority: P0
+  - id: S31-04
+    name: 自动续费规则
+    text: 只用于时长订阅；扣款前提醒；目标日已过且长期未学时，续费前再确认一次
+    page_priority: P0
+  - id: S31-05
+    name: 限的是规模与高成本能力
+    text: 同时进行的目标数、资料解析量、导师深度能力的额度
+    page_priority: P0
+  - id: S31-06
+    name: 用量与额度
+    text: 各项能力已用与剩余，明细可查；耗额度的操作事先告知
+    page_priority: P0
+  - id: S31-07
+    name: 到期降级不阻断
+    text: 数据全部可见可导出，核心闭环照常；超出免费规模的部分转只读
+    page_priority: P0
+  - id: S31-08
+    name: 订单记录
+    text: 查看全部订单及状态
+    page_priority: P0
+  - id: S31-09
+    name: 自动续费购买与关闭
+    text: 购买时「单次购买」与「自动续费」并列、不预选，写明周期、金额与下次扣款日；当前订阅显示下次扣款日与一键关闭，关闭后当期仍有效
+    page_priority: P0
+  - id: S31-10
+    name: 加量包
+    text: 批改、口述、解析等一次性加量，未用可退
+    page_priority: P1
+  - id: S31-11
+    name: 兑换码与机构权益
+    text: 机构批量开通，与服务期绑定
+    page_priority: P1
+  - id: S31-12
+    name: 设备上限随档位
+    text: 显示当前档位的设备上限，管理入口指向数据与隐私（S32）
+    page_priority: P1
+  - id: S31-13
+    name: 续学权益
+    text: 以有效学习周数为条件，与考试结果无关
+    page_priority: P2
+  - id: S31-14
+    name: 邀请
+    text: 邀请好友双方得时长；不做以焦虑为卖点的促销
+    page_priority: P2
+  - id: S31-15
+    name: 发票申请
+    text: 申请与下载发票
+    page_priority: P0
+  - id: S31-16
+    name: 退款试算、申请与进度
+    text: 退款公式公示，可先试算再提交申请，提交后可查看退款进度
+    page_priority: P0
+  - id: S31-17
+    name: 支付失败处理
+    text: 按用户取消、余额或网络问题、订单超时、系统异常分别说明并给出重试；已扣款未开通时直达人工客服
+    page_priority: P0
+  - id: S31-18
+    name: 扣款失败宽限期
+    text: 自动续费扣款失败后进入宽限期，期间权益保留；提示更新支付方式，并按计划重试扣款
+    page_priority: P1
+  - id: S31-19
+    name: 到期提醒
+    text: 到期前分档提醒续费，最后一次说明到期后保留什么；已开自动续费的改为“将自动续期”，页面与通知措辞一致
+    page_priority: P1
+  - id: S31-20
+    name: 权益顺延衔接
+    text: 有效期内再次购买、兑换或获赠时，新权益排在当前权益之后，不重叠浪费；显示待生效清单与最终到期日
+    page_priority: P1
+  - id: S31-21
+    name: 升级补差
+    text: 从低档升到高档时按剩余价值折算补差，到期日的算法可查
+    page_priority: P1
+  - id: S31-22
+    name: 管理下次续费
+    text: 当期权益不变，到期后改按较低档位续费，可撤销
+    page_priority: P2
+  - id: S31-23
+    name: 我的优惠券
+    text: 按可用、已用、已过期分组，临期的排前；支付时可直接选用
+    page_priority: P2
+  - id: S31-24
+    name: 关闭续费原因
+    text: 关闭自动续费后可选填原因，跳过不影响关闭；原因收集不放在关闭之前
+    page_priority: P2
+  - id: S31-25
+    name: 支付渠道
+    text: 按端提供支付方式；苹果应用内购买不支持优惠码；续费与退款回到原购买渠道办理
+    page_priority: P0
+slice: design/screens/slices/S31.html
+shots: design/screens/shots/S31/

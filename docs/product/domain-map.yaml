@@ -1,0 +1,110 @@
+# 领域划分（ADR-002）。功能 ID 前缀取 code；表、业务事件、参数、AI 场景、指标的 owner 取 name。
+# depends：本领域调用或订阅的领域（只能单向）；learner 为核心域，证据与掌握档只由它写入。
+- code: LRN
+  name: learner
+  title: 学习者模型
+  group: 学习核心
+  owns: 学习证据账本、六档掌握派生、记忆状态、预测、摸底估计
+  depends: [map, content, exam]
+- code: PLAN
+  name: plan
+  title: 计划引擎
+  group: 学习核心
+  owns: 目标与时间预算、今日清单、到期队列、轮次与范围、提议与重排记录、复盘
+  depends: [learner, map, exam, content]
+- code: MAP
+  name: map
+  title: 知识地图
+  group: 学习核心
+  owns: 知识点稳定身份与版本、类型、关系、扩展层、地图体检
+  depends: [exam]
+- code: PRAC
+  name: practice
+  title: 练习
+  group: 学习核心
+  owns: 作答与揭晓、练习与模考会话、错题与回炉、复习卡片与会话、背诵训练
+  depends: [learner, content, map, plan]
+- code: GRADE
+  name: grading
+  title: 批改
+  group: 学习核心
+  owns: 主观题与口头表达的评分、批注与示范
+  depends: [learner, content, practice, aigov]
+- code: TUTOR
+  name: tutor
+  title: AI 导师
+  group: 学习核心
+  owns: 对话、讲解、追问、导师长期记忆、危机识别
+  depends: [learner, content, map, plan, aigov]
+- code: EXM
+  name: exam
+  title: 考试画像
+  group: 内容
+  owns: 考试画像库、评价规则、考试日历、考情档案、扩展包挂载
+  depends: []
+- code: CONT
+  name: content
+  title: 内容与题库
+  group: 内容
+  owns: 题目与可信度、资料与对齐、阅读器、视听、笔记、模板与学习包、搜索
+  depends: [exam, map, aigov]
+- code: MOD
+  name: moderation
+  title: 内容审核
+  group: 内容
+  owns: 审核队列、题目质检与可信度升级、报错处理与下架、内容安全
+  depends: [content]
+- code: ORG
+  name: org
+  title: 机构
+  group: 机构
+  owns: 租户与组织、班级与学员、作业与课表、督学、机构内容与答疑
+  depends: [account, plan, learner, practice, grading, content, compliance]
+- code: ACCT
+  name: account
+  title: 账号与身份
+  group: 平台
+  owns: 账号、游客身份与合并、登录与会话、年龄分段与未成年人模式、员工身份、偏好设置
+  depends: []
+- code: BILL
+  name: billing
+  title: 会员与计费
+  group: 平台
+  owns: 档位与额度、订单与支付、自动续费、发票退款、机构席位与用量
+  depends: [account]
+- code: AIGOV
+  name: aigov
+  title: AI 治理
+  group: 平台
+  owns: AI 网关、场景注册与模型路由、执行者台账、提示词版本、评测与监控
+  depends: []
+- code: COMP
+  name: compliance
+  title: 合规
+  group: 平台
+  owns: 授权与同意、数据导出与注销、协议版本、审计、备案、生成内容标识检查
+  depends: [account]
+- code: METR
+  name: metrics
+  title: 指标
+  group: 平台
+  owns: 埋点事件、指标口径与看板、数据任务
+  depends: [learner, plan, practice]
+- code: ENG
+  name: engagement
+  title: 触达与增长
+  group: 平台
+  owns: 通知中心与通道、频控与免打扰、公告与资讯、自习室与小组、增长活动
+  depends: [account, plan, exam]
+- code: SUPP
+  name: support
+  title: 客服与反馈
+  group: 平台
+  owns: 帮助中心、反馈与工单、人工客服、满意度
+  depends: [account, content]
+- code: PLAT
+  name: platform
+  title: 平台基础
+  group: 平台
+  owns: 端外壳与通用组件、参数与开关的运行时、发布与环境、容量预案
+  depends: []

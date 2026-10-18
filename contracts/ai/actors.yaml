@@ -1,0 +1,74 @@
+# AI 执行者与读写范围（安全制品，独立审计；原型称“行为体”，后台 P11 台账由此生成种子）。
+# writes.mode：direct 直接写 | propose 只能提议 | none。对计划与掌握档的 direct 只允许 planner（INV-01，检查 E-AI-03）。
+- id: planner
+  name: 计划引擎
+  kind: deterministic
+  reads: [personal_learning, inferred, org_task]
+  writes:
+    - target: plan.items
+      mode: direct
+    - target: plan.carryover
+      mode: direct
+    - target: plan.scope
+      mode: propose
+    - target: plan.rounds
+      mode: propose
+    - target: plan.goal
+      mode: propose
+  scenarios: []
+  approval: 双人
+  note: 唯一能自动顺延的执行者；目标、范围、轮次的调整只以提议出现（S06-10、P11-04）
+- id: tutor
+  name: AI 导师
+  reads: [personal_learning, inferred, sensitive]
+  writes:
+    - target: plan.items
+      mode: propose
+    - target: practice.cards
+      mode: propose
+    - target: practice.questions
+      mode: propose
+    - target: tutor.messages
+      mode: direct
+  tools: [search_knowledge, create_proposal]
+  scenarios: []
+  escalation:
+    crisis_signal: 停止催学，展示核验过的求助渠道，转平台值守（INV-10）
+    answer_conflict: 拦截输出（INV-08）
+    low_confidence: 说明不确定，资格类问题只做限定回答
+- id: explainer
+  name: 文案与讲解生成
+  reads: [personal_learning]
+  writes: []
+  tools: []
+  scenarios: []
+- id: grader
+  name: 批改
+  reads: [personal_learning]
+  writes:
+    - target: grading.results
+      mode: direct
+  tools: []
+  scenarios: []
+  escalation:
+    low_confidence: 转人工复核或只给要点（INV-09）
+- id: org_assistant
+  name: 机构助教
+  reads: [org_task]
+  writes:
+    - target: org.qa_answers
+      mode: direct
+  tools: [search_org_knowledge]
+  scenarios: []
+  escalation:
+    low_confidence: 转老师
+    price_or_promise: 转老师
+- id: classifier
+  name: 内容与危机分类
+  kind: 只分类，不生成内容
+  reads: [sensitive]
+  writes:
+    - target: moderation.flags
+      mode: direct
+  tools: []
+  scenarios: []

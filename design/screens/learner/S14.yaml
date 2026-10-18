@@ -1,0 +1,84 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S14
+end: learner
+title: 笔记本
+mode: standard
+purpose: 笔记按知识点归位，在该用时自己回来；考前汇成一本通和最后一页纸。
+refine: pending
+states: [loading, empty, error, offline, restricted, insufficient_data]
+state_overrides:
+  empty: 还没有笔记：在阅读、做题、问导师时随手记，都会归到知识点；主按钮“新笔记”
+  offline: 笔记可离线编辑，联网后同步
+  restricted: AI 整理属于高成本 AI，额度用完时暂停，手写不受影响
+  insufficient_data: 笔记太少时不生成最后一页纸，只给模板
+layout_notes:
+  - 页头：笔记本；动作“新笔记”“AI 整理”“导出”。
+  - 标签：笔记｜收藏｜一本通｜最后一页纸。
+  - 笔记标签：类型筛选（综合、口诀、释义、要点、易错五类）、列表（标题、类型、来源小标、知识点路径、出处）、右栏完整性检查；多选后批量转卡片或自测题。
+data:
+  reads: [错题, 卡片稳定度, 考频]
+  writes: [笔记与知识点的关联]
+ai:
+  - role: 笔记整理、完整性检查、最后一页纸的筛选与压缩。
+entries: [S10, S19, S27, S29]
+exits: [S12, S16, S17, S28]
+unresolved_links: [S15]
+items:
+  - id: S14-01
+    name: 多源汇聚
+    text: 阅读、看课、做题、对话、语音、拍照手写的笔记统一入库
+    page_priority: P0
+  - id: S14-02
+    name: 按知识点归位
+    text: 不用文件夹，自动挂到知识点，可改
+    page_priority: P0
+  - id: S14-03
+    name: 五种类型与来源标识
+    text: 综合、口诀、释义、要点、易错；标明手写、导师生成、导师生成后编辑
+    page_priority: P0
+  - id: S14-04
+    name: 编辑器
+    text: 富文本、公式、表格、图片、手写画板、斜杠命令
+    page_priority: P0
+  - id: S14-05
+    name: 转卡片与转题目
+    text: 选中内容生成，确认后入队
+    page_priority: P0
+  - id: S14-06
+    name: 筛选与全文搜索
+    text: 按来源、类型、科目、时间筛选
+    page_priority: P0
+  - id: S14-07
+    name: 导出与打印
+    text: 通用格式，不限次数
+    page_priority: P0
+  - id: S14-08
+    name: 整理成稿
+    text: 把零散或语音笔记理顺成结构化笔记，须确认才保存
+    page_priority: P1
+  - id: S14-09
+    name: 收藏
+    text: 题目、段落、讲解、笔记四类收藏一处管理；收藏的题可直接组卷
+    page_priority: P1
+  - id: S14-10
+    name: 完整性检查
+    text: 对照地图提示遗漏要点，并指出哪些是高频
+    page_priority: P1
+  - id: S14-11
+    name: 导图与导图背诵
+    text: 生成章节导图，可逐层遮挡回忆
+    page_priority: P1
+  - id: S14-12
+    name: 个人一本通
+    text: 把笔记、错题结论、易混对比按地图顺序汇编
+    page_priority: P1
+  - id: S14-13
+    name: 最后一页纸
+    text: 按错题、低稳定度、高频加权，压缩成几种可选篇幅
+    page_priority: P1
+  - id: S14-14
+    name: 搬运提醒
+    text: 大段照抄时提示改用自己的话
+    page_priority: P1
+slice: design/screens/slices/S14.html
+shots: design/screens/shots/S14/

@@ -1,0 +1,94 @@
+# 跨功能待定问题（编号 OQ-<nnn>，只在主干用 new oq 分配）。每条都有临时默认；功能级待定问题写在各规格的 front matter。
+- id: OQ-001
+  q: 1 期参数的默认值与区间如何定稿？
+  features: [LRN-01, LRN-02, LRN-03, PRAC-05, PRAC-07, PLAN-03, PLAN-04, PLAN-06, PLAN-07, PLAN-08]
+  owner: 产品负责人
+  default: 取 contracts/params.yaml 的现值；证据与掌握相关取值随 OQ-002、记忆调度相关随 OQ-003、排程相关随 OQ-005 定稿，1 期开工时按校准表复核一次
+  status: open
+- id: OQ-002
+  q: 证据如何换算成档位（把握度、蒙对待验证、异题印证、可信度上限、提示降级）？由探针 0.4A 回答
+  features: [LRN-01, LRN-02]
+  owner: 产品负责人
+  default: 按 docs/models/learner-model.md 的现行决策表与参数临时默认实现，探针结论以 ADR 定稿后替换
+  status: open
+- id: OQ-003
+  q: 记忆调度采用哪种算法与默认参数？由探针 0.4B 在模拟数据上比较后回答
+  features: [LRN-03, PLAN-04]
+  owner: 产品负责人
+  default: 按 docs/models/srs.md 的现行规则：以目标保持率决定间隔，每日上限与积压保护按参数；探针结论以 ADR 定稿后替换
+  status: open
+- id: OQ-004
+  q: AI 解析教材章节、讲义与往年卷的可用度如何？直接决定 5 期路线与工作量，由探针 0.4C 回答
+  features: [CONT-09, CONT-11, MAP-04, CONT-14]
+  owner: 产品负责人
+  default: 5 期按“AI 生成骨架、人工校准补全”估算；不承诺无人工的自动建图
+  status: open
+- id: OQ-005
+  q: 排程采用启发式还是约束求解？由探针 0.4D 在模拟一个月里验证配比、保底、顺延与提议规则后回答
+  features: [PLAN-01, PLAN-02, PLAN-03, PLAN-06]
+  owner: 产品负责人
+  default: 按 docs/models/planner.md 的启发式：先巩固段保底，再按性价比装推进段，排不下的顺延或转提议
+  status: open
+- id: OQ-006
+  q: 客户端形态：响应式网页先行，还是小程序或原生？影响登录方式、支付渠道、离线与推送能力（0 期进入条件）
+  features: [PLAT-01, ACCT-01]
+  owner: 产品负责人
+  default: 响应式网页先行（可安装为渐进式网页应用）；小程序与原生在 4 期上线门槛前重新评估
+  status: resolved
+  resolution: ADR-022：响应式网页先行，可安装为渐进式网页应用；小程序与原生在 4 期上线门槛前重新评估
+- id: OQ-007
+  q: 微信授权后是否必须绑定手机号（S01-14、S33-16）？
+  features: [ACCT-04]
+  owner: 产品负责人
+  default: 按 S33-16 建受限账号：付费、注销、换绑、管理设备前须先绑手机号
+  status: open
+- id: OQ-008
+  q: 知识类型中的“分类与结构”“流程与步骤”是否保留为副类型（原型 P04 的注）？
+  features: [MAP-01]
+  owner: 产品负责人
+  default: 不设副类型；一个知识点标一至两个 glossary 中的知识类型
+  status: open
+- id: OQ-009
+  q: 合并版原型与深化来源原型在八项跨页口径上如何取舍（掌握档与自评生效、错因层级、重要度刻度、笔记类型、知识点身份、额度与降级、AI 对话面板归属、题型）？
+  features: [LRN-01, LRN-02, PRAC-02, PRAC-04, MAP-01, MAP-03, CONT-06, TUTOR-01]
+  owner: 产品负责人
+  default: 以合并版原型为准，即 glossary.yaml、learner-model.md 与 exam-profile.schema.json 的现值；S18、S19 深化前逐项对照，采纳深化来源做法的走重型通道
+  status: resolved
+  resolution: ADR-017：八项跨页口径已裁决：ADR-017（掌握档、错因、重要度、笔记类型、知识点身份、题型、导航）、ADR-018（额度与降级）、ADR-019（导师面板）
+- id: OQ-010
+  q: 种子考试的题目、解析与教材文本从哪里来，使用权是否已确认？
+  features: [CONT-02]
+  owner: 产品负责人
+  default: 0 期用原型演示数据与自编解析作测试夹具；正式种子在 2 期进入前替换为授权内容
+  status: open
+- id: OQ-011
+  q: 深化清单除 S18、S19 外还包括哪些页？
+  features: []
+  owner: 产品负责人
+  default: 只有 S18、S19；其他页按需加入深化清单并标 refine：pending
+  status: resolved
+  resolution: "ADR-001：深化清单共 32 页，见归档 deep-source/refine-list.md；登记中对应页标 refine: pending"
+- id: OQ-012
+  q: 种子考试选哪一门，对照考试选哪一门？
+  features: [EXM-01, CONT-02]
+  owner: 产品负责人
+  default: 主种子为初级会计职称，对照考试为大学英语六级（分期规划的建议：一个合格线型、一个分数段型）
+  status: open
+- id: OQ-013
+  q: 没有群体数据时，诊断与预测的先验从哪里来？
+  features: [LRN-02, LRN-03, PLAN-03]
+  owner: 算法负责人
+  default: 按画像中的题型与分值分布、知识点重要度和中等水平先验估计，并标“低置信”；同类人数达到参数 learner.prior.min_population 后改用群体数据。
+  status: open
+- id: OQ-014
+  q: 合规类不变量（INV-05、INV-06、INV-07、INV-15、INV-19、INV-22）的法规依据与年龄线由谁确认、何时确认？
+  features: [ACCT-03, COMP-01, PLAN-05]
+  owner: 法务
+  default: 按 docs/product/invariants.yaml 的现行表述执行；法务确认后只更新 source 字段，陈述有变化时按重型通道修改。
+  status: open
+- id: OQ-015
+  q: AI 场景使用哪家模型、如何完成备案？
+  features: [PLAN-05, AIGOV-01]
+  owner: 技术负责人
+  default: 使用兼容 OpenAI 协议的国内已备案模型，经 packages/ai 的统一出口调用；生成式 AI 功能上线前完成备案（INV-15）。
+  status: open

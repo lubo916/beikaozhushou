@@ -1,0 +1,122 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S28
+end: learner
+title: AI 导师
+mode: standard
+purpose: 随时有人问，而且它知道你在看什么、哪里薄弱；回答带出处，写操作必须确认。
+views:
+  - id: normal
+    when: 正常
+  - id: crisis
+    when: 危机信号
+  - id: down
+    when: 不可用
+states: [loading, empty, error, offline, restricted, insufficient_data]
+state_overrides:
+  empty: 还没有对话：可以问：我现在怎么样、这道题为什么错、把今天改轻一点；主按钮“开始提问”
+  offline: 离线时导师不可用；历史对话可查看
+  restricted: 今日额度用完后，讲解与出题暂停，到期复习与做题照常
+  insufficient_data: 学情数据少时，导师先问你目标与情况
+layout_notes:
+  - 全局抽屉：顶部上下文（带入对象与状态标签）→ 讲法模式 → 对话（出处、把握度、AI 标识、执行卡）→ 追问键 → 快捷指令 → 输入（拍照、语音）。
+  - 独立页：左栏对话历史与搜索；中栏同抽屉；右栏快捷指令管理、它记得的关于你、关于导师、额度。
+  - 状态：测评态隐藏；危机信号时切到规程界面；不可用时说明哪些功能暂停。
+data:
+  reads: [当前页面与学习者模型]
+  writes: [待确认的卡片与计划提议。对话只有本人可见]
+ai:
+  - role: 检索增强并注入学习者上下文；回答与标准答案冲突时拦截。
+entries: [S14, S29]
+exits: [S06, S12, S15, S17, S19]
+unresolved_links: [S07, S18]
+items:
+  - id: S28-01
+    name: 三种形态
+    text: 页内侧栏、每页右下角浮标、完整对话页，共用同一份上下文与记忆
+    page_priority: P0
+  - id: S28-02
+    name: 上下文自动带入
+    text: 当前题目、段落、视频时刻、所选项；按所在页面自动选讲解、纠错或整理
+    page_priority: P0
+  - id: S28-03
+    name: 学情感知
+    text: 档位、近期错题、计划进度作为回答前提
+    page_priority: P0
+  - id: S28-04
+    name: 带出处回答
+    text: 指向教材页、视频时刻或用户自己的错题
+    page_priority: P0
+  - id: S28-05
+    name: 把握度与边界
+    text: 不确定就说不确定；不预测考题、不承诺结果；资格类问题只做限定回答
+    page_priority: P0
+  - id: S28-06
+    name: 五种讲法
+    text: 通俗、学术、案例、对比、类比，可设默认
+    page_priority: P0
+  - id: S28-07
+    name: 工具调用
+    text: 组题、制卡、查日历；写操作先预览再确认；计划改动只生成提议
+    page_priority: P0
+  - id: S28-08
+    name: 回答反馈
+    text: 可标事实错误、太深、太浅、不相关；确认的纠错进入评测集
+    page_priority: P0
+  - id: S28-09
+    name: 情绪识别与危机处置
+    text: 识别到风险信号即停止催学、展示核验过的求助热线、转平台值守，不转机构
+    page_priority: P0
+  - id: S28-10
+    name: 生成内容标识
+    text: 所有回答带明确标识
+    page_priority: P0
+  - id: S28-11
+    name: 不可用时的替代
+    text: 服务不可用时说明哪些功能暂停，并给不依赖导师的做法
+    page_priority: P0
+  - id: S28-12
+    name: 消耗提示
+    text: 标准操作不打扰；重型操作执行前告知消耗；额度剩余较少与用完时分档提示，并给出不花钱的替代
+    page_priority: P0
+  - id: S28-13
+    name: 多种模式
+    text: 直接讲、引导提问、讲给我听、出题考我、学习咨询
+    page_priority: P1
+  - id: S28-14
+    name: 快捷提示词
+    text: 预置与自定，可排序、隐藏
+    page_priority: P1
+  - id: S28-15
+    name: 知识点对比
+    text: 一键对比两个知识点
+    page_priority: P1
+  - id: S28-16
+    name: 拍照与语音
+    text: 拍照后先确认意图
+    page_priority: P1
+  - id: S28-17
+    name: 长期记忆可管理
+    text: 可查看、修改、删除导师记住的内容
+    page_priority: P1
+  - id: S28-18
+    name: 按环节的能力
+    text: 理解：讲解、多角度、类比举例、易混对比、概念图、原文改写。记忆：制卡、口诀、费曼、挖空。练习：组题、拍照识题、提示、引导我想、变式。诊断：错题分析、主观批改、薄弱点雷达。规划：解释计划、对话式调整、冲刺规划、复盘
+    page_priority: P1
+  - id: S28-19
+    name: 清空对话
+    text: 可清本次或清某知识点下全部，后者可短时撤销
+    page_priority: P2
+  - id: S28-20
+    name: 学业转人工
+    text: 逐次确认后只发当前题与用户写的问题
+    page_priority: P2
+  - id: S28-21
+    name: 本章概念图
+    text: 生成本章结构图，并按档位着色
+    page_priority: P1
+  - id: S28-22
+    name: 对话历史
+    text: 导师对话按知识点或题目归档，可回看、接着问；清空的对话不再出现
+    page_priority: P1
+slice: design/screens/slices/S28.html
+shots: design/screens/shots/S28/

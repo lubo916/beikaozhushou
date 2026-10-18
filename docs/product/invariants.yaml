@@ -1,0 +1,138 @@
+# 产品不变量与合规义务。INV-01 至 INV-17 与 doc-system 附录 E 同号；INV-18 起为补充。
+# 执行方式：test（标题含 [INV-nn] 的测试）、check（spec_tool 检查）、eval（评测阈值）、review（人工复核）、process（流程）。
+# 新增用 python scripts/spec_tool.py new inv（只在主干）。
+- id: INV-01
+  statement: AI 执行者对学习计划、掌握档等学员状态的写操作只能是待确认的提议；只有计划引擎可以自动顺延与分摊。
+  scope: 全局；plan、learner、tutor 领域与 contracts/ai/actors.yaml
+  source: 产品决定（S06、S07、P11）
+  enforcement: [check, test]
+- id: INV-02
+  statement: 任务理由等 AI 文案中的数字只能来自算法输出字段，模型只能润色措辞。
+  scope: S06、S07 与所有声明了 numbers_from 的 AI 场景
+  source: 产品决定（S06）
+  enforcement: [eval, test]
+- id: INV-03
+  statement: AI 导师的写操作（组题、制卡、改计划）先预览，由学员确认后才生效。
+  scope: tutor 领域；S28 与各页导师面板
+  source: 产品决定（S28）
+  enforcement: [test]
+- id: INV-04
+  statement: 大模型或导师不可用、额度用完或高峰排队时，今日清单、到期复习、错题回炉照常可用；计划与调度不依赖大模型。
+  scope: 全局；S06、S15、S19、P10、P19
+  source: 产品决定（S06、P10、P19）
+  enforcement: [test]
+- id: INV-05
+  statement: AI 生成内容在展示时带显式标识；下载、复制、导出的文件中带显式标识，文件元数据带隐式标识。
+  scope: 全局；所有有展示或导出输出的 AI 场景
+  source: 《人工智能生成合成内容标识办法》及配套国家标准（以法务确认为准，见 OQ-004）
+  enforcement: [test, check]
+- id: INV-06
+  statement: 14 岁以下不提供服务、不保存学习数据；14–17 岁自动进入未成年人模式，本人不能关闭；未确认年龄段的按未成年人处理。
+  scope: account 领域；S01、S32、P18
+  source: 未成年人保护相关规定（以法务确认为准，见 OQ-004）；原型 S01、S32
+  enforcement: [test]
+- id: INV-07
+  statement: 机构只能看到入班约定可见与学员逐项授权的数据类别；敏感数据永不向机构开放；未授权的数据不显示、不参与任何排序与统计；学员撤回授权后，机构侧副本在 contracts/data-classes.yaml 规定的期限内删除。
+  scope: 全局；org 端全部页面、开放接口与导出
+  source: 产品决定（S32、O04、P18）；个人信息保护相关规定
+  enforcement: [test]
+- id: INV-08
+  statement: 讲解或导师回答与标准答案冲突时拦截输出。
+  scope: tutor、practice 领域的讲解类场景
+  source: 产品决定（S18、S28）
+  enforcement: [eval, test]
+- id: INV-09
+  statement: 主观题批改多次独立评分取区间；把握低时转人工复核，一致性不达标的题型只给要点反馈、不给分数。
+  scope: grading 领域；S20、O09
+  source: 产品决定（S20）
+  enforcement: [eval]
+- id: INV-10
+  statement: 识别到危机信号时停止催学，展示核验过的求助渠道并转平台值守；危机记录单独存储、最小权限，全程不向机构披露。
+  scope: tutor、moderation 领域；S28、P17
+  source: 产品决定（S28、P17）
+  enforcement: [test, review]
+- id: INV-11
+  statement: 界面、通知与宣传文案不出现“保过”“必过”“押题”等禁用语，也不暗示命题信息或承诺考试结果。
+  scope: 全局；学员端、机构端素材、模板命名、通知
+  source: 广告与宣传相关规定；原型 O02、P05、P18
+  enforcement: [check]
+- id: INV-12
+  statement: 机构内容默认只在本机构可见，不进入公共库、不用于训练；用户导入的资料仅本人可见、不进入公共库、不用于训练；督学数据不用于续报营销。
+  scope: content、org 领域
+  source: 产品决定（S11、O08、O11、P09）
+  enforcement: [check, review]
+- id: INV-13
+  statement: 手机号等个人信息默认脱敏展示，查看明细须填事由并留痕；含个人信息的导出须审批并留痕。
+  scope: org、admin 端
+  source: 产品决定（O02、O03、P13）；个人信息保护相关规定
+  enforcement: [test]
+- id: INV-14
+  statement: 后台与机构端敏感操作按风险分三档：不可逆的经二级审批（双人复核只用于这一档）、可回滚的保存前后快照并可一键回滚、只读敏感的只留痕；执行前重验身份，验证服务不可用时一律拒绝；全部写审计日志。
+  scope: admin、org 端
+  source: 产品决定（P19、O15）
+  enforcement: [test, review]
+- id: INV-15
+  statement: 生成式 AI 功能上线前完成相应的备案或登记，并记入备案台账。
+  scope: 全局；aigov、compliance 领域
+  source: 生成式人工智能服务相关规定（以法务确认为准）
+  enforcement: [process]
+- id: INV-16
+  statement: 提示词与模型的灰度以学习效果指标判定，不以点击率判定。
+  scope: aigov 领域；P11、P12
+  source: 产品决定（P11、P12）
+  enforcement: [review, eval]
+- id: INV-17
+  statement: 任一关键评测指标低于阈值时阻断发布。
+  scope: aigov 领域；CI 与提示词发布
+  source: 产品决定（P12）
+  enforcement: [check]
+- id: INV-18
+  statement: 核心闭环（今日清单、计划、到期复习、错题回炉）在任何档位都不限量；会员到期后数据全部可见、可导出，核心闭环照常，超出免费规模的部分转只读。
+  scope: billing、plan、review、practice 领域；S31
+  source: 产品决定（S31、P19）
+  enforcement: [test]
+- id: INV-19
+  statement: 学员可随时导出自己的学习数据，任何档位不设门槛、不限次数；退班或结课后学员保留全部个人学习数据。
+  scope: compliance、org 领域；S32、O12
+  source: 产品决定（S32、O12）；个人信息保护相关规定
+  enforcement: [test]
+- id: INV-20
+  statement: 测评态（摸底诊断作答中、模考作答中、班级考试期间）不提供导师、搜题与提示。
+  scope: learner、practice、org 领域；S04、S22、O07
+  source: 产品决定（S04、S22、O07）
+  enforcement: [test]
+- id: INV-21
+  statement: 录音录像默认只用于本次评估，不留存；留存须单独同意；画面分析只在本地处理。
+  scope: review、grading 领域；S16、S21
+  source: 产品决定（S16、S21）；个人信息保护相关规定
+  enforcement: [test, review]
+- id: INV-22
+  statement: 发送给模型的只有内容文本，不含个人标识；学员数据默认不用于模型训练，单独同意后也只用去标识的作答数据。
+  scope: 全局；packages/ai 与 compliance 领域
+  source: 产品决定（S32）；个人信息保护相关规定
+  enforcement: [review, test]
+- id: INV-23
+  statement: 学习类提醒每天有上限、深夜不推、连续被忽略自动降频，不出现“落后”“欠”等字样；考试当天只保留考务提醒。
+  scope: notify、plan 领域；S27、S35、P15
+  source: 产品决定（S27、S35、P15）
+  enforcement: [test]
+- id: INV-24
+  statement: 揭晓后不能修改答案
+  scope: [practice]
+  source: 产品决定（S18-03）
+  enforcement: [test]
+- id: INV-25
+  statement: 蒙对或用时过短的正确作答不升档
+  scope: [learner, practice]
+  source: 产品决定（S18-09）
+  enforcement: [test]
+- id: INV-26
+  statement: 核心领域代码不按考试写分支
+  scope: [learner, plan, map, practice, grading, tutor, content]
+  source: 工程决定
+  enforcement: [check]
+- id: INV-27
+  statement: 学习计划的变化有原因、可查、可撤销
+  scope: [plan]
+  source: 产品决定（S07-10）
+  enforcement: [test]

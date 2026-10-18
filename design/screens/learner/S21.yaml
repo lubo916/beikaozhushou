@@ -1,0 +1,75 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S21
+end: learner
+title: 口头表达训练
+mode: standard
+purpose: 口试没人给反馈；仿真作答、有考官追问、有逐字稿批注。放在“练”组，按考试画像挂载。
+extension_pack: true
+states: [loading, empty, error, offline, restricted, insufficient_data]
+state_overrides:
+  empty: 还没有仿真记录：开始一次仿真，系统会先讲清五步流程；主按钮“开始仿真”
+  offline: 仿真需要联网
+  restricted: 未成年人模式下不开放视频分析
+  insufficient_data: 评估样本少于 3 次时不显示能力雷达
+layout_notes:
+  - 页头：口头表达训练；动作“开始一次仿真”；顶部提示下一站与突击计划提议。
+  - 类型卡（按画像显示），点开先看五步流程再开始。
+  - 左栏：上次评估（分数加具体描述、追问）→ 逐字稿批注；右栏：高分重构 → 能力雷达 → 隐私三条。
+data:
+  writes: [口述能力画像]
+ai:
+  - role: 语音识别、内容评估、追问生成。
+entries: []
+exits: []
+unresolved_links: [S16, S27, S28]
+items:
+  - id: S21-01
+    name: 按画像挂载
+    text: 考试画像含口试环节时自动出现，也可手动开启
+    page_priority: P0
+  - id: S21-02
+    name: 录音录像隐私
+    text: 默认只录音不留存，留存需单独同意
+    page_priority: P0
+  - id: S21-03
+    name: 多种场景
+    text: 结构化问答、小组讨论、口语考试、复试问答、答辩、试讲
+    page_priority: P1
+  - id: S21-04
+    name: 全流程仿真
+    text: 抽题、思考计时、作答计时
+    page_priority: P1
+  - id: S21-05
+    name: 追问
+    text: 针对回答中的漏洞与空话追问
+    page_priority: P1
+  - id: S21-06
+    name: 多维评估
+    text: 内容、逻辑、表达、时间；画面分析可选且只在本地处理
+    page_priority: P1
+  - id: S21-07
+    name: 逐字稿批注
+    text: 口头禅、长停顿、超时标在时间轴上
+    page_priority: P1
+  - id: S21-08
+    name: 重构示范
+    text: 保留原有思路，只优化结构与表达
+    page_priority: P1
+  - id: S21-09
+    name: 重答对比
+    text: 同题多次作答的得分轨迹
+    page_priority: P1
+  - id: S21-10
+    name: 突击计划
+    text: 口试临近时以提议切换为口试计划；口试在笔试之后的，笔试结束后再提
+    page_priority: P1
+  - id: S21-11
+    name: 题库与热点
+    text: 按地区、类别、年份组织
+    page_priority: P2
+  - id: S21-12
+    name: 真人模拟
+    text: 预约真人考官，作为增值服务
+    page_priority: P2
+slice: design/screens/slices/S21.html
+shots: design/screens/shots/S21/

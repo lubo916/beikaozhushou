@@ -1,0 +1,37 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: P02
+end: admin
+title: 数据中台
+mode: standard
+purpose: 埋点、指标与数据任务是所有看板和预测的地基；与系统配置分开，由数据岗位单独维护。
+refine: pending
+states: [loading, empty, error, offline, restricted, insufficient_data]
+data:
+  read_writes: [事件注册表, 指标字典, 数据任务与同步日志]
+ai:
+  - role: 识别埋点缺失与指标口径冲突，生成数据质量日报。
+entries: []
+exits: []
+items:
+  - id: P02-01
+    name: 指标字典
+    text: 每个指标的口径与版本
+    page_priority: P0
+  - id: P02-02
+    name: 数据任务监控
+    text: 统计任务的运行、失败与重跑
+    page_priority: P1
+  - id: P02-03
+    name: 行为事件登记
+    text: 新增统计事件须先登记
+    page_priority: P1
+  - id: P02-04
+    name: 归因分析
+    text: 首次触点与转化触点
+    page_priority: P1
+  - id: P02-05
+    name: 同步与字典查看
+    text: 看板同步状态、数据字典
+    page_priority: P1
+slice: design/screens/slices/P02.html
+shots: design/screens/shots/P02/

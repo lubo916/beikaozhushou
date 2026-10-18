@@ -1,0 +1,112 @@
+{
+  "exam_id": "cet-6",
+  "name": "大学英语六级",
+  "short_name": "六级",
+  "aliases": [],
+  "kind": "official",
+  "evaluation_rule": {
+    "type": "score_band",
+    "description": "自设目标 520 分（满分 710）",
+    "bands": [
+      {
+        "label": "未达 425",
+        "min": 0
+      },
+      {
+        "label": "425 以上",
+        "min": 425
+      },
+      {
+        "label": "自设目标",
+        "min": 520
+      }
+    ]
+  },
+  "full_score": 710,
+  "structure": [
+    {
+      "subject": "大学英语六级",
+      "sections": [
+        {
+          "name": "词汇与语法",
+          "knowledge_point_count": 40
+        },
+        {
+          "name": "听力",
+          "knowledge_point_count": 34
+        },
+        {
+          "name": "阅读理解",
+          "knowledge_point_count": 38
+        },
+        {
+          "name": "写作",
+          "knowledge_point_count": 28
+        },
+        {
+          "name": "翻译",
+          "knowledge_point_count": 28
+        }
+      ]
+    }
+  ],
+  "question_types": [
+    {
+      "type": "writing",
+      "label": "写作",
+      "response_form": "written",
+      "count": 1,
+      "subjective": true
+    },
+    {
+      "type": "listening",
+      "label": "听力",
+      "response_form": "listening",
+      "count": 25,
+      "subjective": false
+    },
+    {
+      "type": "reading",
+      "label": "阅读",
+      "response_form": "choice",
+      "count": 30,
+      "subjective": false
+    },
+    {
+      "type": "translation",
+      "label": "翻译",
+      "response_form": "written",
+      "count": 1,
+      "subjective": true
+    }
+  ],
+  "scoring": {
+    "target_default": 520,
+    "target_basis": "520 分",
+    "rubrics": []
+  },
+  "duration_minutes": 125,
+  "key_dates": [
+    {
+      "kind": "exam",
+      "date": "2026-12-12",
+      "status": "estimated",
+      "basis": "按往年 12 月第二个周六推算，准考证打印时核对"
+    }
+  ],
+  "readiness": {
+    "map": {
+      "level": 3,
+      "note": "官方技能树与词表"
+    },
+    "questions": {
+      "level": 3,
+      "note": "审定题 3,100 道"
+    },
+    "exam_intel": {
+      "level": 3,
+      "note": "近 10 次真题档案"
+    }
+  },
+  "variation_extensions": []
+}

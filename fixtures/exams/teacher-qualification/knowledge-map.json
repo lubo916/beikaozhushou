@@ -1,0 +1,140 @@
+{
+  "exam_id": "teacher-qualification",
+  "map_version": 1,
+  "source": "template",
+  "note": "演示数据：章节与知识点数量取自原型，sample_points 为每章的示例知识点",
+  "chapters": [
+    {
+      "name": "教育基础知识和基本原理",
+      "knowledge_point_count": 30,
+      "sample_points": [
+        {
+          "name": "教育的本质与功能",
+          "knowledge_types": [
+            "concept"
+          ],
+          "default_target_level": 3
+        }
+      ]
+    },
+    {
+      "name": "中学课程",
+      "knowledge_point_count": 14,
+      "sample_points": [
+        {
+          "name": "课程类型",
+          "knowledge_types": [
+            "fact"
+          ],
+          "default_target_level": 2
+        }
+      ]
+    },
+    {
+      "name": "中学教学",
+      "knowledge_point_count": 26,
+      "sample_points": [
+        {
+          "name": "教学原则",
+          "knowledge_types": [
+            "concept"
+          ],
+          "default_target_level": 4
+        },
+        {
+          "name": "教学评价类型",
+          "knowledge_types": [
+            "concept"
+          ],
+          "default_target_level": 3
+        },
+        {
+          "name": "材料分析：教学原则的运用",
+          "knowledge_types": [
+            "application"
+          ],
+          "default_target_level": 4
+        }
+      ]
+    },
+    {
+      "name": "中学生学习心理",
+      "knowledge_point_count": 28,
+      "sample_points": [
+        {
+          "name": "最近发展区",
+          "knowledge_types": [
+            "concept"
+          ],
+          "default_target_level": 4
+        },
+        {
+          "name": "学习动机理论",
+          "knowledge_types": [
+            "concept"
+          ],
+          "default_target_level": 3
+        },
+        {
+          "name": "知识的迁移",
+          "knowledge_types": [
+            "concept"
+          ],
+          "default_target_level": 3
+        }
+      ]
+    },
+    {
+      "name": "中学生发展心理",
+      "knowledge_point_count": 22,
+      "sample_points": [
+        {
+          "name": "皮亚杰认知发展阶段",
+          "knowledge_types": [
+            "fact"
+          ],
+          "default_target_level": 2
+        }
+      ]
+    },
+    {
+      "name": "中学生心理辅导",
+      "knowledge_point_count": 14,
+      "sample_points": [
+        {
+          "name": "心理健康教育",
+          "knowledge_types": [
+            "concept"
+          ],
+          "default_target_level": 2
+        }
+      ]
+    },
+    {
+      "name": "中学德育",
+      "knowledge_point_count": 22,
+      "sample_points": [
+        {
+          "name": "德育原则与方法",
+          "knowledge_types": [
+            "statute"
+          ],
+          "default_target_level": 3
+        }
+      ]
+    },
+    {
+      "name": "中学班级管理与教师心理",
+      "knowledge_point_count": 30,
+      "sample_points": [
+        {
+          "name": "班级管理模式",
+          "knowledge_types": [
+            "concept"
+          ],
+          "default_target_level": 2
+        }
+      ]
+    }
+  ]
+}

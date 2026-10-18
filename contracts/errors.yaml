@@ -1,0 +1,26 @@
+# 错误码。响应体统一为 {code, message_key, details}（docs/conventions/api.md）。
+- code: COMMON_VALIDATION
+  owner: platform
+  http_status: 422
+  message_key: error.common.validation
+  description: 请求不符合接口结构
+- code: COMMON_FORBIDDEN
+  owner: platform
+  http_status: 403
+  message_key: error.common.forbidden
+  description: 当前角色或数据范围无权执行该动作
+- code: COMMON_NOT_FOUND
+  owner: platform
+  http_status: 404
+  message_key: error.common.not_found
+  description: 资源不存在或不在可见范围内
+- code: PRAC_REVEAL_LOCKED
+  owner: practice
+  http_status: 409
+  message_key: error.practice.reveal_locked
+  description: 揭晓后不能修改答案（INV-24）
+- code: PRAC_CONFIDENCE_REQUIRED
+  owner: practice
+  http_status: 422
+  message_key: error.practice.confidence_required
+  description: 把握度开启时，未选择把握度不能提交

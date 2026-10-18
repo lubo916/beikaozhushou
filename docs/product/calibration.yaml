@@ -1,0 +1,5 @@
+# 校准记录（ADR-008；分期规划 3.3、9.6）。闭环开卡时由 open-loop 新增一条，收尾时由 close-loop 补全。
+# coefficient：后续闭环预算的乘数。status 会按最近关上的闭环给出建议值，由人决定是否采用；连续两个闭环都在预算内时可调回 1.0。
+# loops 每条字段：loop（闭环编号）、opened、budget（开卡时换算后的 [下限, 上限]）、closed、actual_rounds、slices_done、fused（熔断时移回待办的切片）、note。
+coefficient: 1.0
+loops: []

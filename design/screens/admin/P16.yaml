@@ -1,0 +1,54 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: P16
+end: admin
+title: 客服、工单与反馈
+mode: standard
+purpose: 报错是用户替平台做的免费质检，必须有时限、有去向、有回音。
+refine: pending
+states: [loading, empty, error, offline, restricted, insufficient_data]
+data:
+  read_writes: [工单, 反馈, 报错记录]
+ai:
+  - role: 首答与工单分类。
+entries: []
+exits: []
+unresolved_links: [P08, P12]
+items:
+  - id: P16-01
+    name: 工单系统
+    text: 分类、时限、超时升级
+    page_priority: P0
+  - id: P16-02
+    name: 内容报错
+    text: 直达对应教研，结论回复报错人并同步受影响用户
+    page_priority: P0
+  - id: P16-03
+    name: 导师回答纠错
+    text: 确认后修正并进入评测集
+    page_priority: P0
+  - id: P16-04
+    name: 退款与投诉
+    text: 按规则自动计算；投诉有时限与升级路径
+    page_priority: P0
+  - id: P16-05
+    name: 产品反馈管理
+    text: 归类、回复、状态流转
+    page_priority: P1
+  - id: P16-06
+    name: 智能客服与知识库
+    text: 首答；费用、投诉、账号安全直接转人工
+    page_priority: P1
+  - id: P16-07
+    name: 满意度与调查
+    text: 工单评价、一次解决率、低频调查
+    page_priority: P1
+  - id: P16-08
+    name: 排障只读视图
+    text: 经用户授权后，限时以其视角只读查看页面；不含笔记、导师对话与情绪数据；进出留痕，不计入用户行为数据；不提供可写的「以用户身份登录」
+    page_priority: P2
+  - id: P16-09
+    name: 账号共享核查工单
+    text: 同一账号反复超出设备上限时，自动生成核查工单
+    page_priority: P2
+slice: design/screens/slices/P16.html
+shots: design/screens/shots/P16/

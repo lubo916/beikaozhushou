@@ -1,0 +1,89 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S04
+end: learner
+title: 摸底诊断
+mode: guided
+purpose: 用尽量少的题估出整张地图的掌握分布。
+refine: pending
+views:
+  - id: start
+    when: 开始页
+  - id: test
+    when: 测评中
+    mode: immersive
+states: [loading, empty, error, offline, restricted, insufficient_data]
+state_overrides:
+  empty: 题源不足：可用的题不足 20 道：先导入题目，或改用快速定位；主按钮“改用快速定位”
+  offline: 已下载的题可离线作答，交卷在联网后提交；中途断网不丢答案
+  restricted: 测评中不出现导师、提示与推送
+  insufficient_data: 未测到的模块先用同类人群数据代替，并在起点报告里标注
+layout_notes:
+  - 开始页：三种方式卡（自适应约 26 题 15 分钟、快速定位 5 分钟、章节抽测），各写代价；题源说明；规则；开始。
+  - 测评页（沉浸）：顶部测评条（第 n 题、预计剩余、暂停并退出）；题干与选项；把握度三档加“不会”；提交。
+  - 桌面右侧放分模块进度；手机收进进度条下的“模块”抽屉。
+  - 手机上把握度四档排成两行两列，放在拇指区。
+data:
+  writes: [各知识点初始掌握估计与不确定度, 把握度校准]
+ai:
+  - role: 能力估计与选题；用同类用户的群体数据初始化先验。
+entries: [S03, S05, S09]
+exits: [S03, S05]
+items:
+  - id: S04-01
+    name: 自适应选题
+    text: 按作答实时调整下一题的难度与模块，题量有上下限
+    page_priority: P0
+  - id: S04-02
+    name: 按知识点抽题
+    text: 题库较小时改为按知识点抽少量题，优先中等难度客观题
+    page_priority: P0
+  - id: S04-03
+    name: 快速定位
+    text: 几分钟内完成：按章自评为主、少量题为辅；代价是区间更宽，并明说
+    page_priority: P0
+  - id: S04-04
+    name: 测评态
+    text: 全程不显示对错，不出现导师、搜题与提示
+    page_priority: P0
+  - id: S04-05
+    name: 把握度与“不会”
+    text: 每题必选确定、模糊、蒙的或不会，不设默认，用来识别蒙对
+    page_priority: P0
+  - id: S04-06
+    name: 题源与可信度
+    text: 优先审定题，其次用户自有题；都不足时提示先导入题目或改用快速定位
+    page_priority: P0
+  - id: S04-07
+    name: 断点续做
+    text: 测评可分次完成，已答的题保留
+    page_priority: P0
+  - id: S04-08
+    name: 分模块估计
+    text: 每个模块给出能力估计与不确定度；未测模块用群体先验并标注
+    page_priority: P0
+  - id: S04-09
+    name: 开始页
+    text: 第一题之前讲清三种方式各自的代价、题源、预计时长与规则；测评中只留“改用快速定位”，已答的题保留
+    page_priority: P0
+  - id: S04-10
+    name: 沉浸测评界面
+    text: 桌面与平板也收起侧栏与顶栏，只留测评条与“暂停并退出”；侧栏不放任何学科内容
+    page_priority: P0
+  - id: S04-11
+    name: 主观题自评
+    text: 简答类对照得分点勾选自评；须先作答或思考一定时间，防止全勾
+    page_priority: P1
+  - id: S04-12
+    name: 可重复且只升不降
+    text: 再次诊断只覆盖本次测到的知识点，结果低于现有证据时不降级
+    page_priority: P1
+  - id: S04-13
+    name: 诊断错题不自动入错题本
+    text: 结果页可手动勾选加入，避免一次诊断塞满错题本
+    page_priority: P1
+  - id: S04-14
+    name: 补充诊断
+    text: 长时间中断后，可做一次简短的补充诊断
+    page_priority: P0
+slice: design/screens/slices/S04.html
+shots: design/screens/shots/S04/

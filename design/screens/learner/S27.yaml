@@ -1,0 +1,81 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S27
+end: learner
+title: 冲刺与考后
+mode: standard
+purpose: 最后十天求稳；考完之后估分、登记、选下一站。
+views:
+  - id: sprint
+    when: 冲刺
+  - id: after
+    when: 考后
+states: [loading, empty, error, offline, restricted, insufficient_data]
+state_overrides:
+  empty: 还没到冲刺期：目标日前 10 天起出现冲刺安排；主按钮“去今日”（去 S06）
+  offline: 最后一页纸可离线查看与打印
+  restricted: 考试当天全站静默，只保留考务提醒
+  insufficient_data: 没登记成绩时，不计入预测校准
+layout_notes: [冲刺标签：冲刺时间线 → 冲刺提议（时机到时）→ 今日三件事 → 保温进度、作息与考务 → 最后一页纸预览。, 考后标签：估分 → 登记成绩 → 下一站三选一 → 本次备考归档 → 上次预测与实际。]
+data:
+  reads: [全周期错题, 卡片稳定度, 考频]
+  writes: [真实成绩]
+ai:
+  - role: 冲刺内容的筛选与压缩；考后复盘。
+entries: [S24]
+exits: [S14, S34]
+unresolved_links: [S21, S33]
+items:
+  - id: S27-01
+    name: 冲刺模式提议
+    text: 临近目标日时提议进入冲刺模式，未确认再提醒一次；确认后生效
+    page_priority: P0
+  - id: S27-02
+    name: 今日三件事
+    text: 高频速览、手感保温、错题只看不做
+    page_priority: P0
+  - id: S27-03
+    name: 考试当天静默
+    text: 不推送任何学习消息
+    page_priority: P0
+  - id: S27-04
+    name: 登记成绩与校准
+    text: 回填真实成绩，只用于校准预测
+    page_priority: P0
+  - id: S27-05
+    name: 本次备考归档
+    text: 数据进入成长档案
+    page_priority: P0
+  - id: S27-06
+    name: 最后一页纸入口
+    text: 冲刺期提示生成并打印最后一页纸；生成规则见 S14-13
+    page_priority: P1
+  - id: S27-07
+    name: 保温全量扫描
+    text: 把已稳定的高分值卡快速过一遍，只在忘记处停留
+    page_priority: P1
+  - id: S27-08
+    name: 作息对齐
+    text: 按真实开考时间调整学习时段
+    page_priority: P1
+  - id: S27-09
+    name: 考务清单
+    text: 证件、路线、文具、禁带物品
+    page_priority: P1
+  - id: S27-10
+    name: 考后估分
+    text: 按科目对答案估分，主观题给区间
+    page_priority: P1
+  - id: S27-11
+    name: 考后分流
+    text: 通过则转下一科或口述面试；未过则复盘并继承数据；可迁移到相近目标
+    page_priority: P1
+  - id: S27-12
+    name: 心态与睡眠提示
+    text: 克制而具体的考前建议
+    page_priority: P1
+  - id: S27-13
+    name: 临考增频
+    text: 冲刺期复习提醒可增加频次，仍受每日上限约束
+    page_priority: P2
+slice: design/screens/slices/S27.html
+shots: design/screens/shots/S27/

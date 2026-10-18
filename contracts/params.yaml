@@ -1,0 +1,517 @@
+# 参数、阈值、开关的唯一来源（ADR-014）。代码只经 packages/params 的访问器读取（gen 生成）。
+# 字段：name、owner、description、default、range、unit、tunable_by、learner_range、rollout、reason_required、source_items（出处原型条目）。
+# 默认值为临时默认（OQ-001）：证据与掌握相关由探针 0.4A 定稿，记忆调度由 0.4B 定稿，排程由 0.4D 定稿；参数语义变化走重型通道。
+- name: learner.evidence.strength_weights
+  owner: learner
+  description: 各强度证据在掌握计算中的权重
+  default:
+    strong: 1.0
+    medium: 0.6
+    weak: 0.3
+    negative: -1.0
+  range: null
+  unit: weight
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S10-06, S18-03, S18-04, S18-13]
+- name: learner.evidence.credibility_caps
+  owner: learner
+  description: 各级题目可信度对应的证据强度上限
+  default:
+    reviewed: strong
+    own: strong
+    generated_confirmed: medium
+    generated_instant: weak
+  range: null
+  unit: strength
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [P08-06, S17-05, S17-11, S18-12]
+- name: learner.evidence.fast_answer_ratio
+  owner: learner
+  description: 用时低于建议用时的该比例视为秒答，答对记待验证
+  default: 0.3
+  range: [0.1, 0.6]
+  unit: ratio
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S18-09]
+- name: learner.evidence.min_for_sufficient
+  owner: learner
+  description: 一个知识点不再标“证据不足”所需的最少证据条数
+  default: 2
+  range: [1, 6]
+  unit: count
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S09-03, S09-04, S09-14]
+- name: learner.mastery.level_thresholds
+  owner: learner
+  description: 由证据分推出六档掌握的分界
+  default: [1.0, 2.5, 4.5, 7.0, 10.0]
+  range: null
+  unit: score
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S10-01]
+- name: learner.verify.recheck_after_hours
+  owner: learner
+  description: 待验证的作答多少小时后进入巩固段复核
+  default: 24
+  range: [2, 168]
+  unit: hours
+  tunable_by: [platform]
+  learner_range: null
+  rollout: immediate
+  reason_required: true
+  source_items: [S06-03, S06-13, S18-09]
+- name: learner.memory.target_retention
+  owner: learner
+  description: 目标日的目标保持率，决定复习间隔
+  default: 0.9
+  range: [0.8, 0.97]
+  unit: ratio
+  tunable_by: [platform, learner]
+  learner_range: [0.85, 0.95]
+  rollout: gray_required
+  reason_required: true
+  source_items: [S15-07, S33-05]
+- name: learner.memory.min_rating_seconds
+  owner: learner
+  description: 翻面后短于该秒数的评级视为秒评，不计入
+  default: 1.5
+  range: [0.5, 5]
+  unit: seconds
+  tunable_by: [platform]
+  learner_range: null
+  rollout: immediate
+  reason_required: true
+  source_items: [S15-11]
+- name: plan.review.daily_cap
+  owner: plan
+  description: 每日到期复习的上限，超出只给最要紧的一批
+  default: 80
+  range: [20, 300]
+  unit: items
+  tunable_by: [platform, learner]
+  learner_range: [60, 120]
+  rollout: immediate
+  reason_required: true
+  source_items: [S06-24, S15-08]
+- name: plan.review.new_card_daily_cap
+  owner: plan
+  description: 每日新卡上限
+  default: 8
+  range: [0, 50]
+  unit: cards
+  tunable_by: [platform, learner]
+  learner_range: [5, 20]
+  rollout: immediate
+  reason_required: true
+  source_items: [S33-04, S33-05]
+- name: plan.consolidate.min_ratio
+  owner: plan
+  description: 巩固段在今日时间预算中的保底占比
+  default: 0.3
+  range: [0.1, 0.6]
+  unit: ratio
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S06-02, S06-13]
+- name: plan.week.buffer_ratio
+  owner: plan
+  description: 每周留作缓冲的时间比例
+  default: 0.15
+  range: [0.0, 0.3]
+  unit: ratio
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S07-08]
+- name: plan.carryover.search_days
+  owner: plan
+  description: 没做完的任务向后寻找空位的天数
+  default: 3
+  range: [1, 7]
+  unit: days
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S07-06]
+- name: plan.proposal.undo_days
+  owner: plan
+  description: 自动顺延与已确认提议的可撤销天数
+  default: 7
+  range: [1, 14]
+  unit: days
+  tunable_by: [platform]
+  learner_range: null
+  rollout: immediate
+  reason_required: true
+  source_items: [S06-10, S07-10]
+- name: plan.disconnect.tiers_days
+  owner: plan
+  description: 断连天数分档，决定回归时的启动方式
+  default: [3, 14]
+  range: null
+  unit: days
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S06-11, S06-18]
+- name: plan.disconnect.start_task_minutes
+  owner: plan
+  description: 断连回归时启动任务的时长
+  default: 10
+  range: [3, 30]
+  unit: minutes
+  tunable_by: [platform]
+  learner_range: null
+  rollout: immediate
+  reason_required: true
+  source_items: [S06-11, S06-18]
+- name: practice.mistake.review_intervals
+  owner: practice
+  description: 错题回炉的间隔序列
+  default: [3, 7, 14]
+  range: null
+  unit: days
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S19-04]
+- name: practice.mistake.graduate_correct_count
+  owner: practice
+  description: 错题毕业所需的间隔做对次数
+  default: 2
+  range: [1, 6]
+  unit: count
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S19-05]
+- name: practice.mistake.no_variant_extra_count
+  owner: practice
+  description: 没有变式题时毕业所需的额外做对次数
+  default: 1
+  range: [1, 3]
+  unit: count
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S18-11, S19-05]
+- name: practice.recall.relearn_delay_minutes
+  owner: practice
+  description: 评“忘了”的项当天再现的延迟分钟数
+  default: 10
+  range: [1, 120]
+  unit: minutes
+  tunable_by: [platform]
+  learner_range: null
+  rollout: immediate
+  reason_required: true
+  source_items: [S15-17]
+- name: ui.loading.slow_hint_seconds
+  owner: platform
+  description: 加载超过该秒数时显示慢速提示（工程参数）
+  default: 3
+  range: [1, 10]
+  unit: seconds
+  tunable_by: [platform]
+  learner_range: null
+  rollout: immediate
+  reason_required: false
+  source_items: []
+- name: api.page.max_limit
+  owner: platform
+  description: 列表接口单页条数上限（工程参数）
+  default: 100
+  range: [20, 500]
+  unit: items
+  tunable_by: [platform]
+  learner_range: null
+  rollout: immediate
+  reason_required: true
+  source_items: []
+- name: org.stats.min_class_size
+  owner: org
+  description: 班级人数低于该值时不显示汇总统计
+  default: 10
+  range: [5, 30]
+  unit: learners
+  tunable_by: [platform]
+  learner_range: null
+  rollout: immediate
+  reason_required: true
+  source_items: [O13-01]
+- name: compliance.revoke.purge_days
+  owner: compliance
+  description: 学员撤回授权后机构侧副本的删除期限（天）
+  default: 30
+  range: [1, 30]
+  unit: days
+  tunable_by: [platform]
+  learner_range: null
+  rollout: immediate
+  reason_required: true
+  source_items: [S32-04]
+- name: learner.mastery.cross_check_items
+  owner: learner
+  description: 升到已掌握及以上所需的不同题目数（异题印证）
+  default: 2
+  range: [2, 5]
+  unit: count
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S18-10]
+- name: learner.self_check.items
+  owner: learner
+  description: 自评已掌握时出的检验题数
+  default: 2
+  range: [1, 3]
+  unit: count
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S10-08]
+- name: learner.prior.min_population
+  owner: learner
+  description: 同类人数达到后改用群体先验（OQ-003）
+  default: 200
+  range: [50, 2000]
+  unit: count
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S04-08]
+- name: learner.forecast.coverage_target
+  owner: learner
+  description: 预测区间覆盖率目标
+  default: 0.8
+  range: [0.7, 0.95]
+  unit: ratio
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S05-01, S24-03]
+- name: learner.forecast.max_tier_jump
+  owner: learner
+  description: 性价比阶梯相邻两次重算的最大跳档
+  default: 1
+  range: [1, 2]
+  unit: level
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S24-04]
+- name: learner.memory.min_cards_for_personal
+  owner: learner
+  description: 新卡少于该数量时用默认记忆参数
+  default: 20
+  range: [10, 100]
+  unit: count
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S15-14]
+- name: plan.report.min_days
+  owner: plan
+  description: 一周至少有几天学习记录才生成周报
+  default: 3
+  range: [1, 7]
+  unit: day
+  tunable_by: [platform]
+  learner_range: null
+  rollout: none
+  reason_required: true
+  source_items: [S08-01]
+- name: plan.report.min_effective_minutes
+  owner: plan
+  description: 一周有效学习不足该时长时只给数据不给结论
+  default: 120
+  range: [30, 600]
+  unit: minute
+  tunable_by: [platform]
+  learner_range: null
+  rollout: none
+  reason_required: true
+  source_items: [S08-01]
+- name: plan.consolidate.sprint_ratio
+  owner: plan
+  description: 冲刺期巩固段下限
+  default: 0.5
+  range: [0.3, 0.8]
+  unit: ratio
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S07-15, S27-02]
+- name: plan.short_mode.minutes
+  owner: plan
+  description: 短时重组的默认时长
+  default: 15
+  range: [5, 30]
+  unit: minute
+  tunable_by: [platform]
+  learner_range: null
+  rollout: none
+  reason_required: true
+  source_items: [S06-08]
+- name: plan.sprint.days_before
+  owner: plan
+  description: 距目标日几天起提议进入冲刺模式
+  default: 10
+  range: [5, 30]
+  unit: day
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S27-01]
+- name: plan.calibrate.weeks
+  owner: plan
+  description: 声明与实测连续相差几周后提议校准
+  default: 2
+  range: [1, 4]
+  unit: week
+  tunable_by: [platform]
+  learner_range: null
+  rollout: none
+  reason_required: true
+  source_items: [S03-05]
+- name: plan.calibrate.gap_ratio
+  owner: plan
+  description: 声明与实测相差超过该比例视为不符
+  default: 0.2
+  range: [0.1, 0.5]
+  unit: ratio
+  tunable_by: [platform]
+  learner_range: null
+  rollout: none
+  reason_required: true
+  source_items: [S03-05]
+- name: practice.mistake.stubborn_fail_count
+  owner: practice
+  description: 回炉失败多少次单列为顽固题
+  default: 3
+  range: [2, 6]
+  unit: count
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S19-10]
+- name: practice.smart.target_accuracy
+  owner: practice
+  description: 智能练习把正确率控制在的目标值
+  default: 0.7
+  range: [0.5, 0.9]
+  unit: ratio
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S17-01]
+- name: map.health.min_kp_count
+  owner: map
+  description: 地图体检：知识点总数下限（阻断项）
+  default: 20
+  range: [10, 100]
+  unit: count
+  tunable_by: [platform]
+  learner_range: null
+  rollout: none
+  reason_required: true
+  source_items: [S05-10, S09-10, S09-13, S24-07]
+- name: map.health.min_question_coverage
+  owner: map
+  description: 地图体检：有题的知识点占比下限（阻断项）
+  default: 0.3
+  range: [0.1, 0.8]
+  unit: ratio
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S05-10, S09-10, S09-13, S24-07]
+- name: map.health.max_missing_target_ratio
+  owner: map
+  description: 地图体检：缺目标档或类型的知识点占比上限（阻断项）
+  default: 0.2
+  range: [0.0, 0.5]
+  unit: ratio
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [S05-10, S09-10, S09-13, S24-07]
+- name: engagement.learning_notice.daily_cap
+  owner: engagement
+  description: 每人每天学习类提醒上限（INV-23）
+  default: 2
+  range: [1, 5]
+  unit: count
+  tunable_by: [platform]
+  learner_range: null
+  rollout: gray_required
+  reason_required: true
+  source_items: [P15-02, S35-02]
+- name: engagement.quiet_hours
+  owner: engagement
+  description: 深夜免打扰时段（学员可在设置中改）
+  default: [22:00, 08:00]
+  range: null
+  unit: time_range
+  tunable_by: [platform, learner]
+  learner_range: null
+  rollout: none
+  reason_required: true
+  source_items: [P15-02, S33-03, S35-05]
+- name: account.deregister.cooling_days
+  owner: account
+  description: 注销冷静期
+  default: 15
+  range: [7, 30]
+  unit: day
+  tunable_by: [platform]
+  learner_range: null
+  rollout: none
+  reason_required: true
+  source_items: [S01-20, S32-09]
+- name: billing.quota.remind_at
+  owner: billing
+  description: 额度剩余比例降到这些值时分档提醒
+  default: [0.5, 0.2]
+  range: null
+  unit: ratio_list
+  tunable_by: [platform]
+  learner_range: null
+  rollout: none
+  reason_required: true
+  source_items: [S31-06]

@@ -1,0 +1,45 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: O14
+end: org
+title: 品牌与多端
+mode: standard
+purpose: 学员看到的应当是机构自己的品牌；但有几样东西任何机构都不能拿掉。
+states: [loading, empty, error, offline, restricted, insufficient_data]
+data:
+  read_writes: [品牌配置]
+ai:
+  - role: 品牌素材的合规检查。
+entries: []
+exits: []
+unresolved_links: [O15, O16]
+items:
+  - id: O14-01
+    name: 不可移除的标识
+    text: “技术支持”与生成内容标识不可移除；安全策略不可关闭
+    page_priority: P0
+  - id: O14-02
+    name: 品牌
+    text: 标识、主色、登录页、启动页，可实时预览
+    page_priority: P1
+  - id: O14-03
+    name: 模块开关
+    text: 按班型开关自习与小组、扩展包等模块
+    page_priority: P1
+  - id: O14-04
+    name: 学员端机构专区
+    text: 机构公告、课表、作业集中展示
+    page_priority: P1
+  - id: O14-05
+    name: 消息署名
+    text: 机构发出的通知带机构署名，受平台统一频控
+    page_priority: P1
+  - id: O14-06
+    name: 自有域名与入口
+    text: 自有域名、小程序与应用内的机构入口
+    page_priority: P2
+  - id: O14-07
+    name: 渠道配置
+    text: 小程序、网页、应用、企业微信
+    page_priority: P2
+slice: design/screens/slices/O14.html
+shots: design/screens/shots/O14/

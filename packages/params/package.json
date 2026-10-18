@@ -1,0 +1,6 @@
+{
+  "name": "@exam-prep/params",
+  "private": true,
+  "type": "module",
+  "exports": "./index.ts"
+}

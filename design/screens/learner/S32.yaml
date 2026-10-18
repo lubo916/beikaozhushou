@@ -1,0 +1,147 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S32
+end: learner
+title: 数据与隐私
+mode: standard
+purpose: 看得清、管得住、带得走、删得掉；学习资产的流转与误删恢复也在这里。
+refine: pending
+states: [loading, empty, error, offline, restricted]
+state_overrides:
+  empty: 还没有可导出的数据：开始学习后这里会列出你的全部数据
+  offline: 导出、注销与授权变更需要联网
+  restricted: 注销有 15 天冷静期，期间可撤销，注销前可完整导出
+layout_notes:
+  - 页头：数据与隐私；动作“导出全部数据”。
+  - 隐私与授权：机构能看到什么、开关、我的数据、导师数据声明。
+  - 资产：导入导出任务（可取消未完成的导入，导出可加密）、分享链接、回收站、操作历史（可按类筛选，含安全事件）。
+  - 账号与设备：左栏安全概况、登录设备、异地登录确认、登录记录；右栏安全提醒（不可关闭）、权限记录、未成年人模式、注销。
+data:
+  read_writes: [授权记录, 导出与删除请求]
+ai:
+  - role: 用一句话解释某项数据的用途与不给会怎样。
+entries: [S01, S31, S34]
+exits: [S33]
+unresolved_links: [S11]
+items:
+  - id: S32-01
+    name: 在线设备与下线
+    text: 查看在线设备，可让任一设备下线
+    page_priority: P0
+  - id: S32-02
+    name: 我的数据总览
+    text: 保存了什么、各用来做什么
+    page_priority: P0
+  - id: S32-03
+    name: 机构授权
+    text: 机构任务数据按入班约定可见；个人学习数据逐项授权、默认不勾；情绪与导师对话永不开放
+    page_priority: P0
+  - id: S32-04
+    name: 个性化分析同意
+    text: 用到同类人群数据的功能（群体难度、陷阱对比）在首次使用时单独征求同意，可随时撤回
+    page_priority: P0
+  - id: S32-05
+    name: 自动化开关
+    text: 自动顺延与分摊可关，关闭后每次先问
+    page_priority: P0
+  - id: S32-06
+    name: 模型训练授权
+    text: 默认不用于训练，需单独同意
+    page_priority: P0
+  - id: S32-07
+    name: 导师数据声明
+    text: 发送给模型的只有内容文本，不含个人标识
+    page_priority: P0
+  - id: S32-08
+    name: 数据导出
+    text: 错题、卡片、笔记、作答记录，通用格式，不限次数
+    page_priority: P0
+  - id: S32-09
+    name: 账号注销
+    text: 有冷静期，说明删除范围与法定保存；注销前可完整导出
+    page_priority: P0
+  - id: S32-10
+    name: 未成年人模式
+    text: 未成年人自动开启，本人不能关闭；年龄线按法规要求设定
+    page_priority: P0
+  - id: S32-11
+    name: 任务中心
+    text: 进行中的导入导出任务、进度与结果
+    page_priority: P0
+  - id: S32-12
+    name: 三类资产搬运
+    text: 教材、题库、整个科目的导入与导出
+    page_priority: P0
+  - id: S32-13
+    name: 导出可选内容
+    text: 标注、笔记、关联、学习记录可分别勾选；含个人数据时提醒
+    page_priority: P0
+  - id: S32-14
+    name: 导出不设门槛
+    text: 任何档位都能导出自己的数据
+    page_priority: P0
+  - id: S32-15
+    name: 回收站
+    text: 误删内容在保留期内可恢复，到期前提醒
+    page_priority: P0
+  - id: S32-16
+    name: 高危操作二次确认
+    text: 覆盖导入、批量删除等先说明后果
+    page_priority: P0
+  - id: S32-17
+    name: 权限使用记录
+    text: 相机、麦克风、相册的调用记录
+    page_priority: P1
+  - id: S32-18
+    name: 账号活动记录
+    text: 登录、改密、换绑、被下线、注销申请等安全事件，与设备增减、导入、删除、订购进同一条时间线，可按类别筛选
+    page_priority: P1
+  - id: S32-19
+    name: 导师记忆管理
+    text: 逐条查看与删除
+    page_priority: P1
+  - id: S32-20
+    name: 分享链接
+    text: 有效期、提取码、导入次数上限、可撤销；接收方先预览再导入
+    page_priority: P1
+  - id: S32-21
+    name: 导入历史与重试
+    text: 失败可用原文件重试
+    page_priority: P1
+  - id: S32-22
+    name: 异地登录提醒
+    text: 在新地点登录时提醒本人；提醒里的确认选项见 S32-30
+    page_priority: P0
+  - id: S32-23
+    name: 多次登录失败提醒
+    text: 短时间内多次输错密码时通知本人，并建议改密
+    page_priority: P1
+  - id: S32-24
+    name: 账号共享提醒
+    text: 同时在线设备超出上限时提醒本人；反复发生时转人工核查（P16-09）
+    page_priority: P2
+  - id: S32-25
+    name: 登录将过期提醒
+    text: 登录有效期临近时提示，可一键延续，避免做题中途掉线
+    page_priority: P2
+  - id: S32-26
+    name: 导出加密
+    text: 导出内容含笔记或掌握数据时，默认要求设置打开密码，可关闭；密码不在平台保存
+    page_priority: P2
+  - id: S32-27
+    name: 取消导入
+    text: 任务中心可取消尚未完成的导入，并说明已处理的部分如何处置
+    page_priority: P2
+  - id: S32-28
+    name: 安全概况
+    text: 近期异常登录次数与当前在线设备数一眼可见
+    page_priority: P2
+  - id: S32-29
+    name: 登录记录
+    text: 最近若干次登录的时间、设备、方式与地点，可加载更早的记录
+    page_priority: P1
+  - id: S32-30
+    name: 异地登录确认
+    text: 提醒中可选「是我本人」（记为常用地点）或「不是我」（立即改密，并让全部设备下线）
+    page_priority: P1
+slice: design/screens/slices/S32.html
+shots: design/screens/shots/S32/

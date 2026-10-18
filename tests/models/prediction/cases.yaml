@@ -1,0 +1,30 @@
+# prediction 金标用例：given → expect；算法实现须全部通过（见 docs/models/prediction.md#acceptance）。
+- id: PD-01
+  desc: 地图体检不通过时锁定预测，完成度与健康度照常
+  given:
+    map_health: blocked
+  expect:
+    forecast: null
+    completion: shown
+    health: shown
+- id: PD-02
+  desc: 没有考情数据时性价比按重要度估算并标注
+  given:
+    maturity: 冷启动
+  expect:
+    roi_basis: importance
+    labeled: true
+- id: PD-03
+  desc: 相邻两次重算的跳档有上限
+  given:
+    tier_before: D
+    raw_tier_after: S
+  expect:
+    tier_after: C
+- id: PD-04
+  desc: 只做快速定位时区间更宽并写明原因
+  given:
+    diagnosis: quick
+  expect:
+    interval_wider_than: full
+    reason_shown: true

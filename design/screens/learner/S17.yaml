@@ -1,0 +1,128 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S17
+end: learner
+title: 练习中心
+mode: standard
+purpose: “练测”标签的落地页，先回答“现在练什么”，再提供自己掌控的方式。
+refine: pending
+states: [loading, empty, error, offline, restricted, insufficient_data]
+state_overrides:
+  empty: 题库是空的：导入题目、拍照录题，或让导师出题（确认后入库）；主按钮“添加题目”
+  offline: 已下载的题组可离线练习
+  restricted: 即时生成题按 AI 额度计；审定题与自有题不限
+  insufficient_data: 某个知识点没有可用题时，提示补题或改用生成题
+layout_notes:
+  - 页头：练习中心；动作“添加题目”（菜单：新建、拍照录题、批量导入、让导师出题）。
+  - 标签：推荐｜题库与试卷｜记录。
+  - 推荐左栏：智能练习大卡 → 每日一练、真题与套卷、专项与限时三张卡 → 一句话组卷；右栏：提醒、AI 出题。
+  - 题库与试卷：表格（来源、可信度、题数、已做、正确率）、预设组卷、手动组卷。
+data:
+  reads: [档位, 近期做过的题]
+  writes: [题库, 试卷, 练习配置]
+ai:
+  - role: 选题、拆题与预标注、出题与自检。
+entries: [S14, S18, S28]
+exits: [S10, S18, S22]
+items:
+  - id: S17-01
+    name: 智能练习
+    text: 按档位与性价比选题，把正确率控制在适中区间
+    page_priority: P0
+  - id: S17-02
+    name: 多种练习入口
+    text: 章节与知识点、真题与套卷、专项题型、限时、每日一练、快刷、收藏题、错题重练
+    page_priority: P0
+  - id: S17-03
+    name: 我的题库
+    text: 新建题库，逐题添加或编辑；题型与字段见 S17-21
+    page_priority: P0
+  - id: S17-04
+    name: 批量导入
+    text: 表格、文档、图片拆题，预标知识点与难度，逐行校验并给错误明细
+    page_priority: P0
+  - id: S17-05
+    name: 题目四级可信度
+    text: 审定题、自有题、已确认的生成题、未确认的即时题；决定作答能记多强的证据。已确认的生成题同时满足“先做后核、质检通过、有出处”时，与前两级一样可记强证据
+    page_priority: P0
+  - id: S17-06
+    name: 题目列表与卷面视图
+    text: 数据概览、筛选排序、合并查看多个题库、保存常用筛选
+    page_priority: P0
+  - id: S17-07
+    name: 题与知识点关联
+    text: 自动推荐与手动选择，带强度；核心题优先被推荐
+    page_priority: P0
+  - id: S17-08
+    name: 自动组卷
+    text: 基本信息、范围、条件、数量四步；有弱项专项、错题重练、真题模考、随机四个预设
+    page_priority: P0
+  - id: S17-09
+    name: 做题记录
+    text: 历次练习可回看续做，保留当时的档位快照
+    page_priority: P0
+  - id: S17-10
+    name: 拍照识题
+    text: 整页多题切分，先问意图：看解析、录入错题、找同类题
+    page_priority: P1
+  - id: S17-11
+    name: 导师出题
+    text: 选题型、范围与特殊要求；默认“先做后核”：直接作答，揭晓后再确认题目有无问题。也可先看后存，但那样最高只记中证据
+    page_priority: P1
+  - id: S17-12
+    name: 一句话组卷
+    text: 自然语言描述，展示解析出的条件
+    page_priority: P1
+  - id: S17-13
+    name: 手动组卷与打印
+    text: 逐题挑选编排，可导出打印卷与答题卡
+    page_priority: P1
+  - id: S17-14
+    name: 做题设置
+    text: 乱序、打乱选项、计算器、计分规则，题库与试卷各自保存
+    page_priority: P1
+  - id: S17-15
+    name: 前置提醒
+    text: 前置知识未达标时先提示
+    page_priority: P1
+  - id: S17-16
+    name: 群体正确率
+    text: 审定题显示群体正确率
+    page_priority: P1
+  - id: S17-17
+    name: 真题与套卷
+    text: 按年份、地区练习；来源分级：官方公开、授权、回忆版（明示未经官方核实），解析原创
+    page_priority: P1
+  - id: S17-18
+    name: 限时训练
+    text: 按考场节奏限定每题用时，训练该放就放
+    page_priority: P1
+  - id: S17-19
+    name: 每日一练
+    text: 每天一小组精选题，保持手感
+    page_priority: P1
+  - id: S17-20
+    name: 快刷模式
+    text: 答对自动下一题，答错停留看简短解析；把握度可选，不标时正确最多计中证据
+    page_priority: P1
+  - id: S17-21
+    name: 题目编辑
+    text: 支持单选、多选、不定项、判断、填空、排序、配对、材料题、计算与分步、简答、论述写作、口头作答、实操提交等题型；可设解析、关联知识点与强度、知识类型、难度、评分细则
+    page_priority: P1
+  - id: S17-22
+    name: 熟练错觉提醒
+    text: 反复刷已掌握的内容时，提醒换一种练法
+    page_priority: P1
+  - id: S17-23
+    name: 我的标签
+    text: 可给题打私有标签，用于筛选和组卷
+    page_priority: P1
+  - id: S17-24
+    name: 试卷分部分
+    text: 试卷按大题分部分，各部分有标题、题号与分值；未设置时按题型自动分组
+    page_priority: P1
+  - id: S17-25
+    name: 试卷完整性提示
+    text: 试卷中有题目被删除或下架时，在试卷与作答页提示得分可能不准，并可重新组卷
+    page_priority: P2
+slice: design/screens/slices/S17.html
+shots: design/screens/shots/S17/

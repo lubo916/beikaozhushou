@@ -1,0 +1,147 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S18
+end: learner
+title: 做题与解析
+mode: immersive
+purpose: 每次作答都变成可信证据；揭晓先纠正你的错，再讲道理。
+refine: pending
+views:
+  - id: obj
+    when: 客观题
+  - id: gen
+    when: 生成题（先做后核）
+states: [loading, empty, error, offline, restricted, insufficient_data]
+state_overrides:
+  empty: 这一组题做完了：看练习小结，或再来一组；主按钮“看小结”
+  offline: 已下载的题可离线作答，联网后计入证据
+  restricted: 测评态不能切换模式、不能看提示
+  insufficient_data: 自有题没有群体数据：不显示误选率与陷阱对比
+layout_notes:
+  - 版式：沉浸页
+  - 顶部：结束、题组名、模式标签、题号点、计时；右侧收藏、易错、报错、标记。
+  - 题目：题型、知识点、题源；题干与选项；作答工具；把握度；提示计数；提交。
+  - 揭晓：这次记为什么证据 → 你选的为什么错与陷阱 → 一句话与分步看、回原文 → 生成题确认 → 错因七类 → 下一题。
+  - 桌面右栏：本组进度与小结。
+  - 手机上选项与把握度放在拇指区，提交按钮固定在底部。
+data:
+  writes: [作答, 用时, 把握度, 提示使用, 错因, 更新档位]
+ai:
+  - role: 错项归因与错因初判；变式题生成与自检；讲解与标准答案冲突时拦截。
+entries: [S06, S09, S10, S12, S13, S17, S19, S20, S23, S24, S29]
+exits: [S17]
+unresolved_links: [S28]
+items:
+  - id: S18-01
+    name: 九种作答形态
+    text: 选择、填空、匹配排序、计算分步、简答论述、材料组合、听力、口述、实操自评
+    page_priority: P0
+  - id: S18-02
+    name: 四种模式
+    text: 随堂（逐题揭晓）、快刷（答对自动下一题）、限时、测评态（交卷后揭晓）
+    page_priority: P0
+  - id: S18-03
+    name: 固定流程
+    text: 作答、选把握度、提交、揭晓；揭晓后不能改答案
+    page_priority: P0
+  - id: S18-04
+    name: 把握度
+    text: 确定、模糊、蒙的，必选无默认；可关闭，关闭后正确作答最高计中证据
+    page_priority: P0
+  - id: S18-05
+    name: 纸笔动作
+    text: 草稿、标记、划掉选项、计算器、题号导航
+    page_priority: P0
+  - id: S18-06
+    name: 分层解析
+    text: 一句话结论、分步推导、知识点回链、资料定位
+    page_priority: P0
+  - id: S18-07
+    name: 针对所选错项
+    text: 先讲你选的为什么错，标出陷阱类型与群体误选率
+    page_priority: P0
+  - id: S18-08
+    name: 错因确认
+    text: 按统一的错因分类选择，无默认，可跳过；导师给出建议错因供采纳
+    page_priority: P0
+  - id: S18-09
+    name: 待验证
+    text: 蒙对或用时过短的正确作答不升档，稍后换问法再考
+    page_priority: P0
+  - id: S18-10
+    name: 异题印证
+    text: 只凭生成题升到「已掌握」及以上，或让错题毕业时，须有不同的题结果一致
+    page_priority: P0
+  - id: S18-11
+    name: 变式巩固
+    text: 当场再来几道同知识点题：先取审定变式，不足时即时生成并标注
+    page_priority: P0
+  - id: S18-12
+    name: 生成题先做后核
+    text: 导师出的题先盲答；揭晓后必须确认「题目没问题」或「有问题」，选「有问题」的不计证据并进入报错
+    page_priority: P0
+  - id: S18-13
+    name: 讲解与追问
+    text: 自动带上题目、所选项、把握度与草稿
+    page_priority: P0
+  - id: S18-14
+    name: 报错与处理进度
+    text: 题目、答案、解析有误可反馈并看到结果
+    page_priority: P0
+  - id: S18-15
+    name: 练习小结
+    text: 对了多少、慢在哪、错因分布、下一步练什么
+    page_priority: P0
+  - id: S18-16
+    name: 提示阶梯
+    text: 提交前只给分级提示不给答案；用过提示降为弱证据
+    page_priority: P1
+  - id: S18-17
+    name: 引导式纠错
+    text: 可选“先问我怎么想的”，导师指出思路第几步出了问题
+    page_priority: P1
+  - id: S18-18
+    name: 题目笔记与反思
+    text: 文字加图片，可被全文搜索
+    page_priority: P1
+  - id: S18-19
+    name: 收藏、标签与标记易错
+    text: 做对的题也可手动标为易错，进入回炉
+    page_priority: P1
+  - id: S18-20
+    name: 填空与分步判分
+    text: 关键词与同义词匹配、数值容差；计算题指出从哪一步开始错
+    page_priority: P1
+  - id: S18-21
+    name: 断点续做
+    text: 作答中断后可从原处继续
+    page_priority: P1
+  - id: S18-22
+    name: 计时
+    text: 显示本题用时与建议用时，超时不打断，只在小结提示
+    page_priority: P1
+  - id: S18-23
+    name: 主观题判分
+    text: 简答与论述可按采分点由导师批改（事前告知消耗），或自评加反思；批改细节见主观题批改
+    page_priority: P1
+  - id: S18-24
+    name: 答题前预热
+    text: 一句话激活相关知识点，可关闭
+    page_priority: P2
+  - id: S18-25
+    name: 讨论区
+    text: 只展示经过治理的高质量讨论
+    page_priority: P2
+  - id: S18-26
+    name: 证据回溯重算
+    text: 题目事后被改了答案时，由它产生的证据撤回并重算
+    page_priority: P0
+  - id: S18-27
+    name: 离线作答
+    text: 已缓存的题无网也能做，联网后补交
+    page_priority: P1
+  - id: S18-28
+    name: 练习多端互斥
+    text: 同一场练习不能在两台设备同时作答；模考的多端互斥见 S22-09
+    page_priority: P1
+slice: design/screens/slices/S18.html
+shots: design/screens/shots/S18/

@@ -1,0 +1,44 @@
+{
+  "autoMemoryEnabled": false,
+  "plansDirectory": "./work/.plans",
+  "permissions": {
+    "allow": [
+      "Bash(python scripts/spec_tool.py:*)",
+      "Bash(python3 scripts/spec_tool.py:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          { "type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/hooks/session_context.py\" --tool claude" }
+        ]
+      }
+    ],
+    "InstructionsLoaded": [
+      {
+        "hooks": [
+          { "type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/hooks/trace.py\" --tool claude --event instructions" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read|Bash",
+        "hooks": [
+          { "type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/hooks/trace.py\" --tool claude" }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/agent_gate.py\" --tool claude", "timeout": 120 }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,97 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S10
+end: learner
+title: 知识点主页
+mode: standard
+purpose: 一个知识点的一切汇于一页，并告诉人下一步怎么补。
+states: [loading, empty, error, offline, restricted, insufficient_data, locked]
+state_overrides:
+  empty: 这个知识点还没有内容：还没挂上资料与题目；主按钮“去挂资料”（去 S11）
+  offline: 已缓存的讲解与笔记可看；做题记录联网后同步
+  restricted: 考点档案在冷启动阶段不展示，成熟中只显示原始次数
+  insufficient_data: 考情数据不足时按重要度估算，并标“按重要度估算”
+  locked: 地图体检不通过时，预测类区块显示原因与“去修复”，学习照常
+layout_notes:
+  - 页头：知识点名、路径、来源；动作“加入今日”“30 分钟攻坚包”。下一行属性标签。
+  - 左栏：阶梯卡（三标记、还差几档、去验证）→ 建议学法四格 → 我在这里怎么错 → 关联题目表 → 我的证据。
+  - 右栏：在哪里学 → 考点档案 → 知识关系 → 卡片与笔记计数。
+  - 卡片按用户意图排序：我现在什么水平、怎么补、我怎么错、去哪学、考什么、证据与关系。
+  - 页头不放「问导师」，用顶栏与浮标即可。
+data:
+  read_writes: [该知识点下全部证据, 关联与目标]
+ai:
+  - role: 归纳个人错误模式；按卡点定制攻坚包；生成对比讲解。
+entries: [S05, S06, S09, S17, S19, S29]
+exits: [S12, S14, S15, S18]
+unresolved_links: [S13]
+items:
+  - id: S10-01
+    name: 档位阶梯
+    text: 同时标出系统判定、我的自评与目标档，显示差几档；可改个人目标档
+    page_priority: P0
+  - id: S10-02
+    name: 双层重要度
+    text: 官方或模板给默认星级，个人可覆盖
+    page_priority: P0
+  - id: S10-03
+    name: 建议学法
+    text: 按知识点类型给出学、记、练、测四格建议，可一键执行
+    page_priority: P0
+  - id: S10-04
+    name: 考点档案
+    text: 考频星级、历年分值、主要题型、考察角度、典型陷阱、趋势；按数据成熟度逐项显示
+    page_priority: P0
+  - id: S10-05
+    name: 多源资料定位
+    text: 教材页段、视频时刻、纸书页码、外部课讲次、增强资料
+    page_priority: P0
+  - id: S10-06
+    name: 我的掌握证据
+    text: 最近的作答、回忆、用时、把握度，以及档位是怎么算出来的
+    page_priority: P0
+  - id: S10-07
+    name: 三板块
+    text: 关联的题目、卡片、笔记，可在此直接补
+    page_priority: P0
+  - id: S10-08
+    name: 自评与检验
+    text: 可自评“已掌握”，系统随即出一两道检验题，通过才生效
+    page_priority: P0
+  - id: S10-09
+    name: 加入今日
+    text: 估算耗时并提示会挤掉今天哪一项
+    page_priority: P0
+  - id: S10-10
+    name: 范围开关
+    text: 在此移出或加回学习范围
+    page_priority: P0
+  - id: S10-11
+    name: 头部状态
+    text: 名称、所属、知识类型、范围状态、考情重要度、我的星标
+    page_priority: P0
+  - id: S10-12
+    name: 关联题目与变式
+    text: 按「我做错的、我没做过的、高频的」排序；变式只取审定题池或个人题库
+    page_priority: P0
+  - id: S10-13
+    name: 关联知识
+    text: 按八类关系分组显示，强度高的在前
+    page_priority: P1
+  - id: S10-14
+    name: 易混对比
+    text: 与易混点的差异对照，差异点来自用户自己的错题
+    page_priority: P1
+  - id: S10-15
+    name: 错误模式归纳
+    text: 把反复犯的错总结成一句话
+    page_priority: P1
+  - id: S10-16
+    name: 三层难度
+    text: 客观难度、同类人群难度、对你的难度；未同意个性化分析时只显示客观难度
+    page_priority: P1
+  - id: S10-17
+    name: 攻坚包
+    text: 诊断卡点、讲解、示范、渐退练习、检验，前后测证明有效；时长有上限
+    page_priority: P1
+slice: design/screens/slices/S10.html
+shots: design/screens/shots/S10/

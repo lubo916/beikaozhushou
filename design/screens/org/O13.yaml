@@ -1,0 +1,53 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: O13
+end: org
+title: 数据中心
+mode: standard
+purpose: 知识点级的班级热力图让老师知道下节课讲什么，结果追踪让负责人知道哪种班型有效。
+states: [loading, empty, error, offline, restricted, insufficient_data]
+data:
+  reads: [已授权学员的聚合数据]
+ai:
+  - role: 从班级数据中找出下节课最该讲的三个知识点。
+entries: [O01]
+exits: []
+unresolved_links: [O06]
+items:
+  - id: O13-01
+    name: 教学质量
+    text: 知识点与学员交叉的档位热力图；只含已授权学员，人数过少时不显示
+    page_priority: P1
+  - id: O13-02
+    name: 经营总览
+    text: 招生、到课、续报、退费
+    page_priority: P1
+  - id: O13-03
+    name: 结果追踪
+    text: 按班型统计结果，内部口径，不得用于对外宣传
+    page_priority: P1
+  - id: O13-04
+    name: 教师效能
+    text: 批改量、答疑量、所带班级的进步
+    page_priority: P1
+  - id: O13-05
+    name: 导师效能
+    text: 节省工时与老师对结果的采纳率
+    page_priority: P1
+  - id: O13-06
+    name: 班级与校区对比
+    text: 只在本机构内比较
+    page_priority: P1
+  - id: O13-07
+    name: 必修与认证看板
+    text: 必修完成率、认证通过率与到期情况
+    page_priority: P1
+  - id: O13-08
+    name: 自定义报表
+    text: 选指标、选维度、定时发送；指标口径取自平台的指标字典
+    page_priority: P2
+  - id: O13-09
+    name: 报表导出
+    text: 含个人信息的导出须审批留痕
+    page_priority: P2
+slice: design/screens/slices/O13.html
+shots: design/screens/shots/O13/

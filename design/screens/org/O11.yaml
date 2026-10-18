@@ -1,0 +1,102 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: O11
+end: org
+title: 内容、地图与题库
+mode: standard
+purpose: 机构的讲义、课程、题库挂接到知识地图后才能被个性化调度；内容默认只在本机构可见，是机构愿意上传的前提。
+states: [loading, empty, error, offline, restricted, insufficient_data]
+data:
+  writes: [机构内容与题库]
+  notes: [默认仅本机构可见，不进公共库、不用于训练]
+ai:
+  - role: 拆题与预标注、视频处理、出题草稿。
+entries: []
+exits: []
+unresolved_links: [O06, O10, O13]
+items:
+  - id: O11-01
+    name: 内容库与版本
+    text: 讲义、视频、回放、题库
+    page_priority: P0
+  - id: O11-02
+    name: 地图挂接与机构扩展层
+    text: 引用官方地图或自建地图，可加机构扩展层
+    page_priority: P0
+  - id: O11-03
+    name: 机构私有模板
+    text: 把画像、地图、题库打包分发到班级，学员一键获得
+    page_priority: P0
+  - id: O11-04
+    name: 题库智能导入
+    text: 文档与图片拆题，预标知识点与难度，老师确认后入库
+    page_priority: P0
+  - id: O11-05
+    name: 组卷与模板
+    text: 手动与智能组卷，可存为模板
+    page_priority: P0
+  - id: O11-06
+    name: 分发与回收
+    text: 按班级、服务期分发，过期回收
+    page_priority: P0
+  - id: O11-07
+    name: 内容审核流
+    text: 讲义、题目、评分细则上线前的审核与发布
+    page_priority: P0
+  - id: O11-08
+    name: 视频处理
+    text: 转写、按知识点切片、生成小测
+    page_priority: P1
+  - id: O11-09
+    name: 出题与审核
+    text: 条件化批量生成，老师审核后成为审定题
+    page_priority: P1
+  - id: O11-10
+    name: 题目质量分析
+    text: 正确率、区分度、选项分布
+    page_priority: P1
+  - id: O11-11
+    name: 覆盖度检查
+    text: 未覆盖的知识点与覆盖了但普遍学不会的知识点
+    page_priority: P1
+  - id: O11-12
+    name: 版权保护
+    text: 水印、限设备
+    page_priority: P1
+  - id: O11-13
+    name: 私有知识库
+    text: 讲义、答疑口径、评分细则，仅供本机构助教检索
+    page_priority: P1
+  - id: O11-14
+    name: 集体备课
+    text: 多人协作编辑讲义与题组，评论与修订记录
+    page_priority: P1
+  - id: O11-15
+    name: 备课助手
+    text: 按班级薄弱点准备下节课的讲点、例题与提纲，老师修改后使用
+    page_priority: P1
+  - id: O11-16
+    name: 口径库
+    text: 易错点、答疑口径、评分口径的统一版本
+    page_priority: P1
+  - id: O11-17
+    name: 教学质检
+    text: 作业批改、答疑答复的抽检与整改
+    page_priority: P1
+  - id: O11-18
+    name: 大纲变化跟进
+    text: 平台的变更影响分析同步到机构内容，列出待更新清单
+    page_priority: P1
+  - id: O11-19
+    name: 教研任务看板
+    text: 待编、待审、待更新的任务与负责人
+    page_priority: P1
+  - id: O11-20
+    name: 公开模板发布
+    text: 可选把部分内容发布到模板大厅，带机构品牌并享受作者激励
+    page_priority: P2
+  - id: O11-21
+    name: 听课评课
+    text: 抽看回放并按量表打分，反馈给讲师
+    page_priority: P2
+slice: design/screens/slices/O11.html
+shots: design/screens/shots/O11/

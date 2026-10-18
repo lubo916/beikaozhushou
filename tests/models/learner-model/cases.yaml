@@ -1,0 +1,78 @@
+# learner-model 金标用例：given → expect；算法实现须全部通过（见 docs/models/learner-model.md#acceptance）。
+- id: LM-01
+  desc: 答对但把握度为“蒙的”记待验证，档位不变
+  given:
+    level: 2
+    answer: correct
+    confidence: 蒙的
+    trust: 审定题
+  expect:
+    strength: 待验证
+    level: 2
+- id: LM-02
+  desc: 答对但用时低于建议用时的秒答阈值记待验证
+  given:
+    answer: correct
+    confidence: 确定
+    duration_ratio: 0.1
+  expect:
+    strength: 待验证
+- id: LM-03
+  desc: 答对但用过提示记弱
+  given:
+    answer: correct
+    confidence: 确定
+    hint_used: true
+  expect:
+    strength: 弱
+- id: LM-04
+  desc: 把握度标注关闭时答对最高记中
+  given:
+    answer: correct
+    confidence_off: true
+  expect:
+    strength: 中
+- id: LM-05
+  desc: 未确认的生成题不计证据
+  given:
+    answer: correct
+    trust: 未确认的即时题
+  expect:
+    strength: null
+- id: LM-06
+  desc: 同一道题重复强证据不能升到已掌握
+  given:
+    level: 2
+    strong_on_same_question: 3
+  expect:
+    level_max: 2
+- id: LM-07
+  desc: 不同题目的强证据达到异题印证后升到已掌握
+  given:
+    level: 2
+    strong_on_distinct_questions: 2
+  expect:
+    level: 3
+- id: LM-08
+  desc: 自评已掌握但检验题未全对，档位不变
+  given:
+    level: 2
+    self: 3
+    check_all_correct: false
+  expect:
+    level: 2
+    self_shown: 3
+- id: LM-09
+  desc: 再次诊断结果低于现有证据时不降级
+  given:
+    level: 3
+    diagnosis_estimate: 1
+  expect:
+    level: 3
+- id: LM-10
+  desc: 题目答案修订后撤回旧证据并重算
+  given:
+    evidence_from_revised_question: true
+  expect:
+    event: evidence.revoked
+    recomputed: true

@@ -1,0 +1,45 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: P11
+end: admin
+title: 行为体与提示词
+mode: standard
+purpose: 每个 AI 行为体能写什么、用什么提示词，是安全制品，需要独立的台账与审计，不和场景成本混在一页。
+refine: pending
+states: [loading, empty, error, offline, restricted, insufficient_data]
+data:
+  read_writes: [行为体台账（可写范围）, 提示词与示例库版本, 上下文模块, 工具权限, 用户指令审核记录]
+ai:
+  - role: 对提示词改动做回归评测；按学习效果而不是点击率判断灰度结果。
+entries: []
+exits: []
+items:
+  - id: P11-01
+    name: 行为体台账
+    text: 职责、可读数据、可写范围
+    page_priority: P0
+  - id: P11-02
+    name: 角色与上下文模块
+    text: 讲解、出题、批改、教练等角色及各自带入的上下文
+    page_priority: P0
+  - id: P11-03
+    name: 提示词模板与示例库
+    text: 版本、评审、回滚
+    page_priority: P0
+  - id: P11-04
+    name: 工具权限
+    text: 只有计划引擎能自动顺延，其余只能提议
+    page_priority: P0
+  - id: P11-05
+    name: 安全策略
+    text: 拒答与限定回答边界，机构不可关闭
+    page_priority: P0
+  - id: P11-06
+    name: 灰度与对照实验
+    text: 以学习效果判定，不以点击率判定
+    page_priority: P1
+  - id: P11-07
+    name: 用户提示词审核
+    text: 优质提示词可被采纳为预置
+    page_priority: P2
+slice: design/screens/slices/P11.html
+shots: design/screens/shots/P11/

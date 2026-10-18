@@ -1,0 +1,28 @@
+!.env.example
+# 密钥
+# 工具产物
+# 技术栈
+# 指令文件：任一存在都会让两个工具读到的规则分叉（见 docs/meta/doc-system.md 5.1）
+# 指令文件：任何位置都不允许（E-INSTR-01）
+# 生成或本地产物
+*.key
+*.pem
+*.pyc
+.DS_Store
+.env
+.env.*
+.eval/
+.next/
+.pack/
+.test-results/
+.trace/
+AGENTS.local.md
+AGENTS.override.md
+CLAUDE.local.md
+__pycache__/
+build-artifacts/
+coverage/
+dist/
+node_modules/
+packages/db/generated/
+work/.plans/

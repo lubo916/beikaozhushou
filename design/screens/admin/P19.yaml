@@ -1,0 +1,79 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: P19
+end: admin
+title: 系统、参数与权限
+mode: standard
+purpose: 后台自身也要可控：谁能看什么、改什么、参数怎么调。
+refine: pending
+states: [loading, empty, error, offline, restricted, insufficient_data]
+layout_notes: [视图「参数与权限」：标准页；参数中心、功能开关、敏感操作分档。, 视图「员工登录」（P19#login）：独立页，只有标志、没有导航；入口是退出登录（顶栏右侧）与会话失效，出口是 P01 运营驾驶舱。]
+data:
+  read_writes: [系统配置与审计记录]
+ai:
+  - role: 本页是配置页，不直接使用 AI。
+entries: []
+exits: [P01]
+unresolved_links: [P10]
+items:
+  - id: P19-01
+    name: 后台角色权限
+    text: 按角色分配后台权限，默认最小权限
+    page_priority: P0
+  - id: P19-02
+    name: 参数中心
+    text: 档位阈值、证据权重、配比下限、复习上限、地图体检阈值、生成题记强证据的条件等集中管理；改动说明理由并先灰度
+    page_priority: P0
+  - id: P19-03
+    name: 功能开关与灰度
+    text: 按人群逐步放量
+    page_priority: P0
+  - id: P19-04
+    name: 操作审计
+    text: 所有写操作留痕，可按对象回溯
+    page_priority: P0
+  - id: P19-05
+    name: 可调区间对齐
+    text: 学员端可调的参数（每日复习上限、新卡上限、目标保持率）只能在平台允许的区间内取值；巩固下限不对学员开放
+    page_priority: P0
+  - id: P19-06
+    name: 容量预案
+    text: 高峰期可慢可排队，但今日清单、到期复习、错题回炉必须可用
+    page_priority: P1
+  - id: P19-07
+    name: 发布记录与多环境
+    text: 版本发布与回滚
+    page_priority: P1
+  - id: P19-08
+    name: 敏感操作按风险分档确认
+    text: 不可逆的经二级审批（双人复核只留给这一档），涉及金额的须手动输入金额或套餐名；可回滚的保存前后快照，可一键回滚；只读敏感的只留痕
+    page_priority: P0
+  - id: P19-09
+    name: 员工登录
+    text: 平台员工用工作邮箱和密码登录，与学员登录分开
+    page_priority: P0
+  - id: P19-10
+    name: 二次验证
+    text: 密码之后再过一道动态验证码
+    page_priority: P0
+  - id: P19-11
+    name: 登录失败锁定
+    text: 连续失败到阈值即锁定一段时间，并按来源限频
+    page_priority: P0
+  - id: P19-12
+    name: 单会话
+    text: 同一员工只保留一个活跃会话，新登录挤掉旧会话
+    page_priority: P0
+  - id: P19-13
+    name: 离职即失效
+    text: 员工停用或离职时，账号与全部会话立即失效
+    page_priority: P0
+  - id: P19-14
+    name: 定期改密
+    text: 密码超过期限，须改密后才能继续使用
+    page_priority: P0
+  - id: P19-15
+    name: 敏感操作重验身份
+    text: 执行敏感操作前重新验证身份；验证服务不可用时一律拒绝，不得跳过
+    page_priority: P0
+slice: design/screens/slices/P19.html
+shots: design/screens/shots/P19/

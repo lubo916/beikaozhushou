@@ -1,0 +1,110 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S07
+end: learner
+title: 学习计划
+mode: standard
+purpose: 看得见全局、随现实重排、每次变动讲得出理由。
+refine: pending
+states: [loading, empty, error, offline, restricted, insufficient_data, locked]
+state_overrides:
+  empty: 还没有计划：在起点报告里选一个方案生成；主按钮“去选方案”（去 S05）
+  offline: 可查看计划；重排与沙盘需要联网
+  restricted: 机构锁定的课表与作业不能拖动，只能请老师调整
+  insufficient_data: 实测不足两周时，健康度用声明时间估算并标注
+  locked: 地图体检不通过时，预测类区块显示原因与“去修复”，学习照常
+layout_notes:
+  - 页头：标题与说明；动作“请假或忙季”“计划沙盘”，更多菜单里放同步日历。
+  - 常驻时间轴：日期、轮次、目标深度与配比、当前位置、待确认的切换。
+  - 标签一“本周”：预算与已排、7 列周视图、配比模式。
+  - 标签二“学习范围”：完成度与健康度、移出提议、范围明细表。
+  - 标签三“排序依据”：前 N 个知识点的排序因子。
+  - 标签四“重排记录”与标签五“复习日历”。
+  - 沙盘抽屉：预设方案与一句话调整，结果显示代价。
+  - 轮次与阶段只用一条时间轴表达，时间轴在标签之上常驻。
+data:
+  reads: [掌握档, 记忆状态, 时间预算, 考期日历]
+  writes: [计划版本, 轮次, 范围, 重排记录]
+ai:
+  - role: 带约束的排程（分值、遗忘、前置依赖、可用时间）；生成每次重排的变更说明。
+entries: [S06, S24]
+exits: [S09, S15]
+unresolved_links: [S08]
+items:
+  - id: S07-01
+    name: 三层视图
+    text: 轮次路线、本周、今日
+    page_priority: P0
+  - id: S07-02
+    name: 轮次路线
+    text: 系统按目标日给出默认路线（打基础、攻重点、刷题冲刺、考前七天），每轮有目标深度、学记练考配比与切换条件
+    page_priority: P0
+  - id: S07-03
+    name: 轮次不清零
+    text: 换轮不重置掌握度；每轮另记“本轮覆盖进度”，满足再过一遍的需要
+    page_priority: P0
+  - id: S07-04
+    name: 学习范围管理
+    text: 每个知识点三态：跟随默认、我加入、我移出；移出不删数据、仍可学，只是不进工作量与今日推荐
+    page_priority: P0
+  - id: S07-05
+    name: 压缩与战略放弃
+    text: 时间不够时以提议列出建议移出的知识点及代价（几分、几档），确认后生效
+    page_priority: P0
+  - id: S07-06
+    name: 动态重排
+    text: 夜间只做顺延与分摊并记录原因；白天只响应用户操作与机构任务避让
+    page_priority: P0
+  - id: S07-07
+    name: 手动锁定与拖动
+    text: 用户锁定的安排不被自动重排覆盖
+    page_priority: P0
+  - id: S07-08
+    name: 缓冲与顺延规则
+    text: 每周留出缓冲；没做完的在近几天内找空位顺延，排不下则生成提议
+    page_priority: P0
+  - id: S07-09
+    name: 请假与忙季
+    text: 请假期间只保留到期复习
+    page_priority: P0
+  - id: S07-10
+    name: 重排记录
+    text: 每次变动的原因与代价可查、可撤销
+    page_priority: P0
+  - id: S07-11
+    name: 自定轮次
+    text: 可改名、增删、调整目标深度；同一目标同一时刻只有一个活跃轮次
+    page_priority: P1
+  - id: S07-12
+    name: 轮次总结
+    text: 完成一轮生成总结：耗时、达标数、复习次数、最薄弱章节
+    page_priority: P1
+  - id: S07-13
+    name: 计划沙盘
+    text: 试算增加投入、移出某一章等变化对预测与完成度的影响，点「采用」才生效；过线情景也在这里模拟
+    page_priority: P1
+  - id: S07-14
+    name: 外部课程排程
+    text: 把在别处报的课排进计划，任务写明看哪一讲哪一段，看完回来做题确认
+    page_priority: P1
+  - id: S07-15
+    name: 冲刺计划生成
+    text: 临近目标日时可一键生成逐日冲刺路线
+    page_priority: P1
+  - id: S07-16
+    name: 对话式调整
+    text: 一句话提出修改，转成提议后确认生效
+    page_priority: P1
+  - id: S07-17
+    name: 进度与配速
+    text: 在计划页显示完成度与健康度摘要，口径同 S24-01、S24-02
+    page_priority: P1
+  - id: S07-18
+    name: 优先级解释
+    text: 每个知识点的排序依据：分值、考频、掌握缺口、前置、所需时长、我的星标
+    page_priority: P1
+  - id: S07-19
+    name: 班级计划融合
+    text: 机构进度与个人计划合并而不是覆盖，共用一份时间预算
+    page_priority: P1
+slice: design/screens/slices/S07.html
+shots: design/screens/shots/S07/

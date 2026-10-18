@@ -1,0 +1,3 @@
+# AI 场景注册（ADR-004、ADR-015）。新增按重型通道：python scripts/spec_tool.py new scenario <领域>.<名称> --actor <执行者>，
+# 再按 docs/meta/doc-system.md 附录 D.6 补齐字段，并在 evals/<场景>/ 准备评测。1 期不接入 AI（分期规划 1 期“本期不做”）。
+[]

@@ -1,0 +1,61 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: O01
+end: org
+title: 机构工作台
+mode: standard
+purpose: 机构里每个角色每天的起点不同。工作台按角色给出今天必须处理的事，而不是一屏报表。
+states: [loading, empty, error, offline, restricted, insufficient_data]
+data:
+  reads: [授权范围内的班级学情与任务数据]
+ai:
+  - role: 汇总待办并排出处理顺序；生成周报。
+entries: [O15]
+exits: [O04, O06, O08, O09, O10, O13]
+unresolved_links: [O03]
+items:
+  - id: O01-01
+    name: 角色化首页
+    text: 负责人、校区主管、教务、班主任、讲师、教研、顾问各有默认首页，可自定卡片
+    page_priority: P0
+  - id: O01-02
+    name: 今日待办
+    text: 待批改、待答疑、待联系、待审核、待排课，点击直达处理
+    page_priority: P0
+  - id: O01-03
+    name: 关键指标
+    text: 在读学员、周有效学习率、计划完成率、AI 节省工时；风险学员数见班级健康度；口径可点开
+    page_priority: P0
+  - id: O01-04
+    name: 多校区切换与汇总
+    text: 按校区、部门或学段切换；上级看汇总，下级只看本级
+    page_priority: P0
+  - id: O01-05
+    name: 班级健康度
+    text: 各班活跃、完成与风险一览
+    page_priority: P0
+  - id: O01-06
+    name: 通知公告
+    text: 面向学员与员工分别发布，已读可查
+    page_priority: P0
+  - id: O01-07
+    name: 组织类型预设
+    text: 培训机构看招生与续报，学校看课程与成绩册，企业看必修完成率与认证到期
+    page_priority: P1
+  - id: O01-08
+    name: 导师节省工时
+    text: 预批改、首答、督学整理各省多少小时，口径可查
+    page_priority: P1
+  - id: O01-09
+    name: 运营周报
+    text: 每周自动生成经营与教学摘要
+    page_priority: P1
+  - id: O01-10
+    name: 节点提醒
+    text: 与本机构班型相关的考试节点与大纲变化
+    page_priority: P1
+  - id: O01-11
+    name: 按组织类型切换指标
+    text: 培训机构、学校、企业内训共用页面，默认指标与用词随组织类型切换
+    page_priority: P1
+slice: design/screens/slices/O01.html
+shots: design/screens/shots/O01/

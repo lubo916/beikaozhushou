@@ -1,0 +1,37 @@
+# 合并底线：verify --full；改动涉及的 AI 场景跑回归评测；主干发布 roadmap.md 与覆盖报告（见 docs/meta/doc-system.md 附录 I.7）
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - name: 技术栈（接入 package.json 后生效）
+        if: hashFiles('package.json') != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: 安装依赖（接入 package.json 后生效）
+        if: hashFiles('package.json') != ''
+        run: corepack enable && pnpm install --frozen-lockfile
+      - name: 完成标准
+        run: python3 scripts/spec_tool.py verify --full
+      - name: 改动涉及的 AI 场景回归评测
+        run: python3 scripts/spec_tool.py eval --affected --suite regression
+      - name: 主干构建产物（带测试结果的 roadmap.md 与覆盖报告）
+        if: github.ref == 'refs/heads/main'
+        run: python3 scripts/spec_tool.py gen --artifacts build-artifacts
+      - uses: actions/upload-artifact@v4
+        if: github.ref == 'refs/heads/main'
+        with:
+          name: roadmap-and-coverage
+          path: build-artifacts

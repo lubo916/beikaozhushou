@@ -1,0 +1,87 @@
+{
+  "exam_id": "ds-final-custom",
+  "note": "演示数据，取自原型脚本；题目与解析的正式来源见 OQ-010",
+  "questions": [
+    {
+      "id": "ds-final-custom-q0001",
+      "question_type": "choice",
+      "response_form": "choice",
+      "credibility": "own",
+      "knowledge_points": [
+        "二叉树的遍历"
+      ],
+      "stem": "已知一棵二叉树的先序序列为 ABDEC，中序序列为 DBEAC，则其后序序列为（　）。",
+      "options": [
+        "DEBCA",
+        "DBECA",
+        "EDBCA",
+        "DEBAC"
+      ],
+      "answer": [
+        0
+      ],
+      "common_wrong_option": 3,
+      "explanation": {
+        "conclusion": "根是 A；中序中 A 左边 DBE 为左子树、右边 C 为右子树。左子树先序为 BDE，根 B，左 D 右 E。后序：D、E、B、C、A。"
+      },
+      "option_notes": {
+        "3": {
+          "note": "后序遍历最后访问的一定是根 A，序列必须以 A 结尾。你把根放在了右子树 C 之前。",
+          "trap": "步骤次序错（计算类干扰）"
+        }
+      },
+      "group_miss_rate": null,
+      "hints": [
+        "先序的第一个结点是什么？",
+        "在中序里找到它，左右各是哪些结点？"
+      ]
+    },
+    {
+      "id": "ds-final-custom-q0002",
+      "question_type": "short_answer",
+      "response_form": "written",
+      "credibility": "own",
+      "knowledge_points": [
+        "二叉树的遍历"
+      ],
+      "stem": "写出二叉树中序遍历的非递归算法，并说明栈的作用。",
+      "scoring_points": [
+        {
+          "point": "初始化栈与当前指针",
+          "sample_answer_hit": 1
+        },
+        {
+          "point": "沿左链入栈",
+          "sample_answer_hit": 1
+        },
+        {
+          "point": "出栈并访问",
+          "sample_answer_hit": 1
+        },
+        {
+          "point": "转向右子树",
+          "sample_answer_hit": 1
+        },
+        {
+          "point": "循环终止条件（栈空且指针空）",
+          "sample_answer_hit": 0
+        },
+        {
+          "point": "说明栈保存回溯路径",
+          "sample_answer_hit": 0
+        }
+      ],
+      "sample_answer": "用一个栈。p 指向根，p 不空就入栈并走左孩子；p 空了就出栈、访问、再走右孩子。",
+      "label": "算法设计题"
+    }
+  ],
+  "cards": [
+    {
+      "id": "ds-final-custom-card0001",
+      "card_type": "问答卡",
+      "front": "哪两种遍历序列可以唯一确定一棵二叉树？",
+      "back": "先序加中序，或后序加中序。只有先序加后序不能唯一确定。",
+      "knowledge_point": "二叉树的遍历"
+    }
+  ]
+}

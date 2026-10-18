@@ -1,0 +1,51 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: P15
+end: admin
+title: 触达与公告
+mode: standard
+purpose: 触达以对用户有用为准绳，由平台统一频控。
+refine: pending
+states: [loading, empty, error, offline, restricted, insufficient_data]
+data:
+  reads: [行为数据（不含敏感数据）]
+  writes: [触达记录]
+ai:
+  - role: 召回文案草稿与合规检查。
+entries: []
+exits: []
+unresolved_links: [P06, P16]
+items:
+  - id: P15-01
+    name: 通知模板与通道
+    text: 站内、推送、短信、服务号
+    page_priority: P0
+  - id: P15-02
+    name: 全局频控与免打扰
+    text: 每人每天上限、深夜不推、连续忽略自动降频
+    page_priority: P0
+  - id: P15-03
+    name: 分群与触发
+    text: 按中断天数、距目标日天数等触发；召回消息不提积压
+    page_priority: P0
+  - id: P15-04
+    name: 文案合规检查
+    text: 拦截焦虑营销与承诺性表述
+    page_priority: P0
+  - id: P15-05
+    name: 资讯与公告发布
+    text: 编辑、审核、定向发布
+    page_priority: P1
+  - id: P15-06
+    name: 效果分析
+    text: 到达、打开、回流、退订；退订率过高自动暂停
+    page_priority: P1
+  - id: P15-07
+    name: 公告横幅
+    text: 严重、警告、提示三级
+    page_priority: P1
+  - id: P15-08
+    name: 活动配置
+    text: 配置与上下线
+    page_priority: P2
+slice: design/screens/slices/P15.html
+shots: design/screens/shots/P15/

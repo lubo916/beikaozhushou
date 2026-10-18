@@ -1,0 +1,16 @@
+table: mastery_levels
+owner: learner
+description: 掌握档的派生快照，可随时由 evidence_events 重算；只由 learner 写入（检查 E-OWN-02）
+derived_from: evidence_events
+tenant_scoped: true
+fields:
+  - {name: learner_id, type: uuid, ref: users.id, x-data-class: inferred}
+  - {name: tenant_id, type: uuid, ref: tenants.id, x-data-class: operational}
+  - {name: knowledge_point_id, type: uuid, ref: knowledge_points.id, x-data-class: inferred}
+  - {name: level, type: int, x-data-class: inferred, note: 0 至 5，对应 glossary 的六档}
+  - {name: sufficiency, type: "enum[sufficient, insufficient]", x-data-class: inferred}
+  - {name: pending_verification, type: bool, x-data-class: inferred}
+  - {name: score, type: float, x-data-class: inferred}
+  - {name: last_evidence_at, type: timestamptz, nullable: true, x-data-class: inferred}
+  - {name: rule_version, type: string, x-data-class: inferred}
+  - {name: recomputed_at, type: timestamptz, x-data-class: inferred}

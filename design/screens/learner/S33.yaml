@@ -1,0 +1,96 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: S33
+end: learner
+title: 设置
+mode: standard
+purpose: 参数能调、提醒能管，每个会削弱证据的开关旁写明代价。
+refine: pending
+states: [loading, empty, error, offline, restricted]
+state_overrides:
+  empty: 使用默认设置：所有设置都有默认值，可以不改
+  offline: 设置可离线修改，联网后同步
+  restricted: 学员端可调参数只能在平台允许的区间内取值
+layout_notes: [标签“学习与记忆｜导师与阅读｜提醒｜外观与无障碍｜账号”，每个标签一屏内可见。]
+data:
+  reads: [历次备考归档]
+  writes: [偏好]
+ai:
+  - role: 基于已掌握知识推荐下一个目标。
+entries: [S01, S15, S32, S34]
+exits: [S13]
+unresolved_links: [S02, S30]
+items:
+  - id: S33-01
+    name: 修改密码
+    text: 验证旧密码，成功后其他设备下线
+    page_priority: P0
+  - id: S33-02
+    name: 学习节奏偏好
+    text: 每日时长、配比模式（与学习计划同一设置）
+    page_priority: P0
+  - id: S33-03
+    name: 提醒与免打扰
+    text: 分类别、分通道开关，可设提醒时段；统一频控；深夜不推
+    page_priority: P0
+  - id: S33-04
+    name: 新卡上限提示
+    text: 调高每日新卡数时，提示之后的复习量可能超过每日上限
+    page_priority: P0
+  - id: S33-05
+    name: 记忆参数
+    text: 目标保持率、每日复习上限、新卡上限，只能在平台允许的区间内调
+    page_priority: P1
+  - id: S33-06
+    name: 导师偏好
+    text: 默认讲法、纠错方式、预热、制卡数量
+    page_priority: P1
+  - id: S33-07
+    name: 阅读与标注偏好
+    text: 字号行高、默认标注类型与颜色、重要度显示方式
+    page_priority: P1
+  - id: S33-08
+    name: 外观
+    text: 浅色、深色、护眼、跟随系统
+    page_priority: P1
+  - id: S33-09
+    name: 多端与离线
+    text: 跨端接力、离线包
+    page_priority: P1
+  - id: S33-10
+    name: 无障碍
+    text: 字号、对比度、色觉友好的档位配色、读屏与键盘操作
+    page_priority: P1
+  - id: S33-11
+    name: 帮助与引导
+    text: 重开新手引导、重置“不再提示”
+    page_priority: P1
+  - id: S33-12
+    name: 快捷键
+    text: 总表可查
+    page_priority: P2
+  - id: S33-13
+    name: 插件与集成
+    text: 浏览器伴学插件、系统日历
+    page_priority: P2
+  - id: S33-14
+    name: 换绑手机号
+    text: 须两步验证，成功后其他设备下线
+    page_priority: P0
+  - id: S33-15
+    name: 头像与昵称
+    text: 可修改头像与显示名称；昵称做敏感词与仿冒检查
+    page_priority: P1
+  - id: S33-16
+    name: 补绑手机号
+    text: 只用微信登录的账号，付费、注销、换绑、管理设备前须先绑手机号。待定：微信授权后未绑手机号时，是按本条建受限账号，还是登录时直接要求绑定；若选后者，本条取消
+    page_priority: P1
+  - id: S33-17
+    name: 绑定邮箱
+    text: 选填，验证后作为短信不可用时的备用验证方式（S01-22）
+    page_priority: P2
+  - id: S33-18
+    name: 做题辅助开关
+    text: 把握度标注与读后即测可分别关闭，默认开启；关闭前说明对证据等级的影响
+    page_priority: P0
+slice: design/screens/slices/S33.html
+shots: design/screens/shots/S33/

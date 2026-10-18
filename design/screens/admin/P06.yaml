@@ -1,0 +1,45 @@
+# 页面登记：范围的唯一来源（ADR-001，原型冻结后以本文件为准）。条目编号只增不减；删除的条目标 removed: true；新条目只在末尾追加，编号用 import-prototype --write-ids 分配。
+id: P06
+end: admin
+title: 变更影响分析
+mode: standard
+purpose: 大纲、教材、规则一变，题、卡、讲义、计划都要跟着变。变更必须有事件、有影响清单、有处理闭环。
+states: [loading, empty, error, offline, restricted, insufficient_data]
+data:
+  reads: [地图版本, 内容与用户学习记录]
+ai:
+  - role: 变更影响范围分析。
+entries: []
+exits: []
+unresolved_links: [P04, P15]
+items:
+  - id: P06-01
+    name: 待更新标注
+    text: 处理完成前受影响内容对用户标“待更新”
+    page_priority: P0
+  - id: P06-02
+    name: 变更事件登记
+    text: 须附官方文件与生效时间
+    page_priority: P1
+  - id: P06-03
+    name: 影响范围分析
+    text: 受影响的知识点、题、卡、模板与用户数
+    page_priority: P1
+  - id: P06-04
+    name: 任务分派
+    text: 按考期远近与受影响人数排优先级
+    page_priority: P1
+  - id: P06-05
+    name: 用户通知
+    text: 分批通知并写明对你意味着什么
+    page_priority: P1
+  - id: P06-06
+    name: 模板作者通知
+    text: 受影响模板的作者收到更新提醒
+    page_priority: P1
+  - id: P06-07
+    name: 计划调整建议
+    text: 为受影响用户生成提议，确认后生效
+    page_priority: P1
+slice: design/screens/slices/P06.html
+shots: design/screens/shots/P06/
