@@ -4,7 +4,8 @@
   features: [LRN-01, LRN-02, LRN-03, PRAC-05, PRAC-07, PLAN-03, PLAN-04, PLAN-06, PLAN-07, PLAN-08]
   owner: 产品负责人
   default: 取 contracts/params.yaml 的现值；证据与掌握相关取值随 OQ-002、记忆调度相关随 OQ-003、排程相关随 OQ-005 定稿，1 期开工时按校准表复核一次
-  status: open
+  status: resolved
+  resolution: 已决定：取 contracts/params.yaml 现值作为当前默认；证据与掌握、记忆调度、排程相关取值随 OQ-002、OQ-003、OQ-005 的探针结论定稿后替换，1 期开工时复核（2026-10-18，产品负责人确认）。
 - id: OQ-002
   q: 证据如何换算成档位（把握度、蒙对待验证、异题印证、可信度上限、提示降级）？由探针 0.4A 回答
   features: [LRN-01, LRN-02]
@@ -41,13 +42,15 @@
   features: [ACCT-04]
   owner: 产品负责人
   default: 按 S33-16 建受限账号：付费、注销、换绑、管理设备前须先绑手机号
-  status: open
+  status: resolved
+  resolution: 已决定：微信授权后未绑手机号时建受限账号；付费、注销、换绑、管理设备前须先绑手机号（2026-10-18，产品负责人确认）。
 - id: OQ-008
   q: 知识类型中的“分类与结构”“流程与步骤”是否保留为副类型（原型 P04 的注）？
   features: [MAP-01]
   owner: 产品负责人
   default: 不设副类型；一个知识点标一至两个 glossary 中的知识类型
-  status: open
+  status: resolved
+  resolution: 已决定：不设知识类型副类型；一个知识点标一至两个 glossary 中的知识类型（2026-10-18，产品负责人确认）。
 - id: OQ-009
   q: 合并版原型与深化来源原型在八项跨页口径上如何取舍（掌握档与自评生效、错因层级、重要度刻度、笔记类型、知识点身份、额度与降级、AI 对话面板归属、题型）？
   features: [LRN-01, LRN-02, PRAC-02, PRAC-04, MAP-01, MAP-03, CONT-06, TUTOR-01]
@@ -60,7 +63,8 @@
   features: [CONT-02]
   owner: 产品负责人
   default: 0 期用原型演示数据与自编解析作测试夹具；正式种子在 2 期进入前替换为授权内容
-  status: open
+  status: resolved
+  resolution: 已决定：0 期用原型演示数据与自编解析作测试夹具；正式种子在 2 期开工前替换为已授权内容（2026-10-18，产品负责人确认）。
 - id: OQ-011
   q: 深化清单除 S18、S19 外还包括哪些页？
   features: []
@@ -73,7 +77,8 @@
   features: [EXM-01, CONT-02]
   owner: 产品负责人
   default: 主种子为初级会计职称，对照考试为大学英语六级（分期规划的建议：一个合格线型、一个分数段型）
-  status: open
+  status: resolved
+  resolution: 已决定：主种子为初级会计职称；对照考试为大学英语六级，只做测试夹具（2026-10-18，产品负责人确认）。
 - id: OQ-013
   q: 没有群体数据时，诊断与预测的先验从哪里来？
   features: [LRN-02, LRN-03, PLAN-03]

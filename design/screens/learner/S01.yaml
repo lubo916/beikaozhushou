@@ -87,7 +87,7 @@ items:
     page_priority: P0
   - id: S01-14
     name: 微信登录
-    text: 微信授权登录；授权失败时回落到手机号；授权后是否必须绑定手机号待定（见 S33-16）
+    text: 微信授权登录；授权失败时回落到手机号；授权后未绑手机号时建受限账号，补绑要求见 S33-16
     page_priority: P0
   - id: S01-15
     name: Apple 登录

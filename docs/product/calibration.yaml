@@ -10,3 +10,6 @@ events:
   - event: handshake_ok
     date: 2026-10-18
     note: B0-3：HANDSHAKE-r1-result.zip 经 dry-run 校验通过，令牌一致，网页版 Claude 搬运通道可用。
+  - event: decision
+    date: 2026-10-18
+    note: B0-4：产品负责人确认六项全部按默认；路线变体为 A（学员端先行，3 期后、7 期前按分期决策点复核），其余决定见 OQ-001、OQ-007、OQ-008、OQ-010、OQ-012 的 resolution。
