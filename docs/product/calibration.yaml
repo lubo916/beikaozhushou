@@ -6,4 +6,7 @@
 #   gate_passed、decision、preauthorized、fuse、coefficient。
 coefficient: 1.0
 loops: []
-events: []
+events:
+  - event: handshake_ok
+    date: 2026-10-18
+    note: B0-3：HANDSHAKE-r1-result.zip 经 dry-run 校验通过，令牌一致，网页版 Claude 搬运通道可用。
