@@ -103,3 +103,9 @@
   owner: 产品负责人
   default: 首发只做单次购买（考期通行证）；代扣权限先申请，自动续费功能后置。4.3 写规格前决定 BILL-03 是否移出 4.3（技术选型定稿的临时默认）。
   status: open
+- id: OQ-017
+  q: OQ-001 的“1 期开工时复核”之后、PLAT-04 上线之前，是否允许修改 rollout 为 gray_required 参数的登记默认值并随发布全量生效？
+  features: [PLAT-02, PLAT-04, LRN-01, LRN-02, LRN-03, PRAC-05, PRAC-07, PLAN-03, PLAN-04, PLAN-06, PLAN-07, PLAN-08]
+  owner: 产品负责人
+  default: 从严，这段时间不改 gray_required 参数的登记默认值，确需修改时由负责人逐项决定（另立 ADR，或把灰度能力提前）。
+  status: open
