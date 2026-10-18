@@ -691,3 +691,7 @@
     - label: 锁定
       code: locked
   forbidden: []
+- term: 灰度
+  code: gray_rollout
+  definition: 变更先对一部分人群生效、再按人群逐步放量的发布方式（P19-03）；登记 rollout 为 gray_required 的参数只经灰度调整（ADR-014）
+  forbidden: []

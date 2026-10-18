@@ -7,12 +7,12 @@ started: （由 work start 填写）
 # PLAT-01 进行中
 
 ## 计划（确认后才动代码）
-- 前置：0.1b、PLAT-02、METR-01 都已合入主干；0.1b 已补齐学员端 834 截图，令牌生成器能处理新增的修饰器（见 docs/meta/plan/work/0.1b.md 第 2 节 C7 与第 3 节）。
+- 前置：0.1b、PLAT-02、METR-01 都已合入主干；0.1b 已补齐学员端 834 截图，令牌生成器能处理新增的修饰器、带透明度的颜色与 shadow 类型（见 docs/meta/plan/work/0.1b.md 第 2 节 C7 与第 3 节）。
 - Codex 先做（出包前提交在本分支；这些文件 Claude 不改）：
   1. 确认 0.1b 的样式字面量检查覆盖 apps/learner 与 packages/ui 的 CSS、className 与 style；没有覆盖就先补上并写反例测试。
   2. 确认任务包仍在预算内（当前约 12,900 字符，上限 15,000）。
 - 改动文件：
-  - design/tokens.json（外壳尺寸、间距、遮罩与阴影令牌）
+  - design/tokens.json（一次登记下文“外壳令牌”所列令牌，以及通用组件用到的间距与尺寸）
   - design/tokens.resolver.json（深色修饰器）
   - packages/ui/src/state-view/（状态组件与骨架）
   - packages/ui/src/proposal/（提议卡与撤销条）
@@ -40,9 +40,9 @@ started: （由 work start 填写）
   - packages/contract/src/
   - ./playwright.config.ts（仓库根下的文件写成 ./ 开头，交接脚本才能识别）
   - ./vitest.config.ts
-  - design/screens/shots/S06/normal@375.png（手机布局参考）
-  - design/screens/shots/S06/normal@834.png（平板布局参考，0.1b 补齐）
-  - design/screens/shots/S06/normal@1280.png（桌面布局参考）
+  - design/screens/shots/S06/normal@375.png（手机布局参考，外壳令牌取值）
+  - design/screens/shots/S06/normal@834.png（平板布局参考，外壳令牌取值，0.1b 补齐）
+  - design/screens/shots/S06/normal@1280.png（桌面布局参考，外壳令牌取值）
   - design/screens/shots/S03/time@1280.png（引导页参考）
   - design/screens/shots/S01/first@375.png（独立页参考）
   - design/screens/shots/S18/obj@375.png（沉浸页参考）
@@ -55,7 +55,7 @@ started: （由 work start 填写）
   - PLAT-01-AC5 → packages/ui/src/proposal/proposal.test.tsx：[PLAT-01-AC5] 提议卡回调与撤销条剩余时间
   - PLAT-01-AC6 → tests/e2e/shell/demo.spec.ts：[PLAT-01-AC6] 预发构建的演示页；apps/learner/src/routes.test.ts：[PLAT-01-AC6] 生产构建不注册演示页
   - PLAT-01-AC7 → tests/e2e/shell/app-opened.spec.ts：[PLAT-01-AC7] 启动与回到前台各上报一次，切换路由不上报，上报失败外壳照常（拦截请求计数）
-  - PLAT-01-AC8 → tests/ui/token-contrast.test.ts：[PLAT-01-AC8] 浅色、深色叠加修饰器的对比度；tests/e2e/shell/visual.spec.ts：[PLAT-01-AC8] S06 占位页与演示页截图基线
+  - PLAT-01-AC8 → tests/ui/token-contrast.test.ts：[PLAT-01-AC8] 浅色、深色叠加修饰器的对比度；tests/e2e/shell/visual.spec.ts：[PLAT-01-AC8] S06 占位页与演示页截图基线；同一文件另截 375 宽度抽屉打开、834 宽度弹出列表打开两张基线（见“外壳令牌的取值”第 3 项）
   - PLAT-01-AC9 → tests/e2e/shell/keyboard.spec.ts：[PLAT-01-AC9] 只用键盘走完导航、抽屉、弹出列表与演示操作
   - PLAT-01-AC10 → tests/e2e/shell/old-browser.spec.ts：[PLAT-01-AC10] 能力检查不通过时只显示过旧提示（页面脚本运行前注入不支持的能力）
 - 实现要点（给实现者）：
@@ -69,14 +69,20 @@ started: （由 work start 填写）
   8. 浏览器能力检查是 index.html 里位于应用模块之前的内联脚本；不支持时把提示写进页面并设标记，main.tsx 见到标记就不挂载。
   9. 文案：通用组件的键在 packages/ui 的文案文件，外壳与演示页的键在 apps/learner 的文案文件，数字用插值。
   10. 字徽是文字徽标，不引入新的图标或界面依赖。
-- 原型外壳取值（登记为令牌后使用，单位 px，来自原型外壳样式）：
-  - 桌面：侧栏宽 236；顶栏高 56，左右内边距 20；内容区内边距上 22、左右 24、下 48；侧栏链接左缩进 38，当前页左侧 3 宽主色条；侧栏字徽 22。
-  - 平板：图标栏宽 72；字徽按钮宽 62，按钮内字徽 28；弹出列表宽 230、内边距 8、圆角 12，贴在图标栏右侧；内容区内边距 18。
-  - 手机：顶栏高 52、左右内边距 10；抽屉宽 300 且不超过容器的 86%；底栏每项纵向排列字徽 22 与文字，上下内边距 6，底部加安全区；内容区内边距 14。
-  - 通用：顶栏图标按钮 36；圆角用已有的 radius.sm 与 radius.md；遮罩 rgba(12,18,32,0.36)；抽屉阴影 8 0 28 rgba(15,25,45,0.2)；弹出列表阴影 0 12 32 rgba(20,30,55,0.16)。
+  11. 布局细节：桌面侧栏的当前页左侧有主色指示条；平板弹出列表贴在图标栏右侧；手机底栏每项纵向排列字徽与文字，底部用 env(safe-area-inset-bottom) 留出安全区。
+- 外壳令牌（只在 design/tokens.json 登记一次；计划、规格与代码只写令牌名，不写数值）：
+  - 尺寸 size.shell.*：sidebar（桌面侧栏宽）、rail（平板图标栏宽）、rail-item（图标栏字徽按钮宽）、topbar-wide 与 topbar-compact（平板与桌面、手机的顶栏高；834 截图与桌面不同时另加 topbar-tablet）、icon-button（顶栏图标按钮）、glyph-sm 与 glyph-lg（侧栏与底栏的字徽、图标栏按钮内的字徽）、active-bar（当前页指示条宽）、drawer 与 drawer-max（抽屉宽，以及它占外壳容器宽度的上限比例，number 类型）、popover（弹出列表宽）。
+  - 间距 space.shell.*：content-desktop-top、content-desktop-inline、content-desktop-bottom、content-tablet、content-phone（各档内容区内边距）、topbar-inline-wide 与 topbar-inline-compact（顶栏左右内边距）、nav-indent（侧栏页面链接左缩进）、tabbar-block（底栏每项上下内边距）、popover（弹出列表内边距）。
+  - 颜色与阴影：color.overlay.scrim（遮罩）、shadow.drawer、shadow.popover。
+  - 沿用已有令牌：圆角 radius.sm 与 radius.md（弹出列表用 radius.md）、颜色 color.*、字号 font.size.*、断点 size.breakpoint.*。
+  - 状态组件、提议卡与撤销条用到而尚未登记的间距与尺寸，按用途命名登记（如 space.card、size.control），能复用上面的令牌就复用。
+- 外壳令牌的取值（ADR-030 决定 5，设计值只以令牌登记一次，原型的变量名与样式数值不进仓库）：
+  1. 截图看得到的（顶栏、侧栏、图标栏、底栏、字徽、指示条、图标按钮、各档内容区的上与左右内边距）按 design/screens/shots/S06/ 下 normal 的 375、834、1280 三张截图量取；截图按 1 倍像素生成，量得的像素数即 CSS 像素。通用组件参照同一组截图中的卡片、按钮，以及右栏“计划调整”卡片里的待确认提议与“撤销”。
+  2. 截图看不到的（抽屉、弹出列表、遮罩、阴影、桌面内容区底部留白）按约束给出：抽屉要放下与桌面侧栏相同的分组列表，宽度不小于侧栏，上限比例保证手机上仍露出一截遮罩；弹出列表只列一组页面，宽度与侧栏相当；遮罩与两种阴影以 color.ink.primary 为基色加透明度，遮罩下的页面仍可辨认；桌面底部留白大于两侧内边距。
+  3. 第 2 项的取值由负责人确认：视觉测试另截 375 宽度抽屉打开、834 宽度弹出列表打开两张基线，与 AC8 的基线一起确认。登记后的微调只改 design/tokens.json，走轻量通道。
 - 风险与不确定：
   1. 截图基线只在固定版本的 Linux 镜像中生成与比对；首次基线由产品负责人在本功能复查时看过截图后确认，确认后再合并。
-  2. 深色取值属于设计判断：实现者按 R9 的对比度要求给出，负责人在演示页走查时确认，之后的微调走轻量通道。
+  2. 深色取值与“外壳令牌的取值”第 2 项属于设计判断：实现者按 R9 的对比度要求与上面的约束给出，负责人确认截图基线与演示页走查时确认；与冻结原型的细节可能不同，0 期不做视觉打磨，按此处理。
   3. 演示页与占位页不构成业务页面，页面登记的 states 由各页功能实现（规格第 3 节）；复查时不按业务页要求七态。
   4. 只有 S01 至 S35 的路由；S21、S26 有路由但不进导航（规格第 1 节）。
   5. 任务包接近预算，规格如需补充 refs，先量体量。
