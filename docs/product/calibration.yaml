@@ -5,7 +5,10 @@
 # events：闭环以外推不出来的事件。字段：event、date、note。event 取 handshake_ok、tracks_started、phase_start、phase_end、
 #   gate_passed、decision、preauthorized、fuse、coefficient。
 coefficient: 1.0
-loops: []
+loops:
+  - loop: "0.1"
+    opened: 2026-10-18
+    budget: [10, 15]
 events:
   - event: handshake_ok
     date: 2026-10-18
