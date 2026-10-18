@@ -82,8 +82,18 @@ progress_out = "docs/product/progress.md"
 
 [pack.feature_paths]
 PLAT-01 = ["packages/ui/**", "apps/learner/**", "tests/**"]
-PLAT-02 = ["packages/params/**", "packages/domains/platform/**", "tests/**"]
+PLAT-02 = ["packages/params/**", "packages/domains/platform/**", "deploy/params/*.json", "tests/**"]
 METR-01 = ["packages/domains/metrics/**", "tests/**"]
 
 [pack.layout_header_keys]
 PLAT-01 = ["id", "end", "title", "mode", "views", "states"]
+
+[pack.context_sources]
+PLAT-01 = ["docs/meta/plan/loops/0.1-foundation.md", "docs/meta/plan/loops/0.1-ui-contract.md", "docs/domains/platform/PLAT-01-components.md"]
+PLAT-02 = ["docs/meta/plan/loops/0.1-foundation.md", "contracts/params-validation.yaml", "docs/product/domain-map.yaml"]
+METR-01 = ["docs/meta/plan/loops/0.1-foundation.md", "docs/domains/metrics/phase0-contract.md", "docs/domains/metrics/contracts/phase0-fixture.schema.json"]
+
+[pack.external_adr]
+PLAT-01 = ["ADR-026", "ADR-029"]
+PLAT-02 = ["ADR-025", "ADR-026"]
+METR-01 = ["ADR-026"]

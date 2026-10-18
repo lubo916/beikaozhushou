@@ -205,7 +205,8 @@ def log_work(fid, row=None, decisions=(), open_items=()):
 
 
 def tell(zpath, result, key, n, nfiles):
-    where = "新开一个对话" if n == 1 else f"回到 {key} 第 1 轮的那个对话"
+    where = "新开一个对话（规格包可独立复核）" if key.endswith("-specs") else (
+        "新开一个对话" if n == 1 else f"回到 {key} 第 1 轮的那个对话")
     size = zpath.stat().st_size // 1024 + 1
     print(f"交接包已生成：{zpath.resolve()}（{size} KB，含 {nfiles} 个仓库文件）")
     print("请转告产品负责人：")
@@ -257,7 +258,8 @@ def cmd_out(a):
         print("任务包生成失败。超出预算说明功能太宽，按 doc-system 第 10 章处理。")
         return 2
     change, refs = plan_paths(key)
-    files = expand(change + refs + ALWAYS)
+    meta = json.loads(read(ROOT / ".pack" / f"{key}.json"))
+    files = expand(change + refs + ALWAYS + meta.get("required_sources", []))
     if n > 1:
         main = "main" if git("rev-parse", "--verify", "main") else "origin/main"
         changed = git("diff", "--name-only", f"{main}...HEAD").splitlines() + git("diff", "--name-only").splitlines()

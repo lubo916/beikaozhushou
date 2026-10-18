@@ -63,6 +63,21 @@ class PackContextTests(unittest.TestCase):
         self.assertNotIn("DO_NOT_INCLUDE_MARKER", result)
         self.assertIn("docs/models/fixture.md", meta["sources"])
 
+    def test_companion_contract_is_required_and_in_the_source_manifest(self):
+        repo = self.repo()
+        self.write("docs/fixture-contract.md", "# Companion\nCONTEXT_SOURCE_MARKER\n")
+        self.config["pack"] = {"context_sources": {"TEST-01": ["docs/fixture-contract.md"]}}
+        result, meta = tool.build_pack(repo, "TEST-01")
+        self.assertTrue("docs/fixture-contract.md" in result, "missing required companion link")
+        self.assertIn("docs/fixture-contract.md", meta["sources"])
+        self.assertIn("docs/fixture-contract.md", meta["required_sources"])
+
+    def test_missing_companion_contract_prevents_pack_generation(self):
+        repo = self.repo()
+        self.config["pack"] = {"context_sources": {"TEST-01": ["docs/missing.md"]}}
+        with self.assertRaises(ValueError):
+            tool.build_pack(repo, "TEST-01")
+
     def test_explicit_paths_determine_ui_rules_and_omit_server_domain(self):
         repo = self.repo()
         self.config["pack"] = {"feature_paths": {"TEST-01": ["packages/ui/**", "apps/learner/**", "tests/**"]}}

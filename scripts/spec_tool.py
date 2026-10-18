@@ -2681,11 +2681,17 @@ def build_pack(repo, fid: str) -> tuple[str, dict]:
     if gl:
         sources.append("docs/product/glossary.yaml")
     al = []
+    required_sources = list(CFG.get("pack", {}).get("context_sources", {}).get(fid, []))
+    external_adr = set(CFG.get("pack", {}).get("external_adr", {}).get(fid, []))
     adr_ids = list(dict.fromkeys(sp.ref_list("adr") + re.findall(r"\bADR-\d{3}\b", sp.body)))
     for a in adr_ids:
         ad = repo.adrs.get(a)
         if ad:
-            al.append(f"### {a} {ad['title']}\n" + ad["sections"].get("决定", "（无“决定”一节）").strip())
+            if a in external_adr:
+                al.append(f"### {a} {ad['title']}\n必读共同基线原文：{ad['path']}（交接包 repo/ 下）。")
+                required_sources.append(ad["path"])
+            else:
+                al.append(f"### {a} {ad['title']}\n" + ad["sections"].get("决定", "（无“决定”一节）").strip())
             sources.append(ad["path"])
     S["10 相关 ADR 的决定"] = "\n\n".join(al) or "（未引用 ADR）"
     oq = [f"- {q.get('id')}：{q.get('q')}　临时默认：{q.get('default') or '（缺）'}" for q in (sp.oqs or []) if isinstance(q, dict)]
@@ -2698,10 +2704,23 @@ def build_pack(repo, fid: str) -> tuple[str, dict]:
         locs = tags.get(ac, [])
         tl.append(f"- {ac}：" + ("、".join(f"{a}:{b}" for a, b in locs[:3]) + f"（最近结果：{res.get(ac, '未知')}）" if locs else "尚无测试"))
     S["12 AC 与测试现状"] = "\n".join(tl) or "（规格中没有 AC）"
+    required_sources = list(dict.fromkeys(required_sources))
+    for source in required_sources:
+        try:
+            if not isinstance(source, str) or Path(source).is_absolute() or ":" in source:
+                raise ValueError(source)
+            (repo.root / source).resolve().relative_to(repo.root.resolve())
+            if not (repo.root / source).is_file():
+                raise ValueError(source)
+        except (ValueError, OSError):
+            raise ValueError(f"{fid} 缺少或存在非法必读配套来源：{source}") from None
+    if required_sources:
+        S["13 必读配套来源"] = "这些原文与本包共同组成任务输入，交接包中位于 repo/ 下，须在实现或复核前阅读：\n" + "\n".join(f"- {p}" for p in required_sources)
+        sources += required_sources
     lim = CFG["budgets"]["pack_chars"]
     header = (f"- 功能：{fid} {f.get('title')}；领域 {f.get('domain')}；release {f.get('release')}；闭环 {loop_txt}\n"
               f"- 依赖：{'、'.join(deps) or '无'}\n- 涉及路径：{'、'.join(paths)}\n"
-              "- 本包中的规则就是本任务适用的全部规则，不必再读约定全文。只有包确实缺信息时才读包外文件，并在 work 文件“包外读取”一节记一行原因。\n"
+              "- 本包及第 13 节配套来源共同构成任务输入；约定已摘录，不必再读约定全文。额外包外读取在 work 文件中记录原因。\n"
               f"- 同时生效规则：{rule_count} 条（根红线 {red} 条已常驻）。")
     body = "\n\n".join(f"## {k}\n\n{v}" for k, v in S.items())
     title = f"# 任务包 {fid} {f.get('title')}（由 {_commit()} 生成，勿手改）"
@@ -2710,7 +2729,7 @@ def build_pack(repo, fid: str) -> tuple[str, dict]:
     text = draft.replace("{CHARS}", f"{approx:,}").replace("{BYTES}", f"{utf8len(draft):,}")
     sizes = {k: len(v) for k, v in S.items()}
     return text, {"chars": len(text), "bytes": utf8len(text), "sizes": sizes, "rules": rule_count,
-                  "sources": sorted(set(s for s in sources if s))}
+                  "sources": sorted(set(s for s in sources if s)), "required_sources": required_sources}
 
 
 def build_spec_pack(repo, fid: str) -> tuple[str, dict]:
@@ -2770,7 +2789,8 @@ def cmd_pack(args):
     out = repo.root / ".pack" / f"{fid}.md"
     write_text(out, text)
     write_text(repo.root / ".pack" / f"{fid}.json", json.dumps({"id": fid, "generated_at": _dt.datetime.now().isoformat(timespec="seconds"),
-                                                                "commit": _commit(), "sources": meta["sources"]}, ensure_ascii=False, indent=1))
+                                                                "commit": _commit(), "sources": meta["sources"],
+                                                                "required_sources": meta.get("required_sources", [])}, ensure_ascii=False, indent=1))
     lim = CFG["budgets"]["pack_chars"]
     print(f"任务包：{rel(out)}　{meta['chars']:,} 字符（{meta['bytes']:,} 字节），上限 {lim:,} 字符")
     if meta["chars"] > lim and not args.allow_over and not args.spec_mode:

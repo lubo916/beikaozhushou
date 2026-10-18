@@ -39,7 +39,7 @@ phases:
       - 黄金路径 0 通过（做一题→证据→档位→方格变色）
       - 五份 ADR（证据模型、记忆调度、排程方法、AI 解析结论、客户端形态）
       - 一向门清单逐项有结论
-      - 项目记忆文件 v1
+      - 项目记忆文件 v1（AGENTS.md 与状态命令，ADR-008）
     not_doing: [任何后台界面, 正式登录（用固定的开发者账号）, 视觉打磨, 除行走骨架外的任何原型功能]
     metrics: [没有用户指标。只看：探针结论是否明确、黄金路径是否稳定、一次部署要多久]
     budget_rounds: [40, 63]
@@ -58,7 +58,7 @@ phases:
             title: 仓库、目录约定与项目记忆文件
             type: eng
             carrier: docs/meta/doc-system.md
-            accept: 新开一个对话，只读 memory.md 就能说清项目在哪一步、下一步做什么、必须遵守哪些规则。
+            accept: 新开一个对话，只读 AGENTS.md 并运行 python scripts/spec_tool.py status，就能说清项目在哪一步、下一步做什么、必须遵守哪些规则。
             rounds: [2, 3]
           - id: 0.1b
             title: 持续集成与预发环境

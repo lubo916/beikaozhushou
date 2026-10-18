@@ -1,6 +1,7 @@
 """Specs handoff must reject stale/overbudget inputs and ship shared sources."""
 import argparse
 import importlib.util
+import json
 from pathlib import Path
 import tempfile
 from types import SimpleNamespace
@@ -57,6 +58,27 @@ class SpecHandoffTests(unittest.TestCase):
             self.assertEqual(archive.read("packs/TEST-01.md"), b"FRESH")
             self.assertEqual(archive.read("repo/model.md"), b"model-source")
             self.assertEqual(archive.read("context/loop.yaml"), b"selected-loop")
+
+    def test_implementation_package_carries_required_companion_sources(self):
+        (self.root / "work").mkdir()
+        (self.root / "work/TEST-01.md").write_text("Plan", encoding="utf-8")
+        (self.root / "docs").mkdir()
+        (self.root / "docs/contract.md").write_text("Required context", encoding="utf-8")
+        (self.root / ".pack/TEST-01.json").write_text(
+            json.dumps({"required_sources": ["docs/contract.md"]}), encoding="utf-8")
+        args = argparse.Namespace(id="TEST-01", round=1, handshake=False, force=True, notes=None)
+        with patch.object(handoff, "LOG", self.root / "log"), \
+             patch.object(handoff, "ALWAYS", []), \
+             patch.object(handoff, "git", return_value="feat/TEST-01-fixture"), \
+             patch.object(handoff, "plan_confirmed", return_value=True), \
+             patch.object(handoff, "plan_paths", return_value=([], [])), \
+             patch.object(handoff, "spec_tool", return_value=SimpleNamespace(returncode=0)), \
+             patch.object(handoff, "feature_title", return_value="Fixture"), \
+             patch.object(handoff, "fill", return_value="Implement"), \
+             patch.object(handoff, "log_work"), patch.object(handoff, "tell"):
+            self.assertEqual(handoff.cmd_out(args), 0)
+        with zipfile.ZipFile(self.out / "TEST-01-r1.zip") as archive:
+            self.assertEqual(archive.read("repo/docs/contract.md"), b"Required context")
 
 
 if __name__ == "__main__":

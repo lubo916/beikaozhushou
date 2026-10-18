@@ -1,5 +1,5 @@
 {
-  "$description": "主题解析（DTCG Resolver）。基础令牌为 tokens.json；机构白标、色觉友好配色、大字号为修饰器，按顺序叠加。",
+  "$description": "基础令牌取 tokens.json；叠加顺序 scheme→brand→vision→text。0.1只编译brand=platform，org含未来运行时绑定，排除该上下文；vision别名在当前scheme叠加后解析。",
   "version": "2025.10",
   "sets": [
     {
@@ -11,6 +11,131 @@
     }
   ],
   "modifiers": [
+    {
+      "name": "scheme",
+      "default": "light",
+      "contexts": {
+        "light": [],
+        "dark": [
+          {
+            "color": {
+              "bg": {
+                "canvas": {
+                  "$type": "color",
+                  "$value": "#101724"
+                },
+                "surface": {
+                  "$type": "color",
+                  "$value": "#182235"
+                },
+                "sunk": {
+                  "$type": "color",
+                  "$value": "#121C2C"
+                }
+              },
+              "ink": {
+                "primary": {
+                  "$type": "color",
+                  "$value": "#F2F5FA"
+                },
+                "secondary": {
+                  "$type": "color",
+                  "$value": "#C4CDDC"
+                },
+                "tertiary": {
+                  "$type": "color",
+                  "$value": "#A5B1C4"
+                },
+                "on-brand": {
+                  "$type": "color",
+                  "$value": "#101724"
+                }
+              },
+              "line": {
+                "strong": {
+                  "$type": "color",
+                  "$value": "#70819A"
+                },
+                "soft": {
+                  "$type": "color",
+                  "$value": "#324158"
+                }
+              },
+              "brand": {
+                "primary": {
+                  "$type": "color",
+                  "$value": "#93B4FF"
+                },
+                "primary-ink": {
+                  "$type": "color",
+                  "$value": "#CADBFF"
+                },
+                "primary-soft": {
+                  "$type": "color",
+                  "$value": "#22375E"
+                }
+              },
+              "status": {
+                "warning": {
+                  "$type": "color",
+                  "$value": "#FFD080"
+                },
+                "warning-soft": {
+                  "$type": "color",
+                  "$value": "#49331A"
+                },
+                "warning-line": {
+                  "$type": "color",
+                  "$value": "#C9A366"
+                },
+                "danger": {
+                  "$type": "color",
+                  "$value": "#FFACA0"
+                },
+                "danger-soft": {
+                  "$type": "color",
+                  "$value": "#492C32"
+                },
+                "success": {
+                  "$type": "color",
+                  "$value": "#84D6B2"
+                },
+                "success-soft": {
+                  "$type": "color",
+                  "$value": "#193F37"
+                },
+                "ai": {
+                  "$type": "color",
+                  "$value": "#CEB5FF"
+                },
+                "ai-soft": {
+                  "$type": "color",
+                  "$value": "#34274F"
+                }
+              },
+              "cvd": {
+                "success": {
+                  "$type": "color",
+                  "$value": "#9BCBFF"
+                },
+                "success-soft": {
+                  "$type": "color",
+                  "$value": "#1D3550"
+                },
+                "danger": {
+                  "$type": "color",
+                  "$value": "#FFC37A"
+                },
+                "danger-soft": {
+                  "$type": "color",
+                  "$value": "#49331A"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
     {
       "name": "brand",
       "default": "platform",
@@ -46,22 +171,21 @@
               "status": {
                 "success": {
                   "$type": "color",
-                  "$value": "#1F6FB2"
+                  "$value": "{color.cvd.success}"
                 },
                 "success-soft": {
                   "$type": "color",
-                  "$value": "#E1EEF8"
+                  "$value": "{color.cvd.success-soft}"
                 },
                 "danger": {
                   "$type": "color",
-                  "$value": "#B35A00"
+                  "$value": "{color.cvd.danger}"
                 },
                 "danger-soft": {
                   "$type": "color",
-                  "$value": "#FCEBDC"
+                  "$value": "{color.cvd.danger-soft}"
                 }
-              },
-              "$description": "色觉友好：对错不靠红绿区分，改用蓝橙；掌握档本身为单色相明度阶梯，保持不变"
+              }
             }
           }
         ]

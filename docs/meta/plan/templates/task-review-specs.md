@@ -6,7 +6,7 @@
 1. AGENTS.md
 2. context/loop.yaml 与 repo/docs/meta/plan/loops/{{LOOP}}.md：当前期、闭环、切片与执行顺序。存在 {{LOOP}}-foundation.md 时先读该共同工程前置；它列出的未来产物尚未实现，不当作已完成。
 3. context/SOURCES.md：共享来源索引。先读 repo/docs/adr/ADR-025*、ADR-026*、ADR-029*，以及 repo/design/tokens*.json、repo/scripts/spec_tool.toml、repo/fixtures/runtime/（如有）；其他 refs、模型、词表（含枚举值）、完整参数登记与两套考试夹具均在 repo/，按关联读取。
-4. packs/<ID>.md：每个功能的任务包，含规格正文与相关契约、页面、不变量。本轮功能：{{FEATURES}}。原始规格（含 refs/open_questions）也在 repo/docs/domains/。以当前包为准，勿沿用旧轮次内容。
+4. packs/<ID>.md 及其第 13 节列出的配套必读原文：共同构成每个功能的完整任务输入，原文在 repo/ 同路径。共同 ADR 只存一份，按包中链接完整阅读，不当作缺失。本轮功能：{{FEATURES}}。原始规格（含 refs/open_questions）也在 repo/docs/domains/。以当前包为准，勿沿用旧轮次内容。
 
 ## 要做的
 - 对每个功能，列出所有“实现前必须问人、或只能靠猜”的地方。每条标注类型：缺信息、信息冲突、含糊、越界（规格要求超出本功能，或与其他功能重叠）。不提风格建议。

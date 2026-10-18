@@ -515,3 +515,14 @@
   rollout: none
   reason_required: true
   source_items: [S31-06]
+- name: api.request.max_body_bytes
+  owner: platform
+  description: HTTP JSON 请求体的协议大小上限；0.1b 注入 Fastify bodyLimit
+  default: 1048576
+  range: [65536, 16777216]
+  unit: bytes
+  tunable_by: [platform]
+  learner_range: null
+  rollout: immediate
+  reason_required: false
+  source_items: []

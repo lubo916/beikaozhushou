@@ -1,0 +1,8 @@
+# 参数登记与运行时校验元数据；0.1b 接入生成器，运行时消费生成结果，不加载 YAML。
+version: 1
+required_fields: [name, owner, description, default, range, unit, tunable_by, learner_range, rollout, reason_required, source_items]
+owner_source: docs/product/domain-map.yaml#name
+allowed_units: [bytes, cards, count, day, days, hours, items, learners, level, minute, minutes, ratio, ratio_list, score, seconds, strength, time_range, week, weight]
+integer_units: [bytes, cards, count, day, days, items, learners, level, week]
+allowed_tuners: [platform, learner]
+allowed_rollouts: [immediate, gray_required, none]
