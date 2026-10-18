@@ -32,7 +32,7 @@
 4. **复核**：Codex 用 review-spec 复核，有意见就 `ho write-specs <闭环> --notes <文件>` 退回同一个对话；重型通道再用 `ho specs <闭环>` 请网页版 Claude 新开对话冷启动复核。问题清零后 Codex 写大白话概况，你确认后改为 `ready`。
 5. **计划与实现**：在 `feat/<ID>-<短名>` 分支 `st work start <ID>` → 有预写稿用 `ho adopt-plan <ID>` 换入，没有就 `ho write-plan <ID>` 请网页版 Claude 写、`ho in --latest <ID>-plan` 回收 → review-plan 复核 → 你看计划概况回“确认计划” → `ho out <ID>` 出实现包（回到写计划的对话）→ `ho in --latest <ID>` 应用结果并跑 verify。
 6. **复查**：Codex 用 review-change 技能对照任务包复查；不过就出修复包（README 的 P3）。
-7. **收尾**：`st work close <ID>` → 提交 → CI 全绿后合并。闭环的最后一个功能合并后，close-loop 技能核对完成定义并记实际轮次。功能状态由 CI 推导，不手改。
+7. **收尾**：`st work close <ID>` → 提交 → CI 全绿后合并（0.1b 接入远端之前：本地 `st verify` 通过后 `git merge --no-ff`，见 README 第 5 节）。闭环的最后一个功能合并后，close-loop 技能核对完成定义并记实际轮次。功能状态由 CI 推导，不手改。
 
 ## 页面深化（暂缓，ADR-023）
 

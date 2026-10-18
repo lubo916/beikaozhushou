@@ -1,4 +1,3 @@
-!.env.example
 # 密钥
 # 工具产物
 # 技术栈
@@ -11,6 +10,7 @@
 .DS_Store
 .env
 .env.*
+!.env.example
 .eval/
 .next/
 .pack/

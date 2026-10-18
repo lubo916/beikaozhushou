@@ -36,7 +36,7 @@ Codex 每次会话按顺序判断，命中即停：
    - `spec/loop-<闭环>`：继续该闭环的规格批次（P1）。
    - `chore/<切片>-*`：继续该闭环级任务，按 work/&lt;切片&gt;.md 执行。
    - 其他非主干分支：停下来问我。
-2. 在主干：先 `git pull`。B0.md 每一步都有可机检的完成判据，有未满足的，就做最前面那一步。
+2. 在主干：配置了远端就先 `git pull`（0.1b 接入远端之前没有远端，跳过）。B0.md 每一步都有可机检的完成判据，有未满足的，就做最前面那一步。
 3. B0 全部满足后：运行 `python scripts/spec_tool.py status` 与 `python scripts/spec_tool.py gen`，读 docs/product/roadmap.md 的功能状态和 docs/product/calibration.yaml，按 steps.md 的顺序找第一个没完成的步骤。
    - 期初行（`P<n>-入`）：docs/product/calibration.yaml 里没有该期的 `phase_start` 记录，就做 P7 期初。
    - 并行事项、门槛、决策点（`P<n>-TR`、`-G`、`-D`、`-CAL`）：docs/product/calibration.yaml 里没有对应记录，就提醒我，并做标“Codex”的部分。并行事项不阻塞闭环推进，门槛和决策点阻塞。
@@ -77,12 +77,12 @@ Codex 每次会话按顺序判断，命中即停：
 7. Codex：
    - 把你确认的规划改动（功能依赖、步骤顺序、切片验收句）落到 roadmap.yaml、phases.yaml、闭环文件与 steps.md，运行 gen。
    - 把这些规格改为 ready，提交信息写明“业务确认：<日期>”。
-   - 运行 `check`，推送并开 PR，CI 绿后合并。
+   - 运行 `check`，推送并开 PR，CI 绿后合并（远端接入前按第 5 节在本地合并）。
    - 如果你预授权了计划，在 docs/product/calibration.yaml 的 events 记一条 preauthorized。
 
 ### P2 功能实现（每个功能一次）
 
-1. Codex：主干 `git pull` 后建分支、建 work 文件：
+1. Codex：在主干（有远端时先 `git pull`）建分支、建 work 文件：
    ```text
    git switch -c feat/<ID>-<短名>
    python scripts/spec_tool.py work start <ID>
@@ -103,7 +103,7 @@ Codex 每次会话按顺序判断，命中即停：
 8. Codex：运行 `python scripts/handoff.py in --latest <ID>`。它会校验路径、写入文件、运行 gen 与 verify，并在 work 文件里记交接记录、决定和未决。
    - verify 失败：走 P3。
    - verify 通过：按 review-change 技能复查。严重问题走 P3；一般问题当场轻量修。
-9. Codex：运行 `python scripts/spec_tool.py work close <ID>`，然后提交、推送、开 PR，CI 全绿后合并，回到主干。
+9. Codex：运行 `python scripts/spec_tool.py work close <ID>`，然后提交、推送、开 PR，CI 全绿后合并，回到主干（远端接入前按第 5 节在本地合并）。
 
 ### P3 修复轮
 
@@ -175,6 +175,7 @@ Codex 每次会话按顺序判断，命中即停：
 - 编写包与交接包的内容只按 packages.yaml；网页版 Claude 因缺依据出错时，补 packages.yaml，不在对话里零散补发。
 - 不读归档：页面深化与旧文档分拣暂缓（ADR-023）；冻结原型只随规格编写包送达（ADR-030）。
 - 验证以本地 verify 和 CI 为准；Claude 的自测只作参考。
+- 远端与 CI 由 0.1b 接入。接入之前，凡是写“推送、开 PR、CI 绿后合并”的步骤，改为本地 `python scripts/spec_tool.py verify` 通过后，在主干上 `git merge --no-ff <分支>`；不运行 `git pull` 与 `git push`。接入之后恢复 PR 与 CI。
 - 计划、规格、交接只认仓库文件：work 文件、规格、本目录。
 
 ## 6 九期一览
