@@ -16,3 +16,7 @@ events:
   - event: tracks_started
     date: 2026-10-18
     note: B0-5：产品负责人确认合规轨、内容轨、验证轨均由本人负责并于当日启动，三份台账已登记负责人及预计启动日期。
+  - event: phase_start
+    phase: "0"
+    date: 2026-10-18
+    note: P0-入：第 0 期进入检查通过；原型基线为 v1.0 且 prototype_mode 为 frozen（ADR-001）；种子考试与内容来源已由 OQ-010、OQ-012 定稿；客户端形态按 ADR-022、ADR-029 采用响应式网页与 PWA；场外轨道负责人和启动日期已由产品负责人确认。
