@@ -6,13 +6,13 @@ refs:
   events: [app_opened]
   params: [ui.loading.slow_hint_seconds]
   inv: [INV-01]
-  adr: [ADR-013, ADR-025, ADR-026, ADR-029]
+  adr: [ADR-013, ADR-026, ADR-029]
 open_questions: []
 ---
 # PLAT-01 学员端外壳与通用状态组件
 
 ## 1 目标与边界
-交付切片 0.1c、0.1d：三档外壳、七态、提议卡与撤销条，以占位和演示夹具验收。依赖 0.1b 的工程骨架、生成产物和测试工具；参数接入依赖 PLAT-02。0.1b 负责 getParams/app_opened 联调、开发身份、错误响应、低版本浏览器提示和令牌编译。
+交付切片 0.1c、0.1d：三档外壳、七态、提议卡与撤销条，以占位和演示夹具验收。依赖 0.1b 的工程骨架、生成产物和测试工具；参数接入依赖 PLAT-02。工程与工具基线见 docs/meta/plan/loops/0.1-foundation.md；0.1b 负责 getParams/app_opened 联调、开发身份、错误响应、低版本浏览器提示和令牌编译。
 不交付业务页面、真实计划、正式账号、AI 内容/导师对话、离线同步或对错标记组件。外壳先用登记默认参数运行，生效参数未取得不阻塞，也不宣称已取得生效值。
 
 ## 2 业务规则
@@ -52,16 +52,16 @@ open_questions: []
 
 locked 拒绝 page 范围；页面决定哪个预测区块锁定。组件不生成业务数字；所属页面功能负责 state_overrides 转键及登记的全部 states。
 - R5 进入 loading 即呈现 R4 内容，达到 slowHintSeconds 显示 ui.state.still_loading，退出清理订阅。apps/learner 经 PLAT-02 访问器取 ui.loading.slow_hint_seconds 并注入；ui 不引用 params。Clock 为 now():epoch毫秒、subscribe(tick):取消订阅函数；默认每秒及返回前台时 tick，测试可推进替身。刷新节拍/单位换算是工程常量，非业务阈值。时长变更按本次加载已持续时间立即重算，避免旧计时残留。
-- R6 onRetry():Promise<void>，pending 禁止重复点击；resolve 后调用方更新 state，reject 时保留 error、恢复按钮并调用一次 onReport({pageKey,errorCode})。首次错误由调用方上报，每次重试 reject 均通知，去重归上报层。0.1 注入上报桩，正式适配器归 0.1b 按 ADR-025 接 GlitchTip，不发送未登记埋点。错误码映射文案键，不展示原始异常，避免泄露个人信息。
+- R6 onRetry():Promise<void>，pending 禁止重复点击；resolve 后调用方更新 state，reject 时保留 error、恢复按钮并调用一次 onReport({pageKey,errorCode})。首次错误由调用方上报，每次重试 reject 均通知，去重归上报层。0.1 注入上报桩，正式适配器归共同前置 0.1b 接 GlitchTip，不发送未登记埋点。错误码映射文案键，不展示原始异常，避免泄露个人信息。
 - R7 ProposalCard 接 source:'plan_engine'|'manual'|'demo'、四项文案键/插值（改什么、为什么、代价、不改会怎样）、onConfirm/onDecline:()=>Promise<void>；仅发回调，pending 禁重复动作，resolve 后由调用方更新展示，reject 保留原态并显示错误键。类型不接受 AI 来源；运行时 ai/未知来源拒绝正文和动作，显示 ui.proposal.unsupported_source，待 AiContent 落地后另定接入，避免无标识展示。UndoBar 接带时区 ISO 8601 deadline、Clock、onUndo:()=>Promise<void>；无效时间禁用，pending 防重，失败保持原态且显示错误键。remaining=max(0,deadline-now)，取天/小时/分/秒中最大的非零单位向上取整，用 ui.undo.remaining_{days,hours,minutes,seconds} 的 count 插值。到期显示 ui.undo.expired 并禁用；真实撤销以服务端结果为准，界面不复制计划引擎规则（ADR-013）。
 - R8 开发构建才注册 /__demo/platform，不入页面登记。apps/learner/src/demo/platform.fixture.ts 存“演示”标签、四项文案键、固定时钟起点/截止 ISO；固定测试时间与演示数字逐处注明 param-exempt，仅用于夹具，不使用真实撤销期限。待确认→确认显示撤销条→撤销恢复本地演示；不改只触发拒绝回调，不发持久化请求。演示支持四 mode、七态与时钟，避免占位被误认为真实业务。
 - R9 样式只消费 design/tokens.json 与 tokens.resolver.json 的结果 packages/ui/generated/tokens.css，0.1b 用 Terrazzo 编译。当前源缺深色/间距令牌：实现前由 Codex 补齐、复核后出包，实现者只消费，不写样式数值兜底。主题约定 scheme=light/dark、vision=default/cvd、text=default/large，按 resolver 顺序叠加，brand=platform；正式外壳默认 light/default/default，演示独立切换作用于整棵外壳，不持久化、不推断系统偏好。大字号用 text.large 登记字号，不另设倍率。375 下文字可换行、底栏等分、内容纵向滚动，主要动作不裁切。可点元素有可见焦点与可读名称，图标按钮有 aria-label，覆盖层约束焦点且关闭归还。
 
 ## 3 界面
-五路由只显示登记 title 与 ui.placeholder.not_open（尚未开放），不搭建 layout_notes 业务区块；作为外壳占位免做对应页 states，真实页面落地时恢复完整要求。演示路由承担通用七态验收，不视为业务页，不展示未实现功能的业务结果。
+五路由的布局参考登记为 S06、S09、S17、S28、S34：只读取其 id、title、mode、views 及视图内 mode 覆盖；视图未登记 mode 时继承页面值，不新增业务视图。占位只显示登记 title 与 ui.placeholder.not_open（尚未开放），不搭建 layout_notes 业务区块；作为外壳占位免做对应页 states，真实页面落地时恢复完整要求。演示路由承担通用七态验收，不视为业务页，不展示未实现功能的业务结果。
 
 ## 4 数据
-不新增表/接口。组件/类型在 packages/ui/**，路由/注入/夹具/文案在 apps/learner/**，测试在 tests/**；缺失令牌登记仅涉及 design/tokens.json、design/tokens.resolver.json，生成文件只改源后 gen。文案 apps/learner/src/i18n/zh-CN.json，采用 ADR-025 的 i18next/react-i18next，平铺点分键 nav.*、ui.state.*、ui.proposal.*、ui.undo.*、demo.platform.*，数字用 {{count}} 等插值。Provider 注入 t，传入的文案键可类型检查；页面键由所属功能维护。ui 不依赖 domains/db/ai/params，浏览器依赖方向按 ADR-026。
+不新增表/接口。组件/类型在 packages/ui/**，路由/注入/夹具/文案在 apps/learner/**，测试在 tests/**；缺失令牌登记仅涉及 design/tokens.json、design/tokens.resolver.json，生成文件只改源后 gen。文案 apps/learner/src/i18n/zh-CN.json，采用共同前置约定的 i18next/react-i18next，平铺点分键 nav.*、ui.state.*、ui.proposal.*、ui.undo.*、demo.platform.*，数字用 {{count}} 等插值。Provider 注入 t，传入的文案键可类型检查；页面键由所属功能维护。ui 不依赖 domains/db/ai/params，浏览器依赖方向按 ADR-026。
 
 ## 5 AI 行为
 无模型调用，导师仅占位。AI 内容按 R7 拒绝，待 AiContent 对接后另定规格。

@@ -40,8 +40,8 @@ open_questions:
 - R5 按 learner-model#effective-learning 验证夹具：片段有关联的 accepted 未撤回证据才有效；时长取 UTC 终点减起点，片段归其当地自然日，与证据补录日无关；每学员日内任一有效片段即有效日，周内去重日数、去重学员数分别形成周有效日数和北极星。完整分钟时长求和，不做舍入；撤回最后一条证据后，下次查询移除相应片段、日及周贡献。跨午夜、同学员重叠、倒置/零时长、非完整分钟、未知时区历史按 OQ-METR-01-4 返回 not_ready，不静默修正。
 - R6 按 planner#completion 验证 fixture 明确选择的快照：plan 给出的 completed 集合除以各自 eligible 集合，不自行从埋点或答题字段重新判完成。夹具中看过/未完成不进分子，今日清单写明原因的剔除项不进分母；巩固段按其显式集合，未知剔除约定按 OQ-METR-01-5。completed 必须是 eligible 子集；零分母 value=null、reason=no_applicable_plan，缺快照/集合冲突为 not_ready，不伪造零或满额。
 - R7 日为每学员固定 IANA 时区的自然日，周为当地周一零时至下周一零时的左闭右开区间；不取服务器时区或固定 UTC 偏移。查询按输入即时验证，不建定时任务；refresh 登记不代表本期已实现生产刷新。只输出每学员每日完成率、每学员每周有效日数/分钟及所选周有效学员去重数；不输出群体完成比例或跨周相加去重数。
-- R8 事件查询按自身身份、可选事件名与 UTC [from,to) 过滤，返回记录及 schemaHash，可跨哈希查看原始属性但不重解释。fixture 查询选当地周一日期，只计算该周及其中每天；所有 0.1 输出 simulated=true，输入缺失或不支持时按学员/日期/指标给 not_ready，不污染其他可计算行。目标/最小样本只读生成的指标登记快照，本期所有 conclusion=null，不给达标判断。
-- R9 领域包提供开发查询入口 dev:query，调用形态为 pnpm --dir packages/domains/metrics dev:query -- <参数>：events 模式用 --mode events --from --to，可选 --event；fixture 模式用 --mode fixture --fixture --week。共同 --store 指定隔离 JSONL，--output 指定 UTF-8 CSV；未给 output 则写标准输出。CSV 带表头 kind,name,learner_id,period,timezone,value,reason,simulated,schemaHash；kind 为 event_count、metric、not_ready、candidate，事件计数每身份/事件名/查询窗/schemaHash 一行。两候选只列名称、reason=deferred、value 留空。该 CLI 只供开发自测，不是 ADR-026 的正式业务导出或公开查询接口。
+- R8 事件查询按自身身份、可选事件名与 payload.occurred_at 的 UTC [from,to) 发生窗过滤，只查已落盘记录；recorded_at 仅作入库审计，不参与该筛选。返回记录及 schemaHash，可跨哈希查看原始属性但不重解释。fixture 查询选当地周一日期，只计算该周及其中每天；所有 0.1 输出 simulated=true，输入缺失或不支持时按学员/日期/指标给 not_ready，不污染其他可计算行。目标/最小样本只读生成的指标登记快照，本期所有 conclusion=null，不给达标判断。
+- R9 领域包提供开发查询入口 dev:query，调用形态为 pnpm --dir packages/domains/metrics dev:query -- <参数>：events 模式用 --mode events --from --to，可选 --event；fixture 模式用 --mode fixture --fixture --week。共同 --store 指定隔离 JSONL，--output 指定 UTF-8 CSV；未给 output 则写标准输出。CSV 带表头 kind,name,learner_id,period,timezone,value,reason,simulated,schemaHash；kind 为 event_count、metric、not_ready、candidate，事件计数每身份/事件名/发生窗/schemaHash 一行，period 为 R8 的发生窗。两候选只列名称、reason=deferred、value 留空。该 CLI 只供开发自测，不是 ADR-026 的正式业务导出或公开查询接口。
 
 ## 3 界面
 无业务界面。本期用测试、开发 CLI 与 CSV 检查。
@@ -49,7 +49,7 @@ open_questions:
 ## 4 数据
 trackEvent、统一错误体和 metrics.event.track 以契约为准；guest/learner 仅自身范围。固定身份、actor 联合类型与 IANA 时区只取 foundation 的 fixtures/runtime/phase0.json，不从请求属性取得；仅 0 期开发/测试环境使用该上下文，测试可注入其他身份。
 
-仓储接口 EventRepository.appendOnce(record) 返回 inserted/duplicate/conflict，query(filter) 返回已提交记录；服务注入仓储、时钟及 UUIDv7 工厂。开发实现为配置路径的只追加 JSONL，不建数据库客户端；记录含 UUIDv7 id、tenant/identity、source、payload、幂等键/规范化摘要、UTC recorded_at、schemaHash、simulated。单进程串行写入并落盘后才成功；测试各用临时目录、可失败替身。损坏文件或不支持的并发写仓储返回不可用，不将半条记录算成功。规范化 payload 递归排序对象键、保留数组顺序，时间转 UTC 后比较。
+仓储接口 EventRepository.appendOnce(record) 返回 inserted/duplicate/conflict，query(filter) 按 R8 返回已提交记录；服务注入仓储、时钟及 UUIDv7 工厂。开发实现为配置路径的只追加 JSONL，不建数据库客户端；记录含 UUIDv7 id、tenant/identity、source、payload、幂等键/规范化摘要、UTC recorded_at、schemaHash、simulated。单进程串行写入并落盘后才成功；测试各用临时目录、可失败替身。损坏文件或不支持的并发写仓储返回不可用，不将半条记录算成功。规范化 payload 递归排序对象键、保留数组顺序，时间转 UTC 后比较；幂等重复保留首次记录的发生时间。
 
 schemaHash：event_count 行取实际记录的 events.yaml 内容哈希，跨哈希按哈希分别计数；metric/not_ready/candidate 行取 metrics.yaml 内容哈希。二者均来自 foundation 的生成快照；生成器由 0.1b 交付，不在运行时读取 YAML 或取 Git HEAD。
 
@@ -66,7 +66,7 @@ schemaHash：event_count 行取实际记录的 events.yaml 内容哈希，跨哈
 - METR-01-AC5 撤回最后一条证据后重新查 fixture，移除对应分钟以及失去最后片段的日/周贡献，与从未提供该证据一致，不修改埋点或证据存储。
 - METR-01-AC6 明确快照含完成、看过、未完成、有/无原因剔除，分别按 plan 替身给出的两组集合验证比例；重复完成埋点不改变比例。零分母为空且无适用计划；缺快照/集合冲突为 not_ready，不自行选日终分母。
 - METR-01-AC7 固定 IANA 时区覆盖午夜、周日到周一、夏令时；UTC 时长与当地归日分别手算一致，端点左闭右开且服务器时区不影响结果。夹具覆盖 Asia/Shanghai 及有夏令时的时区，生产时区变更不由 fixture 推断。
-- METR-01-AC8 CLI 查询/CSV 只输出规定粒度与列，模拟、not_ready、无适用计划及延期候选清晰可区分；event_count 不冒充证据指标，候选 value 为空，所有行无达标结论；不产生正式看板、实时算法或业务导出。元数据引用生成登记。
+- METR-01-AC8 仓储与 CLI events 按发生时间筛选：已落盘事件发生窗外/入库窗内不计入，发生窗内/入库窗外计入；同键同 payload 重试不改变发生时间或计数。CSV period 为该发生窗，列与粒度符合 R9；模拟、not_ready、无适用计划及延期候选可区分。event_count 不冒充证据指标，候选 value 为空，所有行无达标结论；无正式看板、实时算法或业务导出。元数据引用生成登记。
 
 ## 7 不变量与合规
 properties 只含登记属性；禁止夹带手机号、邮箱、答题正文、导师对话或密钥。错误 details 只给字段路径和错误类别，不回显值；身份隔离包含 tenant/identity。学习证据/掌握档只由 learner 写，完成判定只由 plan 提供。fixture、事件和 CSV 均仅开发者模拟数据；单位换算、HTTP 状态和测试时间等常量豁免按 foundation，不当作可调阈值。

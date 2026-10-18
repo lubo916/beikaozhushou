@@ -73,6 +73,20 @@ class PackContextTests(unittest.TestCase):
         self.assertIn("packages/ui/AGENTS.md", meta["sources"])
         self.assertNotIn("packages/domains/platform/**", result)
 
+    def test_learner_shell_pack_includes_all_route_registration_sources(self):
+        with patch.object(tool, "ROOT", PROJECT):
+            with patch.object(tool, "CFG", tool.load_config()):
+                repo = tool.Repo()
+                result, meta = tool.build_pack(repo, "PLAT-01")
+                for pid in ("S06", "S09", "S17", "S28", "S34"):
+                    with self.subTest(page=pid):
+                        self.assertTrue(f"### {pid} " in result, f"pack missing {pid} metadata")
+                        self.assertIn(f"design/screens/learner/{pid}.yaml", meta["sources"])
+                self.assertTrue("views:" in result, "pack missing view registration")
+                self.assertTrue("when: 危机信号" in result, "pack missing S28 view context")
+                self.assertFalse("S06-01" in result, "layout reference includes business items")
+                self.assertLessEqual(meta["chars"], tool.CFG["budgets"]["pack_chars"])
+
     def test_isolated_root_generation_does_not_write_to_source_checkout(self):
         self.write("contracts/params.yaml", "[]\n")
         before = (PROJECT / "packages/params/index.ts").read_bytes()
