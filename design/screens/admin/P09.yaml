@@ -4,7 +4,6 @@ end: admin
 title: 模板与学习包、版权
 mode: standard
 purpose: 模板让产品不靠平台也能覆盖长尾考试，但也带来质量与版权风险。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data]
 data:
   read_writes: [模板, 来源台账, 投诉记录]

@@ -4,7 +4,6 @@ end: learner
 title: 我的资料
 mode: standard
 purpose: 不要求换资料，把已有的书、课、题接到地图上。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data]
 state_overrides:
   empty: 还没有资料：把手头的书、课、题接进来，不用换资料；主按钮“添加资料”

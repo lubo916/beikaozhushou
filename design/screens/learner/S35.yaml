@@ -4,7 +4,6 @@ end: learner
 title: 消息与帮助
 mode: standard
 purpose: 提醒有用、反馈有回音。
-refine: pending
 states: [loading, empty, error, offline, restricted]
 state_overrides:
   empty: 没有新消息：提醒每天最多 2 条，深夜不推；主按钮“去设置提醒”（去 S33）

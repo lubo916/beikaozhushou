@@ -4,7 +4,6 @@ end: learner
 title: 数据与隐私
 mode: standard
 purpose: 看得清、管得住、带得走、删得掉；学习资产的流转与误删恢复也在这里。
-refine: pending
 states: [loading, empty, error, offline, restricted]
 state_overrides:
   empty: 还没有可导出的数据：开始学习后这里会列出你的全部数据

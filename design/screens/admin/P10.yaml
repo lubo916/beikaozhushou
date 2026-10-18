@@ -4,7 +4,6 @@ end: admin
 title: AI 场景、模型与成本
 mode: standard
 purpose: 产品里不是一个导师，而是一组职责、可读数据、可写范围都被限定的能力。它们必须集中登记、可回滚、可审计。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data]
 data:
   writes: [场景, 路由, 提示词与权限配置]

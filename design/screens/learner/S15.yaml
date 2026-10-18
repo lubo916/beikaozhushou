@@ -4,7 +4,6 @@ end: learner
 title: 复习与卡片
 mode: standard
 purpose: 唯一到期队列的家：在忘之前复习，先回忆再翻面。
-refine: pending
 views:
   - id: home
     when: 落地页

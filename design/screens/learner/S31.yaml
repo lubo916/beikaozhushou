@@ -4,7 +4,6 @@ end: learner
 title: 会员与权益
 mode: standard
 purpose: 买的是“这一次备考”或持续的学习服务；核心闭环不设限，到期不锁数据。
-refine: pending
 states: [loading, empty, error, offline, restricted]
 state_overrides:
   empty: 还没有订单：核心闭环免费，不需要购买也能完整备考；主按钮“看档位对比”

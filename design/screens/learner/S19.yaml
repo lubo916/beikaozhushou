@@ -4,7 +4,6 @@ end: learner
 title: 错题本
 mode: standard
 purpose: 错一次，改一类；一条流水线从收录走到毕业。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data]
 state_overrides:
   empty: 没有待处理的错题：今天的回炉都做完了；主按钮“去练习”（去 S17）

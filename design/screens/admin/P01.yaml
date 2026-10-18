@@ -4,7 +4,6 @@ end: admin
 title: 运营驾驶舱
 mode: standard
 purpose: 平台要看的不是有多少人打开，而是产品是否真的在帮人学会。北极星是“周有效学习用户”。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data]
 data:
   reads: [匿名聚合的行为与证据数据]

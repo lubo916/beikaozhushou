@@ -4,7 +4,6 @@ end: learner
 title: 练习中心
 mode: standard
 purpose: “练测”标签的落地页，先回答“现在练什么”，再提供自己掌控的方式。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data]
 state_overrides:
   empty: 题库是空的：导入题目、拍照录题，或让导师出题（确认后入库）；主按钮“添加题目”

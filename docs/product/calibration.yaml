@@ -1,5 +1,9 @@
-# 校准记录（ADR-008；分期规划 3.3、9.6）。闭环开卡时由 open-loop 新增一条，收尾时由 close-loop 补全。
+# 推进与校准记录，全仓库只有这一份（ADR-008、ADR-024）。
 # coefficient：后续闭环预算的乘数。status 会按最近关上的闭环给出建议值，由人决定是否采用；连续两个闭环都在预算内时可调回 1.0。
-# loops 每条字段：loop（闭环编号）、opened、budget（开卡时换算后的 [下限, 上限]）、closed、actual_rounds、slices_done、fused（熔断时移回待办的切片）、note。
+# loops：闭环开卡时由 open-loop 新增一条，收尾时由 close-loop 补全。字段：loop（闭环编号）、opened、budget（开卡时换算后的 [下限, 上限]）、
+#   closed、actual_rounds（总轮次）、claude_rounds（网页版 Claude 轮次，取自 work 文件交接记录）、slices_done、fused（熔断时移回待办的切片）、note。
+# events：闭环以外推不出来的事件。字段：event、date、note。event 取 handshake_ok、tracks_started、phase_start、phase_end、
+#   gate_passed、decision、preauthorized、fuse、coefficient。
 coefficient: 1.0
 loops: []
+events: []

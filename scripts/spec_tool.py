@@ -1274,6 +1274,15 @@ def _baseline_item_ids(ref: str) -> dict:
     return out
 
 
+def _id_baseline(ref):
+    """编号基线标记（design/screens/ID_BASELINE，见 ADR-023）；ref 为 None 时读工作区。"""
+    rel_path = "design/screens/ID_BASELINE"
+    if ref is None:
+        f = ROOT / rel_path
+        return read_text(f).strip() if f.exists() else ""
+    return (git_show(ref, rel_path) or "").strip()
+
+
 def check_coverage(repo, ctx):
     out = []
     cov = coverage_index(repo)
@@ -1309,7 +1318,10 @@ def check_coverage(repo, ctx):
             out.append(F("W-COV-04", repo.screens[pid]["_file"], "", f"页内 P0 条目由不在 R1 的功能覆盖：{len(ids)} 项（{', '.join(ids[:6])}{' …' if len(ids) > 6 else ''}）",
                          "人工确认首发范围；分期见 docs/product/phases.yaml"))
     cur_ids = set(items)
+    cur_base = _id_baseline(None)
     for ref in ctx.baselines:
+        if _id_baseline(ref) != cur_base:
+            continue  # 编号基线不同（一次性重置，见 ADR-023），不比对
         for iid, (path, it) in _baseline_item_ids(ref).items():
             if iid not in cur_ids:
                 out.append(F("E-COV-05", path, iid, f"与 {ref} 相比，已分配的条目编号 {iid} 消失了", "恢复该条目并标 removed: true；条目编号只增不减"))
@@ -1330,7 +1342,7 @@ def check_refine(repo, ctx):
             if pg and pg.get("refine") == "pending":
                 out.append(F("E-REFINE-01", sp.rel, "status", f"{fid} 为 ready，但覆盖条目所在页 {pid} 的 refine 为 pending",
                              "先用 refine-page 完成该页深化，再改为 ready；该页若无需深化，从深化清单移除并去掉 refine 字段"))
-    if ctx.baselines:
+    if ctx.baselines and _id_baseline(ctx.baselines[0]) == _id_baseline(None):
         base = _baseline_item_ids(ctx.baselines[0])
         cov = coverage_index(repo)
         for iid, (pid, it) in repo.items.items():
@@ -3900,6 +3912,13 @@ def check_phase_slices(repo, ctx):
             if isinstance(act, int) and fuse and act > fuse * coef and not e.get("fused"):
                 out.append(F("W-PHASE-07", cf, lid, f"实际 {act} 轮超过熔断线 {round(fuse * coef)} 轮，却没有熔断记录",
                              "写 fused（移回待办的切片）；以后同类闭环按规划 3.3 先熔断再关上"))
+        allowed = {"handshake_ok", "tracks_started", "phase_start", "phase_end", "gate_passed", "decision", "preauthorized", "fuse", "coefficient"}
+        for i, e in enumerate(cal.get("events") or []):
+            ev = (e or {}).get("event") if isinstance(e, dict) else None
+            if ev not in allowed:
+                out.append(F("E-PHASE-06", cf, f"events[{i}]", f"事件类型 {ev} 不合法", "取 " + "、".join(sorted(allowed)) + "（ADR-024）"))
+            elif not e.get("date"):
+                out.append(F("E-PHASE-06", cf, f"events[{i}]", "事件缺少 date", "写事件日期 YYYY-MM-DD"))
     return out
 
 
@@ -4047,7 +4066,7 @@ def cmd_status(args):
         hi = (lp2.get("budget_rounds") or [0, 0])[-1]
         if hi:
             L.append(f"- 最近关上的闭环 {last.get('loop')}：实际 {last['actual_rounds']} 轮，规划上限 {hi} 轮，建议系数 {max(1.0, round(last['actual_rounds'] / hi, 2))}")
-    L.append(f"- 待深化的页：{'、'.join(pend) if pend else '无'}")
+    L.append(f"- 当前闭环的待深化页：{'、'.join(pend) if pend else '无'}")
     rest = [str(l.get("id")) for p2, l in repo.loops() if p2 is ph and lst.get(str(l.get("id"))) not in ("已关上",)]
     L += [f"- 本期未关上的闭环：{'、'.join(rest)}", "", f"闭环卡：python scripts/spec_tool.py status --loop {lid}"]
     print("\n".join(L))

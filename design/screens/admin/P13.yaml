@@ -4,7 +4,6 @@ end: admin
 title: 用户、会员与订单
 mode: standard
 purpose: 用户、订单、权益是最基础的经营数据。原则是查得到、退得清、看得少。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data]
 data:
   read_writes: [用户, 订单, 权益]

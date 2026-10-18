@@ -4,7 +4,6 @@ end: learner
 title: 知识地图
 mode: standard
 purpose: 一张图看完整场考试，并把“看”变成“做”。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data, locked]
 state_overrides:
   empty: 还没有知识地图：选一个考试启用官方地图，或由资料生成；主按钮“由资料生成”（去 S11）

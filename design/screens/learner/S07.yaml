@@ -4,7 +4,6 @@ end: learner
 title: 学习计划
 mode: standard
 purpose: 看得见全局、随现实重排、每次变动讲得出理由。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data, locked]
 state_overrides:
   empty: 还没有计划：在起点报告里选一个方案生成；主按钮“去选方案”（去 S05）

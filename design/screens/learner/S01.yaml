@@ -4,7 +4,6 @@ end: learner
 title: 欢迎与登录
 mode: standalone
 purpose: 第一屏确认年龄段、讲清数据用途，让人先拿到价值再注册。
-refine: pending
 views:
   - id: first
     when: 首次进入

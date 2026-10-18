@@ -4,7 +4,6 @@ end: learner
 title: 备考目标
 mode: guided
 purpose: 把考什么、何时考、考到多少结构化；库里没有的考试也能建。
-refine: pending
 views:
   - id: first
     when: 首次（引导流）

@@ -4,7 +4,6 @@ end: learner
 title: 复盘与报告
 mode: standard
 purpose: 每周十分钟，看投入换来了什么，只改一件事。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data, locked]
 state_overrides:
   empty: 本周还没有可复盘的数据：至少有 3 天学习记录后生成周报；主按钮“先去学习”（去 S06）

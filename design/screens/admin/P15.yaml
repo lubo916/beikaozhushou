@@ -4,7 +4,6 @@ end: admin
 title: 触达与公告
 mode: standard
 purpose: 触达以对用户有用为准绳，由平台统一频控。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data]
 data:
   reads: [行为数据（不含敏感数据）]

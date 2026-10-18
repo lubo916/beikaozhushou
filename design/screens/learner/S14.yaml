@@ -4,7 +4,6 @@ end: learner
 title: 笔记本
 mode: standard
 purpose: 笔记按知识点归位，在该用时自己回来；考前汇成一本通和最后一页纸。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data]
 state_overrides:
   empty: 还没有笔记：在阅读、做题、问导师时随手记，都会归到知识点；主按钮“新笔记”

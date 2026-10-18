@@ -4,7 +4,6 @@ end: admin
 title: 系统、参数与权限
 mode: standard
 purpose: 后台自身也要可控：谁能看什么、改什么、参数怎么调。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data]
 layout_notes: [视图「参数与权限」：标准页；参数中心、功能开关、敏感操作分档。, 视图「员工登录」（P19#login）：独立页，只有标志、没有导航；入口是退出登录（顶栏右侧）与会话失效，出口是 P01 运营驾驶舱。]
 data:

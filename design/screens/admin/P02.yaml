@@ -4,7 +4,6 @@ end: admin
 title: 数据中台
 mode: standard
 purpose: 埋点、指标与数据任务是所有看板和预测的地基；与系统配置分开，由数据岗位单独维护。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data]
 data:
   read_writes: [事件注册表, 指标字典, 数据任务与同步日志]

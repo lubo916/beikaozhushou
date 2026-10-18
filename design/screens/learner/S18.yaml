@@ -4,7 +4,6 @@ end: learner
 title: 做题与解析
 mode: immersive
 purpose: 每次作答都变成可信证据；揭晓先纠正你的错，再讲道理。
-refine: pending
 views:
   - id: obj
     when: 客观题

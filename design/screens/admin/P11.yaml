@@ -4,7 +4,6 @@ end: admin
 title: 行为体与提示词
 mode: standard
 purpose: 每个 AI 行为体能写什么、用什么提示词，是安全制品，需要独立的台账与审计，不和场景成本混在一页。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data]
 data:
   read_writes: [行为体台账（可写范围）, 提示词与示例库版本, 上下文模块, 工具权限, 用户指令审核记录]

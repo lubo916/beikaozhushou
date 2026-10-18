@@ -4,7 +4,6 @@ end: admin
 title: 客服、工单与反馈
 mode: standard
 purpose: 报错是用户替平台做的免费质检，必须有时限、有去向、有回音。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data]
 data:
   read_writes: [工单, 反馈, 报错记录]

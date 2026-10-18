@@ -4,7 +4,6 @@ end: learner
 title: 阅读器
 mode: immersive
 purpose: 读了要留证据；读的时候知道每段在讲哪个知识点、我会不会。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data]
 state_overrides:
   empty: 这份资料还没解析好：预计 3 分钟；先读别的章节也可以；主按钮“回到我的资料”（去 S11）

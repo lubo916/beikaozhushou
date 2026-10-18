@@ -4,7 +4,6 @@ end: admin
 title: 内容安全、社区与危机响应
 mode: standard
 purpose: 有用户内容、有生成内容、有考试，就有违规信息、输出失当、涉考试安全三类风险。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data]
 data:
   reads: [用户生成内容]

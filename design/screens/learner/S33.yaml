@@ -4,7 +4,6 @@ end: learner
 title: 设置
 mode: standard
 purpose: 参数能调、提醒能管，每个会削弱证据的开关旁写明代价。
-refine: pending
 states: [loading, empty, error, offline, restricted]
 state_overrides:
   empty: 使用默认设置：所有设置都有默认值，可以不改

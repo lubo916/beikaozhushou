@@ -4,7 +4,6 @@ end: learner
 title: 今日
 mode: standard
 purpose: 每天打开就知道做什么，给指令不给选择。
-refine: pending
 views:
   - id: normal
     when: 正常

@@ -4,7 +4,6 @@ end: learner
 title: 成长档案
 mode: standard
 purpose: 把一次备考延展成长期关系；同时是“我的”标签的首页。
-refine: pending
 states: [loading, empty, error, offline, insufficient_data]
 state_overrides:
   empty: 还没有备考记录：完成一次备考后，这里会留下档案；主按钮“去今日”（去 S06）

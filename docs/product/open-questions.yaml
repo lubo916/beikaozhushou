@@ -67,7 +67,7 @@
   owner: 产品负责人
   default: 只有 S18、S19；其他页按需加入深化清单并标 refine：pending
   status: resolved
-  resolution: "ADR-001：深化清单共 32 页，见归档 deep-source/refine-list.md；登记中对应页标 refine: pending"
+  resolution: "ADR-023：页面深化暂缓，登记中不标 refine: pending；归档 deep-source/refine-list.md 的 32 页只作日后参考"
 - id: OQ-012
   q: 种子考试选哪一门，对照考试选哪一门？
   features: [EXM-01, CONT-02]

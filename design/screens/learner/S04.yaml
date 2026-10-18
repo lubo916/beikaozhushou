@@ -4,7 +4,6 @@ end: learner
 title: 摸底诊断
 mode: guided
 purpose: 用尽量少的题估出整张地图的掌握分布。
-refine: pending
 views:
   - id: start
     when: 开始页

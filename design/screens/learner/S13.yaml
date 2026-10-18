@@ -4,7 +4,6 @@ end: learner
 title: 视听课堂
 mode: immersive
 purpose: 把看和听变成学：按知识点切段，只看没掌握的，看完听完当场检验。
-refine: pending
 views:
   - id: video
     when: 视频

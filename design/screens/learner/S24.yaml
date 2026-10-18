@@ -4,7 +4,6 @@ end: learner
 title: 进度与预测
 mode: standard
 purpose: 三个数各答一问；先学什么最划算；预测准不准公开可查。提分地图是本页的一个标签。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data, locked]
 state_overrides:
   empty: 还没有进度数据：完成摸底后出现三个数；主按钮“去摸底”（去 S04）

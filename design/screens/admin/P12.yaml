@@ -4,7 +4,6 @@ end: admin
 title: AI 评测与质量
 mode: standard
 purpose: 导师讲错一次的伤害大于讲对一百次的收益。每项能力都要可度量、可预警、可阻断。
-refine: pending
 states: [loading, empty, error, offline, restricted, insufficient_data]
 data:
   reads: [调用记录, 用户反馈与纠错]
