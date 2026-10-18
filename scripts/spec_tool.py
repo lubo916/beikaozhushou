@@ -81,7 +81,8 @@ def is_text_file(p: Path) -> bool:
     return p.suffix.lower() in TEXT_EXT or p.name in {"pre-commit", "AGENTS.md", ".gitignore"}
 
 
-def walk_files(base: Path = ROOT, skip_dirs=SKIP_DIRS):
+def walk_files(base: Path | None = None, skip_dirs=SKIP_DIRS):
+    base = ROOT if base is None else base
     for dirpath, dirnames, filenames in os.walk(base):
         dirnames[:] = sorted(d for d in dirnames if d not in skip_dirs)
         for fn in sorted(filenames):
@@ -554,8 +555,8 @@ class Spec:
 class Repo:
     """按需加载仓库中的各类登记。解析错误记在 self.load_errors。"""
 
-    def __init__(self, root: Path = ROOT):
-        self.root = root
+    def __init__(self, root: Path | None = None):
+        self.root = ROOT if root is None else root
         self.load_errors: list[Finding] = []
         self._cache = {}
 
@@ -943,6 +944,14 @@ class Repo:
         return found
 
     def feature_paths(self, fid: str) -> list[str]:
+        explicit = CFG.get("pack", {}).get("feature_paths", {}).get(fid)
+        if explicit is not None:
+            if not isinstance(explicit, list) or not explicit or any(
+                not isinstance(p, str) or p.startswith(("/", "\\")) or ":" in p or ".." in p.replace("\\", "/").split("/")
+                for p in explicit
+            ):
+                raise ValueError(f"[pack.feature_paths].{fid} 应为仓库内相对路径列表")
+            return list(dict.fromkeys(explicit))
         f = self.feature_map.get(fid) or {}
         paths = []
         dom = f.get("domain")
@@ -2286,6 +2295,18 @@ def stale_generated(repo, expected: dict) -> list[str]:
 def cmd_gen(args):
     repo = Repo()
     expected = gen_outputs(repo)
+    isolated = getattr(args, "root", None) is not None
+    art = Path(args.artifacts) if args.artifacts else None
+    stale = stale_generated(repo, expected)
+    if isolated:
+        if art is not None and not art.is_absolute():
+            art = repo.root / art
+        try:
+            for target in [repo.root / p for p in [*expected, *stale]] + ([art] if art is not None else []):
+                target.resolve().relative_to(repo.root.resolve())
+        except ValueError:
+            print("隔离生成拒绝写入临时根目录之外的路径。")
+            return 2
     if args.check:
         fs = check_gen(repo, CheckCtx())
         for f in fs:
@@ -2299,15 +2320,14 @@ def cmd_gen(args):
             write_text(p, content)
             n += 1
             print(f"写入 {path}")
-    for path in stale_generated(repo, expected):
+    for path in stale:
         (repo.root / path).unlink()
         print(f"删除 {path}")
         n += 1
     for d in sorted((repo.root / ".claude" / "skills").glob("*"), reverse=True) if (repo.root / ".claude" / "skills").exists() else []:
         if d.is_dir() and not any(d.rglob("*")):
             shutil.rmtree(d)
-    if args.artifacts:
-        art = Path(args.artifacts)
+    if art is not None:
         art.mkdir(parents=True, exist_ok=True)
         rm = gen_roadmap_output(repo, with_results=True)
         for _, (content, _, _) in rm.items():
@@ -2420,12 +2440,14 @@ def _yaml_block(d) -> str:
     return "```yaml\n" + dump_yaml(_clean(d) if isinstance(d, dict) else d, flow_max=140).rstrip() + "\n```"
 
 
-def page_slice(repo, pid: str, item_ids=None, header_only=False) -> str:
+def page_slice(repo, pid: str, item_ids=None, header_only=False, header_keys=None) -> str:
     pg = repo.screens.get(pid)
     if not pg:
         return f"（页面登记 {pid} 不存在）"
     keys = ["id", "end", "title", "mode", "purpose", "refine", "views", "states", "state_overrides", "layout_notes",
             "data", "ai", "entries", "exits"]
+    if header_keys is not None:
+        keys = header_keys
     head = {k: pg[k] for k in keys if k in pg and pg[k] not in (None, [], {})}
     parts = [_yaml_block(head)]
     if not header_only:
@@ -2491,6 +2513,30 @@ def _domain_points(repo, domain: str):
     return secs.get("要点", "").strip(), rel(p)
 
 
+def _local_ref_closure(document, seeds):
+    """保留 OpenAPI 本地引用的递归闭包；循环引用只收录一次。"""
+    found, pending = {}, list(seeds)
+    while pending:
+        value = pending.pop()
+        if isinstance(value, list):
+            pending.extend(value)
+        elif isinstance(value, dict):
+            pending.extend(v for k, v in value.items() if k != "$ref")
+            ref = value.get("$ref")
+            if not isinstance(ref, str) or not ref.startswith("#/") or ref in found:
+                continue
+            node = document
+            try:
+                for token in ref[2:].split("/"):
+                    node = node[token.replace("~1", "/").replace("~0", "~")]
+            except (KeyError, TypeError):
+                found[ref] = {"未解析引用": ref}
+            else:
+                found[ref] = node
+                pending.append(node)
+    return dict(sorted(found.items()))
+
+
 def _contract_slices(repo, sp) -> tuple[str, list]:
     out, srcs = [], []
     if sp.ref_list("api"):
@@ -2501,9 +2547,13 @@ def _contract_slices(repo, sp) -> tuple[str, list]:
             if not o:
                 lines.append(f"- {op}：（未登记）")
                 continue
-            d = {k: o[k] for k in ("method", "path", "summary", "x-owner", "requestBody", "responses", "x-errors") if k in o}
+            d = {k: o[k] for k in ("method", "path", "summary", "x-owner", "x-public", "parameters", "security", "requestBody", "responses", "x-errors") if k in o}
             lines.append(f"- {op}\n" + _yaml_block(d))
         out.append("### api\n" + "\n".join(lines))
+        components = _local_ref_closure(repo._yaml("contracts/openapi.yaml", {}),
+                                        [ops[n] for n in sp.ref_list("api") if n in ops])
+        if components:
+            out.append("### OpenAPI 被引用组件（递归闭包）\n" + _yaml_block(components))
         srcs.append("contracts/openapi.yaml")
     if sp.ref_list("schema"):
         blocks = []
@@ -2536,8 +2586,8 @@ def build_pack(repo, fid: str) -> tuple[str, dict]:
     loop_txt = "；".join(f"{lp.get('id')} {lp.get('title')}（{ph.get('id')} 期）" for ph, lp in loops) or "未归入闭环"
     paths = repo.feature_paths(fid)
     S = {}
-    fm = {k: v for k, v in sp.fm.items() if k != "refs"}
-    S["1 规格全文（去掉 refs 列表）"] = _fm_block(fm) + sp.body.strip()
+    fm = {k: v for k, v in sp.fm.items() if k not in ("refs", "open_questions")}
+    S["1 规格全文（refs 按后文展开，待定问题见第 11 节）"] = _fm_block(fm) + sp.body.strip()
     secs, rsrc, rule_count = _rules_for_paths(repo, paths)
     pts, psrc = _domain_points(repo, str(f.get("domain")))
     red = 0
@@ -2564,6 +2614,12 @@ def build_pack(repo, fid: str) -> tuple[str, dict]:
     if mm:
         blk.append("### 指标\n" + _yaml_block(mm))
         sources.append("contracts/metrics.yaml")
+    for model_ref in sp.ref_list("models"):
+        model = repo.model_section(model_ref)
+        if model:
+            model_path, model_text = model
+            blk.append(f"### 模型原文 {model_ref}（{model_path}）\n{model_text}")
+            sources.append(model_path)
     S["4 参数与数据类别"] = "\n\n".join(blk) or "（未引用参数或数据类别）"
     ai = []
     for sid in sp.ref_list("ai"):
@@ -2591,7 +2647,8 @@ def build_pack(repo, fid: str) -> tuple[str, dict]:
         sources += [pg.get("_file", ""), f"design/screens/slices/{pid}.html"]
     for pid in repo.feature_layout_pages(fid):
         pg = repo.screens.get(pid, {})
-        pages.append(f"### {pid} {pg.get('title', '')}（布局参考，本功能不覆盖其条目）\n" + page_slice(repo, pid, header_only=True) + "\n\n" + _shots(repo, pid))
+        header_keys = CFG.get("pack", {}).get("layout_header_keys", {}).get(fid)
+        pages.append(f"### {pid} {pg.get('title', '')}（布局参考，本功能不覆盖其条目）\n" + page_slice(repo, pid, header_only=True, header_keys=header_keys) + "\n\n" + _shots(repo, pid))
         sources.append(pg.get("_file", ""))
     S["6 页面（登记切片 + 原型切片 + 截图路径）"] = "\n\n".join(pages) or "（不覆盖页面条目）"
     invs = [f"- {i}：{repo.inv_map[i].get('statement')}（执行：{'、'.join(repo.inv_map[i].get('enforcement') or [])}）" if i in repo.inv_map else f"- {i}：（未登记）"
@@ -3604,7 +3661,10 @@ def cmd_verify(args):
     stack = (ROOT / v.get("stack_marker", "package.json")).exists()
     ok = True
     files = changed_files(staged=args.staged)
-    me = f"{sys.executable} {TOOL_REL}"
+    python_cmd = f'"{sys.executable}"'
+    me = f"{python_cmd} {TOOL_REL}"
+    if v.get("tooling_test"):
+        ok = _run("工具回归测试", v["tooling_test"].replace("{python}", python_cmd)) and ok
     def stack_step(label, key, extra=""):
         nonlocal ok
         cmd = v.get(key, "")
@@ -4135,7 +4195,9 @@ def gen_progress_output(repo) -> dict:
 
 
 def main(argv=None):
+    global ROOT, CFG
     ap = argparse.ArgumentParser(prog="spec_tool", description="文档体系工具（见 docs/meta/doc-system.md 附录 J）")
+    ap.add_argument("--root", type=Path, help="隔离夹具根目录，仅用于 gen/check/pack/rules")
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("pack", help="生成任务包到 .pack/<ID>.md")
     p.add_argument("id")
@@ -4214,6 +4276,11 @@ def main(argv=None):
     p = sub.add_parser("doctor", help="本地环境检查")
     p.set_defaults(fn=cmd_doctor)
     args = ap.parse_args(argv)
+    if args.root is not None:
+        if args.cmd not in {"gen", "check", "pack", "rules"} or not args.root.is_dir():
+            ap.error("--root 需要现有目录，且仅支持 gen/check/pack/rules")
+        ROOT = args.root.resolve()
+        CFG = load_config()
     return args.fn(args) or 0
 
 

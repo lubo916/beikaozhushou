@@ -43,6 +43,15 @@ actions:
   - id: platform.params.read
     roles: [guest, learner, org_owner, academic_admin, head_teacher, lecturer, researcher, advisor, platform_ops, system_admin]
     data_scope: public
+  - id: platform.runtime.read
+    roles: [guest, learner]
+    data_scope: self
+    note: 0 期只读开发启动摘要，仅返回 guest 与 simulated；生产禁用模拟适配器
   - id: metrics.event.track
     roles: [guest, learner]
     data_scope: self
+  - id: metrics.event.record
+    roles: []
+    callers: [platform, practice, plan]
+    data_scope: self
+    note: 只供受信领域服务写入其 owner 的 server 分析事件，不对端开放

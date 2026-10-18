@@ -485,7 +485,7 @@
 - name: engagement.quiet_hours
   owner: engagement
   description: 深夜免打扰时段（学员可在设置中改）
-  default: [22:00, 08:00]
+  default: ["22:00", "08:00"]
   range: null
   unit: time_range
   tunable_by: [platform, learner]

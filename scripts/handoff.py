@@ -11,6 +11,8 @@
 """
 import argparse
 import datetime
+import hashlib
+import json
 import os
 import pathlib
 import re
@@ -29,7 +31,8 @@ FORBIDDEN_NAMES = {"CLAUDE.md", "CLAUDE.local.md", "AGENTS.override.md", "AGENTS
 PROTECTED = ("docs/meta/", ".agents/", ".claude/", ".codex/", ".githooks/", ".github/", "scripts/",
              "design/screens/", "work/", ".git/")
 ALWAYS = ["package.json", "pnpm-workspace.yaml", "tsconfig.base.json", "tsconfig.json", "packages/params/index.ts",
-          "docs/adr/ADR-025-tech-stack-baseline.md", "docs/adr/ADR-026-frontend-backend-layout.md"]  # 技术栈只经交接包送达网页版 Claude
+          "docs/adr/ADR-025-tech-stack-baseline.md", "docs/adr/ADR-026-frontend-backend-layout.md",
+          "docs/adr/ADR-029-multi-end-and-reach.md"]  # 技术栈只经交接包送达网页版 Claude
 MAX_BYTES = 3_000_000
 PATH_RE = re.compile(r"(?:[A-Za-z0-9_.@\-]+/)+[A-Za-z0-9_.@\-\[\]]*|[A-Za-z0-9_\-]+\.[A-Za-z][A-Za-z0-9]*")
 
@@ -282,6 +285,53 @@ def cmd_out(a):
     return 0
 
 
+def spec_review_resources(loop, have):
+    """Read-only sources shared by the packs, plus the selected loop only."""
+    import yaml
+    sources = {p for p in ALWAYS if (ROOT / p).is_file()} | {
+        "docs/adr/ADR-025-tech-stack-baseline.md", "docs/adr/ADR-026-frontend-backend-layout.md",
+        "docs/adr/ADR-029-multi-end-and-reach.md",
+        "contracts/params.yaml", "design/tokens.json", "design/tokens.resolver.json",
+        "scripts/spec_tool.toml", "docs/product/glossary.yaml",
+    }
+    loop_doc = f"docs/meta/plan/loops/{loop}.md"
+    sources.add(loop_doc)
+    foundation = f"docs/meta/plan/loops/{loop}-foundation.md"
+    spec_text = "\n".join(read(spec_file(fid)) for fid in have)
+    if (ROOT / foundation).exists() or foundation in spec_text:
+        sources.add(foundation)
+    if (ROOT / "fixtures/runtime/phase0.json").exists() or "fixtures/runtime/phase0.json" in spec_text:
+        sources.add("fixtures/runtime/phase0.json")
+    for fid in have:
+        meta = json.loads(read(ROOT / ".pack" / f"{fid}.json"))
+        sources.update(meta["sources"])
+        sources.add(spec_file(fid).relative_to(ROOT).as_posix())
+    for exam in ("junior-accounting", "cet-6"):
+        sources.update(f"fixtures/exams/{exam}/{name}.json"
+                       for name in ("profile", "knowledge-map", "questions"))
+    # Other loops are not review context. Replace the full planning source by a slice.
+    sources.discard("docs/product/phases.yaml")
+    resources = {}
+    for source in sorted(sources):
+        if not norm(source) or not (ROOT / source).is_file():
+            raise ValueError(f"规格复核缺少来源：{source}")
+        resources["repo/" + source] = (ROOT / source).read_bytes()
+    selected = None
+    for ph in yaml.safe_load(read(ROOT / "docs/product/phases.yaml")).get("phases", []):
+        for lp in ph.get("loops") or []:
+            if str(lp.get("id")) == loop:
+                selected = {"phase": {k: v for k, v in ph.items() if k != "loops"}, "loop": lp}
+    if selected is None:
+        raise ValueError(f"phases.yaml 里没有闭环 {loop}")
+    resources["context/loop.yaml"] = yaml.safe_dump(selected, allow_unicode=True, sort_keys=False).encode("utf-8")
+    lines = ["# 共享来源索引", "", "repo/ 是只读源快照，context/loop.yaml 是当前闭环及所在期的原文切片。",
+             "foundation 描述待实现前置；现有生成物不能当作其已交付。页面仅作外壳布局参考，不提前实现业务页。",
+             "", "|路径|SHA-256|", "|---|---|"]
+    lines.extend(f"|{name}|{hashlib.sha256(data).hexdigest()}|" for name, data in sorted(resources.items()))
+    resources["context/SOURCES.md"] = ("\n".join(lines) + "\n").encode("utf-8")
+    return resources
+
+
 def cmd_specs(a):
     OUTBOX.mkdir(parents=True, exist_ok=True)
     feats = loop_features(a.loop)
@@ -289,8 +339,22 @@ def cmd_specs(a):
         print(f"phases.yaml 里没有闭环 {a.loop}。")
         return 2
     have = [f for f in feats if spec_file(f)]
-    if not have:
-        print("这个闭环还没有任何规格。先按 write-spec 写。")
+    missing = [f for f in feats if f not in have]
+    if not have or missing:
+        print("规格批次不完整，拒绝出包。缺少：" + "、".join(missing or feats))
+        return 2
+    packs = {}
+    for f in have:
+        r = spec_tool("pack", f)
+        p = ROOT / ".pack" / f"{f}.md"
+        if r.returncode != 0 or not p.exists():
+            print(f"{f} 任务包生成失败，未创建规格复核 ZIP：\n{r.stdout}{r.stderr}")
+            return 2
+        packs[f"packs/{f}.md"] = p.read_bytes()
+    try:
+        resources = spec_review_resources(a.loop, have)
+    except (ValueError, OSError, KeyError) as exc:
+        print(f"未创建规格复核 ZIP：{exc}")
         return 2
     key = f"L{a.loop}-specs"
     n = next_round(key)
@@ -299,17 +363,9 @@ def cmd_specs(a):
     with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
         z.writestr("TASK.md", fill("task-review-specs.md", LOOP=a.loop, ROUND=n, FEATURES="、".join(have), RESULT=result))
         z.write(ROOT / "AGENTS.md", "AGENTS.md")
-        for f in have:
-            r = spec_tool("pack", f)
-            if r.returncode != 0:
-                r = spec_tool("pack", f, "--allow-over")
-            p = ROOT / ".pack" / f"{f}.md"
-            if p.exists():
-                z.write(p, f"packs/{f}.md")
-    missing = [f for f in feats if f not in have]
-    if missing:
-        print(f"提示：{('、'.join(missing))} 还没有规格，本包不含。")
-    tell(zpath, result, key, n, 0)
+        for name, data in {**packs, **resources}.items():
+            z.writestr(name, data)
+    tell(zpath, result, key, n, len(resources))
     return 0
 
 

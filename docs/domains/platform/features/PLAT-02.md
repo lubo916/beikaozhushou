@@ -4,47 +4,50 @@ status: draft
 refs:
   api: [getParams]
   permissions: [platform.params.read]
+  errors: [COMMON_FORBIDDEN]
   params: [ui.loading.slow_hint_seconds, api.page.max_limit, plan.review.daily_cap]
-  adr: [ADR-014]
+  adr: [ADR-014, ADR-025, ADR-026, ADR-027]
 open_questions:
   - id: OQ-PLAT-02-1
     q: 参数中心（4.6）上线前，运行时取值从哪里覆盖默认值？
-    default: 部署环境的覆盖文件，按环境区分；变更随发布记录；本闭环不发布 gray_required 参数的覆盖值
+    default: 服务端启动时一次读取部署环境覆盖文件；变更随发布记录；拒绝 gray_required 参数的覆盖
+  - id: OQ-PLAT-02-2
+    q: 学员调整是否也须理由，且能否直接调整 gray_required 参数？
+    default: 遵守 reason_required，须理由时拒绝空白理由；未接入灰度流程前拒绝 gray_required 调整；本期仅校验，不保存
 ---
 # PLAT-02 参数注册与运行时访问器
 
 ## 1 目标与边界
-阈值、配比、上限统一登记在 contracts/params.yaml，前后端通过 packages/params 的访问器读取同一生效值，每个参数都能查到默认值、可调区间与出处（切片 0.1e，ADR-014）。
-本闭环提供注册表、生成访问器、运行时注入、公共读取与共享调整校验；不做后台参数中心、参数写入接口、学员设置界面、灰度发布流程或业务算法。持续集成与预发部署由闭环任务 0.1b 承担。
+阈值、配比、上限统一登记在 contracts/params.yaml；生成登记数据，前后端经同一个手写运行时读取平台层参数（切片 0.1e，ADR-014）。提供只读接口及学员调整的共享校验，不做参数中心、写入接口、设置界面、学员值叠加、灰度流程或算法。
+工程先后为 0.1b → PLAT-02 → PLAT-01；依赖 0.1b 的工作区、生成器迁移、公共错误映射与可注入身份。共同前置交付、隔离工具测试调用和闭环接线见 docs/meta/plan/loops/0.1-foundation.md。获取参数与外壳启动事件的联调接线归 0.1b；PLAT-01 只消费注入后的值与状态，未取得时用登记默认继续；本功能负责注入接口与状态。
 
 ## 2 业务规则
-- R1 参数登记包含 name、owner、description、default、range、unit、tunable_by、learner_range、rollout、reason_required、source_items；gen 从登记生成 packages/params 的 PARAMS、ParamName、ParamValue 与 param(name)，避免登记与代码各有一份参数事实。range 为 null 时不推导数值区间，其他默认值与范围直接引用对应参数登记。（检查 E-SCHEMA-01、E-GEN-01、E-GEN-02）
-- R2 未登记的名称在类型检查时被拒绝；绕过类型检查传入未知名称时，访问器也显式报错并指出名称，不调用取值源或返回任何默认值，避免拼写错误被隐藏。已登记参数在取值源未注入、或返回 undefined/null 时返回该参数的登记默认值；这是“没有覆盖值”，不等同于“没有登记”。
-- R3 注入取值源提供已登记参数的运行时覆盖值；对有 range 的数值参数，区间内及端点值原样返回，越下界返回下界，越上界返回上界。每次发生钳制都记录可查的诊断告警，包含参数名、原值与生效值，读取继续成功，使配置越界可定位且不突破登记范围；告警不是业务埋点事件。
-- R4 共享调整校验先检查 tunable_by；不含 learner 的参数不接受学员调整。对登记了 learner_range 的数值参数，仅接受闭区间内的值；越界返回拒绝结果并给出登记的允许范围，调用方不得保存或将其钳制后视为保存成功，使学员调整有明确反馈。没有 learner_range 的结构参数不据此推导数值调整范围，本闭环不提供其设置流程。
-- R5 getParams 返回以登记名称为键的当前生效值对象，每个值与同一运行时取值源下的服务端 param(name) 一致，包括回默认和钳制结果。客户端将成功响应注入访问器后再读取，不自行另配生效值；读取接口失败时不能宣称已取得当前生效参数，避免前后端阈值不一致。
-- R6 getParams 按 platform.params.read 提供公共读取，guest 及权限登记的角色可读；读取能力不授予调整参数的权限。覆盖来源按 OQ-PLAT-02-1 的临时默认，需灰度的参数覆盖只走灰度流程，本闭环使用其登记默认值，使部署文件不绕过 ADR-014。
-- R7 领域规则中的阈值、配比与上限只经访问器读取。检查 packages/domains 的非测试代码，数值字面量按现有白名单与 param-exempt: <理由> 规则判定；非阈值常量才能注明理由豁免，白名单不作为写死业务阈值的依据，避免参数登记失效。（检查 E-PARAM-01、E-PARAM-03）
+- R1 登记现有字段为 name、owner、description、default、range、unit、tunable_by、learner_range、rollout、reason_required、source_items，没有 type 字段。0.1b 将现有混合生成文件迁移为 packages/params/registry.generated.ts，产出完整 PARAMS（含 description、sourceItems）、ParamName、ParamValue；本功能在非 GENERATED 的 runtime.ts、index.ts 实现并导出运行时。未知名称在类型及运行时均拒绝，错误可辨认名称，不调用来源。工程参数的 source_items 可为空，以 description 工程说明及 ADR-014 为依据，不虚构原型条目。
+- R2 ParamValue 按 default 递归宽化：数字为 number、布尔为 boolean、字符串为 string；对象保留精确键集并递归，数组按默认长度生成逐位只读元组，不从字符串猜枚举。运行时拒绝缺键、多键、数组长度/元素类型不符；数字须有限，unit 为 count/items/cards/learners/level 时还须整数；其他数值含 seconds 可为小数。time_range 须为两个合法 HH:mm 字符串。range 为 null 不推导数值区间；结构只检查形状、叶子类型及上述单位约束，不推断排序等业务规则。登记自身不合法时生成/启动失败，不能靠默认掩盖。
+- R3 createServerParams({source?, onClamp}) 创建独立实例；source: (name: ParamName) => unknown 为同步来源，构造时按登记名逐项读取一次并冻结快照。无来源或已登记项返回 undefined/null 表示没有覆盖，采用该项登记默认；来源抛错、错型或给 gray_required 项提供非空覆盖时构造失败并指出名称，API 不启动，不把异常当无覆盖。成功实例提供 param/getStatus，状态 effective；param(name) 只读此快照，不再调用来源。合法数值按 range 闭区间钳制，端点不变；每次读取发生钳制都调用 onClamp({name, raw, effective})，不去重，钳制成功后继续读取。onClamp: (notice: {name: ParamName; raw: number; effective: number}) => void 是必注入的同步诊断接收器，服务端写结构化日志，测试收集记录，不送分析事件；接收器抛错显式抛出，不悄悄回默认。结构取值深拷贝并冻结，不能改写登记或实例。
+- R4 validateAdjustment(actor, name, value, reason?) 为无副作用共享函数，本期只支持 learner，其他 actor 返回 UNSUPPORTED_ACTOR。依次检查已登记（UNKNOWN_PARAM）、tunable_by 含 learner（NOT_TUNABLE）、非 gray_required（GRAY_REQUIRED）、数值且 learner_range 非空（UNSUPPORTED_SHAPE）、类型符合 R2（INVALID_TYPE）、在 learner_range 闭区间（OUT_OF_RANGE）、reason_required 时理由去首尾空白后非空（REASON_REQUIRED）。失败返回 {ok:false, code, allowedRange?}，存在 learner_range 时带其区间；通过返回 {ok:true, value}。不钳制、不保存；结构及无 learner_range 参数拒绝。理由/灰度遵从 OQ-PLAT-02-2，学员配置由后续功能接入，不改变平台快照。
+- R5 createClientParams({onClamp}) 提供 param、getStatus、loadSnapshot、markFailed。初始 unloaded，param 取生成登记默认；0.1b 的启动接线取一次 getParams，PLAT-01 只消费实例。loadSnapshot 按全体 ParamName 精确键集及 R2 校验，拒绝 undefined/null、错型、未钳制的越界值；任一错误整包拒绝并抛出，状态 failed；成功原子冻结快照，状态 effective（runtime ready）。网络失败由调用方 markFailed；失败时明确以登记默认为初始值。仅 unloaded/failed 允许加载、标记失败或重试；effective 后本次生命周期不刷新或重置。来源状态与默认值分开，不能把默认伪装成服务器值，不另建默认表。
+- R6 getParams 为 GET /params（对外 /api/params），返回服务端实例逐项 param(name) 组成的全量只读对象，与同一快照一致；不含覆盖文件路径、环境变量、理由或未登记键。公开标记 security: []，匿名映射 guest；服务端检查 platform.params.read，允许登记的全部角色，其他角色按公共映射返回 COMMON_FORBIDDEN/403。读取不授予调参权限，无修改路由。路由放 packages/domains/platform/api，apps/api 只装配；客户端经契约钩子读取。
+- R7 覆盖文件为 UTF-8 JSON 对象，参数名为键，覆盖值为值；只由服务端读取 deploy/params/<env>.json。env 取 EXAM_PREP_ENV，仅允许 development/test/staging/production，未设取 development；启动时加载一次，不热加载。文件缺失、不可读、坏 JSON、非对象、重复键、未知键、错型均拒绝启动，诊断带路径及可确定的名称，不回退其他环境。无覆盖用显式空对象文件，null 仅为无覆盖。gray_required 名称只要出现即拒绝（含 null），此类参数固定登记默认。文件不进浏览器包；变更随代码发布，提交标识及覆盖文件摘要由 0.1b 的 deploy/releases/<release-id>.json 记录。
+- R8 领域阈值、配比、上限只经访问器。E-PARAM-01 拒绝未登记引用；E-PARAM-03 检查 packages/domains 非测试代码，数值白名单仅 0、1、-1。非阈值常量可在同一行用 TypeScript 注释 // param-exempt: <具体理由> 豁免，不能借白名单或注释写死业务阈值。生成物漂移由 E-GEN-01/02 检查；工具修改、隔离 gen/check 测试归 Codex，Claude 不改 scripts 或 GENERATED 文件。
 
 ## 3 界面
-无界面；学员调整的拒绝结果包含可供调用方展示的允许范围，展示与保存界面由所属功能承担。
+无界面。学员拒绝结果中的范围供所属设置界面展示；外壳是否已取得参数以 getStatus 为准。
 
 ## 4 数据
-无契约例外。getParams 为 GET /params，x-owner: platform，成功响应遵循 contracts/openapi.yaml 的对象结构；权限与数据范围遵循 contracts/permissions.yaml 的 platform.params.read（public）。本功能不定义参数写入接口或持久化表；R4 以共享校验结果验收。
-参数元数据与取值依据仅来自 contracts/params.yaml，前端不维护另一个默认值表。部署环境覆盖文件只提供运行时取值，不替代登记的默认值、区间、可调者、生效方式与出处。
+平台快照无学员层或个人数据；全部已登记参数按当前 public 权限只读提供，无表。getParams 契约 additionalProperties 允许值由 R2/R6 精确约束，不透传任意配置。可写路径为 packages/params 的非生成文件、packages/domains/platform/**、apps/api/**、deploy/params/*.json、tests/**；生成器和生成登记数据归 0.1b。开发身份和测试角色切换来自 fixtures/runtime/phase0.json 及共同前置文档，本功能不做登录。
 
 ## 5 AI 行为
-无 AI 场景；参数读取与校验不调用大模型。
+无 AI 场景，不调用大模型。
 
 ## 6 验收
-- PLAT-02-AC1 在隔离测试中修改已登记参数的默认值或区间后，未生成时检查报告 E-GEN-01；运行 gen 后 ParamName、ParamValue、PARAMS 与登记一致。逐项读取登记可查到 R1 的完整元数据，source_items 能对应原型条目；手改生成物时检查报告 E-GEN-02。
-- PLAT-02-AC2 未注入取值源，以及取值源分别返回 undefined、null 时，读取 ui.loading.slow_hint_seconds 均等于该登记的 default；取值源返回区间内覆盖值时，返回覆盖值，不返回默认值。
-- PLAT-02-AC3 用未登记名称调用访问器，类型检查失败；绕过类型检查后调用也显式报错且可辨认参数名，取值源未被调用，没有返回字面量或其他参数的默认值。
-- PLAT-02-AC4 对 ui.loading.slow_hint_seconds 与 api.page.max_limit 分别注入低于下界、高于上界的值，返回相应 range 端点，每次钳制均有包含原值、生效值及名称的告警，且读取不因越界失败；两个端点及区间内值保持不变，无钳制告警。
-- PLAT-02-AC5 对 plan.review.daily_cap 的共享调整校验，learner_range 两个端点及区间内值通过；低于或高于该范围时均被拒绝，结果含登记的允许范围，不产生可保存的成功结果。学员调整 api.page.max_limit 时因 tunable_by 不含 learner 被拒绝；不以运行时钳制替代调整校验。
-- PLAT-02-AC6 在同一取值源下分别构造无覆盖、区间内覆盖和越界覆盖，调用 getParams 后逐项对照服务端 param(name)，值与结构均一致；客户端注入该成功响应后结果一致。接口读取失败时不作为成功响应注入访问器，也不把独立默认值标为当前生效值。
-- PLAT-02-AC7 guest 与 platform.params.read 登记的角色均可读取 getParams；覆盖文件不包含 gray_required 参数的覆盖时，这些参数返回登记默认值，且本功能没有可调用的参数修改接口。
-- PLAT-02-AC8 在隔离领域代码夹具中放入不在现有白名单内的阈值字面量，检查报告 E-PARAM-03；使用已登记参数访问器后该错误消失。引用未登记参数时报告 E-PARAM-01，非阈值常量带同一行理由豁免时可通过；人工复核没有以白名单或豁免写死阈值。
+- PLAT-02-AC1 按共同前置文档的隔离工具测试修改默认/range：未生成报告 E-GEN-01，gen 后登记数据/类型一致；手改产物报告 E-GEN-02。description、sourceItems 完整，工程参数允许空出处，非空条目由登记引用检查校验；类型夹具覆盖递归对象与逐位元组，不凭字符串推断枚举。
+- PLAT-02-AC2 服务端无来源、来源返回 undefined/null 时取登记默认，区间内覆盖生效；来源仅构造时调用。来源抛错、gray_required 非空覆盖、NaN、Infinity、错型、计数小数、结构缺键/多键/长度错误和非法 HH:mm 均构造失败，无成功快照，错误带名称；结构取值不可被改写。
+- PLAT-02-AC3 未登记名称的类型检查失败，绕过类型也失败，来源未被调用。对 ui.loading.slow_hint_seconds、api.page.max_limit 注入低于/高于 range 的合法数值，各次读取得到端点且有完整 onClamp 记录；端点/区间内无告警。接收器抛错显式失败，不返回默认。
+- PLAT-02-AC4 plan.review.daily_cap 带非空理由时 learner_range 两端/区间内通过，范围外拒绝并带区间，无成功保存结果。api.page.max_limit、无范围/结构参数、gray_required、空白必需理由、其他 actor、未知名称分别返回 R4 原因码，任何结果不改平台快照。
+- PLAT-02-AC5 getParams 在无覆盖、合法覆盖、钳制覆盖时，全量输出逐项等于服务端 param；客户端注入后逐项一致。unloaded/failed 只取登记默认且状态不为 effective；缺键、多键、null、错型、越界响应整包失败，网络失败不注入；重试成功才 effective，不混合部分新值。
+- PLAT-02-AC6 匿名和权限登记全部角色可读，其他角色 COMMON_FORBIDDEN/403，无写接口；仅返回登记键，不泄露部署路径。逐环境验证选定文件：缺失/坏 JSON/重复键/未知名/错型/gray_required 键（含 null）均启动失败；空对象正常，gray_required 均为默认，启动后改文件不热生效。
+- PLAT-02-AC7 按共同前置文档的隔离领域夹具：阈值字面量触发 E-PARAM-03，换成登记访问器后消失；未登记引用触发 E-PARAM-01，非阈值常量附同一行具体理由可通过。工具用例归 Codex；注释理由的人工复查见第7节。
 
 ## 7 不变量与合规
-无额外不变量或个人数据处理。参数语义变化按 ADR-014 走重型通道；本规格不以覆盖文件发布需灰度的变更。
+参数语义变化按 ADR-014 走重型通道，未接灰度不发布 gray_required 覆盖。复查不借白名单/豁免藏阈值。按共同前置基线，以 junior-accounting、cet-6 两套考试的画像、知识地图与题目夹具数据驱动复跑；考试无关的参数逻辑可共用测试实现，但不豁免两套夹具覆盖。

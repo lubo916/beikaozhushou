@@ -48,6 +48,7 @@ height = 900
 quantize = true             # 装有 Pillow 时压成 256 色 PNG
 
 [verify]                   # 按技术栈替换；缺 stack_marker 时跳过这些命令
+tooling_test = "{python} -m unittest discover -s tests/tooling -p test_*.py"
 lint = "pnpm lint"
 lint_files = "pnpm exec eslint {files}"
 typecheck = "pnpm typecheck"
@@ -78,3 +79,11 @@ copy_scan = ["apps/**", "packages/ui/**", "design/screens/**/*.yaml", "docs/prod
 params_out = "packages/params/index.ts"
 roadmap_out = "docs/product/roadmap.md"
 progress_out = "docs/product/progress.md"
+
+[pack.feature_paths]
+PLAT-01 = ["packages/ui/**", "apps/learner/**", "tests/**"]
+PLAT-02 = ["packages/params/**", "packages/domains/platform/**", "tests/**"]
+METR-01 = ["packages/domains/metrics/**", "tests/**"]
+
+[pack.layout_header_keys]
+PLAT-01 = ["id", "end", "title", "mode", "states"]

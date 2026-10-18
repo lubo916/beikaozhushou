@@ -5,7 +5,7 @@
   title: 学员端外壳与通用状态组件
   domain: platform
   release: R1
-  depends: []
+  depends: [PLAT-02]
   covers: []
 - id: PLAT-02
   title: 参数注册与运行时访问器

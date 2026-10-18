@@ -84,24 +84,49 @@ paths:
         - {name: mapId, in: query, required: true, schema: {type: string, format: uuid}}
       responses:
         "200": {description: 方格, content: {application/json: {schema: {type: array, items: {$ref: "#/components/schemas/MasteryCell"}}}}}
+  /runtime-context:
+    get:
+      operationId: getRuntimeContext
+      x-owner: platform
+      x-public: true
+      security: []
+      summary: 0 期开发启动摘要，仅由服务端上下文派生；不接受客户端身份输入
+      responses:
+        "200": {description: 模拟身份是否为游客，不含身份值, content: {application/json: {schema: {type: object, additionalProperties: false, required: [guest, simulated], properties: {guest: {type: boolean}, simulated: {type: boolean, const: true}}}}}}
+        "403": {$ref: "#/components/responses/Error"}
+        "503": {$ref: "#/components/responses/Error"}
+      x-errors: [COMMON_FORBIDDEN, COMMON_UNAVAILABLE]
   /params:
     get:
       operationId: getParams
       x-owner: platform
+      x-public: true
+      security: []
       summary: 读取当前生效的参数取值（已夹在登记区间内）
       responses:
         "200": {description: 参数取值, content: {application/json: {schema: {type: object, additionalProperties: true}}}}
+        "403": {$ref: "#/components/responses/Error"}
+        "503": {$ref: "#/components/responses/Error"}
+      x-errors: [COMMON_FORBIDDEN, COMMON_UNAVAILABLE]
   /events:
     post:
       operationId: trackEvent
       x-owner: metrics
-      summary: 上报埋点事件（contracts/events.yaml 中登记的事件）
+      x-public: true
+      security: []
+      summary: 上报 client 来源的 app_opened；server 事件仅经受信领域内部入口写入
+      parameters:
+        - {name: Idempotency-Key, in: header, required: true, schema: {type: string, minLength: 1}}
       requestBody:
         required: true
         content: {application/json: {schema: {$ref: "#/components/schemas/AnalyticsEvent"}}}
       responses:
         "202": {description: 已接收}
+        "403": {$ref: "#/components/responses/Error"}
+        "409": {$ref: "#/components/responses/Error"}
         "422": {$ref: "#/components/responses/Error"}
+        "503": {$ref: "#/components/responses/Error"}
+      x-errors: [COMMON_VALIDATION, COMMON_FORBIDDEN, COMMON_CONFLICT, COMMON_UNAVAILABLE]
 components:
   responses:
     Error:
@@ -137,5 +162,7 @@ components:
       properties: {knowledge_point_id: {type: string}, level: {type: integer}, target_level: {type: integer}, sufficiency: {type: string}, pending_verification: {type: boolean}, in_scope: {type: boolean}}
     AnalyticsEvent:
       type: object
+      additionalProperties: false
       required: [name, properties, occurred_at]
+      description: 公共请求仅含事件内容；身份、来源与 schemaHash 由受信服务端装配。server 事件名以 403 拒绝。
       properties: {name: {type: string}, properties: {type: object}, occurred_at: {type: string, format: date-time}}

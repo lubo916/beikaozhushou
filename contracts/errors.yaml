@@ -14,6 +14,16 @@
   http_status: 404
   message_key: error.common.not_found
   description: 资源不存在或不在可见范围内
+- code: COMMON_CONFLICT
+  owner: platform
+  http_status: 409
+  message_key: error.common.conflict
+  description: 同一幂等命名空间和键携带不同请求内容
+- code: COMMON_UNAVAILABLE
+  owner: platform
+  http_status: 503
+  message_key: error.common.unavailable
+  description: 依赖不可用或持久化失败，不能宣称已接收
 - code: PRAC_REVEAL_LOCKED
   owner: practice
   http_status: 409
