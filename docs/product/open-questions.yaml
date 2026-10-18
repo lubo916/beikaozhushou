@@ -92,3 +92,9 @@
   owner: 技术负责人
   default: 使用兼容 OpenAI 协议的国内已备案模型，经 packages/ai 的统一出口调用；生成式 AI 功能上线前完成备案（INV-15）。
   status: open
+- id: OQ-016
+  q: 首发收费是否只做单次购买（考期通行证），自动续费功能后置？
+  features: [BILL-02, BILL-03]
+  owner: 产品负责人
+  default: 首发只做单次购买（考期通行证）；代扣权限先申请，自动续费功能后置。4.3 写规格前决定 BILL-03 是否移出 4.3（技术选型定稿的临时默认）。
+  status: open

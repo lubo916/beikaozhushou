@@ -9,6 +9,7 @@ applies_to: ["apps/**", "packages/ui/**"]
 3. AI 生成内容一律用带标识的 AI 内容组件 AiContent，不自行拼接标识。
 4. 知识点方格统一用 packages/ui 的方格组件：六档按 color.mastery.* 着色，证据不足为虚线格，范围外为斜纹格。
 5. 可点元素有可见焦点与可读名称，图标按钮带 aria-label。
+6. 页面只显示接口返回的业务数字（掌握档、预测、额度等），不在界面重算（ADR-026）。
 
 ## 示例
 - 正例：方格组件接收 `{level, sufficiency, inScope}`，证据不足时渲染虚线边框，读屏念“证据不足，不等于不会”。

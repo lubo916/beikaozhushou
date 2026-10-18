@@ -11,7 +11,7 @@
 - 参数、阈值、开关：contracts/params.yaml
 - AI 场景与 AI 执行者的读写范围：contracts/ai/
 - 算法：docs/models/；不变量与合规义务：docs/product/invariants.yaml
-- 术语：docs/product/glossary.yaml；设计决定：docs/adr/
+- 术语：docs/product/glossary.yaml；设计决定：docs/adr/（技术栈与版本基线见 ADR-025）
 - 进行中任务的计划与交接：work/<ID>.md
 
 ## 红线
@@ -22,6 +22,7 @@
 5. 行为变化与规格、契约在同一次提交里更新，文档只写现状。规格与代码不同步，下一个任务就会照着错的规格做。
 6. 标有 GENERATED 的文件不手改，改源后运行 gen。手改的内容会在下次生成时丢失。
 7. 改了 packages/ai/ 下的文件，要跑对应场景的评测，结果不低于基线。
+8. 依赖与大版本只用 ADR-025 登记的，不自行安装或升级。训练语料里旧写法多，未登记的库和版本会带进不兼容的写法。
 
 ## 工作方式
 - 开工先运行 `python scripts/spec_tool.py status`：它给出当前期、当前闭环、下一个切片与待深化的页。

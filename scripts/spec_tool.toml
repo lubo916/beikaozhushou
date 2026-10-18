@@ -41,7 +41,7 @@ pack_chars = 15000
 pack_slice_chars = 2500
 
 [shots]                    # 各端截图宽度
-learner = [375, 1280]
+learner = [375, 834, 1280]   # 834：平板竖屏（ADR-029）
 org = [1280]
 admin = [1280]
 height = 900

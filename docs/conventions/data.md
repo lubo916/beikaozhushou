@@ -8,7 +8,7 @@ applies_to: ["contracts/schema/**", "packages/domains/**"]
 2. 每个字段标 x-data-class，取值见 contracts/data-classes.yaml。
 3. 业务表都有 tenant_id（ADR-011）：个人数据取平台默认租户，机构任务数据取机构租户；查询带租户条件。
 4. append_only 的表只插入：不更新、不删除；撤回写一条撤回事件，派生数据从源事件重算（ADR-005）。
-5. 主键用 UUIDv7，时间字段存 UTC；删除先进回收站（deleted_at），彻底删除按数据类别的保留期执行。
+5. 主键用 UUIDv7，时间字段存 UTC，金额以“分”为整数存储；金额与额度的扣减用数据库中带条件的原子更新，不用 Redis 锁；删除先进回收站（deleted_at），彻底删除按数据类别的保留期执行。
 6. 迁移脚本提交后不再修改；结构变化写新的迁移，并与 schema 文件在同一次提交。
 
 ## 示例
