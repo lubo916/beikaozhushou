@@ -25,7 +25,7 @@
 8. 依赖与大版本只用 ADR-025 登记的，不自行安装或升级。训练语料里旧写法多，未登记的库和版本会带进不兼容的写法。
 
 ## 工作方式
-- 开工先运行 `python scripts/spec_tool.py status`：它给出当前期、当前闭环、下一个切片与待深化的页。
+- 开工使用 drive 技能：它先运行 `python scripts/spec_tool.py status`，再按 docs/meta/plan/README.md 定位并推进下一步。
 - 新功能或改变已规定的行为：先把计划写进 work/<ID>.md，人确认后再改代码和契约。
 - 一个会话只做一个任务（一个切片、功能 ID 或缺陷）；同一时间只开一个闭环；会话之间状态只靠 work 文件和 git 传递。
 - 有功能 ID 的任务使用 implement-feature 技能。任务包里的规则就是本任务适用的全部规则，不必再读约定全文。

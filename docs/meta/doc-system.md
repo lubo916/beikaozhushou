@@ -1,15 +1,15 @@
 # 合并版 AI 通用备考 · 面向 AI 开发的文档体系规范 V3
 
-> 版本：V3.1（现行版）　生效：2026-10-15
-> 适用：同一仓库内混用 Claude Code（≥ v2.1.283）与 Codex（hooks 可用的版本，建议 ≥ v0.124）。
+> 版本：V3.2（现行版）　生效：2026-10-18
+> 适用：Codex（hooks 可用的版本，建议 ≥ v0.124）在仓库根总控；实现者是看不到仓库、只经交接包工作的网页版 Claude（ADR-024）；也可以在同一仓库内改用 Claude Code（≥ v2.1.283）实现。
 > 地位：本规范取代第二册全部内容，以及第一册中关于文档组织与 AI 协作机制的部分。第一册的规划方法（首发范围、节奏、行走骨架）继续有效，二者冲突时以本规范为准。
 > 本文只写现状。各项取舍的来由见《V3 综合分析与择优决策》，变更历史见 git。
-> 读者是维护文档体系的人。本文存放于 `docs/meta/doc-system.md`，任何入口文件都不引用它；AI 通过 AGENTS.md、任务包、skill 和检查报错获得本规范的要求，只有"修改文档体系本身"的任务才需要读本文。日常操作见《V3 日常操作卡》。
+> 读者是维护文档体系的人。本文存放于 `docs/meta/doc-system.md`，任何入口文件都不引用它；AI 通过 AGENTS.md、任务包、skill 和检查报错获得本规范的要求，只有"修改文档体系本身"的任务才需要读本文。日常操作见《V3 日常操作卡》（docs/meta/ops-card.md），推进步骤见 docs/meta/plan/README.md。
 
 ## 目录
 
 1 目标与原则　2 分层与送达　3 事实归属　4 仓库结构　5 文件规格　6 引用与任务包　7 路由　8 工作流程　9 检查与闸门　10 预算　11 验证与维护　12 失败归因　13 写作约定　14 双工具适配
-附录 A AGENTS.md 模板　B 功能规格模板　C 页面登记模板　D 新增契约模板　E 不变量初始候选　F 约定模板与页面状态约定　G work 文件模板　H skill 定义　I 工具配置　J spec_tool 命令参考　K 检查规则全表　L 领域候选　M 迁移计划（迁移完成后删除）
+附录 A AGENTS.md 模板　B 功能规格模板　C 页面登记模板　D 新增契约模板　E 不变量初始候选　F 约定模板与页面状态约定　G work 文件模板　H skill 定义　I 工具配置　J spec_tool 命令参考　K 检查规则全表　L 领域划分　M 迁移计划（迁移完成后删除）
 
 ---
 
@@ -37,7 +37,7 @@
 
 **P10 可度量。** 常驻体量、任务包体量、同时生效的规则条数按工具分别度量；体系本身带来的增益用有无对照实测，没有增益的机制就删掉。
 
-**P11 异构复核。** 一个工具写的规格，由另一个工具做冷启动测试；一个工具写的代码，由另一个工具复查。
+**P11 异构复核。** 一个工具写的规格，由另一个工具做冷启动测试；一个工具写的代码，由另一个工具复查。本仓库的组合见 ADR-024：Codex 写的规格由网页版 Claude 复核，网页版 Claude 写的代码由 Codex 复查。
 
 **P12 知识只在仓库。** 工具的私有记忆不承载项目知识；所有纠正都落到仓库里的文件。
 
@@ -77,6 +77,8 @@ L1 在 Claude 一侧有自动加载：读写匹配文件时加载 `.claude/rules
 | 私有记忆 | 项目设置关闭 auto memory | memories 默认关闭，保持关闭 | 仓库文件 |
 | 代码审查规则 | 作为 AGENTS.md 内容读入 | GitHub 审查读取离改动最近的 AGENTS.md 中的"## Code Review Rules" | 同一节 |
 
+网页版 Claude 不在上表中：它看不到仓库，hooks、路径规则、技能与私有记忆对它都不生效，只能经交接包拿到 AGENTS.md、任务包、work 文件、ADR-025、ADR-026 与计划列出的文件（scripts/handoff.py，ADR-024）。它反复出现的错误写进 docs/meta/plan/templates/claude-project.md，能机检的改成检查。
+
 ---
 
 ## 3 事实归属
@@ -87,9 +89,12 @@ L1 在 Claude 一侧有自动加载：读写匹配文件时加载 `.claude/rules
 |---|---|---|---|
 | 范围：有哪些页面、视图、状态，页面要有哪些条目 | `design/screens/<端>/<页ID>.yaml` | YAML | 覆盖报告 |
 | 页面深化状态（哪些页待深化） | 页面登记的 `refine` 字段 | YAML | 覆盖报告中的待深化页清单 |
+| 条目编号基线 | `design/screens/ID_BASELINE` | 文本 | 无 |
 | 功能清单、首发范围、功能覆盖哪些页面条目、依赖 | `docs/product/roadmap.yaml` | YAML | `roadmap.md`（含推导出的状态） |
+| 受众环、期、闭环、切片、黄金路径、功能所属的闭环 | `docs/product/phases.yaml` | YAML | `progress.md`；`status` 输出 |
+| 闭环开卡与收尾、实际轮次、推进事件、校准系数 | `docs/product/calibration.yaml` | YAML | `status` 中的建议系数 |
 | 功能行为 | `docs/domains/<领域>/features/<ID>.md` | Markdown + front matter | 无 |
-| 接口、数据结构、人类角色权限、埋点、错误码 | `contracts/` 原有五类 | 原格式 | 类型、客户端代码 |
+| 接口、数据结构、人类角色权限、埋点、错误码 | `contracts/` 原有五类；表结构为 `contracts/schema/<领域>.prisma`（0.1b 转换前为 `contracts/schema/*.yaml`，ADR-026） | 原格式；Prisma 多文件 schema | `packages/contract`、数据库客户端 |
 | 业务事件（证据等） | `contracts/domain-events.yaml` | YAML | 事件类型 |
 | 参数、阈值、开关 | `contracts/params.yaml` | YAML | `packages/params` 类型化访问器；后台参数中心（P19）种子 |
 | 数据类别、可见范围、用途限制、保留期限 | `contracts/data-classes.yaml` | YAML | 可见性过滤配置 |
@@ -110,6 +115,7 @@ L1 在 Claude 一侧有自动加载：读写匹配文件时加载 `.claude/rules
 | 任务流程 | `.agents/skills/<名>/SKILL.md` | Markdown | `.claude/skills/<名>/`、`agents/openai.yaml` |
 | 设计令牌 | `design/tokens.json` | DTCG | 主题样式 |
 | 常驻指令 | 根、端、少数包目录下的 `AGENTS.md` | Markdown | 无 |
+| 推进步骤、规格种子与交接流程 | `docs/meta/plan/` | Markdown | 无（与 phases.yaml、roadmap.yaml 不一致时以后两者为准） |
 | 进行中任务的计划与交接 | `work/<ID>.md` | Markdown | 无（只存在于功能分支） |
 
 ### 3.2 归属规则
@@ -124,7 +130,7 @@ O4. 提示词以仓库为准。后台只能灰度发布仓库中存在、且评�
 
 O5. 范围以页面登记为准。旧模块文档只作为规则细节的素材，不决定范围。
 
-O6. 功能 ID、ADR、INV、跨功能 OQ 的编号只在主干分配。已分配的功能编号与页面条目编号不删除、不复用（E-ID-02、E-COV-05）。
+O6. 功能 ID、ADR、INV、跨功能 OQ 的编号只在主干分配。已分配的功能编号与页面条目编号不删除、不复用（E-ID-02、E-COV-05）；条目编号的一次性重置见 5.4。
 
 ---
 
@@ -146,12 +152,16 @@ exam-prep/
 ├── apps/
 │   ├── learner/AGENTS.md             # 学员端 S01–S35
 │   ├── org/AGENTS.md                 # 机构端 O01–O16
-│   └── admin/AGENTS.md               # 平台后台 P01–P19
+│   ├── admin/AGENTS.md               # 平台后台 P01–P19
+│   ├── api/                          # 唯一后端（Fastify），只装配各领域路由（ADR-026）
+│   └── worker/                       # 后台任务进程（BullMQ）
 ├── packages/
 │   ├── domains/<领域>/               # 领域代码，与端无关；有不显然的例外时才放 AGENTS.md
 │   ├── ui/                           # 组件、页面状态组件、令牌消费
 │   ├── params/                       # 生成：参数的类型化访问器
-│   └── ai/<场景>/                    # 提示词、输出结构、调用代码
+│   ├── contract/                     # 生成：由 openapi.yaml 生成的类型、校验、请求钩子与模拟数据
+│   ├── db/                           # 数据库客户端的唯一构造处
+│   └── ai/                           # core 为 AI 网关；<场景>/ 放提示词、输出结构、调用代码
 ├── contracts/
 │   ├── openapi.yaml · schema/ · permissions.yaml · events.yaml · errors.yaml
 │   ├── domain-events.yaml · params.yaml · data-classes.yaml · metrics.yaml
@@ -163,14 +173,19 @@ exam-prep/
 │       ├── learner/S01.yaml … S35.yaml
 │       ├── org/O01.yaml … O16.yaml
 │       ├── admin/P01.yaml … P19.yaml
+│       ├── ID_BASELINE               # 条目编号基线（ADR-023）
 │       ├── slices/<页ID>.html        # 原型单页切片，只作布局参考
 │       └── shots/<页ID>/<视图>@<宽度>.png
 ├── docs/
 │   ├── meta/doc-system.md            # 本规范（不被任何入口引用）
+│   ├── meta/ops-card.md              # 日常操作卡
+│   ├── meta/plan/                    # 实施总纲：推进步骤与规格种子（ADR-024）
 │   ├── product/
 │   │   ├── brief.md · journeys.md
 │   │   ├── roadmap.yaml              # 源
 │   │   ├── roadmap.md                # 生成（只读）
+│   │   ├── phases.yaml · calibration.yaml   # 分期与校准（ADR-008）
+│   │   ├── progress.md               # 生成（只读）
 │   │   ├── glossary.yaml · domain-map.yaml · invariants.yaml · open-questions.yaml
 │   │   └── variation-points.md
 │   ├── domains/<领域>/
@@ -179,12 +194,14 @@ exam-prep/
 │   ├── models/                       # learner-model · planner · srs · prediction
 │   ├── conventions/                  # 见 5.2
 │   └── adr/
+├── deploy/                           # Dockerfile、compose 文件、发布与回滚脚本（ADR-026）
 ├── evals/<场景>/                     # cases/ · graders/ · thresholds.yaml · baseline.json
 ├── fixtures/exams/<考试ID>/          # 四个演示考试：样板数据、端到端测试、评测种子
 ├── tests/                            # 含 tests/models/<模型>/ 的金标数据与模拟场景
 ├── work/<ID>.md                      # 进行中任务的计划与交接，只存在于功能分支
 ├── scripts/
 │   ├── spec_tool.py · spec_tool.toml
+│   ├── handoff.py                    # 交接包：出包、回包与自检（ADR-024）
 │   ├── agent_gate.py                 # Stop 闸门，两个工具共用
 │   └── hooks/session_context.py · hooks/trace.py
 └── .gitignore                        # CLAUDE.local.md、AGENTS.override.md、AGENTS.local.md、.pack/、.trace/、work/.plans/
@@ -194,11 +211,11 @@ exam-prep/
 
 ### 4.1 不在仓库中的东西
 
-原型原件（单文件）、深化来源原型与深化清单（见 5.17）、126 份旧模块文档、合并来历与对两版原型的评述、调研材料，统一放在独立的归档位置（例如 `exam-prep-archive` 仓库），开发仓库不引用、不复制。原型仍在迭代时，按 5.4 的"原型在改"模式由脚本从归档路径读取。AI 任务中按路径读取归档材料的只有两个手动技能：triage-legacy 读旧模块文档，refine-page 读深化来源原型与深化清单；其他任务不读。
+原型原件（单文件）、深化来源原型与深化清单（见 5.17）、126 份旧模块文档、合并来历与对两版原型的评述、调研材料，统一放在独立的归档位置（例如 `exam-prep-archive` 仓库），开发仓库不引用、不复制。原型仍在迭代时，按 5.4 的"原型在改"模式由脚本从归档路径读取。AI 任务中按路径读取归档材料的只有两个手动技能：triage-legacy 读旧模块文档，refine-page 读深化来源原型与深化清单；其他任务不读。两者目前暂缓（ADR-023）。
 
 ### 4.2 启动位置
 
-两个工具都从仓库根启动。功能大多同时改领域包和端目录；Claude 的项目设置、hooks 和权限以启动目录为准；Codex 读不到的端、包级说明由任务包补齐。Codex 单包沙箱模式是可选做法，见 14.8。
+Codex 与 Claude Code 都从仓库根启动；网页版 Claude 不接触仓库，只经交接包工作（ADR-024）。功能大多同时改领域包和端目录；Claude 的项目设置、hooks 和权限以启动目录为准；Codex 读不到的端、包级说明由任务包补齐。Codex 单包沙箱模式是可选做法，见 14.8。
 
 ---
 
@@ -251,7 +268,7 @@ front matter 只放规格自己拥有的字段：`id`、`status`（`draft` 或 `
 编号规则：
 
 - 视图：`<页ID>#<视图名>`，如 `S06#first-day`。
-- 条目：`<页ID>-<两位序号>`，如 `S18-07`。用序号而不用名称，因为同一页可能有重名条目。序号一经分配不再改动，删除的条目保留编号并标 `removed: true`（E-COV-05）。序号由 `import-prototype` 分配，人和 AI 都不手填；新条目只在该页末尾追加。
+- 条目：`<页ID>-<两位序号>`，如 `S18-07`。用序号而不用名称，因为同一页可能有重名条目。序号一经分配不再改动，删除的条目保留编号并标 `removed: true`（E-COV-05）。序号由 `import-prototype` 分配，人和 AI 都不手填；新条目只在该页末尾追加。一次性重置编号须写 ADR 并更改 `design/screens/ID_BASELINE` 的基线标记；E-COV-05 只与基线相同的版本比对（ADR-023）。
 
 每个条目都带 `page_priority`（P0、P1、P2），表示"这一页必须有"的程度。首发范围不看它，看覆盖该条目的功能的 `release`（见 5.5）。
 
@@ -270,7 +287,7 @@ front matter 只放规格自己拥有的字段：`id`、`status`（`draft` 或 `
 
 `docs/product/roadmap.yaml` 每个功能一条，字段为 `id`、`title`、`domain`（领域名）、`release`、`depends`、`covers`；撤销的功能另有 `withdrawn`。
 
-`release` 取 `R1`、`R2`、`R3`、`later`。R1 即第一册所说的首发 P0 功能，数量控制在 15–25 个。P0/P1/P2 只用于页面条目，不再用于功能。
+`release` 取 `R1`、`R2`、`R3`、`later`，与期的对应见 5.18（R1 为 0–1 期的功能）。P0/P1/P2 只用于页面条目，不再用于功能。
 
 `covers` 列出本功能覆盖的页面条目。覆盖关系在写规格之前就要确定，这样覆盖检查可以先于规格运行。功能涉及的页面、视图和端都由 `covers` 推出，不另外填写。
 
@@ -280,7 +297,7 @@ front matter 只放规格自己拥有的字段：`id`、`status`（`draft` 或 `
 
 ### 5.6 契约
 
-原有五类（`openapi.yaml`、`schema/`、`permissions.yaml`、`events.yaml`、`errors.yaml`）格式不变，新增两项要求：`schema/` 中每个字段标注数据类别（注释或扩展字段 `x-data-class`）；`events.yaml` 只放埋点，业务事件一律进 `domain-events.yaml`。
+原有五类（`openapi.yaml`、`schema/`、`permissions.yaml`、`events.yaml`、`errors.yaml`）中，表结构采用 Prisma 多文件 schema（`schema/<领域>.prisma`，一个领域一个文件；0.1b 转换前为每表一个 YAML，ADR-026），其余格式不变。新增两项要求：表结构中每个字段标注数据类别（三斜线注释；转换前为扩展字段 `x-data-class`）；`events.yaml` 只放埋点，业务事件一律进 `domain-events.yaml`。
 
 新增七份，模板见附录 D：
 
@@ -334,7 +351,7 @@ AI 场景的完成标准是回归评测达到阈值且不低于基线。"多次�
 
 `glossary.yaml` 每个术语一条：术语、定义、代码标识、禁用同义词（包括合并前各产品的旧叫法）。`copy` 约定中的宣传禁用语（如"保过""必过"）也登记在这里。check 扫描文档与界面文案中的禁用词；任务包自动带上规格正文中命中的术语。
 
-`domain-map.yaml` 每个领域一条：领域代码（大写，即功能 ID 前缀，如 `PLAN`）、领域名（小写，用于目录、场景 ID 和各登记的 `owner` 字段，如 `plan`）、中文名、领域组、依赖的领域。各领域拥有哪些表、业务事件、参数、AI 场景，以各登记条目的 `owner` 字段为准（表的归属写在 schema 中），由脚本汇总成视图，不在这里重复。候选划分见附录 L。
+`domain-map.yaml` 每个领域一条：领域代码（大写，即功能 ID 前缀，如 `PLAN`）、领域名（小写，用于目录、场景 ID 和各登记的 `owner` 字段，如 `plan`）、中文名、领域组、依赖的领域。各领域拥有哪些表、业务事件、参数、AI 场景，以各登记条目的 `owner` 字段为准（表的归属写在 schema 中），由脚本汇总成视图，不在这里重复。划分见附录 L 与 ADR-002。
 
 领域 README（`docs/domains/<领域>/README.md`）只有一节"要点"，≤ 1,500 字：领域职责、核心概念、与相邻领域的边界。任务包取这一节。
 
@@ -372,6 +389,8 @@ skill 只放仓库根的 `.agents/skills/`，不建子目录级 skill，因为�
 
 ### 5.17 页面深化
 
+当前状态：页面深化暂缓，页面登记中没有 `pending`（ADR-023）。本节是恢复深化时的做法。
+
 部分页面在归档中另有一份交互深得多的产品原型，称为深化来源原型。它的路径、深化清单的路径和它的外部编号模式登记在 `spec_tool.toml` 的 `[deep_source]` 中。
 
 地位：深化来源原型属于 L4，内容转写进合并版原型（原型在改）或页面登记（原型冻结）后才生效。开发会话不读它，只有 refine-page 读。它的页面编号、数据表编号、决定编号、章节号和产品名不进入仓库（E-REFINE-03）。一页转写完成后以合并版原型为准，不再回头比对深化来源。
@@ -398,6 +417,12 @@ skill 只放仓库根的 `.agents/skills/`，不建子目录级 skill，因为�
 - 深化来源中的子面板、弹层做成视图，各视图按 5.4 截图，视觉细节靠截图承载。切片会进入任务包，保持精简。
 - 交互要点写进覆盖该条目的功能规格草稿，只写行为；数值写"由参数决定"，参数在写规格时登记；不写深化来源的编号与叫法。
 - 深化在 `refine/<页ID>` 分支上进行，人审差异后合并；需要的新功能编号先在主干分配。
+
+### 5.18 分期与校准
+
+`docs/product/phases.yaml` 是受众环（ring-0 至 ring-4）、期、闭环、切片、黄金路径、轨道、路线变体与风险的唯一来源；功能所属的闭环只记在这里。release 与期的对应：R1 为 0–1 期，R2 为 2–3 期，R3 为 4 期，later 为 5 期及以后。切片的条目必须由同一闭环的功能覆盖（E-PHASE-05），切片的验收句是功能 AC 的种子。
+
+`docs/product/calibration.yaml` 记闭环开卡与收尾（loops：实际轮次、网页版 Claude 轮次、熔断）、推进事件（events：握手、场外轨道、期初期末、门槛、决策、预授权）与校准系数。`status` 由路线图、分期、校准与规格状态推导当前位置，`progress.md` 由 `gen` 生成。同一时间只开一个闭环，开卡与收尾用 open-loop、close-loop 两个技能（ADR-008、ADR-024）。
 
 ---
 
@@ -524,6 +549,10 @@ skill 只放仓库根的 `.agents/skills/`，不建子目录级 skill，因为�
 - 编号只在主干分配：`spec_tool new …` 在非主干分支上拒绝分配，分配后立即提交。
 - 生成物冲突一律重新生成，不手工合并。
 
+### 8.7 实施总纲与交接包
+
+本仓库按 docs/meta/plan/README.md 推进（ADR-024）。drive 技能先运行 `status` 定位。每个闭环先在 `spec/loop-<闭环>` 分支上批量写规格：Codex 写，网页版 Claude 冷启动复核，产品负责人确认业务摘要。然后逐个功能实现：Codex 写计划并出交接包，网页版 Claude 实现，Codex 应用结果、运行 verify 并用 review-change 复查。最后按 close-loop 收尾并记校准。交接包由 `scripts/handoff.py` 生成与应用；交接仍只认 work 文件（8.4），验证以本地 verify 与 CI 为准。
+
 ---
 
 ## 9 检查与闸门
@@ -570,6 +599,8 @@ hooks 只是加速。项目 hooks 需要每人在各自工具里审阅并信任�
 | E-CONV | 约定的 `applies_to` 与规则条数 |
 | E-BUD / W-BUD | 预算 |
 | W-SPEC | 规格体量与历史性措辞 |
+| E-PHASE / W-PHASE | 功能与闭环的归属、切片条目、校准记录、熔断（5.18） |
+| E-SCHEMA | 登记、路线图、规格与配置的结构和取值 |
 
 每条规则的判定条件和改法见附录 K。报错格式统一为"编号 文件:位置：问题。改法：……"，例如：
 
@@ -749,7 +780,7 @@ Codex 的 `project_doc_max_bytes` 保持默认的 32 KiB，不调高；体量纪
 
 ### 14.9 Windows
 
-hooks 命令中的解释器名在各平台不一致。团队统一约定命令写 `python3`，Windows 成员确保它在 PATH 中可用，由 `doctor` 检查；Codex 侧另配 `commandWindows`。skill 用生成副本，不用软链。
+hooks 命令中的解释器名在各平台不一致。hooks、pre-commit 与 CI 中的命令写 `python3`；文档、技能与 AGENTS.md 中写 `python scripts/…`。Windows 电脑在 WSL2 中开发（ADR-025），两种写法都可用；不在 WSL2 中时，确保 `python3` 在 PATH 中可用（`doctor` 检查），Codex 侧另配 `commandWindows`。skill 用生成副本，不用软链。
 
 ---
 
@@ -1249,8 +1280,11 @@ started: 2026-10-14
 | ai-scenario | 新增或修改 AI 场景：登记、提示词、评测与阈值 | 只许手动 |
 | add-exam | 接入一个新考试：画像数据、校验、演示数据、端到端冒烟 | 只许手动 |
 | doc-garden | 文档园丁：对照代码查找过期或矛盾的文档 | 只许手动 |
-| triage-legacy | 迁移期专用：把旧模块文档中的规则细节分拣到规格、约定或 ADR | 只许手动，迁移完成后删除 |
+| triage-legacy | 迁移期专用：把旧模块文档中的规则细节分拣到规格、约定或 ADR | 只许手动；分拣暂缓期间保留（ADR-023），完成后删除 |
 | refine-page | 页面深化：把深化来源原型中对应页的内容转写进合并版原型与功能规格草稿（见 5.17） | 只许手动 |
+| open-loop | 闭环开卡：核对在制品与依赖，在 calibration.yaml 记开卡（5.18） | 只许手动 |
+| close-loop | 闭环收尾：按完成定义核对，记实际轮次与校准系数（5.18） | 只许手动 |
+| drive | 推进开发：运行 status 定位，按实施总纲执行下一步（8.7） | 只许手动 |
 
 ### H.2 implement-feature（源文件全文）
 
@@ -1293,6 +1327,8 @@ doc-garden：运行 `check --full` 和 `trace-report`；抽查已完成功能的
 triage-legacy：输入一份旧模块文档的路径（位于归档位置）；范围以页面登记为准，不新增范围；把规则细节分拣到对应功能规格的 R、约定、ADR 或待定问题，无法归属的列给人决定。深化来源原型不归本技能处理，见 refine-page。
 
 refine-page：输入目标页 ID。读 `spec_tool.toml` 中 `[deep_source]` 指向的深化来源原型，以及深化清单中该页的一行；对照该页现有登记，列出要新增的能力、视图、布局要点、状态例外和各条目的交互要点，以及与单一事实源冲突之处。冲突逐条交人裁决，裁决前不写入；采纳深化来源做法的，提醒用户按重型通道修改单一事实源。然后修改合并版原型（原型在改）或页面登记（原型冻结）：条目只在末尾追加、不手填序号，子面板与弹层做成视图，并把该页的 `refine` 改为 `refined`；原型在改模式下运行 `import-prototype --write-ids`，确认差异只落在该页。新条目分配到功能，需要新功能时请用户在主干运行 `new feature`。交互要点写进覆盖该条目的功能规格草稿（规格不存在就按附录 B 建为 `draft`），只写行为，数值写"由参数决定"，不写深化来源的编号与叫法。最后运行 `check` 直到通过，提示安排写规格。
+
+open-loop、close-loop、drive：正文见各自的 SKILL.md（ADR-008、ADR-024）。
 
 ---
 
@@ -1438,7 +1474,7 @@ exec python3 scripts/spec_tool.py verify --staged --fast
 
 ```toml
 [paths]
-prototype_source = "../exam-prep-archive/prototype/merged.html"   # 只在"原型在改"模式下使用
+prototype_source = "../exam-prep-archive/prototype/prototype-v1.0.html"   # 原型冻结（ADR-001）：截图仍从它生成
 
 [deep_source]              # 页面深化来源（见 5.17），只由 refine-page 读取
 prototype = "../exam-prep-archive/deep-source/prototype.html"
@@ -1461,7 +1497,7 @@ spec_body_chars = 6000
 pack_chars = 15000
 
 [shots]                    # 各端截图宽度
-learner = [375, 1280]
+learner = [375, 834, 1280]   # 834：平板竖屏（ADR-029）
 org = [1280]
 admin = [1280]
 
@@ -1495,7 +1531,10 @@ claude_min_version = "2.1.283"
 | `coverage` | 页面条目覆盖报告，含"页内 P0 但不在 R1"清单，以及待深化页和覆盖它们的功能 | 规划、CI |
 | `trace-report [--session <ID>]` | 读取轨迹汇总 | 失败归因、月度巡检 |
 | `show <登记> [<ID>]` | 以可读形式显示任一 YAML 登记 | 人查阅 |
+| `status [--loop <闭环>]` | 当前期、受众环、闭环、下一切片与校准系数；闭环卡（5.18） | 每个会话开头（drive 技能） |
 | `doctor` | 本地环境检查 | 新机器、新成员、升级后 |
+
+交接包的命令是 `python scripts/handoff.py`，子命令 out、specs、in、selftest（8.7）。
 
 ---
 
@@ -1525,7 +1564,7 @@ claude_min_version = "2.1.283"
 | E-COV-02 | 一个条目被多个功能覆盖 | 只保留一个 |
 | E-COV-03 | `covers` 指向不存在的条目 | 修正 |
 | W-COV-04 | 页内 P0 条目由不在 R1 的功能覆盖 | 人工确认首发范围 |
-| E-COV-05 | 与主干上一版相比，页面登记中有已分配的条目编号消失 | 恢复该条目并标 `removed: true`；条目编号只增不减 |
+| E-COV-05 | 与主干上一版相比（编号基线相同时，见 `design/screens/ID_BASELINE`），页面登记中有已分配的条目编号消失 | 恢复该条目并标 `removed: true`；条目编号只增不减 |
 | E-REFINE-01 | `ready` 的规格所覆盖条目所在页的 `refine` 为 `pending` | 先用 refine-page 完成该页深化，再改为 `ready`；该页若无需深化，从深化清单移除并去掉 `refine` 字段 |
 | W-REFINE-02 | 重新导入后，`ready` 或已完成功能所覆盖的条目文本有变化 | 按标准通道在同一次提交里更新受影响的规格，或撤回该原型改动 |
 | E-REFINE-03 | 仓库文件出现 `[deep_source].forbidden_patterns` 匹配的内容 | 翻译为本仓库的 ID（表名、ADR、参数名）或删除 |
@@ -1558,12 +1597,20 @@ claude_min_version = "2.1.283"
 | E-BUD-02 | 同时生效规则数超过报错线 | 把可检查的规则移入 lint，或拆分约定 |
 | W-BUD-03 | 同时生效规则数超过告警线，或 skill 描述合计超限 | 精简 |
 | W-SPEC-01 | 规格正文超长，或出现"原来""改为""之前"等历史性措辞 | 拆分或改写为现状 |
+| E-PHASE-01 | 功能不属于任何闭环，或属于多个闭环 | 在 phases.yaml 中只放进一个闭环 |
+| E-PHASE-02 | 闭环引用了不存在的功能 | 修正编号，或先在主干 `new feature` |
+| E-PHASE-03 | 同一期的功能 release 不一致 | 按 5.18 的对应统一 release |
+| W-PHASE-04 | 闭环缺少一句话演示或预算 | 补 demo 与 budget_rounds |
+| E-PHASE-05 | 切片编号重复或不以闭环编号开头；切片条目不在登记中或不由本闭环的功能覆盖；没有条目的切片缺少可解析的 carrier；切片类型不合法 | 修正切片 |
+| E-PHASE-06 | 校准记录指向不存在的闭环、字段格式不合法，或事件类型不合法 | 按 calibration.yaml 文件头的说明改写 |
+| W-PHASE-07 | 实际轮次超过熔断线却没有熔断记录 | 写 fused（移回待办的切片） |
+| E-SCHEMA-01 | 登记、路线图、规格与配置的结构或取值不合法，例如功能编号前缀与领域不符、规格不在路线图中 | 按报错修正 |
 
 ---
 
-## 附录 L　领域候选
+## 附录 L　领域划分
 
-按页面登记中各页的数据读写推出，共 15 个，分为四组。最终划分以 ADR"领域划分"为准。领域代码是功能 ID 的前缀，领域名用于目录、场景 ID 和 `owner` 字段。
+共 18 个，分为四组；划分以 ADR-002 与 docs/product/domain-map.yaml 为准。领域代码是功能 ID 的前缀，领域名用于目录、场景 ID 和 `owner` 字段。
 
 | 组 | 领域代码 | 领域名 | 职责 |
 |---|---|---|---|
@@ -1573,7 +1620,7 @@ claude_min_version = "2.1.283"
 | 学习核心 | PRAC | practice | 练习、作答、错题与回炉 |
 | 学习核心 | GRADE | grading | 批改，含主观题 |
 | 学习核心 | TUTOR | tutor | AI 导师与问答 |
-| 内容 | EXAM | exam | 考试画像库 |
+| 内容 | EXM | exam | 考试画像库 |
 | 内容 | CONT | content | 内容与题库 |
 | 内容 | MOD | moderation | 内容审核流水线 |
 | 机构 | ORG | org | 机构教务、班级、督学 |
@@ -1582,10 +1629,15 @@ claude_min_version = "2.1.283"
 | 平台 | AIGOV | aigov | AI 场景注册、模型路由、提示词灰度、发布前评测 |
 | 平台 | COMP | compliance | 合规、数据授权、导出审批、标识检查 |
 | 平台 | METR | metrics | 指标口径与分析 |
+| 平台 | ENG | engagement | 触达与增长：通知、提醒与公告 |
+| 平台 | SUPP | support | 客服、工单与反馈 |
+| 平台 | PLAT | platform | 端外壳、参数中心与平台基础 |
 
 ---
 
 ## 附录 M　迁移计划（迁移完成后删除本附录）
+
+迁移状态：第 0–3 步已完成；第 4 步暂缓（ADR-023）；第 5 步的行走骨架由分期的 0.3 与 1 期承担（5.18），骨架页的深化随页面深化一并暂缓。第 4 步完成后删除本附录。
 
 按依赖和风险排序。每一步完成后运行 `check` 与 `budget`。
 

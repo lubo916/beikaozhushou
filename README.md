@@ -1,6 +1,6 @@
 # 备考助手（exam-prep）
 
-AI 通用备考：学员端、机构端、平台后台。AI 工具的常驻指令见 AGENTS.md；人的日常操作见 docs/meta/ops-card.md；分期与当前进度见 `python3 scripts/spec_tool.py status`。
+AI 通用备考：学员端、机构端、平台后台。AI 工具的常驻指令见 AGENTS.md；人的日常操作见 docs/meta/ops-card.md；推进开发见 docs/meta/plan/README.md（在 Codex 中调用 drive 技能）；分期与当前进度见 `python3 scripts/spec_tool.py status`。
 
 新机器第一次使用：
 
