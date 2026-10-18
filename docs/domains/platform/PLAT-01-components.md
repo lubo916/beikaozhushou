@@ -38,7 +38,7 @@ declare function useShellLocation(): ShellLocation;
 
 R1 五页占位只传 pageId，不选择业务视图；因此它们的初始 mode 直接取登记。当前页名取 LEARNER_PAGES[pageId].title，入口文字仍取 nav.*。ShellPage 的 pageId 与自身分支的路由映射不一致、未知页面/视图或错误步骤均按下节非法输入处理，避免显示错误页头。
 
-应用只建一个 ShellController，公开 useShellLocation 始终读它发布的全局前景快照，不读最近的局部页面 Provider。覆盖路由使用独立的前景/背景 Routes location 上下文：背景按保存的 backgroundLocation 匹配路由，前景按当前 /tutor 匹配；每个 ShellPage 仅按自己的分支 location 校验。控制器给分支分配唯一 token，ShellPage 只提交/更新该 token 的局部声明；控制器按当前前景 token 选择并发布全局快照，背景声明不能覆盖它。清理仅能移除对应 token 的本次声明，旧清理不能清除新声明；StrictMode 重挂不会抢占当前前景。前景合法声明未就绪时 ready=false。DemoShellPage 使用隔离局部上下文，不向全局注册。tutor 覆盖期间全局为 S28/tutor，背景页保留其局部声明和挂载实例；宽度或模式变化不改变 entry。
+应用只建一个 ShellController，公开 useShellLocation 始终读它发布的全局前景快照，不读最近的局部页面 Provider。覆盖路由使用独立的前景/背景 Routes location 上下文：背景按保存的 backgroundLocation 匹配路由，前景按当前 /tutor 匹配；每个 ShellPage 仅按自己的分支 location 校验。控制器给分支分配唯一 token，ShellPage 只提交/更新该 token 的局部声明；控制器按当前前景 token 选择并发布全局快照，背景声明不能覆盖它。清理仅能移除对应 token 的本次声明，旧清理不能清除新声明；StrictMode 重挂不会抢占当前前景。前景合法声明未就绪时 ready=false。DemoShellPage 使用隔离局部上下文，不向全局注册。tutor 覆盖期间全局为 S28/tutor，外壳页头与 dialog 可读标题均取 S28 登记 title（AI 导师），背景页保留其局部声明和挂载实例；宽度或模式变化不改变 entry。
 
 根路径 replace 到 /today。未知路径保留原 URL，显示 standard 的 404 外壳，entry=null；页头为 ui.shell.not_found，内容为 ui.shell.route_not_found，唯一动作 ui.shell.back_today replace 到 /today。/__demo/platform 也为 standard、entry=null；演示区内的 mode 夹具只影响被测嵌套外壳。公开钩子只报告最外层路由，不把演示夹具变为真实入口。ready=false 表示初始路由尚未规范化；0.1b 在 ready 且 entry 非空时才取得 app_opened.entry。
 
@@ -50,7 +50,11 @@ PLAT-01 只交付原生 HTML dialog 空容器、可读标题、关闭按钮、�
 
 冷启动或刷新 /tutor 没有有效背景记录时，先用 React Router 的 replace 导航到 /today，待背景位置建立后只执行一次 push 到 /tutor，再标记 ready；规范化过程不发启动事件。于是后退落到 /today，前进重新打开；不调用 back 猜测外部历史。背景视图的登记 mode 必须允许导师，否则归同一冷深链路径。外部可伪造的 history state 不作为页面登记或权限来源。
 
-关闭后焦点回到仍连接、可见且可聚焦的触发元素；深链或原元素不可用时，移到落点页的主标题（tabIndex=-1），避免焦点丢到文档开头。手机菜单也用原生 dialog，开启导师前先关闭菜单；外壳同时只保留一个模态容器。
+关闭后焦点回到仍连接、可见且可聚焦的触发元素；深链或原元素不可用时，移到落点页的主标题（tabIndex=-1），避免焦点丢到文档开头。
+
+手机菜单为根内的原生 dialog 左侧抽屉，顶/底贴可用视口，宽度取 size.shell.drawer 与可用外壳宽度的较小值，高度不超过可用视口；留白/层级只用登记令牌。只在手机档且 standard/guided 时显示打开按钮及允许打开；immersive 连同按钮一起隐藏，standalone 无页头。菜单不 push/replace 历史；关闭按钮/Esc 只关闭并归还焦点，浏览器后退按原历史正常导航、不阻止 popstate。任何 location 变化（含 query/hash）、离开手机档或切到不允许导航的 mode 都关闭菜单，路由导航后焦点交给落点页规则。点入口先关闭再执行普通路由导航；同路由入口仅关闭。开启导师前先关闭菜单，外壳同时只保留一个模态容器。
+
+浅/深色使用应用根内存状态，单一最外层 [data-ep-shell] 的 data-scheme 为权威值；演示中的切换控件更新该状态，内嵌演示外壳和所有 dialog 继承，不自行覆盖。切到五入口或返回演示仍保留本次状态，刷新恢复 light；不增加正式外观设置。Playwright 以 addInitScript 在挂载前设 window.__EXAM_PREP_INITIAL_SCHEME__ 为 light/dark；bootstrap 仅在 development/test/staging 读取一次并初始化内存状态，未知值按 light，production 忽略此测试入口。挂载后只通过演示控件更新同一状态，不单独改 DOM 属性。截图矩阵依 PLAT-01-AC5，/tutor 先完成深链规范化再截图。
 
 ## 输入类型与统一错误
 
@@ -110,11 +114,28 @@ declare function createUi<K extends string>(): Readonly<{
 
 应用唯一入口在 React 挂载前调用一次 createUi<MessageKey>() 并导出返回的 UiProvider/组件，页面只用这些已绑定组件，不直接实例化宽泛 string 组件。UiProvider 注入应用的 t；factory 返回组件的 K 已固定，调用方键由组件 props 检查，不依靠 React Context 把父 Provider 的类型传播给任意 children。内置文案键由 UI 实现的已登记键表验证资源存在；0.1b 和功能测试须对照中文资源检查全部内置键及错误映射键，缺失不能静默展示键名。
 
-TypeScript 在编译期检查必填字段、基本类型、枚举和联合约束；跨 JS 边界还做运行时形状检查。有限值和取值条件由运行时检查：slowHintSeconds 须非负且有限，Clock.now() 须有限，数字插值须有限。缺字段、错误类型、locked/page、非法步骤统一只渲染 ui.input.invalid（组件输入无效），不渲染传入 children 或动作、不抛出到应用根。有效 StateView 转态时，hasContent=true 的 children 始终在同一个内容槽位与 React key 下，不克隆或重建。StateView 不禁用任意后代；调用方按自身规则禁用内容动作，组件仅管理自己提供的动作。
+TypeScript 在编译期检查必填字段、基本类型、枚举和联合约束；跨 JS 边界还做运行时形状检查。有限值和取值条件由运行时检查：slowHintSeconds 须非负且有限，Clock.now() 须有限，数字插值须有限。缺字段、错误类型、locked/page、非法步骤统一只渲染 ui.input.invalid（组件输入无效），不渲染传入 children 或动作、不抛出到应用根。有效 StateView 转态或切换 scope 时，hasContent=true 的 children 始终在同一个内容槽位与 React key 下，不克隆或重建。StateView 不禁用任意后代；调用方按自身规则禁用内容动作，组件仅管理自己提供的动作。
 
-两个有意定义的异常使用专用表现：ProposalCard 的 ai/未知 source 显示 ui.proposal.unsupported_source，隐藏正文与动作；UndoBar 的 deadline 格式错误显示 ui.undo.invalid_deadline 且禁用撤销。deadline 要求有效的带 Z 或显式时区偏移 ISO 8601 时间，不能把无时区或溢出日期静默纠正为有效日期。其余非法输入仍用统一表现。
+scope 不改变组件内部树、骨架种类或提示排列，只改变固定外容器的区域/宽度样式。page 由调用方放在现有 main 的主内容层、占用该层可用宽度；block 放在所属业务区块内并受该块宽度约束。两者使用同一个 section 外容器且不另建 main、不自动加页标题；不由组件 reparent 到其他节点或 portal。提示与内容的固定顺序如下，切换 scope 只更新外容器属性，不能重挂 children。
 
-动作 Promise pending 时禁用本组件全部动作，避免确认与不改并发；resolve 后由调用方更新状态，组件不提前执行学员状态变更。reject 保留原内容、恢复动作，错误文案按登记 code→errors.yaml 的 message_key；未知错误及断网/超时/解析失败统一为 COMMON_UNAVAILABLE 对应键，不显示原始异常。StateView 重试每次 reject 后调用一次 onReport，使用本次映射码；首次错误由调用方上报。onReport 抛错由边界吞并且不再递归上报；0.1（含预发）由调用方注入只含 Report 的结构化桩。
+|state|page/block 共用的内部结构|提示语义|
+|---|---|---|
+|normal|仅固定内容槽|无新增角色|
+|loading|无内容为同形骨架；有内容为忙碌提示后接内容槽|status，容器 aria-busy|
+|empty|原因/动作提示后接可选内容槽|status|
+|error|错误/重试提示后接可选内容槽|alert|
+|offline|可用功能提示后接可选内容槽|status|
+|restricted|原因/动作提示后接可选内容槽|alert|
+|insufficient_data|缺口/动作提示后接可选内容槽|status|
+|locked|仅 block：锁定/动作提示后接可选内容槽|status；page 为非法输入|
+
+R4 的“横幅/区块提示”指上述同一个提示槽在所属区域内呈现，不暗示 scope 改变内部结构。骨架不复制业务页面布局；没有传入内容时组件只呈现通用状态内容。
+
+两个有意定义的异常使用专用表现：ProposalCard 的 ai/未知 source 显示 ui.proposal.unsupported_source，隐藏正文与动作；UndoBar 的 deadline 格式错误显示 ui.undo.invalid_deadline 且禁用撤销。deadline 复用共同前置事件时间的 RFC 3339 子集判定口径：大写 T/Z、必须有秒、可选 1–3 位小数、Z 或 ±HH:MM，并验证日历日期和时区偏移；拒绝省秒、基本格式、逗号小数、±HHMM、-00:00、闰秒、超过毫秒精度、无时区及溢出日期，不截断或纠正。其余非法输入仍用统一表现。
+
+动作 Promise pending 时禁用本组件全部动作，避免确认与不改并发；resolve 后由调用方更新状态，组件不提前执行学员状态变更。reject 值仅在 typeof 为 object、非 null、具有自有 code 属性，且读取所得为 ERROR_MESSAGE_KEYS 自有成员的字符串时按该登记码映射；带自有 code 的 Error 也接受，继承 code、未知码、非对象及取属性抛错均为 COMMON_UNAVAILABLE。UI 不窥探 Orval 的 response/data 等响应结构；业务适配器先把已识别的领域错误转成 Failure。断网/超时/响应解析失败也适配为 COMMON_UNAVAILABLE，不显示原始异常。
+
+reject 后保留内容、恢复动作，并立即用本次映射键显示本地失败。StateView 以本地失败码优先于 props.errorCode；state/pageKey/errorCode 任一变化即清除本地失败，回到新 props 的表现，普通重渲染不清除。ProposalCard 的 source 或四项 Message 的 key/params 内容变化、UndoBar 的 deadline 变化、其他状态提示的 state/pageKey/message 内容变化同样清除各自本地失败；只变回调/Clock 引用不视为换输入。新尝试开始清除上次动作失败，输入变化/卸载使旧尝试不能再写本地错误或解锁新尝试。StateView 每次实际 retry reject 上报一次，使用该次 pageKey 和映射码；首次 props 错误由调用方上报。onReport 抛错由边界吞并且不递归上报；0.1（含预发）调用方只注入 Report 结构化桩。
 
 Clock 的默认适配器每秒及页面回到前台通知，替身可推进；subscribe 只建立一次，卸载/退出 loading 时取消。进入 loading 即计时；slowHintSeconds 变化按同一次 loading 已经过时长重新判断。UndoBar 同用 Clock：remaining=max(0,deadline-now)，正值取天/小时/分/秒中达到的最大单位向上取整；不足一秒仍显示 ui.undo.remaining_seconds 的 count=1，到零显示 ui.undo.expired。无效 deadline 不显示倒计时。真实是否可撤销仍由回调的服务端结果决定。
 

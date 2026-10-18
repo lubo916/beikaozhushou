@@ -4,7 +4,7 @@
 
 ## 接口与校验次序
 
-由 packages/domains/metrics/index.ts 导出下列类型与服务工厂；EventPayload 从生成事件登记派生，不另手写事件清单。Context、Identity 与统一 HTTP 映射取 foundation。返回 Promise，失败抛带登记码的 MetricsError，不携带原始提交值。
+由 packages/domains/metrics/index.ts 导出下列类型、服务/仓储工厂及领域路由插件；EventPayload 从生成事件登记派生，仅表示校验后的类型，不另手写事件清单。Context、Identity 和 ContextProvider 从 @exam-prep/contract/runtime-context 取，统一 HTTP 映射取 foundation。返回 Promise，失败抛带登记码的 MetricsError，不携带原始提交值。
 
 ```ts
 type Receipt = { status: 'inserted' | 'duplicate'; eventId: string };
@@ -22,14 +22,23 @@ type MetricsDependencies = {
   newId: () => string; // 可注入 UUIDv7 工厂
 };
 interface MetricsService {
-  trackEvent(context: Context, event: EventPayload, key: string): Promise<Receipt>;
-  recordEvent(context: Context, event: EventPayload, key: string): Promise<Receipt>;
+  trackEvent(context: Context, event: unknown, key: unknown): Promise<Receipt>;
+  recordEvent(context: Context, event: unknown, key: unknown): Promise<Receipt>;
   query(context: Context, filter: EventFilter): Promise<StoredEvent[]>;
 }
 declare function createMetricsService(deps: MetricsDependencies): MetricsService;
+type GetContext = ContextProvider<FastifyRequest>;
+declare function metricsRoutes(options: {
+  service: MetricsService | undefined;
+  getContext: GetContext;
+}): FastifyPluginAsync;
 ```
 
-0.1b 构造并注入服务实例，后续领域消费实例的受信方法；不建立隐式全局仓储或另导出绕过注入的单例方法。trackEvent 是 client actor 入口，由路由插件调用；recordEvent 只供进程内受信领域调用，浏览器不能构造 Context，公开请求不能得到 domain actor。HTTP trackEvent 对 inserted/duplicate 都返回契约规定的 202 响应；内部保留首次 eventId，路由不得把内部 Receipt 变成公开未登记响应。
+METR 交付 metricsRoutes 与 createJsonlEventRepository；0.1b 只构造、注入和注册，不实现领域路由/仓储。Fastify 类型仅在服务器入口使用，共享 Context 模块无 Fastify 导入。getContext(request) 异步返回受信 Context；已知不可用 reject ContextUnavailableError，或 resolve 缺字段的上下文时映射 503，未知异常按 foundation 500。HTTP 适配器固定 client actor。service 未装配为 503；服务可用后再执行下列领域检查。
+
+metricsRoutes 注册 POST /events，仅使用 Fastify 的 JSON 解析和传输限制，读取 request.body 与原始 request.headers['idempotency-key'] 后传给 trackEvent；缺失/多值头保留原值，服务判 422，不拼接、不 trim、不强转。不在路由 schema、OpenAPI/Zod middleware 或 preValidation 中预先验证 body/该头，不让结构错误抢先于角色/source 检查。生成类型供校验后消费，不能作为路由已验证的假设。HTTP inserted/duplicate 都为 202、无响应体，内部 Receipt 不外泄。
+
+0.1b 注入服务实例，后续领域消费实例的受信方法；不建立隐式全局仓储或绕过注入的单例。recordEvent 只供进程内受信领域调用，浏览器不能构造 Context。platform/practice/plan 可依赖 metrics 的记录端口；metrics 不导入这些领域或 learner，未来 owner 的只读结果由装配层注入，本期只消费独立 fixture。
 
 检查顺序固定，第一项失败即返回，不继续查幂等或写盘：
 
@@ -40,13 +49,15 @@ declare function createMetricsService(deps: MetricsDependencies): MetricsService
 5. 有效输入后做幂等比较；冲突 COMMON_CONFLICT。
 6. 仓储锁/读取/追加/fsync 失败 COMMON_UNAVAILABLE。
 
-query 也先检查上下文及 actor/role/caller（前两步），再验发生窗和可选事件名，最后读仓储；没有公开查询路由，不新增人类角色权限动作。name 过滤可指定已落盘旧事件名，不要求在当前登记 active，以便跨哈希原样查询。
+query 第一步检查 Context 可用性；第二步仅允许 client + guest/learner，或 domain + metrics.event.record.callers 登记的 platform/practice/plan + guest/learner。两类都只能查 Context 本人，其他 actor/role/caller 为 COMMON_FORBIDDEN。查询不按待查事件 owner 限制本人的历史记录；之后验发生窗/可选事件名，再读仓储。没有公开查询路由，不新增人类角色权限动作。name 过滤可指定已落盘旧事件名，不要求当前 active，以便跨哈希原样查询。
 
 HTTP 非法 JSON、Content-Type、体积等传输失败先于领域流程，状态/登记码取 foundation，不一律当 422。领域映射：VALIDATION 422、FORBIDDEN 403、CONFLICT 409、UNAVAILABLE 503；意外异常由统一装配处理。MetricsError.details 的 FieldIssue[] 只用于内部错误，HTTP 统一包装为 {code,message_key,details:{issues:[...]}}，不直接把数组放到公共 details；无字段问题用 issues:[]。issues 只含字段路径/类别，不回显值。复合用例至少有“非法角色+缺键”“公开 server 事件+坏属性”“坏属性+占用键”。
 
 Idempotency-Key/key 是原字符串，长度 1 至 128 个字符，仅 ASCII 0x21 至 0x7E；空白、Unicode、缺失、超长拒绝，不 trim 后接收。该技术格式与根 OpenAPI 同源，不是可调业务阈值。
 
 occurred_at、recorded_at、fixture start/end/as_of 等时刻：RFC3339 扩展日期、字面大写 T、完整 HH:mm:ss，可选 1 至 3 位小数，后接大写 Z 或 ±HH:mm；须有效公历日期和时刻，不接收闰秒、基本格式、省秒、小写 t/z、无偏移或超过三位小数。拒绝表示未知偏移的 -00:00；+00:00 和 Z 均有效，其他偏移按 RFC3339 验证。规范化为 UTC YYYY-MM-DDTHH:mm:ss.SSSZ。高精度拒绝，不截断后幂等。0.1b 生成 Zod 校验须启用 offset 并叠加精度/历法约束。同一毫秒的不同有效表示规范化 payload 相同。
+
+事件属性 uuid 接受 RFC9562 的带连字符 8-4-4-4-12 十六进制格式，判定正则为 `^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$`：版本位为 1–8，变体位为 8/9/a/b，接受大小写输入，拒绝 nil/max 和其他版本/变体。校验后转小写再计算 payload/hash/幂等，等价大小写不冲突；不把所有事件 UUID 都限为 v7。身份、生成事件 id 及本期夹具内部 ID 仍为 UUIDv7，持久记录用小写。int 仅接收 Number.isSafeInteger(value)，可正可负或零，不新增业务界限；非法/非有限/unsafe 值为 422。HTTP JSON.parse 后仍由服务执行此检查，不以 JSON 解析成功代替整数校验，不保留或按原始数字文本做幂等；超过安全整数的 JSON 大整数解析后也拒绝，避免精度丢失后接收合并。
 
 ## JSONL 仓储
 
@@ -67,11 +78,20 @@ interface EventRepository {
   query(filter: { tenant_id: string; identity_id: string } & EventFilter): Promise<StoredEvent[]>;
   close(): Promise<void>;
 }
+type JsonlIo = Pick<typeof import('node:fs/promises'),
+  'mkdir' | 'open' | 'readFile' | 'unlink'>;
+declare function createJsonlEventRepository(options: {
+  storePath: string; // 绝对路径；环境解析/状态目录边界由 0.1b 检查
+  now: () => number; // 锁诊断时钟，epoch 毫秒
+  io?: JsonlIo; // 默认 node:fs/promises；可注入兼容 FileHandle 的文件/锁替身
+}): Promise<EventRepository>;
 ```
 
 id 经注入 UUIDv7 工厂；身份取 Context。payload_hash 是规范化 payload 的 UTF-8 JSON SHA-256，小写十六进制；schemaHash 是构建 events.yaml 原字节 SHA-256。规范化递归按对象键 Unicode 码元排序，数组保序，occurred_at 转固定毫秒 UTC。命名空间为 tenant_id/identity_id/source/payload.name/idempotency_key 元组，不用可能碰撞的裸字符串拼接。重复返回首次完整 record，不生成另一行。
 
-启动创建父目录，再以 Node fs.open(...,'wx') 获得 '<store>.lock'；锁文件含 PID/启动时刻仅供诊断。锁存在即不可用，不凭 PID 检测自动抢锁。每文件仅一个实例；同实例串行队列处理幂等/追加/query，防止并发写双行。正常 close 等待队列、关闭描述符再删除本实例锁；崩溃遗锁需开发者停止相关进程、核验原文件并备份后人工移除，不自动修复/清尾。测试可注入锁/文件替身。
+工厂异步完成初始化并总以 EventRepository 表示已知存储状态：锁占用、创建/读盘失败或文件损坏不抛错阻止 API 启动，而返回不可用实例，其 appendOnce/query 均 reject COMMON_UNAVAILABLE（无敏感 details），API 因此可返回 503。非存储的未预期编程错误仍按 foundation 处理。不可用实例的 close 可重复调用，只清理自己成功取得的描述符/锁，不删除他人锁；已取得锁后扫描失败也保留自己的锁直到 close。测试以 io 替身注入半写/fsync/锁故障，不替换领域判断。
+
+启动创建父目录，再以 Node fs.open(...,'wx') 获得 '<store>.lock'；锁文件含 PID/启动时刻仅供诊断。锁存在即不可用，不凭 PID 检测自动抢锁。每文件仅一个实例；同实例串行队列处理幂等/追加/query，防止并发写双行。正常 close 等待队列、关闭描述符再删除本实例锁；崩溃遗锁需开发者停止相关进程、核验原文件并备份后人工移除，不自动修复/清尾。
 
 JSONL 是 UTF-8、逐条 JSON 对象、每条以 LF 结束。空文件合法；非 UTF-8、空白行、非法 JSON、缺必需字段/非法类型、重复 id、同幂等元组第二行、摘要不符、非法时间/hash/simulated 均损坏；中间行和未以 LF 完结的尾行同样处理。StoredPayload 是旧版可保留的存储基型，properties 是 JSON 对象、name 非空，身份/id 为 UUIDv7，时间为固定毫秒 UTC，两种 hash 为 64 位小写 hex；值必须可规范化为有限 JSON。旧 schemaHash 只验证这些结构/摘要，不以当前属性登记重解释旧 payload。启动全文件扫描失败保持不可用；运行时发现损坏也标记不可用，不跳过坏行/截断，不把前缀当完整结果。
 
@@ -97,7 +117,9 @@ plan.selectedSnapshotId 命中当日 snapshots 中唯一 snapshot_id，不自动
 
 JSON 语法/Schema 类型/额外字段错是加载失败，非零退出且无部分 CSV；可定位语义 missing/unsupported/引用/集合冲突转 not_ready，不伪造数值。形状验证只消费上述生成 Zod；Schema 的 format/pattern 与支持契约历法约束同时满足才合法，不能只靠正则放过不存在日期。
 
-两考试用同一代码读 junior-accounting/cet-6 profile.exam_id。tests/fixtures/metrics/exam-event-map.json 显式表项 {exam_id,sourceQuestionId,sourceKnowledgePointName,questionId,knowledgePointId}：输出是固定合成 UUIDv7，源 ID/名称匹配原夹具。不从原题字符串强转 UUID，不宣称是 CONT/MAP 正式导入映射。每门执行同形事件写入/查询断言；fixture 根 exam_id 与参数一致，再复跑相同 CSV 金标，证明无按考试分支。缺表或匹配错是测试失败。
+两考试用同一代码读 junior-accounting/cet-6 profile.exam_id。tests/fixtures/metrics/exam-event-map.json 是表项数组，每项字段均必填：{exam_id,sourceLearnerId,learnerId,questionId,knowledgePointId,sourceQuestionId,sourceKnowledgePointName}。(exam_id,sourceLearnerId) 唯一且每门覆盖完整模板 roster；learnerId/questionId/knowledgePointId 是固定且跨考试不同的合成 UUIDv7。sourceLearnerId 指模板学员，sourceQuestionId 命中对应原 questions[].id，sourceKnowledgePointName 同时属于该题 knowledge_points 和 knowledge-map 的 sample_points[].name。缺表、字段或源标签不匹配是测试失败；不从原题字符串强转 UUID，不作为 CONT/MAP 正式导入。
+
+每门事件测试以映射 learnerId 构造 Context 身份，题/知识点属性取同项映射；执行同形写入、self 查询、去重与两学员隔离断言。fixture 查询把模板学员 ID 及其所有学员关联按 sourceLearnerId→learnerId 一对一替换，并令根 exam_id 匹配。题/知识点 ID 仅用于事件属性，未出现在该指标 fixture 时不捏造字段。复跑独立手算同一金标：按上述学员映射逆归一化后比较除根 exam_id/身份字段外的完整结果，逐行比较数值、reason、period、timezone、schemaHash、simulated/conclusion；身份列另断言为对应映射值。不把不同 learner_id 的整份 CSV 文本当相同，也不只删列后按行序比较错人。
 
 ## 输出全集、未知与零
 
@@ -113,7 +135,7 @@ JSON 语法/Schema 类型/额外字段错是加载失败，非零退出且无部
 
 ## CLI 与 CSV
 
-0.1b 配 NodeNext 的 tsconfig.cli.json/依赖 references；dev:query 先 tsc -b tsconfig.cli.json，再 node dist/dev/query.js，源码 src/dev/query.ts。依赖包 exports 指向编译 JS，相对导入遵循 NodeNext，不加 tsx 或假设原生类型剥离。
+0.1b 配 NodeNext 的 tsconfig.cli.json/依赖 references，rootDir='.'、outDir='dist'，同时编译包根 index.ts、generated/** 与 src/dev/query.ts；dev:query 先 tsc -b tsconfig.cli.json，再 node dist/src/dev/query.js。服务器依赖包先按 references 构建，exports 指向编译 JS；相对导入写 .js 且遵循 NodeNext，不加 tsx 或假设原生类型剥离。
 
 events 的 from/to 按时间格式且 from < to；event 若给是非空事件名，可查旧 hash 保存名称。按发生 UTC [from,to) 查，每个有记录的 tenant/identity/name/schemaHash 分组一行；不为不存在身份/旧 hash 捏造 0。fixture 用 --fixture JSON、--week YYYY-MM-DD，--store 不参与计算；--output 默认 stdout。先构造完整结果再输出；失败写 stderr，退出 2（参数/JSON/Schema）或 1（仓储/其他运行错），不含原始值；构建非零则不启动 CLI。
 

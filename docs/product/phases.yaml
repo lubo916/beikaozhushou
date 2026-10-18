@@ -88,7 +88,7 @@ phases:
             title: 埋点事件表与“有效学习”口径
             type: eng
             carrier: METR-01
-            accept: 任何一次作答都会落一条可统计的事件（先用测试中的模拟作答证明）。
+            accept: 模拟作答落可统计事件，已登记三指标口径有隔离金标；次日回访率与访谈“理由可信”比例按 OQ-METR-01-2 暂定延期到 1 期开场，待本批业务确认。
             rounds: [2, 3]
         tasks:
           - 0.1a 仓库、目录约定与项目记忆：由文档体系承担，见 docs/meta/doc-system.md

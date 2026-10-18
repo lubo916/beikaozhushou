@@ -1,5 +1,6 @@
 # 领域划分（ADR-002）。功能 ID 前缀取 code；表、业务事件、参数、AI 场景、指标的 owner 取 name。
-# depends：本领域调用或订阅的领域（只能单向）；learner 为核心域，证据与掌握档只由它写入。
+# depends：本领域直接调用/导入/订阅的领域（单向无环）；应用经中立端口注入 owner 只读结果不形成反向包依赖。
+# learner 为核心域，证据与掌握档只由它写入。
 - code: LRN
   name: learner
   title: 学习者模型
@@ -11,7 +12,7 @@
   title: 计划引擎
   group: 学习核心
   owns: 目标与时间预算、今日清单、到期队列、轮次与范围、提议与重排记录、复盘
-  depends: [learner, map, exam, content]
+  depends: [learner, map, exam, content, metrics]
 - code: MAP
   name: map
   title: 知识地图
@@ -23,7 +24,7 @@
   title: 练习
   group: 学习核心
   owns: 作答与揭晓、练习与模考会话、错题与回炉、复习卡片与会话、背诵训练
-  depends: [learner, content, map, plan]
+  depends: [learner, content, map, plan, metrics]
 - code: GRADE
   name: grading
   title: 批改
@@ -89,7 +90,7 @@
   title: 指标
   group: 平台
   owns: 埋点事件、指标口径与看板、数据任务
-  depends: [learner, plan, practice]
+  depends: []
 - code: ENG
   name: engagement
   title: 触达与增长
@@ -107,4 +108,4 @@
   title: 平台基础
   group: 平台
   owns: 端外壳与通用组件、参数与开关的运行时、发布与环境、容量预案
-  depends: []
+  depends: [metrics]
