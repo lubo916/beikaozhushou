@@ -1,16 +1,28 @@
 # 埋点事件（产品分析用）。业务事件见 domain-events.yaml。有效学习只按证据计，不按在场时长（S24-08）。
+# 字段：name、owner、source、version、trigger、properties、status。
+#   source：client 由学员端经 trackEvent 上报；server 只由服务端经 metrics 包的写入入口记录（METR-01）。
+#   version：属性定义变化时加一，已写入的事件按其版本解读。
+#   properties：属性名与类型（string、uuid、bool、int）；不得含账号与联系信息。
+#   status：active；停用的事件不删除，改标 retired。
+# 学员、租户、是否游客与学员时区由服务端按当前身份写入事件表字段（contracts/schema/analytics_events.yaml），不作为属性。
 - name: app_opened
   owner: platform
+  source: client
+  version: 1
   trigger: 学员端启动或回到前台
-  properties: {entry: string, guest: bool}
+  properties: {entry: string}
   status: active
 - name: practice_question_answered
   owner: practice
+  source: server
+  version: 1
   trigger: 学员提交一道题并揭晓
   properties: {question_id: uuid, knowledge_point_id: uuid, correct: bool, confidence: string, duration_ms: int, mode: string, credibility: string}
   status: active
 - name: today_item_completed
   owner: plan
+  source: server
+  version: 1
   trigger: 今日清单中的一项按证据判定为完成
   properties: {item_id: uuid, segment: string, task_source: string, est_minutes: int, actual_minutes: int}
   status: active

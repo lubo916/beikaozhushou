@@ -231,7 +231,7 @@
   source_items: [S15-17]
 - name: ui.loading.slow_hint_seconds
   owner: platform
-  description: 加载超过该秒数时显示慢速提示（工程参数）
+  description: 加载超过该秒数时显示慢速提示（工程参数；依据 PLAT-01）
   default: 3
   range: [1, 10]
   unit: seconds
@@ -242,7 +242,7 @@
   source_items: []
 - name: api.page.max_limit
   owner: platform
-  description: 列表接口单页条数上限（工程参数）
+  description: 列表接口单页条数上限（工程参数；依据 docs/conventions/api.md 规则 5）
   default: 100
   range: [20, 500]
   unit: items
@@ -485,7 +485,7 @@
 - name: engagement.quiet_hours
   owner: engagement
   description: 深夜免打扰时段（学员可在设置中改）
-  default: [22:00, 08:00]
+  default: ["22:00", "08:00"]
   range: null
   unit: time_range
   tunable_by: [platform, learner]

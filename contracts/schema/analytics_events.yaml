@@ -1,0 +1,18 @@
+table: analytics_events
+owner: metrics
+description: 埋点事件（产品分析用），只追加；事件登记见 contracts/events.yaml。学员与租户按 ID 记录，不建外键（METR-01）
+append_only: true
+tenant_scoped: true
+fields:
+  - {name: id, type: uuid, pk: true, x-data-class: operational}
+  - {name: tenant_id, type: uuid, x-data-class: operational, note: 取自当前身份}
+  - {name: learner_id, type: uuid, x-data-class: personal_learning, note: 取自当前身份}
+  - {name: guest, type: bool, x-data-class: account_info, note: 写入时当前身份是否为游客}
+  - {name: timezone, type: string, x-data-class: personal_learning, note: 写入时学员的 IANA 时区，自然日与自然周按它切分}
+  - {name: name, type: string, x-data-class: operational}
+  - {name: version, type: int, x-data-class: operational}
+  - {name: source, type: "enum[client, server]", x-data-class: operational}
+  - {name: properties, type: json, x-data-class: personal_learning}
+  - {name: occurred_at, type: timestamptz, x-data-class: personal_learning}
+  - {name: received_at, type: timestamptz, x-data-class: operational}
+  - {name: idempotency_key, type: string, nullable: true, unique: true, x-data-class: operational}

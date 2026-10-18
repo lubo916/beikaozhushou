@@ -88,19 +88,23 @@ paths:
     get:
       operationId: getParams
       x-owner: platform
-      summary: 读取当前生效的参数取值（已夹在登记区间内）
+      x-public: true
+      summary: 读取全部登记参数的当前生效值（已夹在登记区间内）；无需登录
       responses:
         "200": {description: 参数取值, content: {application/json: {schema: {type: object, additionalProperties: true}}}}
   /events:
     post:
       operationId: trackEvent
       x-owner: metrics
-      summary: 上报埋点事件（contracts/events.yaml 中登记的事件）
+      summary: 上报学员端埋点事件（contracts/events.yaml 中 source 为 client 的事件）
+      parameters:
+        - {name: Idempotency-Key, in: header, required: false, schema: {type: string, minLength: 1, maxLength: 128}}
       requestBody:
         required: true
         content: {application/json: {schema: {$ref: "#/components/schemas/AnalyticsEvent"}}}
       responses:
-        "202": {description: 已接收}
+        "202": {description: 已接收；同一幂等键的重复请求返回第一次的结果}
+        "403": {$ref: "#/components/responses/Error"}
         "422": {$ref: "#/components/responses/Error"}
 components:
   responses:
@@ -137,5 +141,7 @@ components:
       properties: {knowledge_point_id: {type: string}, level: {type: integer}, target_level: {type: integer}, sufficiency: {type: string}, pending_verification: {type: boolean}, in_scope: {type: boolean}}
     AnalyticsEvent:
       type: object
+      description: 只含事件内容；学员、租户、是否游客与时区由服务端按当前身份记录，请求体带其他字段即拒绝
+      additionalProperties: false
       required: [name, properties, occurred_at]
       properties: {name: {type: string}, properties: {type: object}, occurred_at: {type: string, format: date-time}}

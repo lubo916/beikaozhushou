@@ -11,11 +11,11 @@
 | B0-5 | 启动场外三条轨道（合规与备案、内容授权、受邀用户） | — | 你 | 找负责人、定日期 | 归档 ops/ 下的台账有负责人与日期；docs/product/calibration.yaml 有 tracks_started | [B0.md](B0.md) |
 | P0-入 | 第 0 期期初检查：地基与探针 | P7 | Codex ＋ 你 | 确认外部事项 | 进入条件逐条有证据 | [phase-0.md](phase-0.md) |
 | 0.1-S | 写并复核本闭环 3 份规格：PLAT-01、PLAT-02、METR-01（已 ready 的跳过） | P1 | Codex 写 → Claude 复核 → 你确认 | 读业务摘要，回复“确认”或修改意见；搬运 1 组压缩包 | 本闭环规格全部 ready，check 通过，规格分支已合并 | [loops/0.1.md](loops/0.1.md) |
-| 0.1-1 | 实现 PLAT-01 学员端外壳与通用状态组件 | P2 | Codex 计划 → Claude 实现 → Codex 验证与复查 | 回复“确认计划”；搬运压缩包（通常 1–2 组） | 主干上 roadmap.md 推导为“完成”：每条 AC 都有通过的测试 | [loops/0.1.md](loops/0.1.md) |
+| 0.1-T | 0.1b 按 ADR-025 至 ADR-029 接线：五个应用骨架、docker compose、CI 运行 verify、阿里云预发自动部署与回滚 | 见下文 | Codex | 开通阿里云与 GitHub 账号，按 Codex 的清单填写环境变量与密钥（不进仓库） | 见闭环文件“闭环级任务”与 work/0.1b.md；完成前不出功能实现包 | [loops/0.1.md](loops/0.1.md) |
 | 0.1-2 | 实现 PLAT-02 参数注册与运行时访问器 | P2 | Codex 计划 → Claude 实现 → Codex 验证与复查 | 回复“确认计划”；搬运压缩包（通常 1–2 组） | 主干上 roadmap.md 推导为“完成”：每条 AC 都有通过的测试 | [loops/0.1.md](loops/0.1.md) |
 | 0.1-3 | 实现 METR-01 埋点事件表与有效学习口径 | P2 | Codex 计划 → Claude 实现 → Codex 验证与复查 | 回复“确认计划”；搬运压缩包（通常 1–2 组） | 主干上 roadmap.md 推导为“完成”：每条 AC 都有通过的测试 | [loops/0.1.md](loops/0.1.md) |
+| 0.1-1 | 实现 PLAT-01 学员端外壳与通用状态组件 | P2 | Codex 计划 → Claude 实现 → Codex 验证与复查 | 回复“确认计划”；搬运压缩包（通常 1–2 组） | 主干上 roadmap.md 推导为“完成”：每条 AC 都有通过的测试 | [loops/0.1.md](loops/0.1.md) |
 | 0.1-T | 0.1a 仓库、目录约定与项目记忆：由文档体系承担（ADR-008） | 见下文 | Codex | 无 | 见闭环文件“闭环级任务” | [loops/0.1.md](loops/0.1.md) |
-| 0.1-T | 0.1b 按 ADR-025 至 ADR-029 接线：五个应用骨架、docker compose、CI 运行 verify、阿里云预发自动部署与回滚 | 见下文 | Codex | 开通阿里云与 GitHub 账号，按 Codex 的清单填写环境变量与密钥（不进仓库） | 见闭环文件“闭环级任务” | [loops/0.1.md](loops/0.1.md) |
 | 0.1-C | 收尾：本闭环测试全绿、走查、记校准 | P6 | Codex ＋ 你 | 手机与桌面各走一遍演示（约 10 分钟），回复“通过”或问题 | 黄金路径全绿；你走查通过；docs/product/calibration.yaml 记一行 | [loops/0.1.md](loops/0.1.md) |
 | 0.2-S | 写并复核本闭环 5 份规格：EXM-01、MAP-01、CONT-01、LRN-01、CONT-02（已 ready 的跳过） | P1 | Codex 写 → Claude 复核 → 你确认 | 读业务摘要，回复“确认”或修改意见；搬运 1 组压缩包 | 本闭环规格全部 ready，check 通过，规格分支已合并 | [loops/0.2.md](loops/0.2.md) |
 | 0.2-1 | 实现 EXM-01 考试画像结构与评价规则 | P2 | Codex 计划 → Claude 实现 → Codex 验证与复查 | 回复“确认计划”；搬运压缩包（通常 1–2 组） | 主干上 roadmap.md 推导为“完成”：每条 AC 都有通过的测试 | [loops/0.2.md](loops/0.2.md) |

@@ -1,4 +1,24 @@
 # 错误码。响应体统一为 {code, message_key, details}（docs/conventions/api.md）。
+- code: COMMON_BAD_REQUEST
+  owner: platform
+  http_status: 400
+  message_key: error.common.bad_request
+  description: 请求体不是合法 JSON，或请求无法解析
+- code: COMMON_PAYLOAD_TOO_LARGE
+  owner: platform
+  http_status: 413
+  message_key: error.common.payload_too_large
+  description: 请求体超过服务端允许的大小
+- code: COMMON_UNSUPPORTED_MEDIA_TYPE
+  owner: platform
+  http_status: 415
+  message_key: error.common.unsupported_media_type
+  description: 请求体的媒体类型不受支持
+- code: COMMON_INTERNAL
+  owner: platform
+  http_status: 500
+  message_key: error.common.internal
+  description: 未预期的服务端错误；响应不含异常细节，服务端日志带请求 ID
 - code: COMMON_VALIDATION
   owner: platform
   http_status: 422

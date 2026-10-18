@@ -44,3 +44,21 @@
   shown_on: [P01]
   min_sample: null
   target: null
+- id: metrics.next_day_return_rate
+  name: 次日回访率
+  owner: metrics
+  formula_ref: docs/domains/metrics/features/METR-01.md
+  unit: 比例
+  refresh: daily
+  shown_on: [P01]
+  min_sample: null
+  target: null
+- id: metrics.reason_credible_ratio
+  name: 访谈中“理由可信”的比例
+  owner: metrics
+  formula_ref: docs/domains/metrics/features/METR-01.md
+  unit: 比例
+  refresh: manual
+  shown_on: []
+  min_sample: null
+  target: null
