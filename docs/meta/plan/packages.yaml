@@ -163,3 +163,142 @@ review-specs:
     - packs/<ID>.md — 只给任务包，检验开发者拿到的包是否足够
     - plans/<切片>.md — 本闭环的闭环级任务计划（工程前置，复核时不算规格缺口）
   writable: []
+
+engineering:
+  title: 闭环级工程实施包（负责人授权的代码交接）
+  command: python scripts/handoff.py out <切片> [--notes <复查意见>]
+  template: task-engineering.md
+  result: MANIFEST.md 与 files/
+  must:
+    - AGENTS.md — 红线与权威来源
+    - docs/adr/ADR-025-tech-stack-baseline.md — 技术栈、依赖与部署基线
+    - docs/adr/ADR-026-frontend-backend-layout.md — 目录、导出与 Prisma 转换
+    - docs/adr/ADR-027-auth-and-session.md — 固定身份与后续登录边界
+    - docs/adr/ADR-028-tenant-isolation-two-lines.md — 数据访问与租户防线
+    - docs/adr/ADR-029-multi-end-and-reach.md — 多端与浏览器基线
+    - docs/adr/ADR-030-claude-writes-specs-and-plans.md — 分工与资料不足的处理
+    - docs/conventions/ — 工程代码适用约定
+    - apps/learner/AGENTS.md — 学员端规则
+    - apps/org/AGENTS.md — 机构端规则
+    - apps/admin/AGENTS.md — 后台规则
+  basis:
+    - package.json — 根工作区的当前脚本与依赖
+    - pnpm-workspace.yaml — 工作区与依赖观察期
+    - tsconfig.base.json — TypeScript 基线
+    - evals/package.json — 已登记的 evals 工作区清单（锁文件需包含其 importer，源码只读）
+    - packages/ — 共享包的已有入口与配置
+    - apps/ — 已有应用目录与入口
+    - scripts/spec_tool.py — 检查、生成、表结构解析和测试结果接线的源码
+    - scripts/spec_tool.toml — verify 命令与生成路径
+    - .github/workflows/ci.yml — 当前 CI
+    - .githooks/pre-commit — 现有提交检查入口（只读）
+    - .gitignore — 本地产物与密钥排除
+    - README.md — 仓库入口说明
+    - docs/product/domain-map.yaml — 依赖方向
+    - contracts/openapi.yaml — Orval 的唯一接口输入
+    - contracts/schema/ — 需要等价转换的表结构
+    - contracts/errors.yaml — 错误码生成源
+    - contracts/permissions.yaml — 权限生成源
+    - contracts/params.yaml — 参数登记生成源
+    - contracts/events.yaml — 事件登记生成源
+    - contracts/metrics.yaml — 指标登记生成源
+    - contracts/data-classes.yaml — 数据类别
+    - design/tokens.json — 令牌生成源
+    - design/tokens.resolver.json — 主题修饰器生成源
+    - design/screens/learner/ — 页面清单生成源
+    - tests/ — 已有测试组织与回归依据
+  computed:
+    - work.md — 现有工程计划全文，不重新编写计划
+    - context/WRITE-SCOPE.md — 本地登记的写入、删除、禁止与生成物迁移范围
+    - context/authorization.md — 本次开工与交接分工授权
+    - context/tree.txt — 当前已跟踪文件清单；未出现的计划目标文件待新建
+    - context/SOURCES.md — 每项资料的读法、理由与校验值
+    - FIX.md — 修复轮的本地验证输出与复查意见
+  tasks:
+    0.1b:
+      title: 工程接线
+      loop: "0.1"
+      phase: "0"
+      branch: chore/0.1b-wiring
+      plan: docs/meta/plan/work/0.1b.md
+      features: [PLAT-01, PLAT-02, METR-01]
+      include_packs: false
+      replace_generated: [packages/params/index.ts]
+      writable:
+        - package.json
+        - pnpm-workspace.yaml
+        - pnpm-lock.yaml
+        - tsconfig*.json
+        - eslint.config.*
+        - prettier.config.*
+        - .prettierrc*
+        - .prettierignore
+        - .dependency-cruiser.*
+        - dependency-cruiser.config.*
+        - vitest.config.ts
+        - playwright.config.ts
+        - orval.config.*
+        - prisma.config.*
+        - .dockerignore
+        - .env.example
+        - .gitignore
+        - README.md
+        - apps/learner/package.json
+        - apps/learner/tsconfig*.json
+        - apps/learner/vite.config.*
+        - apps/learner/index.html
+        - apps/learner/src/
+        - apps/org/package.json
+        - apps/org/tsconfig*.json
+        - apps/org/vite.config.*
+        - apps/org/index.html
+        - apps/org/src/
+        - apps/admin/package.json
+        - apps/admin/tsconfig*.json
+        - apps/admin/vite.config.*
+        - apps/admin/index.html
+        - apps/admin/src/
+        - apps/api/package.json
+        - apps/api/tsconfig*.json
+        - apps/api/src/
+        - apps/worker/package.json
+        - apps/worker/tsconfig*.json
+        - apps/worker/src/
+        - packages/db/
+        - packages/params/
+        - packages/contract/
+        - packages/ui/
+        - packages/domains/platform/package.json
+        - packages/domains/platform/tsconfig*.json
+        - packages/domains/platform/src/index.ts
+        - packages/domains/platform/src/api/routes.ts
+        - packages/domains/metrics/package.json
+        - packages/domains/metrics/tsconfig*.json
+        - packages/domains/metrics/src/index.ts
+        - packages/domains/metrics/src/api/routes.ts
+        - contracts/schema/*.prisma
+        - scripts/spec_tool.py
+        - scripts/spec_tool.toml
+        - scripts/engineering/
+        - tests/
+        - deploy/
+        - .github/workflows/ci.yml
+        - docs/conventions/data.md
+      delete_only:
+        - contracts/schema/*.yaml
+      deny:
+        - docs/domains/
+        - docs/product/
+        - docs/adr/
+        - design/
+        - '**/generated/**'
+        - '**/*.generated.*'
+        - '**/node_modules/**'
+        - .test-results/
+        - .env
+        - '**/.env'
+        - '**/.env.*'
+        - '**/*.pem'
+        - '**/*.key'
+        - '**/*.p12'
+        - '**/*.pfx'

@@ -6,13 +6,13 @@
   python scripts/handoff.py write-plan <ID> [--notes <文件>]                       计划编写包（P2）
   python scripts/handoff.py adopt-plan <ID>                                        换入预写计划（P2，有预写稿时）
   python scripts/handoff.py where                                                  列出出包位置与结果包的查找位置
-  python scripts/handoff.py out <ID> [--notes <文件>] [--round N] [--force]        实现或修复包
+  python scripts/handoff.py out <ID|工程任务> [--notes <文件>] [--round N] [--force] 实现或修复包
   python scripts/handoff.py out HANDSHAKE --handshake                              握手测试包
   python scripts/handoff.py specs <闭环>                                           规格冷启动复核包（重型通道）
   python scripts/handoff.py in [<结果包>] [--latest <键>] [--dry-run] [--accept-extra]
   python scripts/handoff.py selftest
 
-键：L<闭环>-write、<ID>-plan、<ID>、L<闭环>-specs、HANDSHAKE。包放在仓库旁边的 ../handoff/（outbox 出包，log 记录）；
+键：L<闭环>-write、<ID>-plan、<ID>、0.1b、L<闭环>-specs、HANDSHAKE。包放在仓库旁边的 ../handoff/（outbox 出包，log 记录）；
 结果包默认从“下载”文件夹或 ../handoff/inbox 里找最新的。
 """
 import argparse
@@ -93,7 +93,7 @@ def norm(p):
     return "/".join(parts) + ("/" if p.endswith("/") else "")
 
 
-def forbidden(rel, allow_protected=False):
+def forbidden(rel, allow_protected=False, replace_generated=False):
     if not norm(rel):
         return "不合法的仓库相对路径"
     name = rel.rstrip("/").rsplit("/", 1)[-1]
@@ -113,7 +113,7 @@ def forbidden(rel, allow_protected=False):
         return "路径无法安全解析，或指向仓库之外"
     if f.is_file():
         head = f.read_text(encoding="utf-8", errors="ignore")[:400]
-        if "GENERATED" in head:
+        if "GENERATED" in head and not replace_generated:
             return "生成物，改源后运行 gen"
     return ""
 
@@ -286,6 +286,8 @@ def cmd_out(a):
             z.writestr("TASK.md", fill("task-handshake.md", RESULT=result, TOKEN=token))
         tell(zpath, result, key, n, 0)
         return 0
+    if engineering_task(key) is not None:
+        return cmd_engineering_out(a)
     if not FEATURE_RE.match(key):
         print(f"{key} 不是功能 ID。")
         return 2
@@ -377,6 +379,42 @@ def cmd_specs(a):
 def packages():
     import yaml
     return yaml.safe_load(read(PACKAGES)) or {}
+
+
+def engineering_task(key):
+    """工程任务的权限只读本地 packages.yaml；回包不能提供或扩展权限。"""
+    return ((packages().get("engineering") or {}).get("tasks") or {}).get(key)
+
+
+def engineering_matches(rel, patterns):
+    return path_matches(rel.casefold(), [p.casefold() for p in patterns or []])
+
+
+def engineering_scope(key, task):
+    lines = [f"# {key} 可写范围", "", "本页由本地 docs/meta/plan/packages.yaml 生成，仅供阅读。",
+             "回包不能改动权限配置；--accept-extra 不能扩大工程任务范围。所有路径仍须通过路径、链接、AGENTS 与生成物检查。", ""]
+    for field, title in (("writable", "允许新增或修改"), ("delete_only", "仅允许删除"),
+                         ("deny", "禁止（优先于允许）"), ("replace_generated", "登记的生成物迁移例外")):
+        lines += [f"## {title}", ""] + [f"- {p}" for p in task.get(field) or []] + [""]
+    lines += ["生成物迁移例外仅适用于 0.1b 的 packages/params/index.ts 转为手写入口；其余生成物须改源后运行 gen。",
+              "未列入允许范围的测试文件也禁止写入。删除只认“仅允许删除”清单。"]
+    return "\n".join(lines) + "\n"
+
+
+def engineering_errors(key, task, rel, deleting=False):
+    # 即便本地误配了宽目录，这些文件也不交给回包改写；handoff/policy 是校验边界自身。
+    hard_deny = (".git/", ".agents/", ".claude/", ".codex/", "work/",
+                 "docs/meta/", "scripts/handoff.py")
+    if engineering_matches(rel, hard_deny) or engineering_matches(rel, task.get("deny")):
+        return "工程任务禁止的位置（本地权限优先）"
+    if skipped(rel.casefold()):
+        return "工程任务不接收依赖、缓存或构建产物"
+    allowed = task.get("delete_only" if deleting else "writable") or []
+    if not engineering_matches(rel, allowed):
+        return "不在工程任务的" + ("可删除" if deleting else "可写") + "范围（--accept-extra 不适用）"
+    replace = (not deleting and key == "0.1b" and rel.casefold() == "packages/params/index.ts"
+               and engineering_matches(rel, task.get("replace_generated")))
+    return forbidden(rel, allow_protected=True, replace_generated=replace)
 
 
 def entry_parts(entry):
@@ -740,6 +778,58 @@ def finish_bundle(b, key, n, result, kind):
     if b.left_out:
         print(f"提示：{len(b.left_out)} 项没有放进包里，已列在包内 context/SOURCES.md 的“未包含”一节。")
     return 0
+
+
+def cmd_engineering_out(a):
+    key, task = a.id, engineering_task(a.id)
+    if not task or not task.get("branch") or not task.get("plan") or not task.get("writable"):
+        print(f"{key} 工程任务缺少本地 branch、plan 或 writable 配置。")
+        return 2
+    br = git("rev-parse", "--abbrev-ref", "HEAD")
+    if br != task["branch"]:
+        print(f"当前分支是 {br}，{key} 工程任务必须在 {task['branch']} 上出包（--force 不适用）。")
+        return 2
+    fids = task.get("features") or []
+    for fid in fids:
+        path = spec_file(fid)
+        if not path or spec_front_matter(path).get("status") != "ready":
+            print(f"{fid} 规格尚未 ready，不能出 {key} 工程代码实施包。")
+            return 2
+    spec = packages()["engineering"]
+    n = a.round or next_round(key)
+    result = f"{key}-r{n}-result.zip"
+    b = Bundle(f"{key} 工程代码实施包第 {n} 轮")
+    ctx = ctx_for(fids, task.get("loop", ""), task.get("phase", ""))
+    add_static(b, spec, ctx)
+    plan = ROOT / task["plan"]
+    if plan.is_file():
+        b.add("work.md", plan.read_bytes(), "必读", "已确认的工程计划原文；本次分工见 authorization.md")
+    else:
+        b.missing.append((task["plan"], "工程任务计划不存在"))
+    if task.get("include_packs", False):
+        for fid in fids:
+            r, pack = run_pack(fid)
+            if r.returncode or not pack:
+                b.missing.append((f"packs/{fid}.md", "功能任务包生成失败：" + (r.stdout + r.stderr).strip()))
+            else:
+                b.add(f"packs/{fid}.md", pack, "依据", "工程骨架需要满足的已确认功能接口")
+    tracked = tracked_files()
+    b.add("context/tree.txt", "\n".join(tracked) + "\n", "计算", "当前仓库已跟踪文件")
+    for rel in tracked:
+        if engineering_matches(rel, task.get("writable", []) + task.get("delete_only", [])):
+            b.add_repo(rel, "依据", "允许改动位置的当前版本")
+    b.add("context/WRITE-SCOPE.md", engineering_scope(key, task), "必读", "本地策略生成的写入和删除范围")
+    b.add("context/authorization.md", "# 本轮执行分工\n\n"
+          "产品负责人于 2026-10-19 要求准备上传包与提示词并开始开发。本轮交付工程代码实施包，不再继续 r6 规格复核。\n"
+          "网页版 Claude 按现有计划编写代码和测试；Codex 回收代码、在本地安装依赖并执行检查、复查结果。\n"
+          "本次分工覆盖 work.md 开头的默认 Codex 本地执行、不走交接包说明；计划的工程范围和验收要求继续适用。\n"
+          "回包不能修改 handoff.py、packages.yaml 或任务说明来扩大写入范围。外部部署与账户操作由 Codex 和负责人按实际条件推进。\n",
+          "必读", "本轮产品负责人授权与执行分工")
+    if n > 1:
+        b.add("FIX.md", fix_text(key, a.notes), "必读", "上轮本地验证结果与复查意见")
+    b.add("TASK.md", fill(spec["template"], KEY=key, ID=key, TITLE=task.get("title", "工程接线"), ROUND=n, RESULT=result),
+          "必读", "工程代码实施任务与交付格式")
+    return finish_bundle(b, key, n, result, "工程代码实施包")
 
 
 def cmd_write_specs(a):
@@ -1121,6 +1211,7 @@ def parse_manifest(text):
 def inspect(zpath, fid, accept_extra=False):
     errs, warns = [], []
     writing = (fid or "").endswith("-write")
+    engineering = engineering_task(fid)
     with zipfile.ZipFile(zpath) as z:
         names = [x for x in z.namelist() if not x.endswith("/")]
         if (fid or "").endswith("-plan"):
@@ -1133,6 +1224,9 @@ def inspect(zpath, fid, accept_extra=False):
             tops = [x for x in names if x.endswith("/MANIFEST.md") or x.endswith("/REVIEW.md")]
             if len(tops) == 1:
                 pre = tops[0].rsplit("/", 1)[0] + "/"
+        if engineering is not None and (pre + "MANIFEST.md" not in names or
+                                       pre + "REVIEW.md" in names or pre + "PLAN.md" in names):
+            return "error", (["工程代码结果必须交付 MANIFEST.md 与 files/，不接受 REVIEW.md 或 PLAN.md"], [], {}, [], {})
         if pre + "REVIEW.md" in names and pre + "MANIFEST.md" not in names:
             return "review", z.read(pre + "REVIEW.md").decode("utf-8", "replace")
         if pre + "MANIFEST.md" not in names:
@@ -1168,9 +1262,12 @@ def inspect(zpath, fid, accept_extra=False):
                 errs.append(f"MANIFEST 删除节里有不合法的路径：{p}")
             else:
                 deletes.append(rel)
+        if engineering is not None and not files and not deletes:
+            errs.append("工程结果包没有代码文件或删除项；仅有 MANIFEST 不能视为实施结果")
         allow, confirm = writable_for(fid[1:-len("-write")]) if writing else ([], [])
         for rel in list(files) + deletes:
-            why = forbidden(rel, allow_protected=writing)
+            why = (engineering_errors(fid, engineering, rel, deleting=rel in deletes)
+                   if engineering is not None else forbidden(rel, allow_protected=writing))
             if why:
                 errs.append(f"{rel}：{why}")
                 continue
@@ -1246,7 +1343,16 @@ def cmd_in(a):
         return 2
     m = re.match(r"^(.+?)-r(\d+)-result", zpath.name)
     key, n = (m.group(1), int(m.group(2))) if m else (a.latest or "UNKNOWN", 0)
-    LOG.mkdir(parents=True, exist_ok=True)
+    if a.latest and key != a.latest:
+        print(f"结果包键 {key} 与 --latest {a.latest} 不一致，未应用。")
+        return 1
+    engineering = engineering_task(key)
+    if engineering is not None and (not engineering.get("branch") or
+                                    git("rev-parse", "--abbrev-ref", "HEAD") != engineering["branch"]):
+        print(f"工程结果必须在 {engineering.get('branch', '已登记的工程分支')} 上回收，未应用（--accept-extra 不适用）。")
+        return 1
+    if not a.dry_run:
+        LOG.mkdir(parents=True, exist_ok=True)
     kind, data = inspect(zpath, key, a.accept_extra)
     print(f"结果包：{win_path(zpath)}")
     sent = sorted(int(m.group(1)) for x in OUTBOX.glob(f"{key}-r*.zip") if (m := re.match(rf"^{re.escape(key)}-r(\d+)\.zip$", x.name)))
@@ -1291,13 +1397,20 @@ def cmd_in(a):
         (LOG / f"{key}-r{n}-MANIFEST.md").write_bytes(z.read(man))
     if key.endswith("-write"):
         return finish_write(key, n, secs)
+    if engineering is not None and not (ROOT / "node_modules/.modules.yaml").is_file():
+        out = "工程代码已落地，待本地安装依赖与执行：node_modules/.modules.yaml 不存在。尚未完成工程验收。\n"
+        (LOG / f"{key}-verify-latest.txt").write_text(out, encoding="utf-8")
+        (LOG / f"{key}-r{n}-verify.txt").write_text(out, encoding="utf-8")
+        print(out.rstrip())
+        print("Codex 安装依赖后须运行 gen 与 verify --full；此阶段不自动执行 MANIFEST 命令。")
+        return 4
     g = spec_tool("gen")  # 结果可能改了任何生成源（契约、令牌、页面登记、约定），一律重新生成再跑 verify
     print("已运行 gen。" if g.returncode == 0 else "gen 失败：\n" + g.stdout + g.stderr)
-    v = spec_tool("verify")
+    v = spec_tool("verify", "--full") if engineering is not None else spec_tool("verify")
     out = v.stdout + v.stderr
     (LOG / f"{key}-verify-latest.txt").write_text(out, encoding="utf-8")
     (LOG / f"{key}-r{n}-verify.txt").write_text(out, encoding="utf-8")
-    ok = v.returncode == 0
+    ok = g.returncode == 0 and v.returncode == 0
     run_cmds = section_lines(secs, "需要运行")
     log_work(key, f"| {now()} | 网页版 Claude | 第 {n} 轮：写入 {len(writes)}、删除 {len(deletes)}；verify {'通过' if ok else '未通过'} | {'复查' if ok else '修复轮'} |",
              [f"- （Claude 第 {n} 轮）{x.lstrip('-* ')}" for x in section_lines(secs, "决定")],
@@ -1369,6 +1482,94 @@ def cmd_selftest(_a):
             result_zip(edge, ["safe", "safe/a.txt"])
             assert inspect(edge, "TEST-03")[1][0], "应在写入前发现文件与目录冲突"
 
+            # 工程交接不能复用功能包的测试豁免，也不能靠 --accept-extra 或改回包策略扩权。
+            task = {"branch": "chore/0.1b-wiring", "plan": "docs/meta/plan/work/0.1b.md", "features": [],
+                    "writable": ["scripts/tool.py", "scripts/spec_tool.py", "scripts/spec_tool.toml",
+                                 ".github/workflows/ci.yml", ".githooks/pre-commit", "contracts/schema/platform.prisma",
+                                 "packages/params/index.ts", "apps/api/", "tests/tooling/"],
+                    "delete_only": ["contracts/schema/platform.yaml"], "deny": ["apps/api/private/"],
+                    "replace_generated": ["packages/params/index.ts", "apps/api/generated.ts"]}
+            policy = {"engineering": {"tasks": {"0.1b": task}}}
+            with patch(__name__ + ".packages", return_value=policy):
+                for rel in ("packages/params/index.ts", "apps/api/generated.ts"):
+                    f = repo / rel
+                    f.parent.mkdir(parents=True, exist_ok=True)
+                    f.write_text("// GENERATED\n", encoding="utf-8")
+                allowed = ["scripts/tool.py", "scripts/spec_tool.py", "scripts/spec_tool.toml",
+                           ".github/workflows/ci.yml", ".githooks/pre-commit", "contracts/schema/platform.prisma",
+                           "packages/params/index.ts", "tests/tooling/test_wiring.py"]
+                result_zip(edge, allowed, ["contracts/schema/platform.yaml"])
+                kind, (errs, _, writes, dels, _) = inspect(edge, "0.1b")
+                assert kind == "ok" and not errs and len(writes) == len(allowed) and len(dels) == 1, errs
+                result_zip(edge, ["scripts/tool.py"])
+                assert inspect(edge, "TEST-03")[1][0], "普通功能仍不能改受保护的 scripts/"
+                for rel in ("scripts/handoff.py", "docs/meta/plan/packages.yaml", ".git/config", "AGENTS.md",
+                            "apps/api/AGENTS.md", "apps/api/private/x.ts", "apps/api/generated.ts",
+                            "tests/other.test.ts", "scripts/unlisted.py", ".github/workflows/other.yml",
+                            "contracts/params.yaml", "apps/api/node_modules/x.js", "apps/api/NODE_MODULES/x.js",
+                            "ScRiPtS/HANDOFF.py", "apps/api/agents.MD", "../escape.txt"):
+                    result_zip(edge, [rel])
+                    assert inspect(edge, "0.1b", accept_extra=True)[1][0], f"工程越界应拒绝：{rel}"
+                result_zip(edge, ["contracts/schema/platform.yaml"])
+                assert inspect(edge, "0.1b")[1][0], "delete_only 不允许写入"
+                result_zip(edge, deletes=["scripts/tool.py"])
+                assert inspect(edge, "0.1b", accept_extra=True)[1][0], "writable 不允许删除"
+                for name in ("REVIEW.md", "PLAN.md"):
+                    with zipfile.ZipFile(edge, "w") as z:
+                        z.writestr(name, "仅复核或计划")
+                    assert inspect(edge, "0.1b")[0] == "error", "工程包不能伪装成复核或计划"
+                engineering_result = temp / "0.1b-r1-result.zip"
+                result_zip(engineering_result, ["scripts/tool.py"])
+                f = repo / "scripts/tool.py"
+                f.write_text("old", encoding="utf-8")
+                args = argparse.Namespace(zip=str(engineering_result), latest="0.1b", accept_extra=True, dry_run=True)
+                with patch(__name__ + ".git", return_value="chore/0.1b-wiring"), \
+                        patch(__name__ + ".spec_tool") as tool, contextlib.redirect_stdout(io.StringIO()):
+                    assert cmd_in(args) == 0
+                    assert f.read_text(encoding="utf-8") == "old" and not LOG.exists(), "dry-run 不得落地代码或日志"
+                    tool.assert_not_called()
+                    args.dry_run = False
+                    assert cmd_in(args) == 4, "未装依赖必须保留 pending 状态"
+                    assert f.read_bytes() == b"test"
+                    tool.assert_not_called()
+                    (repo / "node_modules").mkdir()
+                    (repo / "node_modules/.modules.yaml").touch()
+                    tool.return_value = subprocess.CompletedProcess([], 0, stdout="ok", stderr="")
+                    assert cmd_in(args) == 0
+                    assert [c.args for c in tool.call_args_list] == [("gen",), ("verify", "--full")]
+                f.write_text("unchanged", encoding="utf-8")
+                with patch(__name__ + ".git", return_value="main"), contextlib.redirect_stdout(io.StringIO()):
+                    assert cmd_in(args) == 1
+                assert f.read_text(encoding="utf-8") == "unchanged", "分支错误时不得写入"
+                args.latest = "OTHER"
+                with contextlib.redirect_stdout(io.StringIO()):
+                    assert cmd_in(args) == 1, "--latest 与文件名不符时不能借其他键导入"
+
+                task["features"] = ["TEST-01"]
+                policy["engineering"]["template"] = "task-engineering.md"
+                plan = repo / task["plan"]
+                plan.parent.mkdir(parents=True, exist_ok=True)
+                plan.write_text("现有工程计划", encoding="utf-8")
+                out_args = argparse.Namespace(id="0.1b", round=1, handshake=False, notes=None, force=True)
+                with patch(__name__ + ".git", return_value="chore/0.1b-wiring"), \
+                        patch(__name__ + ".spec_file", return_value=plan), \
+                        patch(__name__ + ".spec_front_matter", return_value={"status": "ready"}), \
+                        patch(__name__ + ".ctx_for", return_value={"flags": {}}), \
+                        patch(__name__ + ".tracked_files", return_value=["scripts/tool.py"]), \
+                        patch(__name__ + ".fill", return_value="工程实施任务"), \
+                        patch(__name__ + ".run_pack") as packer, contextlib.redirect_stdout(io.StringIO()):
+                    assert cmd_out(out_args) == 0
+                    packer.assert_not_called()
+                    with zipfile.ZipFile(OUTBOX / "0.1b-r1.zip") as z:
+                        assert {"TASK.md", "work.md", "context/tree.txt", "context/SOURCES.md",
+                                "context/WRITE-SCOPE.md", "context/authorization.md"} <= set(z.namelist())
+                        assert z.read("work.md").decode("utf-8") == "现有工程计划"
+                        assert not any(x.startswith("packs/") for x in z.namelist())
+                    with patch(__name__ + ".git", return_value="main"):
+                        assert cmd_out(out_args) == 2, "--force 不能绕过工程分支检查"
+                    with patch(__name__ + ".spec_front_matter", return_value={"status": "draft"}):
+                        assert cmd_out(out_args) == 2, "--force 不能绕过 ready 检查"
+
             outside, linked = temp / "outside", repo / "linked"
             outside.mkdir()
             try:
@@ -1385,6 +1586,12 @@ def cmd_selftest(_a):
                 assert inspect(edge, "TEST-03")[1][0], "应拒绝经链接写出仓库"
                 result_zip(edge, deletes=["linked/escape.txt"])
                 assert inspect(edge, "TEST-03")[1][0], "应拒绝经链接删除仓库外文件"
+                with patch(__name__ + ".packages", return_value={"engineering": {"tasks": {
+                        "0.1b": {"writable": ["linked/"], "delete_only": ["linked/"]}}}}):
+                    result_zip(edge, ["linked/escape.txt"])
+                    assert inspect(edge, "0.1b")[1][0], "工程允许目录不能绕过链接检查"
+                    result_zip(edge, deletes=["linked/escape.txt"])
+                    assert inspect(edge, "0.1b")[1][0], "工程删除不能经链接越出仓库"
                 assert not (outside / "escape.txt").exists()
             finally:
                 if linked.is_symlink():
@@ -1472,7 +1679,7 @@ def main():
         pass
     ap = argparse.ArgumentParser(prog="handoff", description="Codex 与网页版 Claude 之间的交接包（ADR-024）")
     sub = ap.add_subparsers(dest="cmd", required=True)
-    o = sub.add_parser("out", help="生成实现、修复或握手包")
+    o = sub.add_parser("out", help="生成功能/工程实现、修复或握手包")
     o.add_argument("id")
     o.add_argument("--notes", help="复查意见文件，写进修复包的 FIX.md")
     o.add_argument("--round", type=int)
