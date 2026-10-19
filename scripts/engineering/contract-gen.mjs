@@ -12,6 +12,7 @@ import { cpSync, existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, wri
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { format, resolveConfig } from "prettier";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const OUT_REL = "packages/contract/src/generated/api";
@@ -52,7 +53,7 @@ function runOrval() {
   if (r.status !== 0) throw new Error(`orval 失败（退出码 ${r.status ?? r.signal}）`);
 }
 
-function stamp() {
+async function stamp() {
   const src = sourceSha();
   const files = {};
   for (const rel of listFiles(OUT)) {
@@ -62,6 +63,8 @@ function stamp() {
     if (HEADER_EXT.test(rel) && !text.startsWith(`// ${MARK}`)) {
       text = `// ${MARK}（Orval，经 pnpm contract:gen），来源：contracts/openapi.yaml；勿手改。source-sha: ${src}\n${text}`;
     }
+    // CLI 的 generated 忽略规则适用于人工文件扫描；生成器直接按配置格式化产物。
+    if (HEADER_EXT.test(rel)) text = await format(text, { ...(await resolveConfig(p)), filepath: p });
     writeFileSync(p, text);
     files[rel] = sha12(text);
   }
@@ -97,14 +100,14 @@ function compare(beforeDir) {
   return diffs;
 }
 
-function main(argv) {
+async function main(argv) {
   if (argv.includes("--print-source-sha")) {
     process.stdout.write(`${sourceSha()}\n`);
     return 0;
   }
   if (!argv.includes("--check")) {
     runOrval();
-    stamp();
+    await stamp();
     process.stdout.write(`接口生成物已写入 ${OUT_REL}\n`);
     return 0;
   }
@@ -112,7 +115,7 @@ function main(argv) {
   let diffs;
   try {
     runOrval();
-    stamp();
+    await stamp();
     diffs = compare(before);
   } finally {
     restore(before);
@@ -126,7 +129,7 @@ function main(argv) {
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   try {
-    process.exitCode = main(process.argv.slice(2));
+    process.exitCode = await main(process.argv.slice(2));
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
     process.exitCode = 1;
