@@ -1,6 +1,6 @@
 ---
 id: METR-01
-status: draft
+status: ready
 refs:
   api: [trackEvent]
   permissions: [metrics.event.track]
