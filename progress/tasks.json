@@ -1,0 +1,2598 @@
+{
+  "tasks": [
+    {
+      "id": "F00",
+      "stage": 0,
+      "lane": "地基",
+      "level": "C",
+      "tool": "Codex＋你",
+      "kind": "ops",
+      "title": "切换到 V4、上 GitHub",
+      "goal": "打 v3-final 标签；安装《册2 仓库工具包》；把冻结原型复制到 design/prototype/prototype.html；移走 V3 流程文件；bk selftest、bk init；建 GitHub 私有仓库并推送。",
+      "accept": [
+        "bk selftest 通过；bk doctor 只剩 Node/pnpm/Docker 未装（阶段 0 后半再装）",
+        "有版本标签 bk-v0001 和版本包 handoff/versions/bk-v0001.zip",
+        "GitHub 上能看到仓库"
+      ],
+      "notes": "按《册1》第 7.2 节的 Codex 提示词做；这一步不经过 Claude。",
+      "deps": [],
+      "pages": [],
+      "status": "todo"
+    },
+    {
+      "id": "F01",
+      "stage": 0,
+      "lane": "地基",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "foundation",
+      "deps": [
+        "F00"
+      ],
+      "title": "握手与地基核对（原型体检）",
+      "goal": "第一次用网页版 Claude：确认沙箱环境；用原型和仓库现有资料核对 docs/baseline 下的地基初稿，补全、改正，列出矛盾清单和需要你拍板的问题。不写应用代码。",
+      "pages": [
+        "S06",
+        "S09",
+        "S10",
+        "S18"
+      ],
+      "owns": [
+        "docs/baseline/**",
+        "docs/decisions/**"
+      ],
+      "reads": [
+        "AGENTS.md",
+        "docs/baseline/00-index.md",
+        "docs/baseline/vocabulary.md",
+        "docs/baseline/pages.md",
+        "docs/baseline/ui-rules.md",
+        "docs/baseline/api-rules.md",
+        "docs/baseline/data-model.md",
+        "docs/baseline/metrics.md",
+        "docs/baseline/golden-paths.md",
+        "docs/baseline/tech.md"
+      ],
+      "lookup": [
+        "docs/product/glossary.yaml（V3 术语表，如有）",
+        "design/tokens.json（如有）",
+        "contracts/（V3 契约草稿，如有）",
+        "docs/models/（V3 算法说明，如有）",
+        "docs/adr/ADR-025* 至 ADR-029*（技术栈与结构）",
+        "docs/history/v3/conventions/（V3 约定，如有）",
+        "运行 python3 tools/bk.py spec <页ID> 查任意页面",
+        "git show v3-final:scripts/spec_tool.py（V3 检查脚本，只看检查项）",
+        "contracts/params.yaml（V3 参数表，如有）"
+      ],
+      "accept": [
+        "交接单「怎么看效果」写出沙箱探测结果：Node 版本、能否联网装包、有无浏览器、有无数据库",
+        "docs/baseline 下每份文件都核对过：与原型一致；与仓库已有资料（术语表、令牌、契约、算法说明、ADR-025～029）冲突的地方写明取舍",
+        "矛盾清单：原型内部、原型与地基初稿、原型与旧决定之间的不一致，每条给推荐处理；要你定的写进交接单问题（大白话，带选项、推荐、临时默认）",
+        "每份地基文档不超过约 300 行，只写现状，不写历史和过程",
+        "核对开工决策单的决定卡（docs/decisions/D-*-kickoff.md）已经落实到地基文档；还没有决定卡，就按 docs/baseline/decision-sheet.md 的默认值补一张，并在交接单里提醒用户",
+        "复核并继续原型勘误：docs/baseline/errata.md 已收录 4 条，新发现的追加在表尾",
+        "查看 V3 的检查脚本（git show v3-final:scripts/spec_tool.py），列出仍然有用的内容一致性检查（裸阈值、术语、参数引用等），写进交接单，交给 F02、F03 移植"
+      ],
+      "status": "todo",
+      "not": [
+        "写任何应用代码",
+        "改 tools/、progress/ 下的文件"
+      ]
+    },
+    {
+      "id": "F02",
+      "stage": 0,
+      "lane": "地基",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "foundation",
+      "deps": [
+        "F01"
+      ],
+      "title": "工程骨架（pnpm 工作区、五个应用、共享包、检查命令）",
+      "goal": "按 docs/baseline/tech.md 建 pnpm 工作区：apps/learner、org、admin、api、worker 与 packages/ui、contract、domains、db、params、ai、shared 的骨架，所有检查命令能跑通。",
+      "owns": [
+        "package.json",
+        "*/package.json",
+        "apps/**",
+        "packages/**",
+        "pnpm-workspace.yaml",
+        "pnpm-lock.yaml",
+        ".npmrc",
+        ".nvmrc",
+        "tsconfig*.json",
+        "eslint.config.*",
+        ".prettierrc*",
+        ".prettierignore",
+        ".editorconfig",
+        ".github/**",
+        "deploy/**",
+        "tests/**",
+        "vitest.*",
+        "playwright.config.*",
+        ".env.example",
+        "tools/sandbox-db.sh",
+        "tools/merge-openapi.mjs",
+        "docs/baseline/tech.md",
+        "docs/decisions/**",
+        ".gitignore"
+      ],
+      "reads": [
+        "AGENTS.md",
+        "docs/baseline/tech.md",
+        "docs/baseline/api-rules.md"
+      ],
+      "lookup": [
+        "docs/adr/ADR-025*、ADR-026*（技术栈与仓库结构）"
+      ],
+      "accept": [
+        "根 package.json 有这些脚本（暂时没内容的放一个能通过的占位，名字必须对）：dev、dev:real、gen、lint、typecheck、test、build、test:db、e2e:smoke、gallery",
+        "engines 写 node>=22.12（网页沙箱是 Node 22），.nvmrc 写 24；.npmrc 不写死任何镜像地址；packageManager 写 pnpm 的确切版本",
+        "大版本严格按 tech.md 的版本表；依赖用精确版本；实际装上的版本写回 tech.md 的“已锁定版本”表",
+        "dependency-cruiser：apps 不能引用 packages/domains、db、ai；领域之间只走公开入口；ESLint 禁用库规则（moment、axios、redux、MUI 等）",
+        "pnpm dev 能打开学员端的“备考助手”占位页；apps/api 有 /health，并有 Fastify inject 测试",
+        "生成物（接口代码、Prisma 客户端、参数访问器）不进 git，由 pnpm gen 生成，并在 dev/test/build/typecheck 之前自动运行",
+        "deploy/compose.dev.yml 能起 PostgreSQL 17（带 pgvector；zhparser、pg_bigm 用自制镜像或先注释说明）与 Redis 7；tools/sandbox-db.sh 尝试在网页沙箱里用 apt 装 PostgreSQL 与 Redis，失败时友好退出",
+        ".github/workflows/verify.yml：push 时运行 python3 tools/bk.py verify --level full（带 PostgreSQL 与 Redis 服务，装好 Playwright 浏览器）",
+        "bk verify --level web 在网页端通过",
+        "pnpm 11 的依赖安装脚本允许名单配好（esbuild 等），网页沙箱与本地都能装上依赖",
+        "packages/domains/<领域>/ 分 core（纯函数）与 server 两层；依赖规则：core 不引用服务端依赖，页面组件不引用 domains，只有模拟层与服务端能引用 core",
+        "用 python3 tools/bk.py start F02 --with-db 验证 tools/sandbox-db.sh 在网页沙箱可用（不可用就在交接单写明）",
+        "移植 F01 列出的 V3 内容一致性检查（能做成 lint 或测试的就做）"
+      ],
+      "pages": [],
+      "status": "todo",
+      "not": [
+        "页面与业务代码"
+      ]
+    },
+    {
+      "id": "F03",
+      "stage": 0,
+      "lane": "地基",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "foundation",
+      "deps": [
+        "F02"
+      ],
+      "title": "设计令牌与公共组件（含组件陈列页）",
+      "goal": "把原型的视觉语言做成令牌和组件库，并做一个组件陈列页 /dev/ui，让后面所有页面只拼装、不各写一套。",
+      "pages": [
+        "S06",
+        "S10"
+      ],
+      "owns": [
+        "packages/ui/**",
+        "design/tokens.json",
+        "apps/learner/src/dev/**",
+        "docs/decisions/**",
+        "packages/shared/src/format/**",
+        "packages/shared/src/vocab/**",
+        "packages/shared/src/today/**",
+        "tools/gen-vocab.*"
+      ],
+      "reads": [
+        "AGENTS.md",
+        "docs/baseline/ui-rules.md",
+        "docs/baseline/vocabulary.md"
+      ],
+      "lookup": [
+        "设计令牌原值：原型 :root（已抄在 ui-rules.md）",
+        "运行 python3 tools/bk.py spec S06 / S10 / S07 看业务组件的用法"
+      ],
+      "accept": [
+        "令牌来自原型（颜色、六档掌握色、圆角、字体），接上 Tailwind 4；断点 700/1024（局部 860、1180），用容器查询",
+        "七态组件：加载、空、出错、离线、受限、数据不足（另有正常），文案可传入",
+        "基础组件：按钮、卡片、标签、列表行、分段选择、标签页、抽屉与底部面板、对话框、提示条、进度条、统计数、键值行、占位骨架",
+        "业务公共组件：掌握阶梯（完整与迷你）、知识点小卡、提议卡（改什么／为什么／代价／不改会怎样；确认、不改、撤销）、AI 内容标识、证据行、今日任务条、掌握方格、“为什么是它”理由标签、撤销条",
+        "/dev/ui 陈列页：每个组件的各种状态都看得到，手机、平板、桌面三档宽度正常",
+        "组件有单元测试；键盘可达、焦点可见、尊重减少动效设置",
+        "统一格式化函数（时长、日期、时间、百分比、分数、区间、档位差）放 packages/shared/src/format/，有单元测试",
+        "词汇常量由 docs/product/glossary.yaml 生成（如有），否则按 vocabulary.md 写进 packages/shared/src/vocab/；页面里硬写状态名、档位名会被 lint 拦下",
+        "文案插值：规则相关文案里的数字从参数访问器取（如“间隔 {{days}} 天”），并有一条检查拦住规则文案里的裸数字",
+        "“今天”函数（按用户时区与日界线参数）放 packages/shared/src/today/，前后端与模拟层共用，边界有测试（凌晨 3:59 与 4:00）",
+        "组件按原型调用次数排优先级（ui-rules.md 第 11 节）"
+      ],
+      "status": "todo",
+      "not": [
+        "页面",
+        "接口"
+      ]
+    },
+    {
+      "id": "F04",
+      "stage": 0,
+      "lane": "地基",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "foundation",
+      "deps": [
+        "F02"
+      ],
+      "title": "接口约定与假数据层（四个演示考试）",
+      "goal": "页面拿数据的统一管道：分文件的接口契约 → 生成钩子与校验 → 来自原型四个演示考试的假数据 → 一键切换真假。和 F03 可以同时做。",
+      "pages": [
+        "S06",
+        "S09"
+      ],
+      "owns": [
+        "contracts/**",
+        "packages/contract/**",
+        "apps/learner/src/mocks/**",
+        "apps/learner/src/api/**",
+        "fixtures/**",
+        "tools/merge-openapi.mjs",
+        "docs/decisions/**",
+        "docs/baseline/api-rules.md"
+      ],
+      "reads": [
+        "AGENTS.md",
+        "docs/baseline/api-rules.md",
+        "docs/baseline/data-model.md",
+        "docs/baseline/vocabulary.md"
+      ],
+      "lookup": [
+        "contracts/（V3 的契约草稿，如有，优先沿用其中的命名）",
+        "运行 python3 tools/bk.py spec <页ID> 看各页读写哪些数据（“数据读写”一行）"
+      ],
+      "accept": [
+        "contracts/openapi/ 分文件：_common.yaml（错误、分页、ID、时间）；schemas/ 下核心数据形状（按 data-model.md）；pages/ 留给各页面。合并脚本把它们合成一份，名字重复直接报错",
+        "Orval 生成类型、Zod 校验、TanStack Query 钩子、MSW 处理器；生成物不进 git",
+        "fixtures/exams/{kj,js,en,ds}/ 从原型的四个演示考试整理（初级会计、教师资格、六级、自建数据结构），全部通过 Zod 校验（有测试）",
+        "MSW：apps/learner/src/mocks/pages/*.ts 自动注册（import.meta.glob），一页一个文件；VITE_REAL=plan,practice 这样的开关能让指定领域走真接口",
+        "示范接口 GET /api/v1/me/context（当前用户、当前目标考试、今天日期）从契约到页面整条走通",
+        "开发用的演示考试切换（kj/js/en/ds）和 ?state= 强制状态，在接口层有统一入口",
+        "模拟层带内存仓库：写操作会改变内存数据（做完一题，错题本与今日跟着变）；规则还没实现的领域先返回示例值，并标注“示例数据”",
+        "支持改“今天”的日期（时间旅行），跨天逻辑当场可测",
+        "在 api-rules.md 第 6 节补一个数据刷新的写法样例（本任务允许改这一节）"
+      ],
+      "status": "todo",
+      "not": [
+        "后端实现",
+        "页面"
+      ]
+    },
+    {
+      "id": "F05",
+      "stage": 0,
+      "lane": "地基",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "foundation",
+      "deps": [
+        "F03",
+        "F04"
+      ],
+      "title": "三端外壳与全部 70 页路由空壳",
+      "goal": "外壳、导航和 70 个页面的空壳一次建好。之后每个页面任务只在自己的目录里干活，互不冲突。",
+      "pages": [
+        "S06",
+        "S17",
+        "O01",
+        "P01"
+      ],
+      "owns": [
+        "apps/learner/src/app/**",
+        "apps/learner/src/router/**",
+        "apps/learner/src/routes.ts",
+        "apps/learner/src/pages/**",
+        "apps/learner/src/i18n/**",
+        "apps/org/**",
+        "apps/admin/**",
+        "docs/decisions/**"
+      ],
+      "reads": [
+        "AGENTS.md",
+        "docs/baseline/ui-rules.md",
+        "docs/baseline/pages.md",
+        "docs/baseline/vocabulary.md"
+      ],
+      "accept": [
+        "学员端外壳与原型一致：手机底部五个标签（今日、学习、练测、导师、我的）＋分组抽屉；平板 72px 图标栏；桌面 236px 侧栏；顶栏（目标切换、倒计时、搜索、通知、问导师）",
+        "35 个学员端页面按 pages.md 的路由全部建好空壳：标题、功能点数量、“开发中”，并提示用 bk proto 看原型",
+        "页面四种模式按原型：标准、引导流（入门步骤条）、沉浸（隐藏导航）、独立页",
+        "开发工具条：切演示考试、切视图（?view=）、切七态（?state=）、改“今天”的日期（时间旅行）；只在开发模式出现",
+        "i18n：每页一个文案文件 apps/learner/src/i18n/zh-CN/<页ID>.json（先建空文件）＋公共文案文件",
+        "机构端（16 页）与平台后台（19 页）的外壳和路由空壳",
+        "导师浮标与抽屉的外壳（内容留给 U28）",
+        "交接单数据块写 \"pages\": {\"*\": \"shell\"}"
+      ],
+      "status": "todo",
+      "not": [
+        "页面内容"
+      ]
+    },
+    {
+      "id": "F06",
+      "stage": 0,
+      "lane": "地基",
+      "level": "B",
+      "tool": "Claude",
+      "kind": "foundation",
+      "deps": [
+        "F05"
+      ],
+      "title": "冒烟测试与页面画廊（防“修一个坏一个”）",
+      "goal": "让每次收包都自动检查全部页面：能打开、七态能显示、画面变化能被发现。",
+      "owns": [
+        "tests/**",
+        "playwright.config.*",
+        "apps/*/playwright*",
+        "tools/gallery*.mjs",
+        "docs/decisions/**"
+      ],
+      "reads": [
+        "AGENTS.md",
+        "docs/baseline/golden-paths.md",
+        "docs/baseline/pages.md",
+        "docs/baseline/ui-rules.md"
+      ],
+      "accept": [
+        "e2e:smoke：每个路由能打开、没有控制台报错、七态都能用 ?state= 显示（假数据模式）",
+        "gallery：所有页面默认视图在 375 与 1280 两档截图，存到 .bk/gallery/<时间>/，并与上一次比对；画面变化超过阈值的页面写进 .bk/gallery/changes.json，并生成 .bk/gallery/index.html（前后并排）",
+        "黄金路径测试骨架：按 golden-paths.md 写 6 条，先只走页面跳转，标注“接后端后补断言”",
+        "Playwright：有 BK_CHROMIUM 环境变量时用它（网页沙箱自带的浏览器），本地用正常安装的浏览器",
+        "bk verify --level web 在网页端能跑通（数据库相关跳过）"
+      ],
+      "pages": [],
+      "status": "todo"
+    },
+    {
+      "id": "F07",
+      "stage": 0,
+      "lane": "地基",
+      "level": "C",
+      "tool": "Codex＋你",
+      "kind": "ops",
+      "deps": [
+        "F06"
+      ],
+      "title": "本地跑通：装 Node 24、pnpm、Docker，看到三端外壳",
+      "goal": "在你的电脑上把前面几个结果包都收齐（bk in --all），装好开发环境，bk run 能看到三端外壳，GitHub 自动检查变绿。",
+      "accept": [
+        "bk doctor 全部 ✓",
+        "bk run 后浏览器里能打开学员端外壳和 /dev/ui 组件陈列页",
+        "GitHub Actions 的 verify 通过"
+      ],
+      "pages": [],
+      "status": "todo"
+    },
+    {
+      "id": "F08",
+      "stage": 0,
+      "lane": "地基",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "page",
+      "deps": [
+        "F06"
+      ],
+      "title": "样板页：S10 知识点主页（后面所有页面照着写）",
+      "pages": [
+        "S10"
+      ],
+      "goal": "做出第一个完整页面，作为后面所有页面任务的样板。S10 被很多页面链接，用到掌握阶梯、证据、关联题目等公共组件，最有代表性。",
+      "owns": [
+        "docs/baseline/ui-rules.md"
+      ],
+      "accept": [
+        "在 docs/baseline/ui-rules.md 末尾的「样板页」一节写 15 行以内的“照着写”说明：目录结构、拿数据的写法、七态的写法、测试的写法"
+      ],
+      "status": "todo",
+      "gate": "look"
+    },
+    {
+      "id": "U01",
+      "stage": 1,
+      "lane": "A 入门",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S01"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S01 欢迎与登录（前端，假数据）",
+      "goal": "照原型做出 S01 欢迎与登录：所有视图、七态、三档宽度，数据来自假数据层。",
+      "notes": "入门车道（U01–U05）建议按顺序做，步骤条与“先体验、后登录”的口径保持一致。",
+      "status": "todo"
+    },
+    {
+      "id": "U02",
+      "stage": 1,
+      "lane": "A 入门",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S02"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S02 备考目标（前端，假数据）",
+      "goal": "照原型做出 S02 备考目标：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo"
+    },
+    {
+      "id": "U03",
+      "stage": 1,
+      "lane": "A 入门",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S03"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S03 时间与资料（前端，假数据）",
+      "goal": "照原型做出 S03 时间与资料：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo"
+    },
+    {
+      "id": "U04",
+      "stage": 1,
+      "lane": "A 入门",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S04"
+      ],
+      "deps": [
+        "F08",
+        "U18a"
+      ],
+      "title": "S04 摸底诊断（前端，假数据）",
+      "goal": "照原型做出 S04 摸底诊断：所有视图、七态、三档宽度，数据来自假数据层。",
+      "notes": "测评中是沉浸模式：不显示对错、不出现导师与提示；计时只做显示，严格计时在后端。 作答部分直接用 U18a 做好的共用作答组件。",
+      "status": "todo"
+    },
+    {
+      "id": "U05",
+      "stage": 1,
+      "lane": "A 入门",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S05"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S05 起点报告与方案（前端，假数据）",
+      "goal": "照原型做出 S05 起点报告与方案：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo"
+    },
+    {
+      "id": "U06a",
+      "stage": 1,
+      "lane": "B 今日与计划",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "page",
+      "pages": [
+        "S06"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S06 今日·上半：英雄区与三段清单（前端，假数据）",
+      "goal": "照原型做出今日页的英雄区、三段清单与任务条串联（继续、一键开始、完成口径），数据来自模拟层。",
+      "notes": "今日页功能点 25 个，拆成两半，免得一次对话太长。上半先定页面骨架与任务条；下半接着做。",
+      "status": "todo"
+    },
+    {
+      "id": "U06b",
+      "stage": 1,
+      "lane": "B 今日与计划",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "page",
+      "pages": [
+        "S06"
+      ],
+      "deps": [
+        "U06a"
+      ],
+      "title": "S06 今日·下半：三个数、计划调整、提议与六个视图（前端，假数据）",
+      "goal": "补齐三个数、计划调整（自动顺延与撤销、待确认提议）、节点提醒与六个视图，七态与三档宽度全部对齐原型。",
+      "notes": "与上半改同一批文件，只能错开半步做。做完先让你看一眼再合并。",
+      "status": "todo",
+      "gate": "look"
+    },
+    {
+      "id": "U07",
+      "stage": 1,
+      "lane": "B 今日与计划",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S07"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S07 学习计划（前端，假数据）",
+      "goal": "照原型做出 S07 学习计划：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo"
+    },
+    {
+      "id": "U08",
+      "stage": 1,
+      "lane": "B 今日与计划",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S08"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S08 复盘与报告（前端，假数据）",
+      "goal": "照原型做出 S08 复盘与报告：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo"
+    },
+    {
+      "id": "U09",
+      "stage": 1,
+      "lane": "C 学",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "page",
+      "pages": [
+        "S09"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S09 知识地图（前端，假数据）",
+      "goal": "照原型做出 S09 知识地图：所有视图、七态、三档宽度，数据来自假数据层。",
+      "notes": "掌握方格是本产品的招牌画面，注意大地图的性能（几百个格子）。",
+      "status": "todo"
+    },
+    {
+      "id": "U11",
+      "stage": 1,
+      "lane": "C 学",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S11"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S11 我的资料（前端，假数据）",
+      "goal": "照原型做出 S11 我的资料：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo"
+    },
+    {
+      "id": "U12",
+      "stage": 1,
+      "lane": "C 学",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "page",
+      "pages": [
+        "S12"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S12 阅读器（前端，假数据）",
+      "goal": "照原型做出 S12 阅读器：所有视图、七态、三档宽度，数据来自假数据层。",
+      "notes": "阅读器用 TipTap 3；划选工具条和 iOS 系统菜单会互相遮挡，先用最小样例验证再铺开。",
+      "status": "todo"
+    },
+    {
+      "id": "U13",
+      "stage": 1,
+      "lane": "C 学",
+      "level": "B",
+      "tool": "Claude 或 Codex",
+      "kind": "page",
+      "pages": [
+        "S13"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S13 视听课堂（简版，前端，假数据）",
+      "goal": "照原型做出 S13 视听课堂：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo",
+      "accept": [
+        "本任务是简版：主视图＋七态＋P0 功能点即可，P1 等对应后端开工时再补（这一条优先于下面“P0、P1 都要有”的通用要求）"
+      ]
+    },
+    {
+      "id": "U14",
+      "stage": 1,
+      "lane": "C 学",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S14"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S14 笔记本（前端，假数据）",
+      "goal": "照原型做出 S14 笔记本：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo"
+    },
+    {
+      "id": "U15",
+      "stage": 1,
+      "lane": "D 记与练",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S15"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S15 复习与卡片（前端，假数据）",
+      "goal": "照原型做出 S15 复习与卡片：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo"
+    },
+    {
+      "id": "U16",
+      "stage": 1,
+      "lane": "D 记与练",
+      "level": "B",
+      "tool": "Claude 或 Codex",
+      "kind": "page",
+      "pages": [
+        "S16"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S16 背诵训练（简版，前端，假数据）",
+      "goal": "照原型做出 S16 背诵训练：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo",
+      "accept": [
+        "本任务是简版：主视图＋七态＋P0 功能点即可，P1 等对应后端开工时再补（这一条优先于下面“P0、P1 都要有”的通用要求）"
+      ]
+    },
+    {
+      "id": "U17",
+      "stage": 1,
+      "lane": "D 记与练",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S17"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S17 练习中心（前端，假数据）",
+      "goal": "照原型做出 S17 练习中心：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo"
+    },
+    {
+      "id": "U18a",
+      "stage": 1,
+      "lane": "D 记与练",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "page",
+      "pages": [
+        "S18"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S18 做题与解析·上半：全站共用的作答组件与做题主流程（前端，假数据）",
+      "goal": "先做全站共用的作答组件（题干渲染、各题型作答、把握度必选、提交、揭晓后不能改），放 packages/ui/src/quiz/；再做 S18 的做题主流程。S04 摸底、S22 模考、错题回炉都复用这个组件。",
+      "notes": "这是唯一允许页面任务改 packages/ui 的地方：只限 packages/ui/src/quiz/。",
+      "status": "todo",
+      "owns": [
+        "packages/ui/src/quiz/**"
+      ]
+    },
+    {
+      "id": "U18b",
+      "stage": 1,
+      "lane": "D 记与练",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "page",
+      "pages": [
+        "S18"
+      ],
+      "deps": [
+        "U18a"
+      ],
+      "title": "S18 做题与解析·下半：分层解析、提示阶梯、错因确认与讲解入口（前端，假数据）",
+      "goal": "补齐分层揭晓与解析、提示阶梯、错因确认、讲解与追问入口、沉浸模式细节，七态与三档宽度对齐原型。",
+      "notes": "与上半改同一批文件，只能错开半步做。做完先让你看一眼再合并。",
+      "status": "todo",
+      "gate": "look"
+    },
+    {
+      "id": "U19",
+      "stage": 1,
+      "lane": "D 记与练",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S19"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S19 错题本（前端，假数据）",
+      "goal": "照原型做出 S19 错题本：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo"
+    },
+    {
+      "id": "U20",
+      "stage": 1,
+      "lane": "D 记与练",
+      "level": "B",
+      "tool": "Claude 或 Codex",
+      "kind": "page",
+      "pages": [
+        "S20"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S20 主观题批改（简版，前端，假数据）",
+      "goal": "照原型做出 S20 主观题批改：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo",
+      "accept": [
+        "本任务是简版：主视图＋七态＋P0 功能点即可，P1 等对应后端开工时再补（这一条优先于下面“P0、P1 都要有”的通用要求）"
+      ]
+    },
+    {
+      "id": "U21",
+      "stage": 1,
+      "lane": "D 记与练",
+      "level": "B",
+      "tool": "Claude 或 Codex",
+      "kind": "page",
+      "pages": [
+        "S21"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S21 口头表达训练（简版，前端，假数据）",
+      "goal": "照原型做出 S21 口头表达训练：所有视图、七态、三档宽度，数据来自假数据层。",
+      "notes": "扩展包页面（只有部分考试有）；原型里大多是 P1、P2，可以放在车道最后。",
+      "status": "todo",
+      "accept": [
+        "本任务是简版：主视图＋七态＋P0 功能点即可，P1 等对应后端开工时再补（这一条优先于下面“P0、P1 都要有”的通用要求）"
+      ]
+    },
+    {
+      "id": "U22",
+      "stage": 1,
+      "lane": "E 考",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S22"
+      ],
+      "deps": [
+        "F08",
+        "U18a"
+      ],
+      "title": "S22 模考中心（前端，假数据）",
+      "goal": "照原型做出 S22 模考中心：所有视图、七态、三档宽度，数据来自假数据层。",
+      "notes": "作答部分直接用 U18a 做好的共用作答组件。",
+      "status": "todo"
+    },
+    {
+      "id": "U23",
+      "stage": 1,
+      "lane": "E 考",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S23"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S23 测评报告（前端，假数据）",
+      "goal": "照原型做出 S23 测评报告：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo"
+    },
+    {
+      "id": "U24",
+      "stage": 1,
+      "lane": "E 考",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S24"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S24 进度与预测（前端，假数据）",
+      "goal": "照原型做出 S24 进度与预测：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo"
+    },
+    {
+      "id": "U25",
+      "stage": 1,
+      "lane": "E 考",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S25",
+        "S26"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S25 考试日历与资讯＋S26 报考决策（前端，假数据）",
+      "goal": "照原型做出 S25 考试日历与资讯、S26 报考决策：所有视图、七态、三档宽度，数据来自假数据层。",
+      "notes": "S26 报考决策是扩展包页面。",
+      "status": "todo",
+      "accept": [
+        "S26 报考决策做简版（主视图＋七态＋P0）；S25 按通用要求做全"
+      ]
+    },
+    {
+      "id": "U27",
+      "stage": 1,
+      "lane": "E 考",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S27"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S27 冲刺与考后（前端，假数据）",
+      "goal": "照原型做出 S27 冲刺与考后：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo"
+    },
+    {
+      "id": "U28",
+      "stage": 1,
+      "lane": "F 助与我",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "page",
+      "pages": [
+        "S28"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S28 AI 导师（前端，假数据）",
+      "goal": "照原型做出 S28 AI 导师：所有视图、七态、三档宽度，数据来自假数据层。",
+      "notes": "聊天界面、五种模式、危机信号视图、不可用视图；回答流式显示用假数据模拟；所有 AI 内容带显式标识。",
+      "status": "todo"
+    },
+    {
+      "id": "U29",
+      "stage": 1,
+      "lane": "F 助与我",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S29",
+        "S30"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S29 搜索与速查＋S30 自习室与小组（前端，假数据）",
+      "goal": "照原型做出 S29 搜索与速查、S30 自习室与小组：所有视图、七态、三档宽度，数据来自假数据层。",
+      "notes": "S30 自习室原型里多为 P1、P2，做出主体即可。",
+      "status": "todo",
+      "accept": [
+        "S30 自习室做简版（主视图＋七态＋P0）；S29 按通用要求做全"
+      ]
+    },
+    {
+      "id": "U31",
+      "stage": 1,
+      "lane": "F 助与我",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S31"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S31 会员与权益（前端，假数据）",
+      "goal": "照原型做出 S31 会员与权益：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo"
+    },
+    {
+      "id": "U32",
+      "stage": 1,
+      "lane": "F 助与我",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S32"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S32 数据与隐私（前端，假数据）",
+      "goal": "照原型做出 S32 数据与隐私：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo"
+    },
+    {
+      "id": "U33",
+      "stage": 1,
+      "lane": "F 助与我",
+      "level": "B",
+      "tool": "Claude（Codex 可做）",
+      "kind": "page",
+      "pages": [
+        "S33",
+        "S35"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S33 设置＋S35 消息与帮助（前端，假数据）",
+      "goal": "照原型做出 S33 设置、S35 消息与帮助：所有视图、七态、三档宽度，数据来自假数据层。",
+      "status": "todo"
+    },
+    {
+      "id": "U34",
+      "stage": 1,
+      "lane": "F 助与我",
+      "level": "C",
+      "tool": "Codex",
+      "kind": "page",
+      "pages": [
+        "S34"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "S34 成长档案（前端，假数据）",
+      "goal": "照原型做出 S34 成长档案：所有视图、七态、三档宽度，数据来自假数据层。",
+      "notes": "功能少且多为 P1，Codex 可以独立完成。",
+      "status": "todo"
+    },
+    {
+      "id": "I1",
+      "stage": 1,
+      "lane": "J 整合",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "integrate",
+      "deps": [
+        "U01",
+        "U06b",
+        "U09",
+        "U17",
+        "U18b",
+        "U19"
+      ],
+      "title": "整合一：提炼重复组件、统一术语与跳转",
+      "goal": "前一批页面做完后统一收拾：把多个页面里重复写的东西提到 packages/ui；统一术语和文案；修好页面之间的跳转。这个任务进行时不要开其他页面任务。",
+      "owns": [
+        "packages/ui/**",
+        "apps/learner/src/pages/**",
+        "apps/learner/src/i18n/**",
+        "docs/baseline/ui-rules.md",
+        "docs/baseline/vocabulary.md",
+        "tests/**",
+        "docs/decisions/**"
+      ],
+      "reads": [
+        "AGENTS.md",
+        "docs/baseline/ui-rules.md",
+        "docs/baseline/vocabulary.md"
+      ],
+      "lookup": [
+        "progress/reports/（各页面交接单「风险与提醒」里提的公共组件需求）"
+      ],
+      "accept": [
+        "收集各页面交接单里的“建议提升为公共组件”逐条处理，处理结果写进交接单",
+        "同一个东西只剩一种叫法、一种画法；grep 检查术语表外的同义词",
+        "全部页面冒烟测试和画廊通过，画面变化都是预期内的（交接单列出）"
+      ],
+      "pages": [],
+      "status": "todo"
+    },
+    {
+      "id": "I2",
+      "stage": 1,
+      "lane": "J 整合",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "integrate",
+      "deps": [
+        "U01",
+        "U02",
+        "U03",
+        "U04",
+        "U05",
+        "U06b",
+        "U07",
+        "U08",
+        "U09",
+        "U11",
+        "U12",
+        "U13",
+        "U14",
+        "U15",
+        "U16",
+        "U17",
+        "U18b",
+        "U19",
+        "U20",
+        "U21",
+        "U22",
+        "U23",
+        "U24",
+        "U25",
+        "U27",
+        "U28",
+        "U29",
+        "U31",
+        "U32",
+        "U33",
+        "U34",
+        "I1"
+      ],
+      "title": "整合二：前端全貌收尾与走查清单",
+      "goal": "35 页全部做完后再收拾一次，并给你一份 20 分钟能走完的走查清单（按黄金路径点一遍）。",
+      "owns": [
+        "packages/ui/**",
+        "apps/learner/src/**",
+        "docs/baseline/ui-rules.md",
+        "docs/baseline/vocabulary.md",
+        "tests/**",
+        "docs/decisions/**",
+        "docs/walkthrough.md"
+      ],
+      "reads": [
+        "AGENTS.md",
+        "docs/baseline/ui-rules.md",
+        "docs/baseline/golden-paths.md"
+      ],
+      "accept": [
+        "docs/walkthrough.md：手机与桌面各一遍，按 6 条黄金路径一步步写“点哪里、应该看到什么”",
+        "全部页面冒烟测试与画廊通过",
+        "列出原型里 P0 功能点还没有界面对应的（应为 0），有的话补上或写明原因"
+      ],
+      "pages": [],
+      "status": "todo"
+    },
+    {
+      "id": "R01",
+      "stage": 1,
+      "lane": "R 规则卡",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "rule",
+      "rule": "evidence-mastery",
+      "pages": [
+        "S18",
+        "S10",
+        "S09"
+      ],
+      "deps": [
+        "F01"
+      ],
+      "title": "规则卡：证据与掌握档：作答怎样变成六档掌握",
+      "goal": "把“证据与掌握档：作答怎样变成六档掌握”这类原型上看不见的业务规则写成一页规则卡，用例子表说清楚（例子表直接变成后端测试），并把需要你定的点用大白话列出来。",
+      "status": "todo"
+    },
+    {
+      "id": "R02",
+      "stage": 1,
+      "lane": "R 规则卡",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "rule",
+      "rule": "review-scheduling",
+      "pages": [
+        "S15",
+        "S16",
+        "S06"
+      ],
+      "deps": [
+        "F01"
+      ],
+      "title": "规则卡：记忆调度与复习队列：卡片何时到期、每天上限、积压保护",
+      "goal": "把“记忆调度与复习队列：卡片何时到期、每天上限、积压保护”这类原型上看不见的业务规则写成一页规则卡，用例子表说清楚（例子表直接变成后端测试），并把需要你定的点用大白话列出来。",
+      "status": "todo"
+    },
+    {
+      "id": "R03",
+      "stage": 1,
+      "lane": "R 规则卡",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "rule",
+      "rule": "mistake-graduation",
+      "pages": [
+        "S19",
+        "S18",
+        "S06"
+      ],
+      "deps": [
+        "F01"
+      ],
+      "title": "规则卡：错题回炉与毕业：收录、四个状态、间隔、变式、毕业条件",
+      "goal": "把“错题回炉与毕业：收录、四个状态、间隔、变式、毕业条件”这类原型上看不见的业务规则写成一页规则卡，用例子表说清楚（例子表直接变成后端测试），并把需要你定的点用大白话列出来。",
+      "status": "todo"
+    },
+    {
+      "id": "R04",
+      "stage": 1,
+      "lane": "R 规则卡",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "rule",
+      "rule": "plan-today",
+      "pages": [
+        "S06",
+        "S07"
+      ],
+      "deps": [
+        "F01"
+      ],
+      "title": "规则卡：计划与今日清单：任务生成、三段配比、排序、完成判定、夜间顺延、提议",
+      "goal": "把“计划与今日清单：任务生成、三段配比、排序、完成判定、夜间顺延、提议”这类原型上看不见的业务规则写成一页规则卡，用例子表说清楚（例子表直接变成后端测试），并把需要你定的点用大白话列出来。",
+      "status": "todo"
+    },
+    {
+      "id": "R05",
+      "stage": 1,
+      "lane": "R 规则卡",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "rule",
+      "rule": "diagnosis-start",
+      "pages": [
+        "S04",
+        "S05"
+      ],
+      "deps": [
+        "F01"
+      ],
+      "title": "规则卡：摸底与起点报告：快速定位、自适应测评、区间、三档方案",
+      "goal": "把“摸底与起点报告：快速定位、自适应测评、区间、三档方案”这类原型上看不见的业务规则写成一页规则卡，用例子表说清楚（例子表直接变成后端测试），并把需要你定的点用大白话列出来。",
+      "status": "todo"
+    },
+    {
+      "id": "R06",
+      "stage": 1,
+      "lane": "R 规则卡",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "rule",
+      "rule": "metrics-prediction",
+      "pages": [
+        "S06",
+        "S24",
+        "S08"
+      ],
+      "deps": [
+        "F01"
+      ],
+      "title": "规则卡：三个数与统计口径：预测区间、完成度、健康度、有效学习时长",
+      "goal": "把“三个数与统计口径：预测区间、完成度、健康度、有效学习时长”这类原型上看不见的业务规则写成一页规则卡，用例子表说清楚（例子表直接变成后端测试），并把需要你定的点用大白话列出来。",
+      "status": "todo"
+    },
+    {
+      "id": "R07",
+      "stage": 1,
+      "lane": "R 规则卡",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "rule",
+      "rule": "mock-exam",
+      "pages": [
+        "S22",
+        "S23"
+      ],
+      "deps": [
+        "F01"
+      ],
+      "title": "规则卡：模考：组卷、严格计时、断点续考、试卷快照、成绩与归因",
+      "goal": "把“模考：组卷、严格计时、断点续考、试卷快照、成绩与归因”这类原型上看不见的业务规则写成一页规则卡，用例子表说清楚（例子表直接变成后端测试），并把需要你定的点用大白话列出来。",
+      "status": "todo"
+    },
+    {
+      "id": "R08",
+      "stage": 1,
+      "lane": "R 规则卡",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "rule",
+      "rule": "account-lifecycle",
+      "pages": [
+        "S01",
+        "S32",
+        "S33"
+      ],
+      "deps": [
+        "F01"
+      ],
+      "title": "规则卡：账号：游客体验与合并、登录、年龄段与未成年人、注销冷静期",
+      "goal": "把“账号：游客体验与合并、登录、年龄段与未成年人、注销冷静期”这类原型上看不见的业务规则写成一页规则卡，用例子表说清楚（例子表直接变成后端测试），并把需要你定的点用大白话列出来。",
+      "status": "todo"
+    },
+    {
+      "id": "R09",
+      "stage": 1,
+      "lane": "R 规则卡",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "rule",
+      "rule": "tutor-boundary",
+      "pages": [
+        "S28",
+        "S18",
+        "S12"
+      ],
+      "deps": [
+        "F01"
+      ],
+      "title": "规则卡：AI 导师边界：讲解、拒答、危机处置、只提议不直改、标识与降级",
+      "goal": "把“AI 导师边界：讲解、拒答、危机处置、只提议不直改、标识与降级”这类原型上看不见的业务规则写成一页规则卡，用例子表说清楚（例子表直接变成后端测试），并把需要你定的点用大白话列出来。",
+      "status": "todo"
+    },
+    {
+      "id": "R10",
+      "stage": 1,
+      "lane": "R 规则卡",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "rule",
+      "rule": "billing-quota",
+      "pages": [
+        "S31"
+      ],
+      "deps": [
+        "F01"
+      ],
+      "title": "规则卡：会员与额度：档位、AI 点数计量与扣减、核心闭环不设限",
+      "goal": "把“会员与额度：档位、AI 点数计量与扣减、核心闭环不设限”这类原型上看不见的业务规则写成一页规则卡，用例子表说清楚（例子表直接变成后端测试），并把需要你定的点用大白话列出来。",
+      "status": "todo"
+    },
+    {
+      "stage": 2,
+      "kind": "foundation",
+      "id": "B01",
+      "title": "数据模型 v1、迁移与四个演示考试的种子导入",
+      "level": "A",
+      "lane": "H1 学习核心",
+      "deps": [
+        "F07",
+        "R01",
+        "I1"
+      ],
+      "owns": [
+        "packages/db/**",
+        "packages/domains/**",
+        "fixtures/**",
+        "contracts/openapi/schemas/**",
+        "docs/baseline/data-model.md",
+        "tests/db/**",
+        "docs/decisions/**",
+        "tools/seed*.ts"
+      ],
+      "reads": [
+        "AGENTS.md",
+        "docs/baseline/data-model.md",
+        "docs/baseline/api-rules.md",
+        "docs/baseline/rule-cards/evidence-mastery.md"
+      ],
+      "lookup": [
+        "contracts/（V3 表结构草稿，如有）",
+        "docs/adr/ADR-028*（租户隔离）"
+      ],
+      "goal": "按 data-model.md 把核心对象建成 Prisma 多文件 schema（一个领域一个文件），写好迁移和种子导入（四个演示考试），把 11 个一向门决定落进表结构与约束测试。后面所有后端任务都依赖它，必须单独做。",
+      "accept": [
+        "每个领域一个 .prisma 文件；ID 用 UUIDv7；时间存 UTC；作答、证据、审计、重排、点数流水只追加（有测试证明不能改）",
+        "每张表标注数据四分类之一；机构归属字段与游客身份字段已预留",
+        "种子导入：一条命令把 fixtures/exams 的四个演示考试导入数据库，本地与 CI 都能跑",
+        "contracts/openapi/schemas 与表结构对齐（不一致的地方改接口视图或写明映射）"
+      ],
+      "tool": "Claude",
+      "pages": [],
+      "status": "todo"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B02",
+      "title": "API 外壳、游客会话与真假数据切换",
+      "level": "A",
+      "lane": "H1 学习核心",
+      "deps": [
+        "B01"
+      ],
+      "domains": [
+        "account"
+      ],
+      "pages": [],
+      "owns": [
+        "apps/api/**",
+        "apps/learner/src/api/**",
+        "tests/api/**"
+      ],
+      "goal": "Fastify 装配、统一错误格式、按契约校验请求与响应、游客匿名会话（登录后合并留到 B13）、Vite 代理同域；VITE_REAL 开关在一个领域上验证通过。",
+      "accept": [
+        "/health 四个健康检查；所有接口默认要求会话，公开接口显式标注",
+        "游客会话能创建并保存目标等数据；会话存数据库，可作废"
+      ],
+      "tool": "Claude",
+      "status": "todo"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B03",
+      "title": "考试、知识地图、题目只读接口，接通 S02（读）、S09、S10、S17",
+      "level": "B",
+      "lane": "H1 学习核心",
+      "deps": [
+        "B02",
+        "U02",
+        "U09",
+        "U17",
+        "F08"
+      ],
+      "domains": [
+        "exam",
+        "map",
+        "content"
+      ],
+      "pages": [
+        "S02",
+        "S09",
+        "S10",
+        "S17"
+      ],
+      "tool": "Claude",
+      "goal": "考试、知识地图、题目只读接口，接通 S02（读）、S09、S10、S17：按规则卡实现领域逻辑与接口，把页面从假数据切到真接口。",
+      "status": "todo"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B04",
+      "title": "作答、判分、证据入账与掌握档，接通 S18 和 S10、S09 的掌握显示",
+      "level": "A",
+      "lane": "H1 学习核心",
+      "deps": [
+        "B03",
+        "R01",
+        "U18b"
+      ],
+      "domains": [
+        "practice",
+        "learner"
+      ],
+      "pages": [
+        "S18",
+        "S10",
+        "S09"
+      ],
+      "rule": "evidence-mastery",
+      "tool": "Claude",
+      "goal": "作答、判分、证据入账与掌握档，接通 S18 和 S10、S09 的掌握显示：按规则卡实现领域逻辑与接口，把页面从假数据切到真接口。",
+      "status": "todo",
+      "gate": "review"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B05",
+      "title": "错题收录、回炉与毕业，接通 S19",
+      "level": "A",
+      "lane": "H1 学习核心",
+      "deps": [
+        "B04",
+        "R03",
+        "U19"
+      ],
+      "domains": [
+        "practice"
+      ],
+      "pages": [
+        "S19"
+      ],
+      "rule": "mistake-graduation",
+      "tool": "Claude",
+      "goal": "错题收录、回炉与毕业，接通 S19：按规则卡实现领域逻辑与接口，把页面从假数据切到真接口。",
+      "status": "todo",
+      "gate": "review"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B06",
+      "title": "卡片与复习调度（ts-fsrs），接通 S15、S16",
+      "level": "A",
+      "lane": "H2 内容与记忆",
+      "deps": [
+        "B04",
+        "R02",
+        "U15",
+        "U16"
+      ],
+      "domains": [
+        "learner",
+        "content"
+      ],
+      "pages": [
+        "S15",
+        "S16"
+      ],
+      "rule": "review-scheduling",
+      "tool": "Claude",
+      "goal": "卡片与复习调度（ts-fsrs），接通 S15、S16：按规则卡实现领域逻辑与接口，把页面从假数据切到真接口。",
+      "status": "todo",
+      "gate": "review"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B07",
+      "title": "计划引擎、今日清单、夜间顺延与提议，接通 S06、S07",
+      "level": "A",
+      "lane": "H1 学习核心",
+      "deps": [
+        "B05",
+        "B06",
+        "R04",
+        "U06b",
+        "U07"
+      ],
+      "domains": [
+        "plan"
+      ],
+      "pages": [
+        "S06",
+        "S07"
+      ],
+      "rule": "plan-today",
+      "tool": "Claude",
+      "goal": "计划引擎、今日清单、夜间顺延与提议，接通 S06、S07：按规则卡实现领域逻辑与接口，把页面从假数据切到真接口。",
+      "status": "todo",
+      "gate": "review"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B08",
+      "title": "入门流程：目标、时间、摸底、起点报告与生成计划，接通 S01–S05（游客）",
+      "level": "A",
+      "lane": "H1 学习核心",
+      "deps": [
+        "B07",
+        "R05",
+        "U01",
+        "U02",
+        "U03",
+        "U04",
+        "U05"
+      ],
+      "domains": [
+        "exam",
+        "learner",
+        "plan"
+      ],
+      "pages": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05"
+      ],
+      "rule": "diagnosis-start",
+      "tool": "Claude",
+      "goal": "入门流程：目标、时间、摸底、起点报告与生成计划，接通 S01–S05（游客）：按规则卡实现领域逻辑与接口，把页面从假数据切到真接口。",
+      "status": "todo",
+      "gate": "review"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B09",
+      "title": "资料、阅读器与笔记，接通 S11、S12、S14",
+      "level": "A",
+      "lane": "H2 内容与记忆",
+      "deps": [
+        "B04",
+        "U11",
+        "U12",
+        "U14"
+      ],
+      "domains": [
+        "content"
+      ],
+      "pages": [
+        "S11",
+        "S12",
+        "S14"
+      ],
+      "tool": "Claude",
+      "goal": "资料、阅读器与笔记，接通 S11、S12、S14：按规则卡实现领域逻辑与接口，把页面从假数据切到真接口。",
+      "status": "todo"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B10",
+      "title": "模考与测评报告，接通 S22、S23",
+      "level": "A",
+      "lane": "H3 考试与触达",
+      "deps": [
+        "B04",
+        "R07",
+        "U22",
+        "U23"
+      ],
+      "domains": [
+        "practice"
+      ],
+      "pages": [
+        "S22",
+        "S23"
+      ],
+      "rule": "mock-exam",
+      "tool": "Claude",
+      "goal": "模考与测评报告，接通 S22、S23：按规则卡实现领域逻辑与接口，把页面从假数据切到真接口。",
+      "status": "todo",
+      "gate": "review"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B11",
+      "title": "进度、预测、复盘与三个数，接通 S24、S08 和今日的三个数",
+      "level": "A",
+      "lane": "H1 学习核心",
+      "deps": [
+        "B07",
+        "B10",
+        "R06",
+        "U24",
+        "U08"
+      ],
+      "domains": [
+        "learner",
+        "metrics",
+        "plan"
+      ],
+      "pages": [
+        "S24",
+        "S08",
+        "S06"
+      ],
+      "rule": "metrics-prediction",
+      "tool": "Claude",
+      "goal": "进度、预测、复盘与三个数，接通 S24、S08 和今日的三个数：按规则卡实现领域逻辑与接口，把页面从假数据切到真接口。",
+      "status": "todo",
+      "gate": "review"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B12",
+      "title": "考试日历、通知中心与消息，接通 S25、S35",
+      "level": "B",
+      "lane": "H3 考试与触达",
+      "deps": [
+        "B02",
+        "U25",
+        "U33"
+      ],
+      "domains": [
+        "exam",
+        "engagement",
+        "support"
+      ],
+      "pages": [
+        "S25",
+        "S35"
+      ],
+      "tool": "Claude（Codex 可做）",
+      "goal": "考试日历、通知中心与消息，接通 S25、S35：按规则卡实现领域逻辑与接口，把页面从假数据切到真接口。",
+      "status": "todo"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B13",
+      "title": "账号正式版：手机号登录、协议同意、游客合并、导出与注销，接通 S01、S32、S33",
+      "level": "A",
+      "lane": "H4 账号与商业",
+      "deps": [
+        "B02",
+        "R08",
+        "U01",
+        "U32",
+        "U33"
+      ],
+      "domains": [
+        "account",
+        "compliance"
+      ],
+      "pages": [
+        "S01",
+        "S32",
+        "S33"
+      ],
+      "rule": "account-lifecycle",
+      "tool": "Claude",
+      "goal": "账号正式版：手机号登录、协议同意、游客合并、导出与注销，接通 S01、S32、S33：按规则卡实现领域逻辑与接口，把页面从假数据切到真接口。",
+      "status": "todo",
+      "gate": "review"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B14",
+      "title": "会员、额度与 AI 点数（先不接真支付），接通 S31",
+      "level": "A",
+      "lane": "H4 账号与商业",
+      "deps": [
+        "B13",
+        "R10",
+        "U31"
+      ],
+      "domains": [
+        "billing"
+      ],
+      "pages": [
+        "S31"
+      ],
+      "rule": "billing-quota",
+      "tool": "Claude",
+      "goal": "会员、额度与 AI 点数（先不接真支付），接通 S31：按规则卡实现领域逻辑与接口，把页面从假数据切到真接口。",
+      "status": "todo",
+      "gate": "review"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B15",
+      "title": "AI 网关与导师 v1，接通 S28 和各页“问导师”",
+      "level": "A",
+      "lane": "H5 AI",
+      "deps": [
+        "B04",
+        "R09",
+        "U28"
+      ],
+      "domains": [
+        "tutor",
+        "aigov"
+      ],
+      "pages": [
+        "S28"
+      ],
+      "rule": "tutor-boundary",
+      "owns": [
+        "packages/ai/**",
+        "evals/**"
+      ],
+      "tool": "Claude",
+      "goal": "AI 网关与导师 v1，接通 S28 和各页“问导师”：按规则卡实现领域逻辑与接口，把页面从假数据切到真接口。",
+      "status": "todo",
+      "gate": "review"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B16",
+      "title": "搜索与速查，接通 S29",
+      "level": "B",
+      "lane": "H2 内容与记忆",
+      "deps": [
+        "B03",
+        "B09",
+        "U29"
+      ],
+      "domains": [
+        "content"
+      ],
+      "pages": [
+        "S29"
+      ],
+      "tool": "Claude（Codex 可做）",
+      "goal": "搜索与速查，接通 S29：按规则卡实现领域逻辑与接口，把页面从假数据切到真接口。",
+      "status": "todo"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B17",
+      "title": "视听课堂与背诵训练补全，接通 S13、S16",
+      "level": "B",
+      "lane": "H2 内容与记忆",
+      "deps": [
+        "B06",
+        "B09",
+        "U13",
+        "U16"
+      ],
+      "domains": [
+        "content",
+        "learner"
+      ],
+      "pages": [
+        "S13",
+        "S16"
+      ],
+      "tool": "Claude",
+      "goal": "视听课堂与背诵训练补全，接通 S13、S16：按规则卡实现领域逻辑与接口，把页面从假数据切到真接口。",
+      "status": "todo"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B18",
+      "title": "主观题批改 v0，接通 S20",
+      "level": "A",
+      "lane": "H5 AI",
+      "deps": [
+        "B15",
+        "U20"
+      ],
+      "domains": [
+        "grading"
+      ],
+      "pages": [
+        "S20"
+      ],
+      "optional": true,
+      "tool": "Claude",
+      "goal": "主观题批改 v0，接通 S20：按规则卡实现领域逻辑与接口，把页面从假数据切到真接口。",
+      "status": "todo"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B19",
+      "title": "冲刺与考后、成长档案，接通 S27、S34",
+      "level": "B",
+      "lane": "H3 考试与触达",
+      "deps": [
+        "B11",
+        "U27",
+        "U34"
+      ],
+      "domains": [
+        "plan",
+        "learner"
+      ],
+      "pages": [
+        "S27",
+        "S34"
+      ],
+      "tool": "Claude（Codex 可做）",
+      "goal": "冲刺与考后、成长档案，接通 S27、S34：按规则卡实现领域逻辑与接口，把页面从假数据切到真接口。",
+      "status": "todo"
+    },
+    {
+      "stage": 2,
+      "kind": "backend",
+      "id": "B20",
+      "title": "自习室与口头表达训练，接通 S30、S21",
+      "level": "B",
+      "lane": "H5 AI",
+      "deps": [
+        "B02",
+        "U29",
+        "U21"
+      ],
+      "domains": [
+        "engagement",
+        "grading"
+      ],
+      "pages": [
+        "S30",
+        "S21"
+      ],
+      "optional": true,
+      "tool": "Claude",
+      "goal": "自习室与口头表达训练，接通 S30、S21：按规则卡实现领域逻辑与接口，把页面从假数据切到真接口。",
+      "status": "todo"
+    },
+    {
+      "stage": 2,
+      "kind": "integrate",
+      "id": "B21",
+      "title": "全链路回归与整合：6 条黄金路径在真后端下全绿",
+      "level": "A",
+      "lane": "J 整合",
+      "deps": [
+        "B07",
+        "B08",
+        "B11",
+        "B13",
+        "B15"
+      ],
+      "owns": [
+        "tests/**",
+        "apps/**",
+        "packages/**",
+        "docs/baseline/**",
+        "docs/decisions/**",
+        "docs/walkthrough.md"
+      ],
+      "reads": [
+        "AGENTS.md",
+        "docs/baseline/golden-paths.md",
+        "docs/baseline/metrics.md"
+      ],
+      "goal": "把黄金路径测试补上真实断言并全部通过；清理各后端任务留下的交接单提醒；更新走查清单。",
+      "accept": [
+        "6 条黄金路径在 bk run --real 下全绿（本地 full 验证）",
+        "各交接单「风险与提醒」逐条有处理结果",
+        "docs/walkthrough.md 更新为真数据版本"
+      ],
+      "tool": "Claude",
+      "pages": [],
+      "status": "todo"
+    },
+    {
+      "stage": 3,
+      "kind": "ops",
+      "id": "L01",
+      "title": "部署到阿里云预发（Docker、ECS、RDS、OSS）",
+      "level": "B",
+      "tool": "Codex＋你",
+      "lane": "K1 首批邀请",
+      "deps": [
+        "B08",
+        "B13"
+      ],
+      "goal": "一条命令发布到预发环境，一条命令回滚；数据库自动备份。账号开通、域名与备案由你办。",
+      "accept": [
+        "预发地址能用测试账号走完黄金路径",
+        "发布前自动备份数据库，回滚演练过一次"
+      ],
+      "pages": [],
+      "status": "todo"
+    },
+    {
+      "stage": 3,
+      "kind": "backend",
+      "id": "L02",
+      "title": "真实短信验证码与微信登录",
+      "level": "A",
+      "tool": "Claude",
+      "lane": "K1 首批邀请",
+      "deps": [
+        "B13",
+        "L01"
+      ],
+      "domains": [
+        "account"
+      ],
+      "pages": [
+        "S01"
+      ],
+      "rule": "account-lifecycle",
+      "notes": "需要你先办好：短信签名与模板、微信开放平台与服务号认证。",
+      "status": "todo"
+    },
+    {
+      "stage": 3,
+      "kind": "ops",
+      "id": "L06",
+      "title": "监控、日志、告警与恢复演练",
+      "level": "B",
+      "tool": "Codex",
+      "lane": "K1 首批邀请",
+      "deps": [
+        "L01"
+      ],
+      "goal": "错误上报（GlitchTip）、结构化日志进阿里云日志服务、健康检查告警到钉钉或企业微信；做一次数据恢复演练。",
+      "pages": [],
+      "status": "todo"
+    },
+    {
+      "id": "LF",
+      "stage": 3,
+      "lane": "K1 首批邀请",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "integrate",
+      "deps": [
+        "B08",
+        "B13"
+      ],
+      "pages": [],
+      "status": "todo",
+      "title": "数据结构冻结（首批邀请前）",
+      "goal": "生成第一份正式迁移（基线），把 tools/bk.config.json 的 schema_frozen 改为 true；从此改表一律走迁移，并在预发用真实规模的种子演练一次。",
+      "owns": [
+        "packages/db/**",
+        "tools/bk.config.json",
+        "docs/baseline/data-model.md",
+        "docs/baseline/tech.md",
+        "tests/db/**",
+        "docs/decisions/**"
+      ],
+      "reads": [
+        "AGENTS.md",
+        "docs/baseline/data-model.md",
+        "docs/baseline/tech.md"
+      ],
+      "accept": [
+        "基线迁移能从空库建出当前全部表；种子导入后黄金路径通过",
+        "schema_frozen 改为 true；冻结后的改表流程写进 data-model.md 第 5 节"
+      ]
+    },
+    {
+      "stage": 3,
+      "kind": "ops",
+      "id": "L08",
+      "title": "真机走查与修复（首批邀请前）",
+      "level": "B",
+      "tool": "你＋Codex",
+      "lane": "K1 首批邀请",
+      "deps": [
+        "L01",
+        "L02"
+      ],
+      "goal": "按 docs/walkthrough.md 在真机清单上走一遍（iPhone Safari、安卓 Chrome、微信内置浏览器、iPad、电脑），问题逐条修。",
+      "pages": [],
+      "status": "todo"
+    },
+    {
+      "stage": 3,
+      "kind": "ops",
+      "id": "L09",
+      "title": "首批邀请：5–10 位备考初级会计的成年考生",
+      "level": "C",
+      "tool": "你",
+      "lane": "K1 首批邀请",
+      "deps": [
+        "L08",
+        "L06",
+        "LF"
+      ],
+      "goal": "开协议与隐私政策、种子内容授权到位后邀请；建反馈群；每周看一次数据和反馈，按问题开修复任务。之后再扩大到 30–100 人。",
+      "pages": [],
+      "status": "todo"
+    },
+    {
+      "stage": 3,
+      "kind": "backend",
+      "id": "L03",
+      "title": "支付：单次购买（微信 JSAPI/H5/Native、支付宝）",
+      "level": "A",
+      "tool": "Claude",
+      "lane": "K2 公开上线门槛",
+      "deps": [
+        "B14",
+        "L01"
+      ],
+      "domains": [
+        "billing"
+      ],
+      "pages": [
+        "S31"
+      ],
+      "rule": "billing-quota",
+      "notes": "需要你先办好微信支付与支付宝商户；用真实小额订单验收。",
+      "status": "todo",
+      "gate": "review"
+    },
+    {
+      "stage": 3,
+      "kind": "backend",
+      "id": "L04",
+      "title": "内容安全、AI 生成内容标识检查、备案材料配合",
+      "level": "B",
+      "tool": "Claude",
+      "lane": "K2 公开上线门槛",
+      "deps": [
+        "B15"
+      ],
+      "domains": [
+        "aigov",
+        "compliance"
+      ],
+      "pages": [
+        "S28"
+      ],
+      "rule": "tutor-boundary",
+      "status": "todo"
+    },
+    {
+      "stage": 3,
+      "kind": "integrate",
+      "id": "L05",
+      "title": "离线与弱网：PWA 缓存、待提交队列、多端互斥",
+      "level": "A",
+      "tool": "Claude",
+      "lane": "K2 公开上线门槛",
+      "deps": [
+        "B21"
+      ],
+      "owns": [
+        "apps/learner/**",
+        "packages/**",
+        "tests/**",
+        "docs/decisions/**"
+      ],
+      "reads": [
+        "AGENTS.md",
+        "docs/baseline/api-rules.md",
+        "docs/baseline/tech.md"
+      ],
+      "goal": "今日清单、到期复习、作答在断网时可用，联网后补交不重复；同一场练习与模考多端互斥。",
+      "pages": [],
+      "status": "todo"
+    },
+    {
+      "stage": 3,
+      "kind": "backend",
+      "id": "L07",
+      "title": "最小运营后台：用户与订单、反馈工单、危机响应、合规请求、参数与开关",
+      "level": "A",
+      "tool": "Claude",
+      "lane": "K2 公开上线门槛",
+      "deps": [
+        "B13",
+        "B14"
+      ],
+      "domains": [
+        "account",
+        "support",
+        "compliance"
+      ],
+      "pages": [
+        "P13",
+        "P16",
+        "P17",
+        "P18",
+        "P19"
+      ],
+      "notes": "公开推广前至少要有这几页能用；没做选做车道 W 的，这里一并做出页面。",
+      "status": "todo"
+    },
+    {
+      "id": "L10",
+      "stage": 3,
+      "lane": "K2 公开上线门槛",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "backend",
+      "domains": [
+        "account",
+        "compliance"
+      ],
+      "pages": [
+        "S01",
+        "S32"
+      ],
+      "rule": "account-lifecycle",
+      "deps": [
+        "B13",
+        "R08"
+      ],
+      "status": "todo",
+      "gate": "review",
+      "title": "未成年人模式与公开注册检查",
+      "goal": "年龄段门槛、未成年人模式（时长、功能、通知限制）、公开注册前的检查清单，按规则卡 R08 与法规最新要求。"
+    },
+    {
+      "id": "L11",
+      "stage": 3,
+      "lane": "K2 公开上线门槛",
+      "level": "B",
+      "tool": "你＋Codex",
+      "kind": "ops",
+      "pages": [],
+      "status": "todo",
+      "deps": [
+        "L03",
+        "L04",
+        "L05",
+        "L07",
+        "L10",
+        "L09"
+      ],
+      "title": "公开上线检查：合规、支付、内容授权、监控全部到位",
+      "goal": "逐项核对第 10 章的场外事项与 K2 车道的任务，全部到位后才公开注册与推广。",
+      "accept": [
+        "场外事项逐项有凭证或结论",
+        "公开注册开关打开前，你确认一次"
+      ]
+    },
+    {
+      "id": "G01",
+      "stage": 4,
+      "lane": "推广之后",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "backend",
+      "pages": [
+        "O01",
+        "O03",
+        "O04",
+        "O06",
+        "O08",
+        "O09"
+      ],
+      "deps": [
+        "L11"
+      ],
+      "title": "机构端 MVP：后端与接通 O01、O03、O04、O06、O08、O09",
+      "optional": true,
+      "goal": "机构端 MVP：后端与接通 O01、O03、O04、O06、O08、O09。推广后按真实用户反馈排序，开工前再细化。",
+      "status": "todo"
+    },
+    {
+      "id": "G02",
+      "stage": 4,
+      "lane": "推广之后",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "backend",
+      "pages": [
+        "P03",
+        "P04",
+        "P07",
+        "P08",
+        "P10",
+        "P11",
+        "P12"
+      ],
+      "deps": [
+        "L11"
+      ],
+      "title": "平台后台其余页面接通（内容、地图、AI 治理）",
+      "optional": true,
+      "goal": "平台后台其余页面接通（内容、地图、AI 治理）。推广后按真实用户反馈排序，开工前再细化。",
+      "status": "todo"
+    },
+    {
+      "id": "G03",
+      "stage": 4,
+      "lane": "推广之后",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "integrate",
+      "pages": [],
+      "deps": [
+        "L09"
+      ],
+      "title": "深度学法：P1 功能加厚（背诵、口头、主观题、导师多模式）",
+      "optional": true,
+      "goal": "深度学法：P1 功能加厚（背诵、口头、主观题、导师多模式）。推广后按真实用户反馈排序，开工前再细化。",
+      "status": "todo"
+    },
+    {
+      "id": "G04",
+      "stage": 4,
+      "lane": "推广之后",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "integrate",
+      "pages": [],
+      "deps": [
+        "L09"
+      ],
+      "title": "任意考试可用：自建目标、资料导入、地图生成与体检",
+      "optional": true,
+      "goal": "任意考试可用：自建目标、资料导入、地图生成与体检。推广后按真实用户反馈排序，开工前再细化。",
+      "status": "todo"
+    },
+    {
+      "id": "G05",
+      "stage": 4,
+      "lane": "推广之后",
+      "level": "A",
+      "tool": "Claude",
+      "kind": "integrate",
+      "pages": [],
+      "deps": [
+        "L09"
+      ],
+      "title": "App 打包与上架（Capacitor）",
+      "optional": true,
+      "goal": "App 打包与上架（Capacitor）。推广后按真实用户反馈排序，开工前再细化。",
+      "status": "todo"
+    },
+    {
+      "id": "V01",
+      "stage": 1,
+      "lane": "G 机构端与后台（选做）",
+      "level": "B",
+      "tool": "Codex 或 Claude",
+      "kind": "page",
+      "pages": [
+        "O01",
+        "O02"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "O01 机构工作台＋O02 招生与线索（机构端前端，假数据）",
+      "optional": true,
+      "goal": "照原型做出机构端的 O01 机构工作台、O02 招生与线索。不影响学员端上线，想早点看到全貌再做。",
+      "notes": "本车道第一个任务同时是这个端的样板页，做完在 docs/baseline/ui-rules.md 的「样板页」一节补一行指向它（本任务允许改这一处）。",
+      "owns": [
+        "docs/baseline/ui-rules.md"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "V02",
+      "stage": 1,
+      "lane": "G 机构端与后台（选做）",
+      "level": "B",
+      "tool": "Codex 或 Claude",
+      "kind": "page",
+      "pages": [
+        "O03",
+        "O04"
+      ],
+      "deps": [
+        "F08",
+        "V01"
+      ],
+      "title": "O03 班级与学员＋O04 学员 360°（机构端前端，假数据）",
+      "optional": true,
+      "goal": "照原型做出机构端的 O03 班级与学员、O04 学员 360°。不影响学员端上线，想早点看到全貌再做。",
+      "owns": [],
+      "status": "todo"
+    },
+    {
+      "id": "V03",
+      "stage": 1,
+      "lane": "G 机构端与后台（选做）",
+      "level": "B",
+      "tool": "Codex 或 Claude",
+      "kind": "page",
+      "pages": [
+        "O05",
+        "O06"
+      ],
+      "deps": [
+        "F08",
+        "V01"
+      ],
+      "title": "O05 排课、考勤与直播＋O06 教学计划与作业（机构端前端，假数据）",
+      "optional": true,
+      "goal": "照原型做出机构端的 O05 排课、考勤与直播、O06 教学计划与作业。不影响学员端上线，想早点看到全貌再做。",
+      "owns": [],
+      "status": "todo"
+    },
+    {
+      "id": "V04",
+      "stage": 1,
+      "lane": "G 机构端与后台（选做）",
+      "level": "B",
+      "tool": "Codex 或 Claude",
+      "kind": "page",
+      "pages": [
+        "O07",
+        "O08"
+      ],
+      "deps": [
+        "F08",
+        "V01"
+      ],
+      "title": "O07 班级考试与讲评＋O08 督学预警（机构端前端，假数据）",
+      "optional": true,
+      "goal": "照原型做出机构端的 O07 班级考试与讲评、O08 督学预警。不影响学员端上线，想早点看到全貌再做。",
+      "owns": [],
+      "status": "todo"
+    },
+    {
+      "id": "V05",
+      "stage": 1,
+      "lane": "G 机构端与后台（选做）",
+      "level": "B",
+      "tool": "Codex 或 Claude",
+      "kind": "page",
+      "pages": [
+        "O09",
+        "O10"
+      ],
+      "deps": [
+        "F08",
+        "V01"
+      ],
+      "title": "O09 批改工作台＋O10 答疑与机构助教（机构端前端，假数据）",
+      "optional": true,
+      "goal": "照原型做出机构端的 O09 批改工作台、O10 答疑与机构助教。不影响学员端上线，想早点看到全貌再做。",
+      "owns": [],
+      "status": "todo"
+    },
+    {
+      "id": "V06",
+      "stage": 1,
+      "lane": "G 机构端与后台（选做）",
+      "level": "B",
+      "tool": "Codex 或 Claude",
+      "kind": "page",
+      "pages": [
+        "O11",
+        "O12"
+      ],
+      "deps": [
+        "F08",
+        "V01"
+      ],
+      "title": "O11 内容、地图与题库＋O12 结业、认证与续报（机构端前端，假数据）",
+      "optional": true,
+      "goal": "照原型做出机构端的 O11 内容、地图与题库、O12 结业、认证与续报。不影响学员端上线，想早点看到全貌再做。",
+      "owns": [],
+      "status": "todo"
+    },
+    {
+      "id": "V07",
+      "stage": 1,
+      "lane": "G 机构端与后台（选做）",
+      "level": "B",
+      "tool": "Codex 或 Claude",
+      "kind": "page",
+      "pages": [
+        "O13",
+        "O14"
+      ],
+      "deps": [
+        "F08",
+        "V01"
+      ],
+      "title": "O13 数据中心＋O14 品牌与多端（机构端前端，假数据）",
+      "optional": true,
+      "goal": "照原型做出机构端的 O13 数据中心、O14 品牌与多端。不影响学员端上线，想早点看到全貌再做。",
+      "owns": [],
+      "status": "todo"
+    },
+    {
+      "id": "V08",
+      "stage": 1,
+      "lane": "G 机构端与后台（选做）",
+      "level": "B",
+      "tool": "Codex 或 Claude",
+      "kind": "page",
+      "pages": [
+        "O15",
+        "O16"
+      ],
+      "deps": [
+        "F08",
+        "V01"
+      ],
+      "title": "O15 组织、权限与开放接口＋O16 订阅与用量（机构端前端，假数据）",
+      "optional": true,
+      "goal": "照原型做出机构端的 O15 组织、权限与开放接口、O16 订阅与用量。不影响学员端上线，想早点看到全貌再做。",
+      "owns": [],
+      "status": "todo"
+    },
+    {
+      "id": "W01",
+      "stage": 1,
+      "lane": "G 机构端与后台（选做）",
+      "level": "B",
+      "tool": "Codex 或 Claude",
+      "kind": "page",
+      "pages": [
+        "P01",
+        "P02"
+      ],
+      "deps": [
+        "F08"
+      ],
+      "title": "P01 运营驾驶舱＋P02 数据中台（平台后台前端，假数据）",
+      "optional": true,
+      "goal": "照原型做出平台后台的 P01 运营驾驶舱、P02 数据中台。不影响学员端上线，想早点看到全貌再做。",
+      "notes": "本车道第一个任务同时是这个端的样板页，做完在 docs/baseline/ui-rules.md 的「样板页」一节补一行指向它（本任务允许改这一处）。",
+      "owns": [
+        "docs/baseline/ui-rules.md"
+      ],
+      "status": "todo"
+    },
+    {
+      "id": "W02",
+      "stage": 1,
+      "lane": "G 机构端与后台（选做）",
+      "level": "B",
+      "tool": "Codex 或 Claude",
+      "kind": "page",
+      "pages": [
+        "P03",
+        "P04"
+      ],
+      "deps": [
+        "F08",
+        "W01"
+      ],
+      "title": "P03 考试画像库与日历＋P04 知识地图与类型库（平台后台前端，假数据）",
+      "optional": true,
+      "goal": "照原型做出平台后台的 P03 考试画像库与日历、P04 知识地图与类型库。不影响学员端上线，想早点看到全貌再做。",
+      "owns": [],
+      "status": "todo"
+    },
+    {
+      "id": "W03",
+      "stage": 1,
+      "lane": "G 机构端与后台（选做）",
+      "level": "B",
+      "tool": "Codex 或 Claude",
+      "kind": "page",
+      "pages": [
+        "P05",
+        "P06"
+      ],
+      "deps": [
+        "F08",
+        "W01"
+      ],
+      "title": "P05 考情分析工作台＋P06 变更影响分析（平台后台前端，假数据）",
+      "optional": true,
+      "goal": "照原型做出平台后台的 P05 考情分析工作台、P06 变更影响分析。不影响学员端上线，想早点看到全貌再做。",
+      "owns": [],
+      "status": "todo"
+    },
+    {
+      "id": "W04",
+      "stage": 1,
+      "lane": "G 机构端与后台（选做）",
+      "level": "B",
+      "tool": "Codex 或 Claude",
+      "kind": "page",
+      "pages": [
+        "P07",
+        "P08"
+      ],
+      "deps": [
+        "F08",
+        "W01"
+      ],
+      "title": "P07 内容生产流水线＋P08 题库审核与质量（平台后台前端，假数据）",
+      "optional": true,
+      "goal": "照原型做出平台后台的 P07 内容生产流水线、P08 题库审核与质量。不影响学员端上线，想早点看到全貌再做。",
+      "owns": [],
+      "status": "todo"
+    },
+    {
+      "id": "W05",
+      "stage": 1,
+      "lane": "G 机构端与后台（选做）",
+      "level": "B",
+      "tool": "Codex 或 Claude",
+      "kind": "page",
+      "pages": [
+        "P09",
+        "P10"
+      ],
+      "deps": [
+        "F08",
+        "W01"
+      ],
+      "title": "P09 模板与学习包、版权＋P10 AI 场景、模型与成本（平台后台前端，假数据）",
+      "optional": true,
+      "goal": "照原型做出平台后台的 P09 模板与学习包、版权、P10 AI 场景、模型与成本。不影响学员端上线，想早点看到全貌再做。",
+      "owns": [],
+      "status": "todo"
+    },
+    {
+      "id": "W06",
+      "stage": 1,
+      "lane": "G 机构端与后台（选做）",
+      "level": "B",
+      "tool": "Codex 或 Claude",
+      "kind": "page",
+      "pages": [
+        "P11",
+        "P12"
+      ],
+      "deps": [
+        "F08",
+        "W01"
+      ],
+      "title": "P11 行为体与提示词＋P12 AI 评测与质量（平台后台前端，假数据）",
+      "optional": true,
+      "goal": "照原型做出平台后台的 P11 行为体与提示词、P12 AI 评测与质量。不影响学员端上线，想早点看到全貌再做。",
+      "owns": [],
+      "status": "todo"
+    },
+    {
+      "id": "W07",
+      "stage": 1,
+      "lane": "G 机构端与后台（选做）",
+      "level": "B",
+      "tool": "Codex 或 Claude",
+      "kind": "page",
+      "pages": [
+        "P13",
+        "P14"
+      ],
+      "deps": [
+        "F08",
+        "W01"
+      ],
+      "title": "P13 用户、会员与订单＋P14 机构租户（平台后台前端，假数据）",
+      "optional": true,
+      "goal": "照原型做出平台后台的 P13 用户、会员与订单、P14 机构租户。不影响学员端上线，想早点看到全貌再做。",
+      "owns": [],
+      "status": "todo"
+    },
+    {
+      "id": "W08",
+      "stage": 1,
+      "lane": "G 机构端与后台（选做）",
+      "level": "B",
+      "tool": "Codex 或 Claude",
+      "kind": "page",
+      "pages": [
+        "P15",
+        "P16"
+      ],
+      "deps": [
+        "F08",
+        "W01"
+      ],
+      "title": "P15 触达与公告＋P16 客服、工单与反馈（平台后台前端，假数据）",
+      "optional": true,
+      "goal": "照原型做出平台后台的 P15 触达与公告、P16 客服、工单与反馈。不影响学员端上线，想早点看到全貌再做。",
+      "owns": [],
+      "status": "todo"
+    },
+    {
+      "id": "W09",
+      "stage": 1,
+      "lane": "G 机构端与后台（选做）",
+      "level": "B",
+      "tool": "Codex 或 Claude",
+      "kind": "page",
+      "pages": [
+        "P17",
+        "P18",
+        "P19"
+      ],
+      "deps": [
+        "F08",
+        "W01"
+      ],
+      "title": "P17 内容安全、社区与危机响应＋P18 合规中心＋P19 系统、参数与权限（平台后台前端，假数据）",
+      "optional": true,
+      "goal": "照原型做出平台后台的 P17 内容安全、社区与危机响应、P18 合规中心、P19 系统、参数与权限。不影响学员端上线，想早点看到全貌再做。",
+      "owns": [],
+      "status": "todo"
+    }
+  ]
+}

@@ -1,0 +1,203 @@
+{
+  "project": "备考助手",
+  "main_branch": "main",
+  "handoff_dir": "../handoff",
+  "zip_limit_mb": 25,
+  "node_major": 24,
+  "max_rounds": 3,
+  "schema_frozen": false,
+  "freeze_paths": [
+    "packages/db/prisma/migrations/**"
+  ],
+  "pack_depth": 30,
+  "prototype": "design/prototype/prototype.html",
+  "shared_ok": [
+    "fixtures/**",
+    "packages/db/prisma/migrations/**",
+    "docs/decisions/**",
+    "tests/rules/**"
+  ],
+  "verify": {
+    "quick": [
+      "lint",
+      "typecheck",
+      "test"
+    ],
+    "web": [
+      "lint",
+      "typecheck",
+      "test",
+      "build",
+      "e2e:smoke"
+    ],
+    "full": [
+      "lint",
+      "typecheck",
+      "test",
+      "build",
+      "test:db",
+      "e2e:smoke",
+      "gallery"
+    ]
+  },
+  "run": {
+    "mock": "pnpm dev",
+    "real": "pnpm dev:real",
+    "compose": "deploy/compose.dev.yml",
+    "urls": {
+      "学员端": "http://localhost:5173",
+      "机构端": "http://localhost:5174",
+      "平台后台": "http://localhost:5175",
+      "接口健康检查": "http://localhost:3000/health",
+      "组件陈列页": "http://localhost:5173/dev/ui"
+    }
+  },
+  "routes": {
+    "今日": "/today",
+    "知识地图": "/map",
+    "知识点主页": "/kp/demo",
+    "做题": "/quiz/demo",
+    "错题本": "/mistakes",
+    "导师": "/tutor"
+  },
+  "kinds": {
+    "page": {
+      "owns": [
+        "apps/{app}/src/pages/{page}/**",
+        "apps/{app}/src/mocks/pages/{page}.ts",
+        "apps/{app}/src/i18n/zh-CN/{page}.json",
+        "contracts/openapi/pages/{page}.yaml",
+        "fixtures/pages/{page}/**",
+        "tests/e2e/pages/{page}.spec.ts"
+      ],
+      "reads": [
+        "AGENTS.md",
+        "docs/baseline/ui-rules.md",
+        "docs/baseline/vocabulary.md",
+        "docs/baseline/api-rules.md",
+        "docs/baseline/pages.md（只看本页那一行）"
+      ],
+      "lookup": [
+        "packages/ui/src/（公共组件：先查有没有现成的）",
+        "apps/learner/src/pages/S10/（样板页，照着写）",
+        "contracts/openapi/schemas/（核心数据形状）",
+        "fixtures/exams/（四个演示考试的数据）",
+        "design/screens/{appdir}/{page}.yaml（V3 页面登记，如有）"
+      ],
+      "proto": true,
+      "accept": [
+        "对照原型截图：手机 375、平板 834、桌面 1280 三档布局一致；本页所有视图都能用 ?view= 切换",
+        "七态（正常、加载、空、出错、离线、受限、数据不足）都能用 ?state= 强制显示，文案按 bk spec 的输出",
+        "数据只来自生成的接口钩子＋假数据层（MSW）；页面里不做业务计算。本页的接口写在 contracts/openapi/pages/{page}.yaml，数据形状引用 schemas/ 里的公共定义，本页私有的形状用 {page} 作前缀命名",
+        "文案放在 i18n/zh-CN/{page}.json；术语与 vocabulary.md 一致；不出现“保过”“必过”“押题”",
+        "原型里本页的 P0、P1 功能点在界面上都有对应（还没有后端的按钮点了提示“即将上线”也算），并在代码里用注释标功能点编号，如 // feat:{page}-03；P2 不做",
+        "跳到其他页面一律用路由表里的路径",
+        "tests/e2e/pages/{page}.spec.ts 冒烟测试覆盖各视图能打开、主要按钮可点；bk verify --level web 通过；交接单数据块 pages 写 {page}: ui"
+      ],
+      "not": [
+        "真实后端接口与数据库",
+        "业务规则计算（掌握档、排程、预测、额度等，接后端时再做）",
+        "改公共组件、路由表、令牌、依赖：需要的话写进交接单「风险与提醒」，由整合任务统一处理"
+      ]
+    },
+    "rule": {
+      "owns": [
+        "docs/baseline/rule-cards/{rule}.md",
+        "tests/rules/{rule}.cases.json",
+        "docs/decisions/**"
+      ],
+      "reads": [
+        "AGENTS.md",
+        "docs/baseline/rule-cards/README.md",
+        "docs/baseline/vocabulary.md",
+        "docs/baseline/data-model.md",
+        "docs/baseline/metrics.md"
+      ],
+      "lookup": [
+        "docs/models/（V3 算法说明，如有）",
+        "contracts/params.yaml（V3 参数表，如有）",
+        "docs/history/v3/domains/（V3 规格草稿，如有）",
+        "docs/adr/"
+      ],
+      "proto": "spec",
+      "accept": [
+        "按 rule-cards/README.md 的模板写完：目的、什么时候用、输入、输出、规则（大白话、编号）、例子表（至少 8 行，覆盖正常、边界、异常）、参数（名称、默认值、可调范围、谁能调）、不做",
+        "例子表同步写成 tests/rules/{rule}.cases.json（输入 → 期望输出），后端任务直接拿来做测试",
+        "需要你拍板的点写进交接单问题（选项、推荐、临时默认），规则卡里对应位置标“待拍板：任务编号-Qn”",
+        "与原型文字、vocabulary.md、metrics.md 一致；有冲突的列出来"
+      ],
+      "not": [
+        "写业务代码"
+      ]
+    },
+    "backend": {
+      "owns": [
+        "packages/domains/{domain}/**",
+        "packages/db/prisma/schema/{domain}.prisma",
+        "packages/db/prisma/migrations/**",
+        "apps/api/src/modules/{domain}/**",
+        "apps/worker/src/jobs/{domain}/**",
+        "tests/api/{domain}/**",
+        "contracts/openapi/pages/{page}.yaml",
+        "apps/{app}/src/pages/{page}/**",
+        "apps/{app}/src/mocks/pages/{page}.ts",
+        "apps/learner/src/mocks/domains/{domain}.ts",
+        "tests/e2e/pages/{page}.spec.ts",
+        "fixtures/**"
+      ],
+      "reads": [
+        "AGENTS.md",
+        "docs/baseline/data-model.md",
+        "docs/baseline/api-rules.md",
+        "docs/baseline/metrics.md",
+        "docs/baseline/rule-cards/{rule}.md",
+        "tests/rules/{rule}.cases.json"
+      ],
+      "lookup": [
+        "packages/domains/（看已有领域的写法）",
+        "packages/db/prisma/schema/",
+        "docs/adr/ADR-025* 至 ADR-029*（技术栈、结构、登录、租户隔离、多端）",
+        "contracts/openapi/"
+      ],
+      "proto": "spec",
+      "accept": [
+        "第一步：把规则写成纯函数放 packages/domains/{domain}/core/（不碰数据库与服务端依赖），规则卡例子表全部变成测试并通过（测试标题带例子编号）；模拟层改用这份规则，页面在假数据模式下就用上真规则",
+        "接口按 contracts/openapi 实现，请求与响应经 Zod 校验；接口测试用 Fastify inject",
+        "涉及的页面关掉假数据后，用真接口能正常显示和操作（VITE_REAL 加上本领域）；七态在真接口下也对",
+        "遵守 data-model.md 的硬规则：证据只追加、UUIDv7、UTC、参数不写裸数字、AI 只提议",
+        "改了表结构就有迁移；数据库测试在本地 full 验证里跑（网页端跑不了就在交接单写明）",
+        "交接单写清：本地 bk run --real 之后打开哪里、看到什么；数据块 pages 把接通的页面写成 api"
+      ],
+      "not": [
+        "改别的领域的内部代码（需要它提供能力就写进交接单）",
+        "在页面里重算业务数字"
+      ]
+    },
+    "foundation": {
+      "reads": [],
+      "proto": "spec"
+    },
+    "integrate": {
+      "proto": false
+    },
+    "ops": {
+      "owns": [
+        "**"
+      ],
+      "reads": [
+        "AGENTS.md",
+        "docs/baseline/tech.md"
+      ]
+    },
+    "fix": {
+      "reads": [
+        "AGENTS.md"
+      ],
+      "lookup": [
+        "docs/baseline/",
+        "progress/reports/（相关任务的交接单）",
+        "progress/changelog.md（最近改了什么）"
+      ]
+    }
+  }
+}

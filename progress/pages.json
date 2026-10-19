@@ -1,0 +1,1168 @@
+{
+  "pages": [
+    {
+      "id": "S01",
+      "name": "欢迎与登录",
+      "app": "learner",
+      "group": "入门",
+      "route": "/welcome",
+      "mode": "独立页",
+      "views": [
+        "first 首次进入",
+        "back 回访登录",
+        "abn 账号异常"
+      ],
+      "features": [
+        13,
+        8,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S02",
+      "name": "备考目标",
+      "app": "learner",
+      "group": "入门",
+      "route": "/goals",
+      "mode": "引导流（管理态为标准）",
+      "views": [
+        "first 首次（引导流）",
+        "manage 管理态"
+      ],
+      "features": [
+        11,
+        7,
+        2
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S03",
+      "name": "时间与资料",
+      "app": "learner",
+      "group": "入门",
+      "route": "/setup",
+      "mode": "引导流",
+      "views": [
+        "time 3a 时间",
+        "res 3b 资料"
+      ],
+      "features": [
+        9,
+        3,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S04",
+      "name": "摸底诊断",
+      "app": "learner",
+      "group": "入门",
+      "route": "/diagnosis",
+      "mode": "引导流（测评中为沉浸）",
+      "views": [
+        "start 开始页",
+        "test 测评中"
+      ],
+      "features": [
+        11,
+        3,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S05",
+      "name": "起点报告与方案",
+      "app": "learner",
+      "group": "入门",
+      "route": "/start-report",
+      "mode": "引导流",
+      "views": [
+        "normal 正常",
+        "quick 只做了快速定位"
+      ],
+      "features": [
+        10,
+        3,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S06",
+      "name": "今日",
+      "app": "learner",
+      "group": "今日",
+      "route": "/today",
+      "mode": "标准",
+      "views": [
+        "normal 正常",
+        "first 首次进入",
+        "done 全部完成",
+        "off 今天不可学",
+        "back 中断回归",
+        "noai 导师不可用"
+      ],
+      "features": [
+        19,
+        6,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S07",
+      "name": "学习计划",
+      "app": "learner",
+      "group": "今日",
+      "route": "/plan",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        10,
+        9,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S08",
+      "name": "复盘与报告",
+      "app": "learner",
+      "group": "今日",
+      "route": "/recap",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        6,
+        8,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S09",
+      "name": "知识地图",
+      "app": "learner",
+      "group": "学",
+      "route": "/map",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        10,
+        9,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S10",
+      "name": "知识点主页",
+      "app": "learner",
+      "group": "学",
+      "route": "/kp/:kpId",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        12,
+        5,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S11",
+      "name": "我的资料",
+      "app": "learner",
+      "group": "学",
+      "route": "/materials",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        12,
+        11,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S12",
+      "name": "阅读器",
+      "app": "learner",
+      "group": "学",
+      "route": "/reader/:docId",
+      "mode": "沉浸",
+      "views": [],
+      "features": [
+        10,
+        11,
+        2
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S13",
+      "name": "视听课堂",
+      "app": "learner",
+      "group": "学",
+      "route": "/classroom",
+      "mode": "视频为沉浸，其余标准",
+      "views": [
+        "video 视频",
+        "audio 听单",
+        "ext 外部课"
+      ],
+      "features": [
+        7,
+        7,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S14",
+      "name": "笔记本",
+      "app": "learner",
+      "group": "学",
+      "route": "/notes",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        7,
+        7,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S15",
+      "name": "复习与卡片",
+      "app": "learner",
+      "group": "记",
+      "route": "/review",
+      "mode": "复习会话为沉浸",
+      "views": [
+        "home 落地页",
+        "session 复习会话"
+      ],
+      "features": [
+        9,
+        9,
+        2
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S16",
+      "name": "背诵训练",
+      "app": "learner",
+      "group": "记",
+      "route": "/recite",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        8,
+        6,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S17",
+      "name": "练习中心",
+      "app": "learner",
+      "group": "练",
+      "route": "/practice",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        9,
+        15,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S18",
+      "name": "做题与解析",
+      "app": "learner",
+      "group": "练",
+      "route": "/quiz/:sessionId",
+      "mode": "沉浸",
+      "views": [
+        "obj 客观题",
+        "gen 生成题（先做后核）"
+      ],
+      "features": [
+        16,
+        10,
+        2
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S19",
+      "name": "错题本",
+      "app": "learner",
+      "group": "练",
+      "route": "/mistakes",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        7,
+        12,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S20",
+      "name": "主观题批改",
+      "app": "learner",
+      "group": "练",
+      "route": "/grading",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        7,
+        9,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S21",
+      "name": "口头表达训练",
+      "app": "learner",
+      "group": "练",
+      "route": "/oral",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        2,
+        8,
+        2
+      ],
+      "extension": true,
+      "status": "todo"
+    },
+    {
+      "id": "S22",
+      "name": "模考中心",
+      "app": "learner",
+      "group": "考",
+      "route": "/mock",
+      "mode": "作答中为沉浸",
+      "views": [
+        "home 落地页",
+        "confirm 开考确认",
+        "exam 作答中"
+      ],
+      "features": [
+        7,
+        5,
+        2
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S23",
+      "name": "测评报告",
+      "app": "learner",
+      "group": "考",
+      "route": "/mock/report/:reportId",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        8,
+        4,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S24",
+      "name": "进度与预测",
+      "app": "learner",
+      "group": "考",
+      "route": "/progress",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        9,
+        10,
+        3
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S25",
+      "name": "考试日历与资讯",
+      "app": "learner",
+      "group": "考",
+      "route": "/calendar",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        5,
+        6,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S26",
+      "name": "报考决策",
+      "app": "learner",
+      "group": "考",
+      "route": "/enroll",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        2,
+        6,
+        1
+      ],
+      "extension": true,
+      "status": "todo"
+    },
+    {
+      "id": "S27",
+      "name": "冲刺与考后",
+      "app": "learner",
+      "group": "考",
+      "route": "/sprint",
+      "mode": "标准",
+      "views": [
+        "sprint 冲刺",
+        "after 考后"
+      ],
+      "features": [
+        5,
+        7,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S28",
+      "name": "AI 导师",
+      "app": "learner",
+      "group": "助",
+      "route": "/tutor",
+      "mode": "标准",
+      "views": [
+        "normal 正常",
+        "crisis 危机信号",
+        "down 不可用"
+      ],
+      "features": [
+        12,
+        8,
+        2
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S29",
+      "name": "搜索与速查",
+      "app": "learner",
+      "group": "助",
+      "route": "/search",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        2,
+        4,
+        3
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S30",
+      "name": "自习室与小组",
+      "app": "learner",
+      "group": "助",
+      "route": "/study-room",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        1,
+        5,
+        6
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S31",
+      "name": "会员与权益",
+      "app": "learner",
+      "group": "我",
+      "route": "/membership",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        13,
+        7,
+        5
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S32",
+      "name": "数据与隐私",
+      "app": "learner",
+      "group": "我",
+      "route": "/privacy",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        17,
+        8,
+        5
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S33",
+      "name": "设置",
+      "app": "learner",
+      "group": "我",
+      "route": "/settings",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        6,
+        9,
+        3
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S34",
+      "name": "成长档案",
+      "app": "learner",
+      "group": "我",
+      "route": "/growth",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        0,
+        6,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "S35",
+      "name": "消息与帮助",
+      "app": "learner",
+      "group": "我",
+      "route": "/messages",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        4,
+        7,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "O01",
+      "name": "机构工作台",
+      "app": "org",
+      "group": "总览",
+      "route": "/workbench",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        6,
+        5,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "O02",
+      "name": "招生与线索",
+      "app": "org",
+      "group": "招生",
+      "route": "/leads",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        1,
+        8,
+        2
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "O03",
+      "name": "班级与学员",
+      "app": "org",
+      "group": "教务",
+      "route": "/classes",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        7,
+        4,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "O04",
+      "name": "学员 360°",
+      "app": "org",
+      "group": "教务",
+      "route": "/students/:studentId",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        6,
+        4,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "O05",
+      "name": "排课、考勤与直播",
+      "app": "org",
+      "group": "教务",
+      "route": "/schedule",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        1,
+        10,
+        5
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "O06",
+      "name": "教学计划与作业",
+      "app": "org",
+      "group": "教学",
+      "route": "/teaching",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        5,
+        4,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "O07",
+      "name": "班级考试与讲评",
+      "app": "org",
+      "group": "教学",
+      "route": "/class-exams",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        5,
+        5,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "O08",
+      "name": "督学预警",
+      "app": "org",
+      "group": "服务",
+      "route": "/alerts",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        3,
+        7,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "O09",
+      "name": "批改工作台",
+      "app": "org",
+      "group": "服务",
+      "route": "/grading",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        5,
+        7,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "O10",
+      "name": "答疑与机构助教",
+      "app": "org",
+      "group": "服务",
+      "route": "/qa",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        3,
+        7,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "O11",
+      "name": "内容、地图与题库",
+      "app": "org",
+      "group": "教研",
+      "route": "/content",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        7,
+        12,
+        2
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "O12",
+      "name": "结业、认证与续报",
+      "app": "org",
+      "group": "服务",
+      "route": "/completion",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        1,
+        6,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "O13",
+      "name": "数据中心",
+      "app": "org",
+      "group": "数据",
+      "route": "/data",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        0,
+        7,
+        2
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "O14",
+      "name": "品牌与多端",
+      "app": "org",
+      "group": "设置",
+      "route": "/brand",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        1,
+        4,
+        2
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "O15",
+      "name": "组织、权限与开放接口",
+      "app": "org",
+      "group": "设置",
+      "route": "/org-settings",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        7,
+        7,
+        2
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "O16",
+      "name": "订阅与用量",
+      "app": "org",
+      "group": "设置",
+      "route": "/subscription",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        3,
+        3,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P01",
+      "name": "运营驾驶舱",
+      "app": "admin",
+      "group": "总览与数据",
+      "route": "/cockpit",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        4,
+        7,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P02",
+      "name": "数据中台",
+      "app": "admin",
+      "group": "总览与数据",
+      "route": "/data-hub",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        1,
+        4,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P03",
+      "name": "考试画像库与日历",
+      "app": "admin",
+      "group": "考试与地图",
+      "route": "/exam-profiles",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        5,
+        3,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P04",
+      "name": "知识地图与类型库",
+      "app": "admin",
+      "group": "考试与地图",
+      "route": "/maps",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        8,
+        3,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P05",
+      "name": "考情分析工作台",
+      "app": "admin",
+      "group": "考试与地图",
+      "route": "/exam-analysis",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        5,
+        2,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P06",
+      "name": "变更影响分析",
+      "app": "admin",
+      "group": "考试与地图",
+      "route": "/impact",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        1,
+        6,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P07",
+      "name": "内容生产流水线",
+      "app": "admin",
+      "group": "内容中台",
+      "route": "/pipeline",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        4,
+        3,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P08",
+      "name": "题库审核与质量",
+      "app": "admin",
+      "group": "内容中台",
+      "route": "/question-review",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        5,
+        3,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P09",
+      "name": "模板与学习包、版权",
+      "app": "admin",
+      "group": "内容中台",
+      "route": "/templates",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        8,
+        5,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P10",
+      "name": "AI 场景、模型与成本",
+      "app": "admin",
+      "group": "AI 治理",
+      "route": "/ai-scenarios",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        4,
+        2,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P11",
+      "name": "行为体与提示词",
+      "app": "admin",
+      "group": "AI 治理",
+      "route": "/ai-actors",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        5,
+        1,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P12",
+      "name": "AI 评测与质量",
+      "app": "admin",
+      "group": "AI 治理",
+      "route": "/ai-evals",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        7,
+        3,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P13",
+      "name": "用户、会员与订单",
+      "app": "admin",
+      "group": "用户与商业",
+      "route": "/users",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        8,
+        9,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P14",
+      "name": "机构租户",
+      "app": "admin",
+      "group": "用户与商业",
+      "route": "/tenants",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        4,
+        3,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P15",
+      "name": "触达与公告",
+      "app": "admin",
+      "group": "运营与服务",
+      "route": "/outreach",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        4,
+        3,
+        1
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P16",
+      "name": "客服、工单与反馈",
+      "app": "admin",
+      "group": "运营与服务",
+      "route": "/support",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        4,
+        3,
+        2
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P17",
+      "name": "内容安全、社区与危机响应",
+      "app": "admin",
+      "group": "运营与服务",
+      "route": "/safety",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        7,
+        0,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P18",
+      "name": "合规中心",
+      "app": "admin",
+      "group": "合规与系统",
+      "route": "/compliance",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        10,
+        0,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    },
+    {
+      "id": "P19",
+      "name": "系统、参数与权限",
+      "app": "admin",
+      "group": "合规与系统",
+      "route": "/system",
+      "mode": "标准",
+      "views": [],
+      "features": [
+        13,
+        2,
+        0
+      ],
+      "extension": false,
+      "status": "todo"
+    }
+  ]
+}
