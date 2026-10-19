@@ -33,3 +33,5 @@ playwright-report/
 test-results/
 deploy/state/
 deploy/backups/
+.bk/
+packages/contract/src/generated/

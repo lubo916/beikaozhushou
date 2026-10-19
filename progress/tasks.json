@@ -17,7 +17,16 @@
       "notes": "按《册1》第 7.2 节的 Codex 提示词做；这一步不经过 Claude。",
       "deps": [],
       "pages": [],
-      "status": "todo"
+      "status": "done",
+      "history": [
+        {
+          "round": 1,
+          "version": "v0001",
+          "tool": "codex",
+          "date": "2026-10-20 06:15",
+          "status": "done"
+        }
+      ]
     },
     {
       "id": "F01",
