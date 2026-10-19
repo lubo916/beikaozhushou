@@ -1,6 +1,6 @@
 ---
 id: PLAT-02
-status: draft
+status: ready
 refs:
   api: [getParams]
   permissions: [platform.params.read]

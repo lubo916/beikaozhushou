@@ -1,6 +1,6 @@
 ---
 id: PLAT-01
-status: draft
+status: ready
 refs:
   api: [trackEvent]
   events: [app_opened]
