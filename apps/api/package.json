@@ -1,0 +1,25 @@
+{
+  "name": "@exam-prep/api",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./app": "./src/app.ts",
+    "./env": "./src/env.ts"
+  },
+  "scripts": {
+    "dev": "node --env-file-if-exists=../../.env --watch src/main.ts",
+    "start": "node src/main.ts"
+  },
+  "dependencies": {
+    "@exam-prep/contract": "workspace:*",
+    "@exam-prep/db": "workspace:*",
+    "@exam-prep/domain-metrics": "workspace:*",
+    "@exam-prep/domain-platform": "workspace:*",
+    "@exam-prep/params": "workspace:*",
+    "fastify": "5.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.0.0",
+    "vitest": "4.0.0"
+  }
+}

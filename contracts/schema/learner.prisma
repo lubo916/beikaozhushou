@@ -1,0 +1,136 @@
+// learner 领域（学习者模型）的表结构。一个领域一个文件；模型的 @owner 与文件名一致，列字段的 @data-class 取 contracts/data-classes.yaml（docs/conventions/data.md 规则 1、2）。
+
+/// 学习证据账本；只追加，撤回写 revoke 事件，掌握档由此重算（ADR-005）
+/// @owner learner
+/// @append_only
+/// @tenant_scoped
+model EvidenceEvent {
+  /// @data-class personal_learning
+  id String @id @db.Uuid
+  /// @data-class operational
+  tenant_id String @db.Uuid
+  tenant Tenant @relation("EvidenceEvent_tenant_id", fields: [tenant_id], references: [id])
+  /// @data-class personal_learning
+  learner_id String @db.Uuid
+  learner User @relation("EvidenceEvent_learner_id", fields: [learner_id], references: [id])
+  /// @data-class personal_learning
+  event_type EvidenceEventEventType
+  /// @data-class personal_learning
+  revokes_event_id String? @db.Uuid
+  revokes_event EvidenceEvent? @relation("EvidenceEvent_revokes_event_id", fields: [revokes_event_id], references: [id])
+  /// @data-class personal_learning
+  knowledge_point_id String @db.Uuid
+  knowledge_point KnowledgePoint @relation("EvidenceEvent_knowledge_point_id", fields: [knowledge_point_id], references: [id])
+  /// @data-class personal_learning
+  source EvidenceEventSource
+  /// 产生证据的作答、复习或测验记录
+  /// @data-class personal_learning
+  source_ref String? @db.Uuid
+  /// @data-class personal_learning
+  question_id String? @db.Uuid
+  question Question? @relation("EvidenceEvent_question_id", fields: [question_id], references: [id])
+  /// @data-class personal_learning
+  question_version Int?
+  /// @data-class personal_learning
+  credibility EvidenceEventCredibility?
+  /// @data-class personal_learning
+  correct Boolean?
+  /// @data-class personal_learning
+  confidence EvidenceEventConfidence
+  /// @data-class personal_learning
+  duration_ms Int
+  /// @data-class personal_learning
+  hint_level Int
+  /// @data-class inferred
+  strength EvidenceEventStrength
+  /// @data-class inferred
+  rule_version String
+  /// @data-class personal_learning
+  occurred_at DateTime @db.Timestamptz(6)
+  /// @data-class personal_learning
+  recorded_at DateTime @db.Timestamptz(6)
+  /// @data-class personal_learning
+  idempotency_key String @unique
+
+  // 反向关系：不是列，由引用本表的外键推出
+  evidence_events_via_revokes_event_id EvidenceEvent[] @relation("EvidenceEvent_revokes_event_id")
+
+  @@map("evidence_events")
+}
+
+enum EvidenceEventEventType {
+  record
+  revoke
+}
+
+enum EvidenceEventSource {
+  practice
+  review
+  reading_quiz
+  mock
+  diagnosis
+  grading
+  self_check
+}
+
+enum EvidenceEventCredibility {
+  reviewed
+  own
+  generated_confirmed
+  generated_instant
+}
+
+enum EvidenceEventConfidence {
+  sure
+  vague
+  guess
+  off
+  none
+}
+
+enum EvidenceEventStrength {
+  strong
+  medium
+  weak
+  negative
+  pending
+}
+
+/// 掌握档的派生快照，可随时由 evidence_events 重算；只由 learner 写入（检查 E-OWN-02）
+/// @owner learner
+/// @tenant_scoped
+/// @derived_from evidence_events
+model MasteryLevel {
+  /// @data-class inferred
+  learner_id String @db.Uuid
+  learner User @relation("MasteryLevel_learner_id", fields: [learner_id], references: [id])
+  /// @data-class operational
+  tenant_id String @db.Uuid
+  tenant Tenant @relation("MasteryLevel_tenant_id", fields: [tenant_id], references: [id])
+  /// @data-class inferred
+  knowledge_point_id String @db.Uuid
+  knowledge_point KnowledgePoint @relation("MasteryLevel_knowledge_point_id", fields: [knowledge_point_id], references: [id])
+  /// 0 至 5，对应 glossary 的六档
+  /// @data-class inferred
+  level Int
+  /// @data-class inferred
+  sufficiency MasteryLevelSufficiency
+  /// @data-class inferred
+  pending_verification Boolean
+  /// @data-class inferred
+  score Float
+  /// @data-class inferred
+  last_evidence_at DateTime? @db.Timestamptz(6)
+  /// @data-class inferred
+  rule_version String
+  /// @data-class inferred
+  recomputed_at DateTime @db.Timestamptz(6)
+
+  @@id([learner_id, knowledge_point_id])
+  @@map("mastery_levels")
+}
+
+enum MasteryLevelSufficiency {
+  sufficient
+  insufficient
+}

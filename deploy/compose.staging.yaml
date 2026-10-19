@@ -1,0 +1,66 @@
+# 预发（阿里云 ECS，0.1b 计划 E2）：Caddy（含学员端静态文件）、api、worker 与 Redis（开 AOF）；数据库为 RDS PostgreSQL 17。
+# 由同目录的 release.sh 与 rollback.sh 驱动：RELEASE_TAG 为镜像标签；其余变量在同目录的 .env（变量名与说明见仓库根 .env.example，取值只放 ECS 与 GitHub Secrets）。
+name: exam-prep-staging
+
+x-server: &server
+  image: ${ACR_REGISTRY:?缺少 ACR_REGISTRY}/${ACR_NAMESPACE:?缺少 ACR_NAMESPACE}/exam-prep-server:${RELEASE_TAG:?缺少 RELEASE_TAG}
+  env_file: .env
+  environment:
+    REDIS_URL: redis://redis:6379
+  restart: unless-stopped
+  depends_on:
+    redis:
+      condition: service_healthy
+
+services:
+  web:
+    image: ${ACR_REGISTRY:?缺少 ACR_REGISTRY}/${ACR_NAMESPACE:?缺少 ACR_NAMESPACE}/exam-prep-web:${RELEASE_TAG:?缺少 RELEASE_TAG}
+    environment:
+      EXAM_PREP_SITE_ADDRESS: ${EXAM_PREP_SITE_ADDRESS:-:80}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  api:
+    <<: *server
+    command: ["node", "--disable-warning=ExperimentalWarning", "apps/api/src/main.ts"]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/healthz').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+
+  worker:
+    <<: *server
+    command: ["node", "--disable-warning=ExperimentalWarning", "apps/worker/src/main.ts"]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/healthz').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  caddy-data:
+  caddy-config:
+  redis-data:

@@ -1,0 +1,125 @@
+// plan 领域（计划引擎）的表结构。一个领域一个文件；模型的 @owner 与文件名一致，列字段的 @data-class 取 contracts/data-classes.yaml（docs/conventions/data.md 规则 1、2）。
+
+/// 提议：对学员状态的待确认变更，计划、复盘、测评、导师都经此改计划（ADR-013）
+/// @owner plan
+/// @tenant_scoped
+model Proposal {
+  /// @data-class personal_learning
+  id String @id @db.Uuid
+  /// @data-class operational
+  tenant_id String @db.Uuid
+  tenant Tenant @relation("Proposal_tenant_id", fields: [tenant_id], references: [id])
+  /// @data-class personal_learning
+  learner_id String @db.Uuid
+  learner User @relation("Proposal_learner_id", fields: [learner_id], references: [id])
+  /// 执行者 id 或系统组件
+  /// @data-class personal_learning
+  proposer String
+  /// @data-class personal_learning
+  kind ProposalKind
+  /// 改什么
+  /// @data-class personal_learning
+  change Json
+  /// 为什么；数字只来自算法字段（INV-02）
+  /// @data-class personal_learning
+  reason Json
+  /// 代价
+  /// @data-class personal_learning
+  cost Json
+  /// 不改会怎样
+  /// @data-class personal_learning
+  if_declined Json
+  /// @data-class personal_learning
+  status ProposalStatus
+  /// @data-class personal_learning
+  undo_until DateTime? @db.Timestamptz(6)
+  /// @data-class personal_learning
+  decided_at DateTime? @db.Timestamptz(6)
+  /// @data-class personal_learning
+  created_at DateTime @db.Timestamptz(6)
+
+  @@map("proposals")
+}
+
+enum ProposalKind {
+  carryover
+  scope
+  rounds
+  goal
+  reinforcement
+  sprint
+  other
+}
+
+enum ProposalStatus {
+  pending
+  accepted
+  declined
+  auto_applied
+  undone
+  expired
+}
+
+/// 学员的时间预算：时间格或每日目标时长；各目标、机构作业与课表共享同一份预算（ADR-016）
+/// @owner plan
+/// @tenant_scoped
+model TimeBudget {
+  /// @data-class personal_learning
+  id String @id @db.Uuid
+  /// @data-class operational
+  tenant_id String @db.Uuid
+  tenant Tenant @relation("TimeBudget_tenant_id", fields: [tenant_id], references: [id])
+  /// @data-class personal_learning
+  learner_id String @db.Uuid
+  learner User @relation("TimeBudget_learner_id", fields: [learner_id], references: [id])
+  /// 可用时段及场景：深度块、碎片、通勤可听
+  /// @data-class personal_learning
+  weekly_grid Json?
+  /// 不填时间格时的每日目标时长
+  /// @data-class personal_learning
+  daily_minutes Int?
+  /// @data-class personal_learning
+  unavailable_dates DateTime[] @db.Date
+  /// @data-class personal_learning
+  source TimeBudgetSource
+  /// @data-class personal_learning
+  valid_from DateTime @db.Date
+
+  @@map("time_budgets")
+}
+
+enum TimeBudgetSource {
+  declared
+  measured
+}
+
+/// 对时间预算的占用：目标的学习任务、机构作业与课表都以占用表达，个人任务自动避让
+/// @owner plan
+/// @tenant_scoped
+model TimeReservation {
+  /// @data-class personal_learning
+  id String @id @db.Uuid
+  /// @data-class operational
+  tenant_id String @db.Uuid
+  tenant Tenant @relation("TimeReservation_tenant_id", fields: [tenant_id], references: [id])
+  /// @data-class personal_learning
+  learner_id String @db.Uuid
+  learner User @relation("TimeReservation_learner_id", fields: [learner_id], references: [id])
+  /// @data-class personal_learning
+  date DateTime @db.Date
+  /// @data-class personal_learning
+  minutes Int
+  /// @data-class personal_learning
+  source_kind TimeReservationSourceKind
+  /// @data-class personal_learning
+  source_ref String @db.Uuid
+
+  @@map("time_reservations")
+}
+
+enum TimeReservationSourceKind {
+  goal
+  org_task
+  class_schedule
+  custom
+}

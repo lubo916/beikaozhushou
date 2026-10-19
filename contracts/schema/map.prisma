@@ -1,0 +1,141 @@
+// map 领域（知识地图）的表结构。一个领域一个文件；模型的 @owner 与文件名一致，列字段的 @data-class 取 contracts/data-classes.yaml（docs/conventions/data.md 规则 1、2）。
+
+/// 知识地图的版本；底图与扩展层分开，官方节点只读（ADR-009）
+/// @owner map
+/// @tenant_scoped
+model KnowledgeMap {
+  /// @data-class public_content
+  id String @id @db.Uuid
+  /// @data-class operational
+  tenant_id String @db.Uuid
+  tenant Tenant @relation("KnowledgeMap_tenant_id", fields: [tenant_id], references: [id])
+  /// @data-class public_content
+  exam_profile_id String @db.Uuid
+  exam_profile ExamProfile @relation("KnowledgeMap_exam_profile_id", fields: [exam_profile_id], references: [id])
+  /// @data-class public_content
+  version Int
+  /// @data-class public_content
+  source KnowledgeMapSource
+  /// @data-class public_content
+  status KnowledgeMapStatus
+  /// @data-class public_content
+  published_at DateTime? @db.Timestamptz(6)
+
+  // 反向关系：不是列，由引用本表的外键推出
+  knowledge_points KnowledgePoint[] @relation("KnowledgePoint_map_id")
+
+  @@map("knowledge_maps")
+}
+
+enum KnowledgeMapSource {
+  official
+  template
+  custom
+}
+
+enum KnowledgeMapStatus {
+  draft
+  published
+  retired
+}
+
+/// 地图版本之间的知识点映射；被拆分的点迁移后标“证据不足”而不清零（S09-14）
+/// @owner map
+/// @append_only
+/// @tenant_scoped
+model KnowledgePointMapping {
+  /// @data-class public_content
+  id String @id @db.Uuid
+  /// @data-class operational
+  tenant_id String @db.Uuid
+  tenant Tenant @relation("KnowledgePointMapping_tenant_id", fields: [tenant_id], references: [id])
+  /// @data-class public_content
+  kind KnowledgePointMappingKind
+  /// @data-class public_content
+  from_point_ids String[] @db.Uuid
+  /// @data-class public_content
+  to_point_ids String[] @db.Uuid
+  /// @data-class public_content
+  from_version Int
+  /// @data-class public_content
+  to_version Int
+  /// @data-class public_content
+  created_at DateTime @db.Timestamptz(6)
+
+  @@map("knowledge_point_mappings")
+}
+
+enum KnowledgePointMappingKind {
+  rename
+  move
+  merge
+  split
+  retire
+}
+
+/// 知识点与章节节点；id 稳定不复用，名称、位置、版本可变，合并拆分经 knowledge_point_mappings 迁移学习记录（ADR-009）
+/// @owner map
+/// @tenant_scoped
+model KnowledgePoint {
+  /// @data-class public_content
+  id String @id @db.Uuid
+  /// @data-class operational
+  tenant_id String @db.Uuid
+  tenant Tenant @relation("KnowledgePoint_tenant_id", fields: [tenant_id], references: [id])
+  /// @data-class public_content
+  map_id String @db.Uuid
+  map KnowledgeMap @relation("KnowledgePoint_map_id", fields: [map_id], references: [id])
+  /// @data-class public_content
+  parent_id String? @db.Uuid
+  parent KnowledgePoint? @relation("KnowledgePoint_parent_id", fields: [parent_id], references: [id])
+  /// @data-class public_content
+  node_kind KnowledgePointNodeKind
+  /// @data-class public_content
+  layer KnowledgePointLayer
+  /// @data-class public_content
+  name String
+  /// 一至两个类型
+  /// @data-class public_content
+  knowledge_types KnowledgePointKnowledgeTypes[]
+  /// @data-class public_content
+  default_target_level Int?
+  /// 官方或模板给默认值，个人覆盖另存（S10-02）
+  /// @data-class public_content
+  importance String?
+  /// @data-class public_content
+  since_version Int
+  /// @data-class public_content
+  retired_in_version Int?
+
+  // 反向关系：不是列，由引用本表的外键推出
+  evidence_events EvidenceEvent[] @relation("EvidenceEvent_knowledge_point_id")
+  knowledge_points_via_parent_id KnowledgePoint[] @relation("KnowledgePoint_parent_id")
+  mastery_levels MasteryLevel[] @relation("MasteryLevel_knowledge_point_id")
+  question_knowledge_points QuestionKnowledgePoint[] @relation("QuestionKnowledgePoint_knowledge_point_id")
+
+  @@map("knowledge_points")
+}
+
+enum KnowledgePointNodeKind {
+  subject
+  chapter
+  section
+  point
+}
+
+enum KnowledgePointLayer {
+  base
+  extension
+}
+
+enum KnowledgePointKnowledgeTypes {
+  concept
+  fact
+  statute
+  procedure
+  application
+  essay
+  oral
+  practical
+  accumulation
+}

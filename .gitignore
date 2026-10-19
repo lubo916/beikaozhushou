@@ -26,3 +26,10 @@ dist/
 node_modules/
 packages/db/generated/
 work/.plans/
+# 0.1b 工程接线：TypeScript 构建缓存、Playwright 本地输出、预发服务器上的发布状态与备份
+*.tsbuildinfo
+.cache/
+playwright-report/
+test-results/
+deploy/state/
+deploy/backups/

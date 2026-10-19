@@ -1,0 +1,23 @@
+{
+  "name": "@exam-prep/contract",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./errors": "./src/errors.ts",
+    "./permissions": "./src/generated/permissions.ts",
+    "./zod": "./src/generated/api/endpoints.zod.ts",
+    "./msw": "./src/generated/api/endpoints.msw.ts"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "5.85.0",
+    "zod": "4.1.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "9.9.0",
+    "@types/react": "19.2.0",
+    "msw": "2.10.0",
+    "react": "19.2.5",
+    "vitest": "4.0.0"
+  }
+}

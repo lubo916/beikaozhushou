@@ -1,0 +1,16 @@
+# 预发入口（0.1b 计划 E2）：/api 转给 api，其余为学员端静态文件，前端路由回退到 index.html；/api 下的未知地址由 api 返回 JSON 404。
+# 站点地址取 EXAM_PREP_SITE_ADDRESS：ICP 备案完成前用默认的 :80（经 ECS 公网 IP 以 HTTP 访问）；有备案域名后写域名，Caddy 自动签发证书。
+{$EXAM_PREP_SITE_ADDRESS::80} {
+	encode zstd gzip
+
+	@api path /api /api/*
+	handle @api {
+		reverse_proxy api:3000
+	}
+
+	handle {
+		root * /srv/learner
+		try_files {path} /index.html
+		file_server
+	}
+}

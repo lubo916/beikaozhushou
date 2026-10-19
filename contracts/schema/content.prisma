@@ -1,0 +1,92 @@
+// content 领域（内容与题库）的表结构。一个领域一个文件；模型的 @owner 与文件名一致，列字段的 @data-class 取 contracts/data-classes.yaml（docs/conventions/data.md 规则 1、2）。
+
+/// 题目与知识点的关联及强度
+/// @owner content
+model QuestionKnowledgePoint {
+  /// @data-class public_content
+  question_id String @db.Uuid
+  question Question @relation("QuestionKnowledgePoint_question_id", fields: [question_id], references: [id])
+  /// @data-class public_content
+  knowledge_point_id String @db.Uuid
+  knowledge_point KnowledgePoint @relation("QuestionKnowledgePoint_knowledge_point_id", fields: [knowledge_point_id], references: [id])
+  /// @data-class public_content
+  relation QuestionKnowledgePointRelation
+
+  @@id([question_id, knowledge_point_id])
+  @@map("question_knowledge_points")
+}
+
+enum QuestionKnowledgePointRelation {
+  primary
+  secondary
+}
+
+/// 题目；内容修改产生新版本，证据记录作答时的版本；可信度决定证据上限（ADR-010）
+/// @owner content
+/// @tenant_scoped
+model Question {
+  /// @data-class public_content
+  id String @id @db.Uuid
+  /// @data-class public_content
+  version Int
+  /// @data-class operational
+  tenant_id String @db.Uuid
+  tenant Tenant @relation("Question_tenant_id", fields: [tenant_id], references: [id])
+  /// @data-class public_content
+  exam_profile_id String @db.Uuid
+  exam_profile ExamProfile @relation("Question_exam_profile_id", fields: [exam_profile_id], references: [id])
+  /// 自有题的所有者；平台题为空
+  /// @data-class personal_learning
+  owner_user_id String? @db.Uuid
+  owner_user User? @relation("Question_owner_user_id", fields: [owner_user_id], references: [id])
+  /// @data-class public_content
+  response_form QuestionResponseForm
+  /// 取自考试画像的题型
+  /// @data-class public_content
+  question_type String
+  /// @data-class public_content
+  stem Json
+  /// @data-class public_content
+  options Json?
+  /// @data-class public_content
+  answer Json
+  /// 一句话结论、分步推导、知识点回链、资料定位
+  /// @data-class public_content
+  explanation Json
+  /// 逐选项解析与陷阱类型
+  /// @data-class public_content
+  option_notes Json?
+  /// @data-class public_content
+  credibility QuestionCredibility
+  /// 出处；生成题记强证据的条件之一
+  /// @data-class public_content
+  source_ref String?
+  /// @data-class public_content
+  created_at DateTime @db.Timestamptz(6)
+
+  // 反向关系：不是列，由引用本表的外键推出
+  answer_records AnswerRecord[] @relation("AnswerRecord_question_id")
+  evidence_events EvidenceEvent[] @relation("EvidenceEvent_question_id")
+  question_knowledge_points QuestionKnowledgePoint[] @relation("QuestionKnowledgePoint_question_id")
+
+  @@map("questions")
+}
+
+enum QuestionResponseForm {
+  choice
+  fill
+  match_order
+  stepwise
+  written
+  material
+  listening
+  oral
+  practical_self
+}
+
+enum QuestionCredibility {
+  reviewed
+  own
+  generated_confirmed
+  generated_instant
+}

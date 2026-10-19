@@ -1,0 +1,67 @@
+// account 领域（账号与身份）的表结构。一个领域一个文件；模型的 @owner 与文件名一致，列字段的 @data-class 取 contracts/data-classes.yaml（docs/conventions/data.md 规则 1、2）。
+
+/// 账号，含游客身份；游客登录后其数据并入正式账号，合并关系留存（ADR-012）
+/// @owner account
+/// @tenant_scoped
+model User {
+  /// @data-class account_info
+  id String @id @db.Uuid
+  /// @data-class operational
+  tenant_id String @db.Uuid
+  tenant Tenant @relation("User_tenant_id", fields: [tenant_id], references: [id])
+  /// @data-class account_info
+  kind UserKind
+  /// 存储加密；机构端脱敏展示（INV-13）
+  /// @data-class account_info
+  phone String?
+  /// @data-class account_info
+  phone_verified_at DateTime? @db.Timestamptz(6)
+  /// 未确认按未成年人处理（S01-02）
+  /// @data-class account_info
+  age_band UserAgeBand
+  /// 未成年人自动开启、本人不能关闭（INV-06）
+  /// @data-class account_info
+  minor_mode Boolean
+  /// 游客合并后的正式账号
+  /// @data-class account_info
+  merged_into String? @db.Uuid
+  merged_into_user User? @relation("User_merged_into", fields: [merged_into], references: [id])
+  /// @data-class account_info
+  merged_at DateTime? @db.Timestamptz(6)
+  /// @data-class account_info
+  status UserStatus
+  /// @data-class account_info
+  created_at DateTime @db.Timestamptz(6)
+
+  // 反向关系：不是列，由引用本表的外键推出
+  answer_records AnswerRecord[] @relation("AnswerRecord_learner_id")
+  evidence_events EvidenceEvent[] @relation("EvidenceEvent_learner_id")
+  mastery_levels MasteryLevel[] @relation("MasteryLevel_learner_id")
+  practice_sessions PracticeSession[] @relation("PracticeSession_learner_id")
+  proposals Proposal[] @relation("Proposal_learner_id")
+  questions Question[] @relation("Question_owner_user_id")
+  time_budgets TimeBudget[] @relation("TimeBudget_learner_id")
+  time_reservations TimeReservation[] @relation("TimeReservation_learner_id")
+  users_via_merged_into User[] @relation("User_merged_into")
+
+  @@map("users")
+}
+
+enum UserKind {
+  guest
+  registered
+}
+
+enum UserAgeBand {
+  unconfirmed
+  under_min
+  minor
+  adult
+}
+
+enum UserStatus {
+  active
+  restricted
+  cooling_off
+  deleted
+}

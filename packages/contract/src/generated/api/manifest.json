@@ -1,0 +1,10 @@
+{
+  "generator": "orval（scripts/engineering/contract-gen.mjs）",
+  "source_sha": "f7d378e68547",
+  "files": {
+    "endpoints.msw.ts": "d19c8cb0d956",
+    "endpoints.schemas.ts": "242d9abc2f81",
+    "endpoints.ts": "57b039f8143f",
+    "endpoints.zod.ts": "09a6ba05e829"
+  }
+}

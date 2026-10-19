@@ -1,0 +1,93 @@
+// practice 领域（练习）的表结构。一个领域一个文件；模型的 @owner 与文件名一致，列字段的 @data-class 取 contracts/data-classes.yaml（docs/conventions/data.md 规则 1、2）。
+
+/// 作答记录；揭晓后锁定（INV-24）；由 practice 调用 learner 的 recordEvidence 产生证据
+/// @owner practice
+/// @tenant_scoped
+model AnswerRecord {
+  /// @data-class personal_learning
+  id String @id @db.Uuid
+  /// @data-class operational
+  tenant_id String @db.Uuid
+  tenant Tenant @relation("AnswerRecord_tenant_id", fields: [tenant_id], references: [id])
+  /// @data-class personal_learning
+  session_id String @db.Uuid
+  session PracticeSession @relation("AnswerRecord_session_id", fields: [session_id], references: [id])
+  /// @data-class personal_learning
+  learner_id String @db.Uuid
+  learner User @relation("AnswerRecord_learner_id", fields: [learner_id], references: [id])
+  /// @data-class personal_learning
+  question_id String @db.Uuid
+  question Question @relation("AnswerRecord_question_id", fields: [question_id], references: [id])
+  /// @data-class personal_learning
+  question_version Int
+  /// @data-class personal_learning
+  response Json
+  /// @data-class personal_learning
+  correct Boolean?
+  /// @data-class personal_learning
+  confidence AnswerRecordConfidence
+  /// @data-class personal_learning
+  duration_ms Int
+  /// @data-class personal_learning
+  hint_level Int
+  /// @data-class personal_learning
+  revealed_at DateTime? @db.Timestamptz(6)
+  /// @data-class personal_learning
+  submitted_at DateTime @db.Timestamptz(6)
+
+  @@map("answer_records")
+}
+
+enum AnswerRecordConfidence {
+  sure
+  vague
+  guess
+  off
+  none
+}
+
+/// 一次练习、诊断或模考会话；记录模式与当时的档位快照（S17-09）
+/// @owner practice
+/// @tenant_scoped
+model PracticeSession {
+  /// @data-class personal_learning
+  id String @id @db.Uuid
+  /// @data-class operational
+  tenant_id String @db.Uuid
+  tenant Tenant @relation("PracticeSession_tenant_id", fields: [tenant_id], references: [id])
+  /// @data-class personal_learning
+  learner_id String @db.Uuid
+  learner User @relation("PracticeSession_learner_id", fields: [learner_id], references: [id])
+  /// @data-class personal_learning
+  kind PracticeSessionKind
+  /// @data-class personal_learning
+  mode PracticeSessionMode
+  /// @data-class personal_learning
+  scope Json
+  /// @data-class inferred
+  mastery_snapshot Json?
+  /// @data-class personal_learning
+  started_at DateTime @db.Timestamptz(6)
+  /// @data-class personal_learning
+  ended_at DateTime? @db.Timestamptz(6)
+
+  // 反向关系：不是列，由引用本表的外键推出
+  answer_records AnswerRecord[] @relation("AnswerRecord_session_id")
+
+  @@map("practice_sessions")
+}
+
+enum PracticeSessionKind {
+  practice
+  diagnosis
+  mock
+  retry
+  variant
+}
+
+enum PracticeSessionMode {
+  in_class
+  quick
+  timed
+  assessment
+}

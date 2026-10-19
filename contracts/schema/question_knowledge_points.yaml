@@ -1,7 +1,0 @@
-table: question_knowledge_points
-owner: content
-description: 题目与知识点的关联及强度
-fields:
-  - {name: question_id, type: uuid, ref: questions.id, x-data-class: public_content}
-  - {name: knowledge_point_id, type: uuid, ref: knowledge_points.id, x-data-class: public_content}
-  - {name: relation, type: "enum[primary, secondary]", x-data-class: public_content}

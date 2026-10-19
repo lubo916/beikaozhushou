@@ -152,7 +152,9 @@ DEFAULT_CONFIG = {
                 "rules_concurrent_warn": 60, "rules_concurrent_error": 80, "convention_rules_max": 15,
                 "spec_body_chars": 6000, "pack_chars": 15000, "pack_slice_chars": 2500},
     "shots": {"learner": [375, 1280], "org": [1280], "admin": [1280], "height": 900},
-    "verify": {"lint": "", "lint_files": "", "typecheck": "", "test": "", "e2e_smoke": "",
+    "verify": {"deps": "", "lint": "", "lint_files": "", "deps_graph": "", "typecheck": "", "test": "", "test_fast": "",
+               "tooling": "", "contract_check": "", "e2e_smoke": "", "results_merge": "",
+               "results_parts": [".test-results/vitest.json", ".test-results/playwright.json", ".test-results/tooling.json"],
                "results": ".test-results/results.json", "stack_marker": "package.json"},
     "eval": {"runner": "", "records": ".eval"},
     "git": {"main": "main"},
@@ -161,7 +163,18 @@ DEFAULT_CONFIG = {
               "term_scan": ["docs/**/*.md", "apps/**", "packages/ui/**", "design/screens/**/*.yaml"],
               "term_exclude": ["docs/meta/**", "docs/product/glossary.yaml", "docs/adr/**"],
               "copy_scan": ["apps/**", "packages/ui/**", "design/screens/**/*.yaml", "docs/product/brief.md"]},
-    "gen": {"params_out": "packages/params/index.ts", "roadmap_out": "docs/product/roadmap.md"},
+    "gen": {"params_out": "packages/params/registry.generated.ts", "pages_out": "apps/learner/src/generated/pages.ts",
+            "errors_out": "packages/contract/src/generated/error-codes.ts",
+            "permissions_out": "packages/contract/src/generated/permissions.ts",
+            "events_out": "packages/domains/metrics/src/generated/events.ts",
+            "metrics_out": "packages/domains/metrics/src/generated/metrics.ts",
+            "db_models_out": "packages/db/src/generated/models.ts",
+            "tokens_out": "packages/ui/src/generated/tokens.css",
+            "tokens_tailwind_out": "packages/ui/src/generated/tailwind-theme.css",
+            "tokens_selector": ":root", "tokens_skip_contexts": [], "tokens_tailwind_map": [],
+            "contract_dir": "packages/contract/src/generated/api",
+            "contract_sources": ["contracts/openapi.yaml", "orval.config.ts", "scripts/engineering/contract-gen.mjs"],
+            "contract_cmd": "", "roadmap_out": "docs/product/roadmap.md"},
 }
 
 
@@ -551,6 +564,142 @@ class Spec:
         return [str(x) for x in v] if isinstance(v, list) else [str(v)]
 
 
+# ---------------------------------------------------------------- 表结构（Prisma 多文件 schema，ADR-026 决定 4）
+
+PRISMA_BLOCK_RE = re.compile(r"^\s*(model|enum|view|type|generator|datasource)\s+(\w+)\s*\{\s*(?://.*)?$")
+PRISMA_FIELD_RE = re.compile(r"^\s*(\w+)\s+([A-Za-z_]\w*)(\[\])?(\?)?(?:\s+(.*?))?\s*$")
+PRISMA_NATIVE_RE = re.compile(r"@db\.\w+(?:\([^)]*\))?")
+
+
+def _prisma_tags(lines) -> tuple[dict, list]:
+    """三斜线注释：以 @ 开头的行是标注（@owner learner、@data-class inferred），其余行是说明。"""
+    tags, text = {}, []
+    for ln in lines:
+        m = re.match(r"^@([\w-]+)(?:\s+(.*))?$", ln.strip())
+        if m:
+            tags[m.group(1)] = (m.group(2) or "").strip()
+        elif ln.strip():
+            text.append(ln.strip())
+    return tags, text
+
+
+def _prisma_list(s: str) -> list[str]:
+    return [x.strip() for x in s.split(",") if x.strip()]
+
+
+def parse_prisma_schema(schema_dir: Path) -> tuple[dict, list]:
+    """解析 contracts/schema/*.prisma，返回 (表名 → 表定义, 问题列表)。
+
+    表定义：table、model、owner、description、append_only、tenant_scoped、derived_from、primary_key、unique、fields、_file。
+    模型的三斜线注释写 @owner、@append_only、@tenant_scoped、@derived_from；列字段的三斜线注释写 @data-class，其余行为说明。
+    fields 只含列字段（name、type、data_class、nullable、pk、unique、ref、enum、note）；关系字段的类型是模型，不是列，不进 fields。
+    """
+    problems, blocks, enums = [], {}, {}
+    for p in sorted(schema_dir.glob("*.prisma")) if schema_dir.exists() else []:
+        r = rel(p)
+        lines = read_text(p).splitlines()
+        docs, i = [], 0
+        while i < len(lines):
+            s = lines[i].strip()
+            m = PRISMA_BLOCK_RE.match(lines[i])
+            if s.startswith("///"):
+                docs.append(s[3:])
+            elif m:
+                kind, name, start, body = m.group(1), m.group(2), i + 1, []
+                i += 1
+                while i < len(lines) and lines[i].strip() != "}":
+                    body.append((i + 1, lines[i]))
+                    i += 1
+                if i >= len(lines):
+                    problems.append(F("E-SCHEMA-01", r, start, f"{kind} {name} 缺少结尾的右花括号", "补全代码块"))
+                if kind == "model":
+                    if name in blocks:
+                        problems.append(F("E-SCHEMA-01", r, start, f"模型 {name} 重复定义（另见 {blocks[name]['_file']}）", "每个模型只定义一次"))
+                    blocks[name] = {"docs": docs, "body": body, "_file": r, "_line": start}
+                elif kind == "enum":
+                    enums[name] = [b.split("//", 1)[0].split()[0] for _, b in body
+                                   if b.split("//", 1)[0].strip() and not b.strip().startswith("@@")]
+                docs = []
+            elif not s.startswith("//"):
+                docs = []
+            i += 1
+    table_of = {}
+    for name, b in blocks.items():
+        mm = next((re.search(r'@@map\(\s*"([^"]+)"', ln) for _, ln in b["body"] if "@@map" in ln), None)
+        table_of[name] = mm.group(1) if mm else name
+    tables = {}
+    for name, b in blocks.items():
+        r = b["_file"]
+        tags, desc = _prisma_tags(b["docs"])
+        t = {"table": table_of[name], "model": name, "owner": tags.get("owner") or None, "description": "；".join(desc) or None}
+        for flag in ("append_only", "tenant_scoped"):
+            if flag in tags:
+                t[flag] = True
+        if tags.get("derived_from"):
+            t["derived_from"] = tags["derived_from"]
+        fields, refs, pk, uniques, fdocs = [], {}, [], [], []
+        for ln, raw in b["body"]:
+            s = raw.strip()
+            if s.startswith("///"):
+                fdocs.append(s[3:])
+                continue
+            if not s:
+                fdocs = []
+                continue
+            if s.startswith("//"):
+                continue
+            if s.startswith("@@"):
+                m = re.match(r"@@id\(\s*\[([^\]]*)\]", s)
+                if m:
+                    pk = _prisma_list(m.group(1))
+                m = re.match(r"@@unique\(\s*\[([^\]]*)\]", s)
+                if m:
+                    uniques.append(_prisma_list(m.group(1)))
+                fdocs = []
+                continue
+            m = PRISMA_FIELD_RE.match(raw)
+            if not m:
+                problems.append(F("E-SCHEMA-01", r, ln, f"无法解析的字段行：{s[:60]}", "按 Prisma 字段语法改写"))
+                fdocs = []
+                continue
+            fname, ftype, lst, opt, attrs = m.group(1), m.group(2), m.group(3), m.group(4), m.group(5) or ""
+            ftags, fdesc = _prisma_tags(fdocs)
+            fdocs = []
+            if ftype in blocks:
+                rm = re.search(r"fields:\s*\[([^\]]*)\][^\]]*references:\s*\[([^\]]*)\]", attrs)
+                if rm:
+                    for a, c in zip(_prisma_list(rm.group(1)), _prisma_list(rm.group(2))):
+                        refs[a] = f"{table_of[ftype]}.{c}"
+                continue
+            native = PRISMA_NATIVE_RE.search(attrs)
+            f = {"name": fname, "type": ftype + ("[]" if lst else "") + (" " + native.group(0) if native else ""),
+                 "data_class": ftags.get("data-class") or None}
+            if opt:
+                f["nullable"] = True
+            if re.search(r"(?<!@)@id\b", attrs):
+                f["pk"] = True
+                pk = pk or [fname]
+            if re.search(r"(?<!@)@unique\b", attrs):
+                f["unique"] = True
+            if ftype in enums:
+                f["enum"] = enums[ftype]
+            if fdesc:
+                f["note"] = "；".join(fdesc)
+            fields.append(f)
+        for f in fields:
+            if f["name"] in refs:
+                f["ref"] = refs[f["name"]]
+        t["primary_key"] = pk
+        if uniques:
+            t["unique"] = uniques
+        t["fields"] = fields
+        t["_file"] = r
+        if t["table"] in tables:
+            problems.append(F("E-SCHEMA-01", r, b["_line"], f"表名 {t['table']} 重复（另见 {tables[t['table']]['_file']}）", "改 @@map"))
+        tables[t["table"]] = t
+    return tables, problems
+
+
 class Repo:
     """按需加载仓库中的各类登记。解析错误记在 self.load_errors。"""
 
@@ -662,24 +811,16 @@ class Repo:
 
     @property
     def tables(self) -> dict:
+        """表名 → 表定义，来自 contracts/schema/<领域>.prisma（ADR-026 决定 4）。"""
         key = ("tables",)
         if key in self._cache:
             return self._cache[key]
-        out = {}
         d = self.root / "contracts" / "schema"
-        if d.exists():
-            for p in sorted(d.glob("*.y*ml")):
-                r = rel(p)
-                try:
-                    data = load_yaml(p, {})
-                except YamlError as e:
-                    self.load_errors.append(F("E-SCHEMA-01", r, 1, str(e).split("：", 1)[-1], "修正 YAML 语法"))
-                    continue
-                if not isinstance(data, dict) or "table" not in data:
-                    self.load_errors.append(F("E-SCHEMA-01", r, 1, "缺少 table 字段", "按 docs/conventions/data.md 的表定义格式补齐"))
-                    continue
-                data["_file"] = r
-                out[str(data["table"])] = data
+        out, problems = parse_prisma_schema(d)
+        self.load_errors += problems
+        for p in sorted(d.glob("*.y*ml")) if d.exists() else []:
+            self.load_errors.append(F("E-SCHEMA-01", rel(p), 1, "表结构的唯一来源是 contracts/schema/<领域>.prisma（ADR-026 决定 4），YAML 表定义不再读取",
+                                      "把表定义转入所属领域的 .prisma 文件后删除本文件"))
         self._cache[key] = out
         return out
 
@@ -1061,7 +1202,10 @@ def _check_agents_structure(text: str, r: str, root: bool):
 
 def check_gen(repo, ctx):
     out = []
-    expected = gen_outputs(repo)
+    try:
+        expected = gen_outputs(repo)
+    except GenError as e:
+        return [F("E-GEN-03", e.file, "", e.msg, "修正来源后运行 python scripts/spec_tool.py gen")]
     for path, (content, src_hash, srcs) in expected.items():
         p = repo.root / path
         if not p.exists():
@@ -1076,6 +1220,43 @@ def check_gen(repo, ctx):
                 out.append(F("E-GEN-01", path, "", f"生成物已过期（来源：{', '.join(srcs)}）", "运行 python scripts/spec_tool.py gen"))
     for path in stale_generated(repo, expected):
         out.append(F("E-GEN-01", path, "", "多余的生成物：源已不存在", "运行 python scripts/spec_tool.py gen 清理"))
+    out += contract_findings(repo)
+    return out
+
+
+def contract_findings(repo) -> list:
+    """Orval 产物（pnpm contract:gen）：按 manifest.json 记录的源哈希与各文件哈希检出缺失、过期与手改，不需要安装依赖。"""
+    g = CFG["gen"]
+    d = str(g.get("contract_dir") or "packages/contract/src/generated/api")
+    srcs = [str(x) for x in (g.get("contract_sources") or ["contracts/openapi.yaml"])]
+    if not (repo.root / srcs[0]).exists():
+        return []
+    fix = "运行 pnpm contract:gen（或 python3 scripts/spec_tool.py gen）"
+    base, man = repo.root / d, repo.root / d / "manifest.json"
+    cur = short_hash("".join(read_text(repo.root / x) for x in srcs if (repo.root / x).exists()))
+    if not man.exists():
+        return [F("E-GEN-01", f"{d}/manifest.json", "", f"接口生成物缺失（来源：{', '.join(srcs)}）", fix)]
+    try:
+        data = json.loads(read_text(man))
+        files = dict(data.get("files") or {})
+    except (ValueError, AttributeError, TypeError):
+        return [F("E-GEN-02", f"{d}/manifest.json", "", "接口生成物清单不是合法 JSON，疑似被手改", fix)]
+    fresh = data.get("source_sha") == cur
+    out = []
+    for name, sha in sorted(files.items()):
+        p = base / name
+        if not p.exists():
+            out.append(F("E-GEN-01", f"{d}/{name}", "", "清单列出的接口生成物缺失", fix))
+        elif short_hash(read_text(p)) != sha:
+            out.append(F("E-GEN-02", f"{d}/{name}", "", "接口生成物与清单不符且源未改动，疑似被手改",
+                         "把改动移到 contracts/openapi.yaml 或 orval.config.ts，再运行 pnpm contract:gen") if fresh
+                       else F("E-GEN-01", f"{d}/{name}", "", "接口生成物已过期（来源已改动）", fix))
+    for p in walk_files(base):
+        r = p.relative_to(base).as_posix()
+        if r != "manifest.json" and r not in files:
+            out.append(F("E-GEN-01", f"{d}/{r}", "", "多余的接口生成物：不在清单中", fix))
+    if not fresh and not out:
+        out.append(F("E-GEN-01", f"{d}/manifest.json", "", f"接口生成物已过期（来源：{', '.join(srcs)}）", fix))
     return out
 
 
@@ -1223,19 +1404,27 @@ def check_owner(repo, ctx):
                 out.append(F("E-OWN-01", fileof(e), k, f"{label} {k} 没有 owner", "补上 owner（domain-map.yaml 中的领域名）"))
             elif o not in names:
                 out.append(F("E-OWN-01", fileof(e), k, f"{label} {k} 的 owner {o} 不是登记的领域名", "改为 domain-map.yaml 中的领域名"))
-    learner_tables = [t for t, d in repo.tables.items() if d.get("owner") == "learner"]
+    for t, d in repo.tables.items():
+        o, stem = d.get("owner"), Path(str(d.get("_file", ""))).stem
+        if o and o in names and stem != o:
+            out.append(F("E-OWN-01", d.get("_file", "contracts/schema"), t, f"表 {t} 的 owner {o} 与所在文件的领域 {stem} 不一致",
+                         f"移到 contracts/schema/{o}.prisma（一个领域一个文件）"))
+    learner_tables = [(t, d) for t, d in repo.tables.items() if d.get("owner") == "learner"]
     if learner_tables:
         alts = []
-        for t in learner_tables:
+        for t, d in learner_tables:
             camel = re.sub(r"_([a-z])", lambda m: m.group(1).upper(), t)
             alts += [re.escape(t), re.escape(camel)]
+            model = str(d.get("model") or "")
+            if model:
+                alts.append(re.escape(model[:1].lower() + model[1:]))
         tab = "(?:" + "|".join(alts) + ")"
         pats = [re.compile(r"\b(?:insert\s+into|update|delete\s+from|upsert\s+into)\s+[\"'`]?" + tab + r"\b", re.I),
                 re.compile(r"\b" + tab + r"\s*\.\s*(?:insert|create|update|upsert|delete|save)\w*\s*\(", re.I)]
         base = repo.root / "packages" / "domains"
         if base.exists():
             for p in walk_files(base):
-                parts = rel(p).split("/")
+                parts = p.relative_to(repo.root).as_posix().split("/")
                 if len(parts) < 4 or parts[2] == "learner" or p.suffix not in CODE_EXT or TEST_FILE_RE.search(p.name):
                     continue
                 text = read_text(p)
@@ -1362,7 +1551,8 @@ def check_refine(repo, ctx):
             out.append(F("E-SCHEMA-01", "scripts/spec_tool.toml", "deep_source.forbidden_patterns", f"正则无效 {s}：{e}", "修正正则"))
     if pats:
         for p in walk_files(repo.root):
-            if not is_text_file(p):
+            # 包管理器完整性摘要可能恰好包含外部编号；它不是深化来源文本。
+            if p.name == "pnpm-lock.yaml" or not is_text_file(p):
                 continue
             try:
                 text = read_text(p)
@@ -1487,10 +1677,10 @@ def check_dc(repo, ctx):
         for i, fld in enumerate(d.get("fields") or []):
             if not isinstance(fld, dict):
                 continue
-            dc = fld.get("x-data-class")
+            dc = fld.get("data_class")
             name = fld.get("name", f"[{i}]")
             if not dc:
-                out.append(F("E-DC-01", d["_file"], f"{t}.{name}", "字段没有标注数据类别", "补 x-data-class"))
+                out.append(F("E-DC-01", d["_file"], f"{t}.{name}", "字段没有标注数据类别", "在字段上方的三斜线注释写 @data-class <类别>"))
             elif dc not in dcs:
                 out.append(F("E-DC-01", d["_file"], f"{t}.{name}", f"数据类别 {dc} 不存在", "改为 contracts/data-classes.yaml 中的类别"))
     for cid, c in dcs.items():
@@ -1531,7 +1721,7 @@ def check_params(repo, ctx):
                 used.add(m.group(1))
                 if m.group(1) not in params:
                     out.append(F("E-PARAM-01", rel(p), text.count("\n", 0, m.start()) + 1, f"引用了未登记的参数 {m.group(1)}", "先在 contracts/params.yaml 登记"))
-            if rel(p).startswith("packages/domains/") and not TEST_FILE_RE.search(p.name):
+            if rel(p).startswith("packages/domains/") and not TEST_FILE_RE.search(p.name) and GEN_MARK not in text[:400]:
                 stripped = _strip_code_literals(text, p.suffix)
                 lines = text.splitlines()
                 for ln, line in enumerate(stripped.splitlines(), 1):
@@ -2171,37 +2361,464 @@ def _ts(v) -> str:
     return json.dumps(str(v), ensure_ascii=False)
 
 
+class GenError(Exception):
+    """生成失败：来源有误（未解析的别名、重名、不支持的类型等），不写出产物。"""
+
+    def __init__(self, file: str, msg: str):
+        super().__init__(f"{file}：{msg}")
+        self.file, self.msg = file, msg
+
+
+def _gen_out(key: str, default: str) -> str:
+    return str(CFG["gen"].get(key) or default)
+
+
+def _gen_head(srcs: str, h: str, note: str = "", css: bool = False) -> list:
+    head = f"{GEN_MARK}，来源：{srcs}；勿手改。source-sha: {h}"
+    if css:
+        return [f"/* {head} */"] + ([f"/* {note} */"] if note else [])
+    return [f"// {head}"] + ([f"// {note}"] if note else [])
+
+
 def gen_params_output(repo) -> dict:
-    path = CFG["gen"].get("params_out", "packages/params/index.ts")
+    """参数登记的数据与类型（0.1b 起访问器 packages/params/index.ts 为手写入口）。"""
+    path = _gen_out("params_out", "packages/params/registry.generated.ts")
     src = repo.root / "contracts" / "params.yaml"
     if not src.exists():
         return {}
     h = short_hash(read_text(src))
-    lines = [f"// {GEN_MARK}，来源：contracts/params.yaml；勿手改。source-sha: {h}",
-             "// 参数的类型化访问器：默认值与区间以 contracts/params.yaml 为准；运行时取值由参数中心注入，数值夹在登记区间内。", "",
-             "export const PARAMS = {"]
+    L = _gen_head("contracts/params.yaml", h,
+                  "参数登记的数据与类型；访问器在 packages/params/index.ts（手写）。integer：YAML 默认值为整数时为 true。")
+    L += ["", "export const PARAMS = {"]
     for name, e in repo.params.items():
-        lines.append(f"  {json.dumps(name)}: {{ owner: {_ts(e.get('owner'))}, default: {_ts(e.get('default'))}, range: {_ts(e.get('range'))}, "
-                     f"unit: {_ts(e.get('unit'))}, tunableBy: {_ts(e.get('tunable_by') or [])}, learnerRange: {_ts(e.get('learner_range'))}, "
-                     f"rollout: {_ts(e.get('rollout'))}, reasonRequired: {_ts(bool(e.get('reason_required')))} }},")
-    lines += ["} as const;", "",
-              "export type ParamName = keyof typeof PARAMS;",
-              "type Widen<T> = T extends number ? number : T extends boolean ? boolean : T extends string ? string :",
-              "  T extends readonly (infer U)[] ? Widen<U>[] : T;",
-              "export type ParamValue<K extends ParamName> = Widen<(typeof PARAMS)[K][\"default\"]>;",
-              "export type ParamSource = (name: ParamName) => unknown;", "",
-              "let source: ParamSource = () => undefined;", "",
-              "/** 由运行时（参数中心）注入当前取值；未注入时取默认值。 */",
-              "export function setParamSource(fn: ParamSource): void {", "  source = fn;", "}", "",
-              "/** 读取参数。数值取值被夹在登记区间内。 */",
-              "export function param<K extends ParamName>(name: K): ParamValue<K> {",
-              "  const spec = PARAMS[name];", "  const raw = source(name);",
-              "  if (raw === undefined || raw === null) return spec.default as unknown as ParamValue<K>;",
-              "  const range = spec.range as unknown as readonly [number, number] | null;",
-              "  if (typeof raw === \"number\" && range) {",
-              "    return Math.min(range[1], Math.max(range[0], raw)) as unknown as ParamValue<K>;", "  }",
-              "  return raw as ParamValue<K>;", "}", ""]
-    return {path: ("\n".join(lines), h, ["contracts/params.yaml"])}
+        d = e.get("default")
+        integer = isinstance(d, int) and not isinstance(d, bool)
+        L.append(f"  {json.dumps(name)}: {{ owner: {_ts(e.get('owner'))}, default: {_ts(d)}, range: {_ts(e.get('range'))}, "
+                 f"unit: {_ts(e.get('unit'))}, tunableBy: {_ts(e.get('tunable_by') or [])}, learnerRange: {_ts(e.get('learner_range'))}, "
+                 f"rollout: {_ts(e.get('rollout'))}, reasonRequired: {_ts(bool(e.get('reason_required')))}, integer: {_ts(integer)} }},")
+    L += ["} as const;", "",
+          "export type ParamName = keyof typeof PARAMS;",
+          "type Widen<T> = T extends number ? number : T extends boolean ? boolean : T extends string ? string :",
+          "  T extends readonly (infer U)[] ? Widen<U>[] : T extends object ? { -readonly [P in keyof T]: Widen<T[P]> } : T;",
+          "export type ParamValue<K extends ParamName> = Widen<(typeof PARAMS)[K][\"default\"]>;", ""]
+    return {path: ("\n".join(L), h, ["contracts/params.yaml"])}
+
+
+def gen_pages_output(repo) -> dict:
+    """学员端页面清单：design/screens/learner/*.yaml → 页面 ID、标题、模式与各视图的 ID 和模式。"""
+    path = _gen_out("pages_out", "apps/learner/src/generated/pages.ts")
+    d = repo.root / "design" / "screens" / "learner"
+    files = sorted(d.glob("*.yaml")) if d.exists() else []
+    if not files:
+        return {}
+    h = short_hash("".join(read_text(p) for p in files))
+    pages = sorted((pg for pg in repo.screens.values() if pg.get("end") == "learner"), key=lambda x: str(x.get("id")))
+    L = _gen_head("design/screens/learner/*.yaml", h, "学员端页面清单：页面 ID、标题、模式与各视图的 ID 和模式（视图未写模式时取页面模式）。")
+    L += ["", 'export type PageMode = "guided" | "immersive" | "standalone" | "standard";', "",
+          "export interface PageView {", "  readonly id: string;", "  readonly mode: PageMode;", "}", "",
+          "export interface PageEntry {", "  readonly id: string;", "  readonly title: string;", "  readonly mode: PageMode;",
+          "  readonly views: readonly PageView[];", "}", "", "export const PAGES = ["]
+    for pg in pages:
+        pid = str(pg.get("id"))
+        where = f"design/screens/learner/{pid}.yaml"
+        mode = str(pg.get("mode") or "standard")
+        if mode not in VALID_MODES:
+            raise GenError(where, f"页面模式 {mode} 不合法（{'、'.join(sorted(VALID_MODES))}）")
+        views = []
+        for v in pg.get("views") or []:
+            vid = v.get("id") if isinstance(v, dict) else None
+            if vid in (None, "") or isinstance(vid, bool):
+                raise GenError(where, "视图缺少 id，或 id 被 YAML 解析成布尔值（给 id 加引号）")
+            vm = str(v.get("mode") or mode)
+            if vm not in VALID_MODES:
+                raise GenError(where, f"视图 {vid} 的模式 {vm} 不合法")
+            views.append(f"{{ id: {json.dumps(str(vid))}, mode: {json.dumps(vm)} }}")
+        L.append(f"  {{ id: {json.dumps(pid)}, title: {json.dumps(str(pg.get('title') or ''), ensure_ascii=False)}, "
+                 f"mode: {json.dumps(mode)}, views: [{', '.join(views)}] }},")
+    L += ["] as const satisfies readonly PageEntry[];", "", "export type PageId = (typeof PAGES)[number][\"id\"];", ""]
+    return {path: ("\n".join(L), h, ["design/screens/learner/*.yaml"])}
+
+
+def gen_contract_registry_outputs(repo) -> dict:
+    """错误码与权限：contracts/errors.yaml、contracts/permissions.yaml → packages/contract/src/generated/。"""
+    out = {}
+    src = "contracts/errors.yaml"
+    if (repo.root / src).exists():
+        h = short_hash(read_text(repo.root / src))
+        L = _gen_head(src, h, "错误码：code → HTTP 状态与文案键；错误响应统一为 {code, message_key, details}（docs/conventions/api.md 规则 3）。")
+        L += ["", "export const ERROR_CODES = {"]
+        for code, e in repo.errors.items():
+            st, mk = e.get("http_status"), e.get("message_key")
+            if not isinstance(st, int) or isinstance(st, bool) or not 400 <= st <= 599:
+                raise GenError(src, f"错误码 {code} 的 http_status 应为 4xx 或 5xx 的整数")
+            if not isinstance(mk, str) or not mk:
+                raise GenError(src, f"错误码 {code} 缺少 message_key")
+            L.append(f"  {json.dumps(code)}: {{ httpStatus: {st}, messageKey: {json.dumps(mk)} }},")
+        L += ["} as const;", "", "export type ErrorCode = keyof typeof ERROR_CODES;", "",
+              "export function isErrorCode(value: unknown): value is ErrorCode {",
+              '  return typeof value === "string" && Object.hasOwn(ERROR_CODES, value);', "}", ""]
+        out[_gen_out("errors_out", "packages/contract/src/generated/error-codes.ts")] = ("\n".join(L), h, [src])
+    src = "contracts/permissions.yaml"
+    if (repo.root / src).exists():
+        h = short_hash(read_text(repo.root / src))
+        roles = [str(r) for r in repo.roles]
+        L = _gen_head(src, h, "角色与动作：动作 → 允许的角色；服务端按此校验，不依赖界面隐藏（docs/conventions/security.md 规则 1）。")
+        L += ["", f"export const ROLES = [{', '.join(json.dumps(r) for r in roles)}] as const;",
+              "export type Role = (typeof ROLES)[number];", "", "export const ACTION_ROLES = {"]
+        for aid, a in repo.actions.items():
+            rs = [str(r) for r in (a.get("roles") or [])]
+            bad = [r for r in rs if r not in roles]
+            if bad:
+                raise GenError(src, f"动作 {aid} 引用了未登记的角色 {'、'.join(bad)}")
+            L.append(f"  {json.dumps(aid)}: [{', '.join(json.dumps(r) for r in rs)}],")
+        L += ["} as const satisfies Readonly<Record<string, readonly Role[]>>;", "",
+              "export type ActionId = keyof typeof ACTION_ROLES;", "",
+              "export function isRole(value: unknown): value is Role {",
+              '  return typeof value === "string" && (ROLES as readonly string[]).includes(value);', "}", "",
+              "export function isActionId(value: unknown): value is ActionId {",
+              '  return typeof value === "string" && Object.hasOwn(ACTION_ROLES, value);', "}", "",
+              "export function roleAllowed(action: ActionId, role: Role): boolean {",
+              "  return (ACTION_ROLES[action] as readonly Role[]).includes(role);", "}", ""]
+        out[_gen_out("permissions_out", "packages/contract/src/generated/permissions.ts")] = ("\n".join(L), h, [src])
+    return out
+
+
+def gen_metrics_registry_outputs(repo) -> dict:
+    """埋点事件与指标登记：contracts/events.yaml、contracts/metrics.yaml → packages/domains/metrics/src/generated/。"""
+    out = {}
+    src = "contracts/events.yaml"
+    if (repo.root / src).exists():
+        h = short_hash(read_text(repo.root / src))
+        L = _gen_head(src, h, "埋点事件登记：source 为 client 的事件由学员端经 trackEvent 上报，为 server 的只由服务端记录。")
+        L += ["", 'export type EventPropertyType = "string" | "uuid" | "bool" | "int";', "",
+              "export interface EventEntry {", "  readonly owner: string;", '  readonly source: "client" | "server";',
+              "  readonly version: number;", "  readonly properties: Readonly<Record<string, EventPropertyType>>;",
+              '  readonly status: "active" | "retired";', "}", "", "export const EVENTS = {"]
+        for name, e in repo.analytics_events.items():
+            props = e.get("properties") or {}
+            if not isinstance(props, dict):
+                raise GenError(src, f"事件 {name} 的 properties 应为对象")
+            for k, tp in props.items():
+                if tp not in ("string", "uuid", "bool", "int"):
+                    raise GenError(src, f"事件 {name} 的属性 {k} 类型 {tp} 不受支持（string、uuid、bool、int）")
+            L.append(f"  {json.dumps(name)}: {{ owner: {_ts(e.get('owner'))}, source: {_ts(e.get('source'))}, version: {_ts(e.get('version'))}, "
+                     f"properties: {_ts(props)}, status: {_ts(e.get('status'))} }},")
+        L += ["} as const satisfies Readonly<Record<string, EventEntry>>;", "",
+              "export type EventName = keyof typeof EVENTS;", ""]
+        out[_gen_out("events_out", "packages/domains/metrics/src/generated/events.ts")] = ("\n".join(L), h, [src])
+    src = "contracts/metrics.yaml"
+    if (repo.root / src).exists():
+        h = short_hash(read_text(repo.root / src))
+        L = _gen_head(src, h, "指标口径登记：名称、归属、口径出处、单位、刷新方式、展示页、最小样本与目标值。")
+        L += ["", "export const METRICS = {"]
+        for mid, e in repo.metrics.items():
+            L.append(f"  {json.dumps(mid)}: {{ name: {_ts(e.get('name'))}, owner: {_ts(e.get('owner'))}, formulaRef: {_ts(e.get('formula_ref'))}, "
+                     f"unit: {_ts(e.get('unit'))}, refresh: {_ts(e.get('refresh'))}, shownOn: {_ts(e.get('shown_on') or [])}, "
+                     f"minSample: {_ts(e.get('min_sample'))}, target: {_ts(e.get('target'))} }},")
+        L += ["} as const;", "", "export type MetricId = keyof typeof METRICS;", ""]
+        out[_gen_out("metrics_out", "packages/domains/metrics/src/generated/metrics.ts")] = ("\n".join(L), h, [src])
+    return out
+
+
+def gen_db_models_output(repo) -> dict:
+    """表的元数据（contracts/schema/*.prisma）：withContext 据此给按租户隔离的表加租户条件，测试辅助据此清表。"""
+    path = _gen_out("db_models_out", "packages/db/src/generated/models.ts")
+    d = repo.root / "contracts" / "schema"
+    files = sorted(d.glob("*.prisma")) if d.exists() else []
+    if not files:
+        return {}
+    h = short_hash("".join(read_text(p) for p in files))
+    L = _gen_head("contracts/schema/*.prisma", h, "表的元数据：模型名 → 表名、归属领域、是否按租户隔离、是否只追加。")
+    L += ["", "export const MODELS = {"]
+    for t, m in sorted(repo.tables.items(), key=lambda kv: str(kv[1].get("model"))):
+        scalar_fields = [f["name"] for f in m.get("fields", [])]
+        compound_keys = {"_".join(cols): cols for cols in [m.get("primary_key", []), *m.get("unique", [])] if len(cols) > 1}
+        L.append(f"  {m['model']}: {{ table: {json.dumps(t)}, owner: {_ts(m.get('owner'))}, "
+                 f"tenantScoped: {_ts(bool(m.get('tenant_scoped')))}, appendOnly: {_ts(bool(m.get('append_only')))}, "
+                 f"scalarFields: {_ts(scalar_fields)}, compoundKeys: {_ts(compound_keys)} }},")
+    L += ["} as const;", "", "export type ModelName = keyof typeof MODELS;", ""]
+    return {path: ("\n".join(L), h, ["contracts/schema/*.prisma"])}
+
+
+# ---- 设计令牌（ADR-025 退路：spec_tool gen 生成“基础值 + 主题覆盖”两层）
+
+_TOKEN_KEY_RE = re.compile(r"^[A-Za-z0-9_-]+$")
+_TOKEN_ALIAS_RE = re.compile(r"^\{([A-Za-z0-9_.-]+)\}$")
+_HEX_COLOR_RE = re.compile(r"^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$")
+_CSS_UNITS = ("px", "rem", "em", "%", "vw", "vh", "dvh", "svh", "lvh", "ms", "s", "deg")
+_COLOR_FUNCS = {"hsl", "hwb", "lab", "lch", "oklab", "oklch"}
+_COLOR_SPACES = {"srgb", "srgb-linear", "display-p3", "a98-rgb", "prophoto-rgb", "rec2020", "xyz", "xyz-d50", "xyz-d65"}
+
+
+def _tok_rel(repo, p: Path) -> str:
+    try:
+        return p.resolve().relative_to(repo.root.resolve()).as_posix()
+    except ValueError:
+        return p.as_posix()
+
+
+def _css_num(x, where: str, what: str) -> str:
+    if isinstance(x, bool) or not isinstance(x, (int, float)):
+        raise GenError(where, f"{what} 应为数字")
+    return str(int(x)) if float(x).is_integer() else repr(float(x))
+
+
+def _flatten_tokens(node, path: list, inherited, out: list, where: str) -> None:
+    if not isinstance(node, dict):
+        raise GenError(where, f"{'.'.join(path) or '（根）'} 应为令牌或分组对象")
+    for k, v in node.items():
+        k = str(k)
+        if k.startswith("$"):
+            continue
+        name = ".".join(path + [k])
+        if not _TOKEN_KEY_RE.match(k):
+            raise GenError(where, f"令牌名 {name} 只能用字母、数字、连字符与下划线")
+        if not isinstance(v, dict):
+            raise GenError(where, f"{name} 应为令牌或分组对象")
+        t = v.get("$type", inherited)
+        if "$value" in v:
+            out.append((tuple(path + [k]), t, v["$value"]))
+        else:
+            _flatten_tokens(v, path + [k], t, out, where)
+
+
+def _token_sources(repo, items, base_dir: Path, where: str) -> list:
+    out = []
+    for s in items or []:
+        if isinstance(s, dict) and set(s) == {"$ref"}:
+            p = base_dir / str(s["$ref"])
+            if not p.exists():
+                raise GenError(where, f"找不到引用的令牌文件 {s['$ref']}")
+            try:
+                out.append((_tok_rel(repo, p), json.loads(read_text(p))))
+            except json.JSONDecodeError as e:
+                raise GenError(_tok_rel(repo, p), f"JSON 解析失败：{e}")
+        elif isinstance(s, dict):
+            out.append((where, s))
+        else:
+            raise GenError(where, "来源应为 {\"$ref\": …} 或令牌对象")
+    return out
+
+
+class _Tokens:
+    def __init__(self):
+        self.base = {}     # 路径 → (类型, 值, 来源)
+        self.blocks = []   # (选择器, [(路径, 类型, 值, 来源)])
+        self.skipped = []
+
+    @staticmethod
+    def var(path) -> str:
+        return "--" + "-".join(path)
+
+    def alias(self, value, where: str):
+        m = _TOKEN_ALIAS_RE.match(value.strip()) if isinstance(value, str) else None
+        if not m:
+            return None
+        target = tuple(m.group(1).split("."))
+        if target not in self.base:
+            raise GenError(where, f"别名 {value} 无法解析")
+        return target
+
+    def css(self, t, v, where: str, what: str) -> str:
+        if isinstance(v, str):
+            target = self.alias(v, where)
+            if target:
+                return f"var({self.var(target)})"
+        if t == "color":
+            return self.color(v, where, what)
+        if t in ("dimension", "duration"):
+            return self.dimension(v, where, what)
+        if t == "fontFamily":
+            items = v if isinstance(v, list) else [v]
+            if not items or not all(isinstance(x, str) and x for x in items):
+                raise GenError(where, f"{what} 的字体族应为非空字符串列表")
+            return ", ".join(x if re.fullmatch(r"-?[A-Za-z][A-Za-z0-9-]*", x) else json.dumps(x, ensure_ascii=False) for x in items)
+        if t == "number":
+            return _css_num(v, where, what)
+        if t == "fontWeight":
+            return v if isinstance(v, str) and re.fullmatch(r"[a-z-]+", v) else _css_num(v, where, what)
+        if t == "cubicBezier":
+            if not (isinstance(v, list) and len(v) == 4):
+                raise GenError(where, f"{what} 的贝塞尔曲线应为四个数字")
+            return "cubic-bezier(" + ", ".join(_css_num(x, where, what) for x in v) + ")"
+        if t == "shadow":
+            return self.shadow(v, where, what)
+        raise GenError(where, f"{what} 的类型 {t or '（未写 $type）'} 不受支持")
+
+    def color(self, v, where: str, what: str) -> str:
+        if isinstance(v, str):
+            if _HEX_COLOR_RE.match(v):
+                return v
+            raise GenError(where, f"{what} 的颜色 {v} 应为 #RGB、#RGBA、#RRGGBB 或 #RRGGBBAA")
+        if isinstance(v, dict):
+            space, comps, alpha = v.get("colorSpace"), v.get("components"), v.get("alpha", 1)
+            if not isinstance(comps, list) or len(comps) != 3:
+                raise GenError(where, f"{what} 的颜色分量应为三个")
+            a = _css_num(alpha, where, f"{what} 的透明度")
+            if not 0 <= float(alpha) <= 1:
+                raise GenError(where, f"{what} 的透明度应在 0 到 1 之间")
+            hexv = v.get("hex")
+            if float(alpha) == 1 and isinstance(hexv, str) and _HEX_COLOR_RE.match(hexv):
+                return hexv
+            cs = " ".join("none" if c == "none" else _css_num(c, where, f"{what} 的颜色分量") for c in comps)
+            tail = "" if float(alpha) == 1 else f" / {a}"
+            if space in _COLOR_FUNCS:
+                return f"{space}({cs}{tail})"
+            if space in _COLOR_SPACES:
+                return f"color({space} {cs}{tail})"
+            raise GenError(where, f"{what} 的色彩空间 {space} 不受支持")
+        raise GenError(where, f"{what} 的颜色值格式不受支持")
+
+    def dimension(self, v, where: str, what: str) -> str:
+        if isinstance(v, dict):
+            unit = v.get("unit")
+            if unit not in _CSS_UNITS:
+                raise GenError(where, f"{what} 的单位 {unit} 不受支持")
+            return _css_num(v.get("value"), where, what) + str(unit)
+        if isinstance(v, str) and re.fullmatch(r"-?\d+(?:\.\d+)?(?:" + "|".join(re.escape(u) for u in _CSS_UNITS) + ")", v):
+            return v
+        raise GenError(where, f"{what} 的尺寸应写成 {{\"value\": 数字, \"unit\": 单位}}")
+
+    def shadow(self, v, where: str, what: str) -> str:
+        parts = []
+        for s in (v if isinstance(v, list) else [v]):
+            if not isinstance(s, dict) or "color" not in s:
+                raise GenError(where, f"{what} 的阴影应含 color、offsetX、offsetY、blur、spread")
+            dims = [self.css("dimension", s.get(k, {"value": 0, "unit": "px"}), where, f"{what}.{k}")
+                    for k in ("offsetX", "offsetY", "blur", "spread")]
+            parts.append(("inset " if s.get("inset") else "") + " ".join(dims + [self.css("color", s["color"], where, f"{what}.color")]))
+        return ", ".join(parts)
+
+    def chain(self, path, where: str, values=None) -> tuple:
+        """沿别名走到最终令牌；遇到循环即失败。"""
+        values = self.base if values is None else values
+        seen = [path]
+        while True:
+            target = self.alias(values[seen[-1]][1], where)
+            if not target:
+                return seen[-1]
+            if target in seen:
+                raise GenError(where, "别名循环：" + " → ".join(".".join(x) for x in seen + [target]))
+            seen.append(target)
+
+    def literal(self, path, where: str) -> str:
+        """容器查询等不能用变量的位置：别名展开为最终字面值。"""
+        final = self.chain(path, where)
+        t, v, _ = self.base[final]
+        return self.css(t, v, where, ".".join(final))
+
+
+def build_tokens(repo):
+    tp, rp = repo.root / "design" / "tokens.json", repo.root / "design" / "tokens.resolver.json"
+    if not tp.exists():
+        return None
+    tk, names = _Tokens(), {}
+    if rp.exists():
+        try:
+            resolver = json.loads(read_text(rp))
+        except json.JSONDecodeError as e:
+            raise GenError("design/tokens.resolver.json", f"JSON 解析失败：{e}")
+        set_srcs = []
+        for st in resolver.get("sets") or []:
+            set_srcs += _token_sources(repo, (st or {}).get("sources"), rp.parent, "design/tokens.resolver.json")
+        modifiers = resolver.get("modifiers") or []
+    else:
+        set_srcs, modifiers = [("design/tokens.json", json.loads(read_text(tp)))], []
+    for where, data in set_srcs:
+        flat = []
+        _flatten_tokens(data, [], None, flat, where)
+        for path, t, v in flat:
+            name = tk.var(path)
+            if path in tk.base or name in names:
+                raise GenError(where, f"令牌 {'.'.join(path)} 重名（与 {'.'.join(names.get(name, path))} 生成同一个变量 {name}）")
+            names[name] = path
+            tk.base[path] = (t, v, where)
+    selector = str(CFG["gen"].get("tokens_selector") or ":root")
+    skip = {str(x) for x in (CFG["gen"].get("tokens_skip_contexts") or [])}
+    for mod in modifiers:
+        mod = mod or {}
+        mname = str(mod.get("name") or "")
+        if not _TOKEN_KEY_RE.match(mname):
+            raise GenError("design/tokens.resolver.json", f"修饰器名 {mname or '（空）'} 不合法")
+        for ctx, srcs in (mod.get("contexts") or {}).items():
+            key, where = f"{mname}.{ctx}", f"design/tokens.resolver.json#{mname}.{ctx}"
+            if not _TOKEN_KEY_RE.match(str(ctx)):
+                raise GenError(where, f"上下文名 {ctx} 不合法")
+            if key in skip:
+                tk.skipped.append(key)
+                continue
+            entries = []
+            for w, data in _token_sources(repo, srcs, rp.parent, where):
+                flat = []
+                _flatten_tokens(data, [], None, flat, w)
+                for path, t, v in flat:
+                    if path not in tk.base:
+                        raise GenError(where, f"覆盖了基础令牌中不存在的 {'.'.join(path)}")
+                    bt = tk.base[path][0]
+                    if t is not None and t != bt:
+                        raise GenError(where, f"把令牌 {'.'.join(path)} 的类型从 {bt} 改成了 {t}")
+                    entries.append((path, bt, v, where))
+            if not entries:
+                continue
+            if ctx == mod.get("default"):
+                for path, t, v, w in entries:
+                    tk.base[path] = (t, v, w)
+            else:
+                tk.blocks.append((f'{selector}[data-{mname}="{ctx}"]', entries))
+    for path, (t, v, w) in tk.base.items():
+        tk.chain(path, w)
+    for _, entries in tk.blocks:
+        values = dict(tk.base)
+        values.update({path: (t, v, w) for path, t, v, w in entries})
+        for path, t, v, w in entries:
+            tk.chain(path, w, values)
+    return tk
+
+
+def gen_tokens_output(repo) -> dict:
+    """令牌：design/tokens.json 与 tokens.resolver.json → tokens.css（CSS 变量）与 tailwind-theme.css（Tailwind 4 主题映射）。"""
+    tk = build_tokens(repo)
+    if tk is None:
+        return {}
+    g = CFG["gen"]
+    srcs = [s for s in ("design/tokens.json", "design/tokens.resolver.json") if (repo.root / s).exists()]
+    cfg = {k: g.get(k) for k in ("tokens_selector", "tokens_skip_contexts", "tokens_tailwind_map")}
+    h = short_hash("".join(read_text(repo.root / s) for s in srcs) + json.dumps(cfg, ensure_ascii=False, sort_keys=True))
+    selector = str(g.get("tokens_selector") or ":root")
+    note = f"基础值在外壳根元素（{selector}）上，修饰器按其 data-<修饰器名> 属性覆盖。"
+    if tk.skipped:
+        note += f"构建时跳过的上下文：{'、'.join(tk.skipped)}（依赖运行时配置）。"
+    L = _gen_head("、".join(srcs), h, note, css=True) + ["", f"{selector} {{"]
+    L += [f"  {tk.var(p)}: {tk.css(t, v, w, '.'.join(p))};" for p, (t, v, w) in tk.base.items()]
+    L.append("}")
+    for sel, entries in tk.blocks:
+        L += ["", f"{sel} {{"] + [f"  {tk.var(p)}: {tk.css(t, v, w, '.'.join(p))};" for p, t, v, w in entries] + ["}"]
+    out = {_gen_out("tokens_out", "packages/ui/src/generated/tokens.css"): ("\n".join(L) + "\n", h, srcs)}
+    rules = []
+    for item in g.get("tokens_tailwind_map") or []:
+        m = re.fullmatch(r"([A-Za-z0-9_.-]+)=([a-z][a-z0-9-]*)(!?)", str(item).strip())
+        if not m:
+            raise GenError("scripts/spec_tool.toml", f"[gen].tokens_tailwind_map 的条目 {item} 应写成 令牌路径前缀=Tailwind 命名空间（字面值加 !）")
+        rules.append((tuple(m.group(1).split(".")), m.group(2), m.group(3) == "!"))
+    rules.sort(key=lambda r: -len(r[0]))
+    static, inline, seen = [], [], {}
+    for path, (t, v, w) in tk.base.items():
+        for prefix, ns, lit in rules:
+            if path[:len(prefix)] == prefix and len(path) > len(prefix):
+                name = f"--{ns}-{'-'.join(path[len(prefix):])}"
+                if name in seen:
+                    raise GenError("scripts/spec_tool.toml", f"令牌 {'.'.join(path)} 与 {'.'.join(seen[name])} 映射到同一个 Tailwind 变量 {name}")
+                seen[name] = path
+                (static if lit else inline).append(f"  {name}: {tk.literal(path, w) if lit else 'var(' + tk.var(path) + ')'};")
+                break
+    T = _gen_head("、".join(srcs) + " 与 scripts/spec_tool.toml 的 [gen].tokens_tailwind_map", h,
+                  "Tailwind 4 主题：先清空默认主题（调色板、间距、断点等），再把令牌变量映射为主题变量，界面只能用登记的令牌类；容器断点用于容器查询，只能写字面值。",
+                  css=True)
+    T += ["", "@theme {", "  --*: initial;"] + static + ["}"]
+    if inline:
+        T += ["", "@theme inline {"] + inline + ["}"]
+    out[_gen_out("tokens_tailwind_out", "packages/ui/src/generated/tailwind-theme.css")] = ("\n".join(T) + "\n", h, srcs)
+    return out
 
 
 def gen_roadmap_output(repo, with_results: bool = False) -> dict:
@@ -2260,6 +2877,11 @@ def gen_outputs(repo) -> dict:
     out.update(gen_skill_outputs(repo))
     out.update(gen_rule_outputs(repo))
     out.update(gen_params_output(repo))
+    out.update(gen_pages_output(repo))
+    out.update(gen_contract_registry_outputs(repo))
+    out.update(gen_metrics_registry_outputs(repo))
+    out.update(gen_db_models_output(repo))
+    out.update(gen_tokens_output(repo))
     out.update(gen_roadmap_output(repo))
     out.update(gen_progress_output(repo))
     return out
@@ -2285,7 +2907,11 @@ def stale_generated(repo, expected: dict) -> list[str]:
 
 def cmd_gen(args):
     repo = Repo()
-    expected = gen_outputs(repo)
+    try:
+        expected = gen_outputs(repo)
+    except GenError as e:
+        print(f"E-GEN-03 {e.file}：{e.msg}。改法：修正来源后重新运行 gen")
+        return 1
     if args.check:
         fs = check_gen(repo, CheckCtx())
         for f in fs:
@@ -2306,6 +2932,13 @@ def cmd_gen(args):
     for d in sorted((repo.root / ".claude" / "skills").glob("*"), reverse=True) if (repo.root / ".claude" / "skills").exists() else []:
         if d.is_dir() and not any(d.rglob("*")):
             shutil.rmtree(d)
+    rc = 0
+    contract_cmd = str(CFG["gen"].get("contract_cmd") or "")
+    if contract_cmd and (repo.root / CFG["verify"].get("stack_marker", "package.json")).exists():
+        if not _run("接口生成物（Orval）", contract_cmd):
+            rc = 1
+    elif contract_cmd:
+        print(f"▷ 接口生成物：依赖尚未安装（缺 {CFG['verify'].get('stack_marker')}），跳过；安装后运行 {contract_cmd}")
     if args.artifacts:
         art = Path(args.artifacts)
         art.mkdir(parents=True, exist_ok=True)
@@ -2315,7 +2948,7 @@ def cmd_gen(args):
         write_text(art / "coverage.md", coverage_report(repo))
         print(f"构建产物已写入 {art}")
     print(f"gen 完成：{n} 个文件有变化。")
-    return 0
+    return rc
 
 
 # ---------------------------------------------------------------- 预算（budget）
@@ -3607,6 +4240,7 @@ def cmd_verify(args):
     ok = True
     files = changed_files(staged=args.staged)
     me = f"{sys.executable} {TOOL_REL}"
+
     def stack_step(label, key, extra=""):
         nonlocal ok
         cmd = v.get(key, "")
@@ -3617,6 +4251,20 @@ def cmd_verify(args):
             print(f"▷ {label}：技术栈尚未接入（缺 {v.get('stack_marker')}），跳过")
             return
         ok = _run(label, cmd + extra) and ok
+
+    def tool_step(label, key):
+        nonlocal ok
+        cmd = v.get(key, "")
+        if not cmd:
+            print(f"▷ {label}：未配置（scripts/spec_tool.toml [verify].{key}），跳过")
+            return
+        ok = _run(label, cmd) and ok
+
+    for part in v.get("results_parts") or []:  # 每次只汇总本次运行的测试结果
+        pp = ROOT / str(part)
+        if pp.exists():
+            pp.unlink()
+    tool_step("依赖登记（版本锁与禁用库）", "deps")
     if args.fast:
         code_files = [f for f in files if Path(f).suffix in CODE_EXT]
         if code_files and v.get("lint_files") and stack:
@@ -3624,13 +4272,18 @@ def cmd_verify(args):
         elif code_files:
             print("▷ 改动文件 lint：未配置 [verify].lint_files 或技术栈尚未接入，跳过")
         stack_step("类型检查", "typecheck")
-        stack_step("单元测试", "test")
+        stack_step("单元测试", "test_fast" if v.get("test_fast") else "test")
+        tool_step("工具测试", "tooling")
+        tool_step("测试结果汇总", "results_merge")
         ok = _run("文档检查（改动）", f"{me} check --changed" + (" --staged" if args.staged else "")) and ok
         ok = _run("生成物校验", f"{me} gen --check") and ok
     else:
         stack_step("lint", "lint")
+        stack_step("依赖方向", "deps_graph")
         stack_step("类型检查", "typecheck")
         stack_step("单元测试", "test")
+        tool_step("工具测试", "tooling")
+        stack_step("接口生成物漂移（重新生成比对）", "contract_check")
         ok = _run("文档检查", f"{me} check" + (" --full" if args.full else "")) and ok
         ok = _run("生成物校验", f"{me} gen --check") and ok
         if any(f.startswith(("packages/ai/", "evals/")) for f in files) and not args.full:
@@ -3639,6 +4292,7 @@ def cmd_verify(args):
             stack_step("端到端冒烟（四个演示考试）", "e2e_smoke")
             ok = _run("预算", f"{me} budget") and ok
             ok = _run("覆盖报告", f"{me} coverage --out .pack/coverage.md") and ok
+        tool_step("测试结果汇总", "results_merge")
     print("verify：全部通过。" if ok else "verify：有失败项，修复后重跑。")
     return 0 if ok else 1
 

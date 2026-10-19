@@ -1,5 +1,22 @@
 {
   "name": "@exam-prep/db",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts",
+    "./context": "./src/context.ts",
+    "./fastify": "./src/fastify.ts",
+    "./testing": "./src/testing.ts"
+  },
+  "dependencies": {
+    "@exam-prep/contract": "workspace:*",
+    "@prisma/adapter-pg": "7.0.0",
+    "@prisma/client": "7.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.0.0",
+    "fastify": "5.4.0",
+    "vitest": "4.0.0"
+  }
 }

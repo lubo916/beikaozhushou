@@ -1,0 +1,21 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/params" },
+    { "path": "./packages/contract" },
+    { "path": "./packages/ui" },
+    { "path": "./packages/db" },
+    { "path": "./packages/domains/platform" },
+    { "path": "./packages/domains/metrics" },
+    { "path": "./apps/api" },
+    { "path": "./apps/worker" },
+    { "path": "./apps/learner" },
+    { "path": "./apps/learner/tsconfig.node.json" },
+    { "path": "./apps/org" },
+    { "path": "./apps/org/tsconfig.node.json" },
+    { "path": "./apps/admin" },
+    { "path": "./apps/admin/tsconfig.node.json" },
+    { "path": "./tests" },
+    { "path": "./tsconfig.tooling.json" }
+  ]
+}

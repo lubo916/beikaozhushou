@@ -1,0 +1,45 @@
+// exam 领域（考试画像）的表结构。一个领域一个文件；模型的 @owner 与文件名一致，列字段的 @data-class 取 contracts/data-classes.yaml（docs/conventions/data.md 规则 1、2）。
+
+/// 考试画像，结构符合 contracts/exam-profile.schema.json；考试差异只进这里或扩展点
+/// @owner exam
+/// @tenant_scoped
+model ExamProfile {
+  /// @data-class public_content
+  id String @id @db.Uuid
+  /// @data-class operational
+  tenant_id String @db.Uuid
+  tenant Tenant @relation("ExamProfile_tenant_id", fields: [tenant_id], references: [id])
+  /// @data-class public_content
+  exam_key String
+  /// @data-class public_content
+  version Int
+  /// @data-class public_content
+  kind ExamProfileKind
+  /// @data-class public_content
+  evaluation_rule ExamProfileEvaluationRule
+  /// 完整画像，按 exam-profile.schema.json 校验
+  /// @data-class public_content
+  profile Json
+  /// @data-class public_content
+  created_at DateTime @db.Timestamptz(6)
+
+  // 反向关系：不是列，由引用本表的外键推出
+  knowledge_maps KnowledgeMap[] @relation("KnowledgeMap_exam_profile_id")
+  questions Question[] @relation("Question_exam_profile_id")
+
+  @@unique([exam_key, version])
+  @@map("exam_profiles")
+}
+
+enum ExamProfileKind {
+  official
+  template
+  custom
+}
+
+enum ExamProfileEvaluationRule {
+  pass_line
+  selective
+  score_band
+  custom
+}

@@ -1,32 +1,71 @@
-# 合并底线：verify --full；改动涉及的 AI 场景跑回归评测；主干发布 roadmap.md 与覆盖报告（见 docs/meta/doc-system.md 附录 I.7）
+# 合并底线：verify --full；改动涉及的 AI 场景跑回归评测；主干合并后构建镜像与静态文件并部署预发（0.1b 计划 E1）。
+# verify 失败不构建、不部署。秘密只放 GitHub Secrets 与 ECS 的 .env，清单见 README“构建与部署”。
 name: ci
 on:
   pull_request:
   push:
     branches: [main]
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+permissions:
+  contents: read
+
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: exam_prep
+          POSTGRES_DB: exam_prep_test
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U exam_prep -d exam_prep_test"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+      redis:
+        image: redis:7.4-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      EXAM_PREP_ENV: test
+      DATABASE_URL: postgresql://exam_prep@localhost:5432/exam_prep_test
+      TEST_DATABASE_URL: postgresql://exam_prep@localhost:5432/exam_prep_test
+      REDIS_URL: redis://localhost:6379
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: pnpm
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - run: pip install pyyaml
-      - name: 技术栈（接入 package.json 后生效）
-        if: hashFiles('package.json') != ''
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-      - name: 安装依赖（接入 package.json 后生效）
-        if: hashFiles('package.json') != ''
-        run: corepack enable && pnpm install --frozen-lockfile
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+      - name: 浏览器（组件测试与端到端）
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - name: 生成数据库客户端
+        run: pnpm db:generate
       - name: 完成标准
         run: python3 scripts/spec_tool.py verify --full
       - name: 改动涉及的 AI 场景回归评测
         run: python3 scripts/spec_tool.py eval --affected --suite regression
+      - name: 上传测试结果
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: .test-results
+          if-no-files-found: ignore
       - name: 主干构建产物（带测试结果的 roadmap.md 与覆盖报告）
         if: github.ref == 'refs/heads/main'
         run: python3 scripts/spec_tool.py gen --artifacts build-artifacts
@@ -35,3 +74,95 @@ jobs:
         with:
           name: roadmap-and-coverage
           path: build-artifacts
+
+  build:
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: tag
+        run: echo "tag=$(date -u +%Y%m%d%H%M)-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      - name: api 与 worker 镜像
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/Dockerfile
+          push: true
+          tags: ${{ secrets.ACR_REGISTRY }}/${{ secrets.ACR_NAMESPACE }}/exam-prep-server:${{ steps.tag.outputs.tag }}
+      - name: 学员端静态文件与入口镜像（Caddy）
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/web.Dockerfile
+          push: true
+          build-args: EXAM_PREP_ENV=staging
+          tags: ${{ secrets.ACR_REGISTRY }}/${{ secrets.ACR_NAMESPACE }}/exam-prep-web:${{ steps.tag.outputs.tag }}
+
+  static:
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: 学员端、机构端与后台静态文件（构建模式 staging）
+        run: |
+          for app in learner org admin; do
+            pnpm --filter "@exam-prep/$app" exec vite build --mode staging
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: static-staging
+          path: |
+            apps/learner/dist
+            apps/org/dist
+            apps/admin/dist
+
+  deploy-staging:
+    needs: [build, static]
+    runs-on: ubuntu-24.04
+    environment: staging
+    concurrency:
+      group: deploy-staging
+      cancel-in-progress: false
+    env:
+      TAG: ${{ needs.build.outputs.tag }}
+      HOST: ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }}
+      DIR: ${{ secrets.STAGING_DIR || '/srv/exam-prep' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: 连接预发服务器
+        env:
+          SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.STAGING_SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: 同步部署文件
+        run: |
+          ssh "$HOST" "mkdir -p '$DIR'"
+          scp deploy/compose.staging.yaml deploy/release.sh deploy/rollback.sh "$HOST:$DIR/"
+      - name: 登录镜像仓库并发布
+        env:
+          ACR_REGISTRY: ${{ secrets.ACR_REGISTRY }}
+          ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+          ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+        run: |
+          printf '%s' "$ACR_PASSWORD" | ssh "$HOST" "docker login '$ACR_REGISTRY' --username '$ACR_USERNAME' --password-stdin"
+          ssh "$HOST" "cd '$DIR' && chmod +x release.sh rollback.sh && ./release.sh '$TAG'"

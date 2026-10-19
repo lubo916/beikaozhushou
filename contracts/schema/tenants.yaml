@@ -1,8 +1,0 @@
-table: tenants
-owner: org
-description: 租户。个人学员的数据归平台默认租户，机构任务数据归机构租户（ADR-011）
-fields:
-  - {name: id, type: uuid, pk: true, x-data-class: operational}
-  - {name: kind, type: "enum[platform_default, org]", x-data-class: operational}
-  - {name: name, type: string, x-data-class: operational}
-  - {name: created_at, type: timestamptz, x-data-class: operational}

@@ -2,23 +2,48 @@
   "name": "exam-prep",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@11.0.0",
   "engines": {
     "node": ">=24 <25",
     "pnpm": ">=11 <12"
   },
   "scripts": {
-    "lint": "eslint .",
+    "lint": "prettier --check . && eslint --max-warnings=0 . && python3 scripts/engineering/check_style_literals.py",
+    "format": "prettier --write .",
     "typecheck": "tsc -b",
     "test": "vitest run",
-    "e2e:smoke": "playwright test e2e/smoke",
+    "test:unit": "vitest run --project node",
+    "e2e:smoke": "playwright test tests/e2e/smoke",
+    "deps:graph": "depcruise --config .dependency-cruiser.cjs apps packages",
+    "deps:check": "python3 scripts/engineering/check_dependencies.py",
+    "contract:gen": "node scripts/engineering/contract-gen.mjs",
+    "contract:check": "node scripts/engineering/contract-gen.mjs --check",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:seed": "node --env-file-if-exists=.env packages/db/src/seed-cli.ts",
+    "dev:api": "pnpm --filter @exam-prep/api dev",
+    "dev:worker": "pnpm --filter @exam-prep/worker dev",
+    "dev:learner": "pnpm --filter @exam-prep/learner dev",
     "spec:check": "python3 scripts/spec_tool.py check",
     "spec:gen": "python3 scripts/spec_tool.py gen"
   },
+  "dependencies": {
+    "prisma": "7.0.0"
+  },
   "devDependencies": {
-    "typescript": "~6.0.0",
-    "eslint": "^10.0.0",
-    "prettier": "^3.0.0",
-    "vitest": "^4.0.0",
-    "@playwright/test": "^1.56.0"
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.56.0",
+    "@types/node": "24.0.0",
+    "@vitejs/plugin-react": "5.0.0",
+    "@vitest/browser-playwright": "4.0.0",
+    "dependency-cruiser": "17.4.3",
+    "eslint": "10.0.0",
+    "orval": "7.11.0",
+    "playwright": "1.56.0",
+    "prettier": "3.6.2",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.1",
+    "vitest": "4.0.0"
   }
 }

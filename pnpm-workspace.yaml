@@ -4,5 +4,16 @@ packages:
   - "packages/domains/*"
   - "packages/ai/*"
   - "evals"
+# 允许执行安装脚本的依赖：Prisma 下载迁移引擎，esbuild 安装平台二进制
+allowBuilds:
+  "@prisma/engines": true
+  esbuild: true
+  # 可选原生加速与安装提示不参与构建；MSW 请求模拟由测试进程提供。
+  "@scarf/scarf": false
+  msgpackr-extract: false
+  msw: false
+  prisma: true
 # 新发布的依赖至少观察 7 天再安装（分钟）
 minimumReleaseAge: 10080
+# pnpm add 写精确版本（ADR-025 决定 1：版本锁）
+savePrefix: ""

@@ -1,0 +1,43 @@
+// metrics 领域（指标）的表结构。一个领域一个文件；模型的 @owner 与文件名一致，列字段的 @data-class 取 contracts/data-classes.yaml（docs/conventions/data.md 规则 1、2）。
+
+/// 埋点事件（产品分析用），只追加；事件登记见 contracts/events.yaml。学员与租户按 ID 记录，不建外键（METR-01）
+/// @owner metrics
+/// @append_only
+/// @tenant_scoped
+model AnalyticsEvent {
+  /// @data-class operational
+  id String @id @db.Uuid
+  /// 取自当前身份
+  /// @data-class operational
+  tenant_id String @db.Uuid
+  /// 取自当前身份
+  /// @data-class personal_learning
+  learner_id String @db.Uuid
+  /// 写入时当前身份是否为游客
+  /// @data-class account_info
+  guest Boolean
+  /// 写入时学员的 IANA 时区，自然日与自然周按它切分
+  /// @data-class personal_learning
+  timezone String
+  /// @data-class operational
+  name String
+  /// @data-class operational
+  version Int
+  /// @data-class operational
+  source AnalyticsEventSource
+  /// @data-class personal_learning
+  properties Json
+  /// @data-class personal_learning
+  occurred_at DateTime @db.Timestamptz(6)
+  /// @data-class operational
+  received_at DateTime @db.Timestamptz(6)
+  /// @data-class operational
+  idempotency_key String? @unique
+
+  @@map("analytics_events")
+}
+
+enum AnalyticsEventSource {
+  client
+  server
+}

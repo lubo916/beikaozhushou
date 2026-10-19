@@ -1,0 +1,36 @@
+// org 领域（机构）的表结构。一个领域一个文件；模型的 @owner 与文件名一致，列字段的 @data-class 取 contracts/data-classes.yaml（docs/conventions/data.md 规则 1、2）。
+
+/// 租户。个人学员的数据归平台默认租户，机构任务数据归机构租户（ADR-011）
+/// @owner org
+model Tenant {
+  /// @data-class operational
+  id String @id @db.Uuid
+  /// @data-class operational
+  kind TenantKind
+  /// @data-class operational
+  name String
+  /// @data-class operational
+  created_at DateTime @db.Timestamptz(6)
+
+  // 反向关系：不是列，由引用本表的外键推出
+  answer_records AnswerRecord[] @relation("AnswerRecord_tenant_id")
+  evidence_events EvidenceEvent[] @relation("EvidenceEvent_tenant_id")
+  exam_profiles ExamProfile[] @relation("ExamProfile_tenant_id")
+  knowledge_maps KnowledgeMap[] @relation("KnowledgeMap_tenant_id")
+  knowledge_point_mappings KnowledgePointMapping[] @relation("KnowledgePointMapping_tenant_id")
+  knowledge_points KnowledgePoint[] @relation("KnowledgePoint_tenant_id")
+  mastery_levels MasteryLevel[] @relation("MasteryLevel_tenant_id")
+  practice_sessions PracticeSession[] @relation("PracticeSession_tenant_id")
+  proposals Proposal[] @relation("Proposal_tenant_id")
+  questions Question[] @relation("Question_tenant_id")
+  time_budgets TimeBudget[] @relation("TimeBudget_tenant_id")
+  time_reservations TimeReservation[] @relation("TimeReservation_tenant_id")
+  users User[] @relation("User_tenant_id")
+
+  @@map("tenants")
+}
+
+enum TenantKind {
+  platform_default
+  org
+}

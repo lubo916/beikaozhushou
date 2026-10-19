@@ -47,14 +47,25 @@ admin = [1280]
 height = 900
 quantize = true             # 装有 Pillow 时压成 256 色 PNG
 
-[verify]                   # 按技术栈替换；缺 stack_marker 时跳过这些命令
+[verify]
+# 按技术栈替换。缺 stack_marker 时跳过 pnpm 命令；deps、tooling、results_merge 不依赖安装，总是运行。
+# 每次 verify 先删除 results_parts，测试结果只汇总本次运行。
+deps = "python3 scripts/engineering/check_dependencies.py"
 lint = "pnpm lint"
-lint_files = "pnpm exec eslint {files}"
+lint_files = "pnpm exec eslint --no-warn-ignored {files}"
+deps_graph = "pnpm deps:graph"
 typecheck = "pnpm typecheck"
 test = "pnpm test"
+# 提交检查（verify --fast）只跑 node 项目的单元测试；数据库与浏览器测试由完整 verify 运行
+test_fast = "pnpm test:unit"
+tooling = "python3 scripts/engineering/test_results.py tooling"
+contract_check = "pnpm contract:check"
 e2e_smoke = "pnpm e2e:smoke"
+results_merge = "python3 scripts/engineering/test_results.py merge"
+results_parts = [".test-results/vitest.json", ".test-results/playwright.json", ".test-results/tooling.json"]
 results = ".test-results/results.json"
-stack_marker = "node_modules/.modules.yaml"   # 依赖装好后才跑 pnpm 命令
+# 依赖装好后才跑 pnpm 命令
+stack_marker = "node_modules/.modules.yaml"
 
 [eval]                     # 评测执行器：可用 {scenario} {suite} {out} 占位；首个 AI 场景接入时填写
 runner = ""
@@ -75,6 +86,25 @@ term_exclude = ["docs/meta/**", "docs/product/glossary.yaml", "docs/adr/**"]
 copy_scan = ["apps/**", "packages/ui/**", "design/screens/**/*.yaml", "docs/product/brief.md"]
 
 [gen]
-params_out = "packages/params/index.ts"
+# 参数登记的数据与类型；访问器 packages/params/index.ts 为手写入口（0.1b）
+params_out = "packages/params/registry.generated.ts"
+pages_out = "apps/learner/src/generated/pages.ts"
+errors_out = "packages/contract/src/generated/error-codes.ts"
+permissions_out = "packages/contract/src/generated/permissions.ts"
+events_out = "packages/domains/metrics/src/generated/events.ts"
+metrics_out = "packages/domains/metrics/src/generated/metrics.ts"
+db_models_out = "packages/db/src/generated/models.ts"
+tokens_out = "packages/ui/src/generated/tokens.css"
+tokens_tailwind_out = "packages/ui/src/generated/tailwind-theme.css"
+# 外壳根元素；修饰器按它的 data-<修饰器名> 属性覆盖
+tokens_selector = ":root"
+# 依赖机构配置的上下文，0 期构建时跳过
+tokens_skip_contexts = ["brand.org"]
+# 令牌路径前缀=Tailwind 命名空间；末尾 ! 表示写字面值（容器查询不能用变量）
+tokens_tailwind_map = ["color=color", "radius=radius", "font.family=font", "font.size=text", "font.line-height=leading", "font.weight=font-weight", "shadow=shadow", "size.breakpoint=container!"]
+# Orval 产物（pnpm contract:gen）：目录内的 manifest.json 记录源哈希与各文件哈希，gen --check 据此检出过期与手改
+contract_dir = "packages/contract/src/generated/api"
+contract_sources = ["contracts/openapi.yaml", "orval.config.ts", "scripts/engineering/contract-gen.mjs"]
+contract_cmd = "pnpm contract:gen"
 roadmap_out = "docs/product/roadmap.md"
 progress_out = "docs/product/progress.md"

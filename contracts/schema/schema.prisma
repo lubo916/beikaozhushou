@@ -1,0 +1,15 @@
+// Prisma 多文件 schema 的生成器与数据源（ADR-026 决定 4）。表结构按领域分文件：contracts/schema/<领域>.prisma。
+// 连接串不写在这里：由 prisma.config.ts 从环境变量 DATABASE_URL 读取。客户端生成到 packages/db/generated/prisma（不进仓库）。
+
+generator client {
+  provider               = "prisma-client"
+  output                 = "../../packages/db/generated/prisma"
+  runtime                = "nodejs"
+  moduleFormat           = "esm"
+  generatedFileExtension = "ts"
+  importFileExtension    = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@exam-prep/learner",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --mode development",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@exam-prep/contract": "workspace:*",
+    "@exam-prep/params": "workspace:*",
+    "@exam-prep/ui": "workspace:*",
+    "@tanstack/react-query": "5.85.0",
+    "i18next": "25.3.0",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
+    "react-i18next": "15.6.0",
+    "react-router": "7.9.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.1.18",
+    "@types/node": "24.0.0",
+    "@types/react": "19.2.0",
+    "@types/react-dom": "19.2.0",
+    "@vitejs/plugin-react": "5.0.0",
+    "tailwindcss": "4.1.18",
+    "vite": "7.1.0",
+    "vitest": "4.0.0"
+  }
+}
