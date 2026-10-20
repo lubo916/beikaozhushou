@@ -1,0 +1,63 @@
+# 每次推送都跑完整验证（与本地 bk verify --level full 相同）：带 PostgreSQL 17（pgvector）与 Redis 7 服务，装好三个浏览器。
+# zhparser、pg_bigm 需要自制镜像（deploy/postgres/Dockerfile），CI 先用官方 pgvector 镜像；现有迁移不依赖这两个扩展。
+name: verify
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: exam_prep
+          POSTGRES_DB: exam_prep
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U exam_prep -d exam_prep"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+      redis:
+        image: redis:7.4-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      CI: "1"
+      DATABASE_URL: postgresql://exam_prep@127.0.0.1:5432/exam_prep
+      TEST_DATABASE_URL: postgresql://exam_prep@127.0.0.1:5432/exam_prep_test
+      REDIS_URL: redis://127.0.0.1:6379
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 启用 pnpm（版本取 package.json 的 packageManager）
+        run: corepack enable
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+      - name: 建测试库
+        run: psql "postgresql://exam_prep@127.0.0.1:5432/exam_prep" -c "CREATE DATABASE exam_prep_test"
+      - name: 安装 Playwright 浏览器
+        run: pnpm exec playwright install --with-deps chromium webkit firefox
+      - name: 完整验证
+        run: python3 tools/bk.py verify --level full
+      - name: 上传失败日志
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verify-logs
+          path: |
+            .bk/logs/
+            .test-results/
+          if-no-files-found: ignore

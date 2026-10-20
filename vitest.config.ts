@@ -4,10 +4,13 @@ import react from "@vitejs/plugin-react";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
 
-try {
-  process.loadEnvFile(".env");
-} catch {
-  // 没有 .env 时用进程环境（CI 与预发）
+// .env.local（网页沙箱的 tools/sandbox-db.sh 写在这里）优先于 .env；都没有时用进程环境（CI 与预发）
+for (const file of [".env.local", ".env"]) {
+  try {
+    process.loadEnvFile(file);
+  } catch {
+    // 没有这个文件
+  }
 }
 
 export default defineConfig({

@@ -15,7 +15,8 @@
 coverage
 build-artifacts
 packages/db/generated
-design
+# 页面登记 design/screens/ 要进镜像（pnpm gen 生成页面清单用），只排除冻结原型
+design/prototype
 docs
 work
 tests
