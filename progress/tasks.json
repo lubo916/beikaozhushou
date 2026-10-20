@@ -283,7 +283,7 @@
         "支持改“今天”的日期（时间旅行），跨天逻辑当场可测",
         "在 api-rules.md 第 6 节补一个数据刷新的写法样例（本任务允许改这一节）"
       ],
-      "status": "doing",
+      "status": "done",
       "not": [
         "后端实现",
         "页面"
@@ -295,6 +295,13 @@
           "tool": "claude-web",
           "date": "2026-10-21 04:56",
           "status": "partial"
+        },
+        {
+          "round": 2,
+          "version": "v0006",
+          "tool": "claude-web+local-review",
+          "date": "2026-10-21 04:58",
+          "status": "done"
         }
       ]
     },
