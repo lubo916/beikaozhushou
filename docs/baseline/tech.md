@@ -16,11 +16,12 @@ apps/api       唯一后端（Fastify 5），只负责装配各领域的路由
 apps/worker    后台任务（BullMQ）：解析、夜间顺延、提醒、导出
 packages/domains/<领域>  业务规则、数据访问、本领域的路由与任务处理器
 packages/contract        由 contracts/openapi 生成：类型、Zod 校验、请求钩子、MSW 假数据（生成物不进 git）
-packages/db              数据库客户端的唯一构造处；多文件 schema 放 packages/db/prisma/schema/，一个领域一个文件（现有 V3 文件在 contracts/schema/，见 data-model.md）
+packages/db              数据库客户端的唯一构造处；多文件 schema 放 packages/db/prisma/schema/，一个领域一个文件（_base.prisma 放生成器与数据源；F02 从 contracts/schema/ 搬来）
 packages/ai              core 是 AI 网关；<场景>/ 放提示词与输出结构
 packages/params          由参数表生成的参数访问器（生成物不进 git）
 packages/ui              组件、七态组件、令牌产物，只给三个界面用
-packages/shared          词汇常量（src/vocab/）、显示格式（src/format/）、“今天”函数（src/today/）等前后端都能用的纯函数与常量
+packages/shared          词汇常量（src/vocab/）、显示格式（src/format/）、“今天”函数（src/today/）等前后端都能用的纯函数与常量（子入口 @exam-prep/shared/vocab 等）
+packages/codegen         pnpm gen 的生成器（Node 直接运行的 TS，不进线上）
 contracts/openapi        接口契约源文件（_common.yaml、schemas/、pages/；V3 单文件 openapi.yaml 由 F04 迁入）
 contracts/*.yaml         参数 params、错误码 errors、权限 permissions、数据类别 data-classes、平台指标 metrics、事件；ai/ 下是 AI 场景与执行者
 docs/product/            术语表 glossary.yaml、领域依赖 domain-map.yaml 等 V3 内容资产（保留）
@@ -37,7 +38,7 @@ design/prototype/        冻结原型（只读；用 bk spec / bk proto 看）
 
 | 层 | 选择 | 不要用 |
 |---|---|---|
-| 运行时 | Node 24 LTS（本地与线上）；开发与测试兼容 Node 22.12+（网页沙箱是 22）；package.json 的 engines 现写 >=24 <25，F02 改为 >=22.12 | Bun、Deno、奇数版本 |
+| 运行时 | Node 24 LTS（本地与线上）；开发与测试兼容 Node 22.18+（网页沙箱是 22）。engines 写 >=22.18：22.18 起 Node 才默认能直接运行 .ts（决定卡 D-2026-10-20-F02-r1） | Bun、Deno、奇数版本 |
 | 包管理 | pnpm 11 工作区，packageManager 写确切版本 | npm、yarn；package.json 里的 pnpm 字段 |
 | 语言 | TypeScript 6.0.x，strict | 7.x；any |
 | 界面 | React 19.2、Vite、React Router 7（只用声明式） | Next.js；React Router framework 模式 |
@@ -66,20 +67,66 @@ design/prototype/        冻结原型（只读；用 bk spec / bk proto 看）
 
 | 包 | 版本 |
 |---|---|
-| （F02 按实际安装填写） | |
+| @eslint/js | 10.0.1 |
+| @faker-js/faker | 9.9.0 |
+| @playwright/test | 1.56.0 |
+| @prisma/adapter-pg | 7.0.0 |
+| @prisma/client | 7.0.0 |
+| @tailwindcss/vite | 4.1.18 |
+| @tanstack/react-query | 5.85.0 |
+| @types/node | 24.0.0 |
+| @types/react | 19.2.0 |
+| @types/react-dom | 19.2.0 |
+| @vitejs/plugin-react | 5.0.0 |
+| @vitest/browser-playwright | 4.0.0 |
+| bullmq | 5.50.0 |
+| dependency-cruiser | 17.4.3 |
+| eslint | 10.0.0 |
+| fastify | 5.4.0 |
+| i18next | 25.3.0 |
+| ioredis | 5.6.1 |
+| msw | 2.10.0 |
+| orval | 7.11.0 |
+| pino | 9.7.0 |
+| playwright | 1.56.0 |
+| prettier | 3.6.2 |
+| prisma | 7.0.0 |
+| react | 19.2.5 |
+| react-dom | 19.2.5 |
+| react-i18next | 15.6.0 |
+| react-router | 7.9.0 |
+| tailwindcss | 4.1.18 |
+| typescript | 6.0.3 |
+| typescript-eslint | 8.71.1 |
+| vite | 7.1.0 |
+| vitest | 4.0.0 |
+| zod | 4.1.0 |
 
-仓库 package.json 现在写的确切版本（还没在能联网的环境装过）：typescript 6.0.3、prisma 7.0.0、vitest 4.0.0、eslint 10.0.0、@playwright/test 1.56.0、orval 7.11.0、prettier 3.6.2、dependency-cruiser 17.4.3。
+按 pnpm-lock.yaml 填写（各包直接依赖的确切版本）。F02 的网页沙箱没能联网，没有实际安装；F01 第 2 轮已在本地按同一份锁文件装成功，F02 只给锁文件补登记了新增的工作区包，没有改任何第三方包的版本。本地收包（bk in）安装后若有出入，以安装结果为准改这里。
+还没装、等用到时由整合任务加的：Zustand、React Hook Form、shadcn/ui、lucide、sonner、motion、TipTap、react-markdown、ECharts、vite-plugin-pwa、idb、Better Auth、date-fns、decimal.js、uuid、ts-fsrs、openai、导出相关的库。
 
 ## 生成物
 
-接口代码（packages/contract/src/generated）、Prisma 客户端、参数访问器都由 `pnpm gen` 生成，不进 git；`dev`、`test`、`build`、`typecheck` 之前自动运行 `gen`。这样并行的任务不会在生成文件上冲突。
+生成物都由 `pnpm gen`（packages/codegen）生成，不进 git；`dev`、`dev:real`、`lint`、`typecheck`、`test`、`build`、`test:db`、`e2e:smoke` 之前自动运行。这样并行的任务不会在生成文件上冲突。
 
-现状：V3 的生成物还在 git 里（packages/contract/src/generated/、packages/params/registry.generated.ts、packages/ui/src/generated/、apps/learner/src/generated/pages.ts、packages/db/src/generated/、packages/domains/metrics/src/generated/），大多由已停用的 V3 spec_tool 生成，眼下没有工具能重新生成它们。F02 建 `pnpm gen` 接管后再移出 git。根 package.json 也还缺 dev、dev:real、gen、build、test:db、gallery 这几个脚本（bk verify 要用），由 F02 补上。
+| 目标 | 来源 | 生成到 |
+|---|---|---|
+| params 参数访问器 | contracts/params.yaml | packages/params/registry.generated.ts |
+| errors、permissions 错误码与权限 | contracts/errors.yaml、permissions.yaml | packages/contract/src/generated/ |
+| metrics 事件与指标登记 | contracts/events.yaml、metrics.yaml | packages/domains/metrics/core/generated/ |
+| pages 学员端页面清单 | design/screens/learner/*.yaml | apps/learner/src/generated/pages.ts |
+| models 表元数据 | packages/db/prisma/schema/*.prisma | packages/db/src/generated/models.ts |
+| orval 接口代码 | contracts/openapi.yaml（经 scripts/engineering/contract-gen.mjs） | packages/contract/src/generated/api/ |
+| prisma 客户端 | packages/db/prisma/schema/ | packages/db/generated/prisma/ |
+
+- 前六项由 packages/codegen 直接读来源生成（自带只认登记文件写法的 YAML 解析器，不用装依赖）；与 V3 旧生成物逐行比对过，除第一行文件头外完全一致。Orval 与 Prisma 两项要先 pnpm install，来源与输出都没变时跳过（记录在 .cache/codegen/）。
+- `pnpm gen:check` 只比对不写盘，过期或被手改就报错；`--only=<目标,…>` 只跑部分目标（镜像构建用）。
+- 设计令牌（packages/ui/src/generated/）的生成方式由 F03 定，F03 接管前仍在 git 里。
 
 ## 网页沙箱（claude.ai 代码执行）注意事项
 
 - 环境：Ubuntu、root、Node 22、Python 3.12、git、Chromium（路径由 bk 探测，传给 Playwright 的环境变量 BK_CHROMIUM）。没有 Docker。全局 npm 里自带 playwright，`bk proto` 不装依赖也能截原型图。
-- 网络：对话的代码执行打开网络访问后，只能访问包管理器（npm、PyPI、GitHub 等）；没打开时连包管理器也连不上，依赖与 Node 24 都装不上，只能做不需要依赖的工作。仓库里的 .npmrc 不能写死国内镜像，否则沙箱装不了依赖；需要镜像的，写在你自己电脑的用户级配置里。
+- 网络：对话的代码执行打开网络访问后，只能访问包管理器（npm、PyPI、GitHub 等）；没打开时连包管理器也连不上，依赖与 Node 24 都装不上，只能做不需要依赖的工作。网络开关在新开的对话里才生效，已经开着的对话要重开。仓库里的 .npmrc 不能写死国内镜像，否则沙箱装不了依赖；需要镜像的，写在你自己电脑的用户级配置里。
 - 单个上传或下载文件最大 30 MB：压缩包不带 node_modules 和构建产物；大文件不进仓库。
 - 数据库：可以试 `bk start <任务> --with-db`（调用 tools/sandbox-db.sh 用 apt 装 PostgreSQL 与 Redis）；装不上就只跑不需要数据库的测试，数据库测试以本地为准。
 
@@ -107,10 +154,10 @@ design/prototype/        冻结原型（只读；用 bk spec / bk proto 看）
 
 ## V4.1 补充
 
-- **领域两层**：`packages/domains/<领域>/core`（纯函数、无服务端依赖，ESLint 与 dependency-cruiser 检查）给模拟层和服务器共用；`server` 放 Prisma、路由与任务处理器。
+- **领域两层**：`packages/domains/<领域>/core`（纯函数、无服务端依赖，ESLint 与 dependency-cruiser 检查）给模拟层和服务器共用；`server` 放 Prisma、路由与任务处理器。18 个领域包都已建好，包名 `@exam-prep/domain-<领域>`，公开入口只有 `/core` 与 `/server`；三个界面和 api、worker 已预先接好全部领域包与 shared，后续任务不用改依赖清单。规则：页面组件不引用领域包，只有 `apps/*/src/mocks/` 能引用 `/core`；core 不引用服务端依赖、node 内置模块和任何领域的 server，不写裸数字（`@typescript-eslint/no-magic-numbers`），并另有一份不带任何运行环境类型的 tsconfig（packages/domains/tsconfig.core.json）检查纯度。packages/shared 同样是纯函数，工作区包里只可引用 params。
 - **pnpm 11 的安装脚本**：默认不运行依赖的安装脚本，esbuild 这类需要登记到允许名单才装得上（F02 配好，沙箱与本地都要能装）。
 - **沙箱里的 Node**：`bk start` 会尝试经 npm 仓库装 Node 24（另一份方案实测约 5–10 秒）；装不上就用沙箱自带的 22，项目仍兼容 22.12 以上。不想装时设环境变量 BK_SKIP_TOOLCHAIN=1。
-- **沙箱数据库**：`bk start <任务> --with-db` 调用 tools/sandbox-db.sh，用 apt 装 PostgreSQL 16 与 Redis（另一份方案实测约 15 秒）；zhparser、pg_bigm 装不上，相关测试以本地为准。
+- **沙箱数据库**：`bk start <任务> --with-db` 调用 tools/sandbox-db.sh，用 apt 装 PostgreSQL 16 与 Redis（另一份方案实测约 15 秒），开发库与测试库的连接串写进 .env.local（vitest 会读）；zhparser、pg_bigm 装不上，相关测试以本地为准。本地用 deploy/compose.dev.yml；CI 见 .github/workflows/verify.yml（push 时跑 bk verify --level full）。
 - **数据结构冻结**：首批邀请用户之前（任务 LF）冻结一次。冻结前不写迁移文件，改 schema 后用 `prisma db push` 加种子重建；冻结后一律走迁移。`bk done` 按 tools/bk.config.json 的 schema_frozen 自动检查。
 - **压缩包上限**：帮助中心的上传上限页面同时出现过 30 MB 与更大的写法，按 25 MB 封顶最稳妥（bk 已设为 25）。
 - **Claude Code 网页版**（可选通道，见册1附录 C）：云端约 4 核、16 GB 内存，预装 Node、pnpm、Docker、PostgreSQL 16、Redis 7，能跑数据库测试；环境里可设一个准备脚本（装 Node 24 与 pnpm 11），结果会被缓存。以官方文档为准。
