@@ -1,0 +1,989 @@
+{
+  "card": "docs/baseline/rule-cards/evidence-mastery.md",
+  "status": "草稿",
+  "rule_version": "R01-r1",
+  "notes": [
+    "kind 表示测哪段规则：strength＝单条证据定级（R1–R5）；mastery＝一个知识点的档位派生（R6–R17、R21）；target＝目标档（R18）；map_stats＝地图上的数（R19、R20）。",
+    "expect 里列出的字段都要相等，没列的不检查；score 允许 0.001 的误差。",
+    "参数取 params 的值，与 contracts/params.yaml 现值相同；只有 credibility_caps 的四级按规则卡写成 none（不记），见规则卡出入表第 1 条。proposed_params 是建议新增、待整合任务登记的参数。",
+    "带 decision 的例子取决于待拍板问题，现按 temp_decisions 的临时默认写；拍板后改卡、改这里、改测试，同一次提交。",
+    "mastery 的 evidence 按写入账本的先后排列。没写的字段取默认：type＝single、kps＝1、source＝practice、confidence＝sure、at_h＝0（作答时间，单位小时）。revoked＝已撤回；inherited＝拆分时按映射继承来的；batch＝同一次自评检验的题。",
+    "取值代码：strength 用 strong、medium、weak、negative、pending、none（none＝不记）；confidence 用 sure、vague、guess、off、none；credibility 用 reviewed、own、generated_confirmed、generated_instant；题型与知识类型用 docs/product/glossary.yaml 的代码。"
+  ],
+  "params": {
+    "learner.evidence.strength_weights": {
+      "strong": 1.0,
+      "medium": 0.6,
+      "weak": 0.3,
+      "negative": -1.0
+    },
+    "learner.evidence.credibility_caps": {
+      "reviewed": "strong",
+      "own": "strong",
+      "generated_confirmed": "medium",
+      "generated_instant": "none"
+    },
+    "learner.evidence.fast_answer_ratio": 0.3,
+    "learner.evidence.min_for_sufficient": 2,
+    "learner.mastery.level_thresholds": [1.0, 2.5, 4.5, 7.0, 10.0],
+    "learner.verify.recheck_after_hours": 24,
+    "learner.mastery.cross_check_items": 2,
+    "learner.self_check.items": 2,
+    "learner.memory.min_rating_seconds": 1.5
+  },
+  "proposed_params": {
+    "learner.mastery.default_target_by_type": {
+      "concept": 3,
+      "fact": 2,
+      "statute": 3,
+      "procedure": 4,
+      "application": 4,
+      "essay": 4,
+      "oral": 4,
+      "practical": 4,
+      "accumulation": null,
+      "untyped": 3
+    },
+    "learner.mastery.apply_question_types": ["material", "calculation", "short_answer", "essay", "oral", "practical"],
+    "learner.mastery.transfer_min_kps": 2,
+    "learner.mastery.weak_gap_levels": 2
+  },
+  "temp_decisions": {
+    "R01-Q1": "C",
+    "R01-Q2": "B",
+    "R01-Q3": "B",
+    "R01-Q4": "A",
+    "R01-Q5": "A",
+    "R01-Q6": "A",
+    "R01-Q7": "A"
+  },
+  "cases": [
+    {
+      "id": "E1",
+      "kind": "strength",
+      "title": "正常：答对、标“确定”",
+      "rule": "R2",
+      "input": {
+        "source": "practice",
+        "credibility": "reviewed",
+        "question_type": "single",
+        "correct": true,
+        "confidence": "sure",
+        "duration_s": 40,
+        "expected_s": 60,
+        "hint_level": 0
+      },
+      "expect": {
+        "strength": "strong",
+        "reason": "normal"
+      }
+    },
+    {
+      "id": "E2",
+      "kind": "strength",
+      "title": "正常：答对、标“模糊”",
+      "rule": "R2",
+      "input": {
+        "source": "practice",
+        "credibility": "reviewed",
+        "question_type": "single",
+        "correct": true,
+        "confidence": "vague",
+        "duration_s": 40,
+        "expected_s": 60,
+        "hint_level": 0
+      },
+      "expect": {
+        "strength": "medium",
+        "reason": "vague"
+      }
+    },
+    {
+      "id": "E3",
+      "kind": "strength",
+      "title": "正常：答对、标“蒙的”",
+      "rule": "R2、R6",
+      "input": {
+        "source": "practice",
+        "credibility": "reviewed",
+        "question_type": "single",
+        "correct": true,
+        "confidence": "guess",
+        "duration_s": 40,
+        "expected_s": 60,
+        "hint_level": 0
+      },
+      "expect": {
+        "strength": "pending",
+        "reason": "guess"
+      }
+    },
+    {
+      "id": "E4",
+      "kind": "strength",
+      "title": "边界：秒答",
+      "rule": "R2",
+      "input": {
+        "source": "practice",
+        "credibility": "reviewed",
+        "question_type": "single",
+        "correct": true,
+        "confidence": "sure",
+        "duration_s": 17,
+        "expected_s": 60,
+        "hint_level": 0
+      },
+      "expect": {
+        "strength": "pending",
+        "reason": "fast"
+      }
+    },
+    {
+      "id": "E5",
+      "kind": "strength",
+      "title": "边界：正好压线",
+      "rule": "R2",
+      "input": {
+        "source": "practice",
+        "credibility": "reviewed",
+        "question_type": "single",
+        "correct": true,
+        "confidence": "sure",
+        "duration_s": 18,
+        "expected_s": 60,
+        "hint_level": 0
+      },
+      "expect": {
+        "strength": "strong",
+        "reason": "normal"
+      }
+    },
+    {
+      "id": "E6",
+      "kind": "strength",
+      "title": "正常：答错",
+      "rule": "R2",
+      "input": {
+        "source": "practice",
+        "credibility": "reviewed",
+        "question_type": "single",
+        "correct": false,
+        "confidence": "sure",
+        "duration_s": 40,
+        "expected_s": 60,
+        "hint_level": 0
+      },
+      "expect": {
+        "strength": "negative",
+        "reason": "wrong"
+      }
+    },
+    {
+      "id": "E7",
+      "kind": "strength",
+      "title": "正常：用过提示",
+      "rule": "R3",
+      "input": {
+        "source": "practice",
+        "credibility": "reviewed",
+        "question_type": "single",
+        "correct": true,
+        "confidence": "sure",
+        "duration_s": 40,
+        "expected_s": 60,
+        "hint_level": 1
+      },
+      "expect": {
+        "strength": "weak",
+        "reason": "hint"
+      }
+    },
+    {
+      "id": "E8",
+      "kind": "strength",
+      "title": "正常：把握度已关闭",
+      "rule": "R2",
+      "input": {
+        "source": "practice",
+        "credibility": "reviewed",
+        "question_type": "single",
+        "correct": true,
+        "confidence": "off",
+        "duration_s": 40,
+        "expected_s": 60,
+        "hint_level": 0
+      },
+      "expect": {
+        "strength": "medium",
+        "reason": "confidence_off"
+      }
+    },
+    {
+      "id": "E9",
+      "kind": "strength",
+      "title": "正常：生成题核过",
+      "rule": "R3、R4",
+      "input": {
+        "source": "practice",
+        "credibility": "generated_instant",
+        "question_type": "single",
+        "correct": true,
+        "confidence": "sure",
+        "duration_s": 40,
+        "expected_s": 60,
+        "hint_level": 0,
+        "generated": {
+          "blind": true,
+          "learner_check": "ok",
+          "qc_passed": true,
+          "has_source": true
+        }
+      },
+      "expect": {
+        "strength": "strong",
+        "reason": "normal"
+      }
+    },
+    {
+      "id": "E10",
+      "kind": "strength",
+      "title": "边界：生成题缺出处",
+      "rule": "R3",
+      "input": {
+        "source": "practice",
+        "credibility": "generated_instant",
+        "question_type": "single",
+        "correct": true,
+        "confidence": "sure",
+        "duration_s": 40,
+        "expected_s": 60,
+        "hint_level": 0,
+        "generated": {
+          "blind": true,
+          "learner_check": "ok",
+          "qc_passed": true,
+          "has_source": false
+        }
+      },
+      "expect": {
+        "strength": "medium",
+        "reason": "credibility_cap"
+      }
+    },
+    {
+      "id": "E11",
+      "kind": "strength",
+      "title": "异常：生成题没确认",
+      "rule": "R1、R4",
+      "input": {
+        "source": "practice",
+        "credibility": "generated_instant",
+        "question_type": "single",
+        "correct": true,
+        "confidence": "sure",
+        "duration_s": 40,
+        "expected_s": 60,
+        "hint_level": 0,
+        "generated": {
+          "blind": true,
+          "learner_check": "none",
+          "qc_passed": true,
+          "has_source": true
+        }
+      },
+      "expect": {
+        "strength": "none",
+        "reason": "generated_unconfirmed"
+      }
+    },
+    {
+      "id": "E12",
+      "kind": "strength",
+      "title": "异常：摸底选“不会”",
+      "rule": "R1",
+      "input": {
+        "source": "diagnosis",
+        "credibility": "reviewed",
+        "question_type": "single",
+        "correct": null,
+        "confidence": "none",
+        "duration_s": 20,
+        "expected_s": 60,
+        "hint_level": 0,
+        "dont_know": true
+      },
+      "expect": {
+        "strength": "none",
+        "reason": "dont_know"
+      }
+    },
+    {
+      "id": "E13",
+      "kind": "strength",
+      "title": "正常：复习想起来了",
+      "rule": "R5",
+      "input": {
+        "source": "review",
+        "recall": "recalled",
+        "rating_s": 6,
+        "confidence": "none"
+      },
+      "expect": {
+        "strength": "weak",
+        "reason": "recall"
+      }
+    },
+    {
+      "id": "E14",
+      "kind": "strength",
+      "title": "异常：复习选“忘了”",
+      "rule": "R1",
+      "input": {
+        "source": "review",
+        "recall": "forgot",
+        "rating_s": 6,
+        "confidence": "none"
+      },
+      "expect": {
+        "strength": "none",
+        "reason": "forgot"
+      }
+    },
+    {
+      "id": "E15",
+      "kind": "mastery",
+      "title": "正常：一路做对",
+      "rule": "R8–R10",
+      "input": {
+        "evidence": [
+          { "q": "a", "strength": "strong" },
+          { "q": "b", "strength": "strong" },
+          { "q": "c", "strength": "strong" },
+          { "q": "d", "strength": "strong" },
+          { "q": "e", "strength": "strong" }
+        ]
+      },
+      "expect": {
+        "level": 3,
+        "score": 5.0,
+        "sufficient": true,
+        "pending": false
+      }
+    },
+    {
+      "id": "E16",
+      "kind": "mastery",
+      "title": "边界：同一道生成题刷 5 次",
+      "rule": "R10、R15",
+      "input": {
+        "evidence": [
+          { "q": "g", "strength": "strong", "credibility": "generated_confirmed" },
+          { "q": "g", "strength": "strong", "credibility": "generated_confirmed" },
+          { "q": "g", "strength": "strong", "credibility": "generated_confirmed" },
+          { "q": "g", "strength": "strong", "credibility": "generated_confirmed" },
+          { "q": "g", "strength": "strong", "credibility": "generated_confirmed" }
+        ]
+      },
+      "expect": {
+        "level": 2,
+        "score": 5.0,
+        "sufficient": false,
+        "pending": false
+      }
+    },
+    {
+      "id": "E17",
+      "kind": "mastery",
+      "title": "正常：再做对另一道题",
+      "rule": "R10",
+      "input": {
+        "evidence": [
+          { "q": "g", "strength": "strong", "credibility": "generated_confirmed" },
+          { "q": "g", "strength": "strong", "credibility": "generated_confirmed" },
+          { "q": "g", "strength": "strong", "credibility": "generated_confirmed" },
+          { "q": "g", "strength": "strong", "credibility": "generated_confirmed" },
+          { "q": "b", "strength": "strong" }
+        ]
+      },
+      "expect": {
+        "level": 3,
+        "score": 5.0,
+        "sufficient": true,
+        "pending": false
+      }
+    },
+    {
+      "id": "E18",
+      "kind": "mastery",
+      "title": "边界：只有中证据",
+      "rule": "R10",
+      "input": {
+        "evidence": [
+          { "q": "a", "strength": "medium", "confidence": "vague" },
+          { "q": "b", "strength": "medium", "confidence": "vague" },
+          { "q": "c", "strength": "medium", "confidence": "vague" },
+          { "q": "d", "strength": "medium", "confidence": "vague" },
+          { "q": "e", "strength": "medium", "confidence": "vague" },
+          { "q": "f", "strength": "medium", "confidence": "vague" },
+          { "q": "g", "strength": "medium", "confidence": "vague" },
+          { "q": "h", "strength": "medium", "confidence": "vague" }
+        ]
+      },
+      "expect": {
+        "level": 2,
+        "score": 4.8,
+        "sufficient": true,
+        "pending": false
+      }
+    },
+    {
+      "id": "E19",
+      "kind": "mastery",
+      "title": "边界：把握度已关闭",
+      "rule": "R10",
+      "decision": "R01-Q7",
+      "input": {
+        "evidence": [
+          { "q": "a", "strength": "medium", "confidence": "off" },
+          { "q": "b", "strength": "medium", "confidence": "off" },
+          { "q": "c", "strength": "medium", "confidence": "off" },
+          { "q": "d", "strength": "medium", "confidence": "off" },
+          { "q": "e", "strength": "medium", "confidence": "off" },
+          { "q": "f", "strength": "medium", "confidence": "off" },
+          { "q": "g", "strength": "medium", "confidence": "off" },
+          { "q": "h", "strength": "medium", "confidence": "off" }
+        ]
+      },
+      "expect": {
+        "level": 2,
+        "score": 4.8,
+        "sufficient": true,
+        "pending": false
+      }
+    },
+    {
+      "id": "E20",
+      "kind": "mastery",
+      "title": "边界：只刷单选",
+      "rule": "R11",
+      "decision": "R01-Q1",
+      "input": {
+        "evidence": [
+          { "q": "a", "strength": "strong" },
+          { "q": "b", "strength": "strong" },
+          { "q": "c", "strength": "strong" },
+          { "q": "d", "strength": "strong" },
+          { "q": "e", "strength": "strong" },
+          { "q": "f", "strength": "strong" },
+          { "q": "g", "strength": "strong" },
+          { "q": "h", "strength": "strong" }
+        ]
+      },
+      "expect": {
+        "level": 3,
+        "score": 8.0,
+        "sufficient": true,
+        "pending": false
+      }
+    },
+    {
+      "id": "E21",
+      "kind": "mastery",
+      "title": "正常：有一道计算题",
+      "rule": "R11",
+      "decision": "R01-Q1",
+      "input": {
+        "evidence": [
+          { "q": "a", "strength": "strong" },
+          { "q": "b", "strength": "strong" },
+          { "q": "c", "strength": "strong" },
+          { "q": "d", "strength": "strong" },
+          { "q": "e", "strength": "strong" },
+          { "q": "f", "strength": "strong" },
+          { "q": "g", "strength": "strong" },
+          { "q": "h", "strength": "strong" },
+          { "q": "i", "strength": "strong" },
+          { "q": "j", "strength": "strong", "type": "calculation" }
+        ]
+      },
+      "expect": {
+        "level": 4,
+        "score": 10.0,
+        "sufficient": true,
+        "pending": false
+      }
+    },
+    {
+      "id": "E22",
+      "kind": "mastery",
+      "title": "正常：计算题连着两个知识点",
+      "rule": "R11",
+      "decision": "R01-Q1",
+      "input": {
+        "evidence": [
+          { "q": "a", "strength": "strong" },
+          { "q": "b", "strength": "strong" },
+          { "q": "c", "strength": "strong" },
+          { "q": "d", "strength": "strong" },
+          { "q": "e", "strength": "strong" },
+          { "q": "f", "strength": "strong" },
+          { "q": "g", "strength": "strong" },
+          { "q": "h", "strength": "strong" },
+          { "q": "i", "strength": "strong" },
+          { "q": "j", "strength": "strong", "type": "calculation", "kps": 2 }
+        ]
+      },
+      "expect": {
+        "level": 5,
+        "score": 10.0,
+        "sufficient": true,
+        "pending": false
+      }
+    },
+    {
+      "id": "E23",
+      "kind": "mastery",
+      "title": "正常：做错降档",
+      "rule": "R8、R14",
+      "decision": "R01-Q4",
+      "input": {
+        "evidence": [
+          { "q": "a", "strength": "strong" },
+          { "q": "b", "strength": "strong" },
+          { "q": "c", "strength": "strong" },
+          { "q": "d", "strength": "strong" },
+          { "q": "e", "strength": "strong" },
+          { "q": "f", "strength": "negative" }
+        ]
+      },
+      "expect": {
+        "level": 2,
+        "score": 4.0,
+        "sufficient": true,
+        "pending": false
+      }
+    },
+    {
+      "id": "E24",
+      "kind": "mastery",
+      "title": "边界：早期做错不欠分",
+      "rule": "R8",
+      "input": {
+        "evidence": [
+          { "q": "a", "strength": "negative" },
+          { "q": "b", "strength": "negative" },
+          { "q": "c", "strength": "negative" },
+          { "q": "d", "strength": "strong" },
+          { "q": "e", "strength": "strong" },
+          { "q": "f", "strength": "strong" }
+        ]
+      },
+      "expect": {
+        "level": 2,
+        "score": 3.0,
+        "sufficient": true,
+        "pending": false
+      }
+    },
+    {
+      "id": "E25",
+      "kind": "mastery",
+      "title": "边界：学过但都做错",
+      "rule": "R13",
+      "decision": "R01-Q2",
+      "input": {
+        "evidence": [
+          { "q": "a", "strength": "negative" },
+          { "q": "b", "strength": "negative" }
+        ]
+      },
+      "expect": {
+        "level": 1,
+        "score": 0.0,
+        "sufficient": true,
+        "pending": false
+      }
+    },
+    {
+      "id": "E26",
+      "kind": "mastery",
+      "title": "边界：只有一条蒙对",
+      "rule": "R6、R13、R19",
+      "input": {
+        "evidence": [{ "q": "a", "strength": "pending", "at_h": 0 }]
+      },
+      "expect": {
+        "level": 0,
+        "score": 0.0,
+        "sufficient": false,
+        "pending": true,
+        "has_evidence": true
+      }
+    },
+    {
+      "id": "E27",
+      "kind": "mastery",
+      "title": "边界：复考太早",
+      "rule": "R7",
+      "input": {
+        "evidence": [
+          { "q": "a", "strength": "pending", "at_h": 0 },
+          { "q": "b", "strength": "strong", "at_h": 5 }
+        ]
+      },
+      "expect": {
+        "level": 1,
+        "score": 1.0,
+        "sufficient": false,
+        "pending": true
+      }
+    },
+    {
+      "id": "E28",
+      "kind": "mastery",
+      "title": "边界：正好满 24 小时",
+      "rule": "R7",
+      "input": {
+        "evidence": [
+          { "q": "a", "strength": "pending", "at_h": 0 },
+          { "q": "b", "strength": "strong", "at_h": 24 }
+        ]
+      },
+      "expect": {
+        "level": 1,
+        "score": 1.0,
+        "sufficient": false,
+        "pending": false
+      }
+    },
+    {
+      "id": "E29",
+      "kind": "mastery",
+      "title": "异常：拿同一道题复考",
+      "rule": "R7",
+      "input": {
+        "evidence": [
+          { "q": "a", "strength": "pending", "at_h": 0 },
+          { "q": "a", "strength": "strong", "at_h": 30 }
+        ]
+      },
+      "expect": {
+        "level": 1,
+        "score": 1.0,
+        "sufficient": false,
+        "pending": true
+      }
+    },
+    {
+      "id": "E30",
+      "kind": "mastery",
+      "title": "正常：自评检验通过",
+      "rule": "R12、R17",
+      "decision": "R01-Q3",
+      "input": {
+        "self_assessment": 3,
+        "evidence": [
+          { "q": "a", "strength": "strong" },
+          { "q": "b", "strength": "strong" },
+          { "q": "c", "strength": "strong", "source": "self_check", "batch": "s1" },
+          { "q": "d", "strength": "strong", "source": "self_check", "batch": "s1" }
+        ]
+      },
+      "expect": {
+        "level": 3,
+        "score": 4.5,
+        "sufficient": true,
+        "pending": false
+      }
+    },
+    {
+      "id": "E31",
+      "kind": "mastery",
+      "title": "异常：自评检验没通过",
+      "rule": "R17",
+      "input": {
+        "self_assessment": 3,
+        "evidence": [
+          { "q": "a", "strength": "strong" },
+          { "q": "b", "strength": "strong" },
+          { "q": "c", "strength": "strong", "source": "self_check", "batch": "s1" },
+          { "q": "d", "strength": "negative", "source": "self_check", "batch": "s1" }
+        ]
+      },
+      "expect": {
+        "level": 1,
+        "score": 2.0,
+        "sufficient": true,
+        "pending": false
+      }
+    },
+    {
+      "id": "E32",
+      "kind": "mastery",
+      "title": "异常：题目事后改了答案",
+      "rule": "R21",
+      "input": {
+        "evidence": [
+          { "q": "a", "strength": "strong" },
+          { "q": "b", "strength": "strong" },
+          { "q": "c", "strength": "strong" },
+          { "q": "d", "strength": "strong" },
+          { "q": "e", "strength": "strong", "revoked": true }
+        ]
+      },
+      "expect": {
+        "level": 2,
+        "score": 4.0,
+        "sufficient": true,
+        "pending": false
+      }
+    },
+    {
+      "id": "E33",
+      "kind": "mastery",
+      "title": "边界：只靠复习卡片",
+      "rule": "R5、R10",
+      "input": {
+        "evidence": [
+          { "card": "c1", "source": "review", "strength": "weak" },
+          { "card": "c1", "source": "review", "strength": "weak" },
+          { "card": "c1", "source": "review", "strength": "weak" },
+          { "card": "c1", "source": "review", "strength": "weak" },
+          { "card": "c2", "source": "review", "strength": "weak" },
+          { "card": "c2", "source": "review", "strength": "weak" },
+          { "card": "c2", "source": "review", "strength": "weak" },
+          { "card": "c2", "source": "review", "strength": "weak" },
+          { "card": "c3", "source": "review", "strength": "weak" },
+          { "card": "c3", "source": "review", "strength": "weak" },
+          { "card": "c3", "source": "review", "strength": "weak" },
+          { "card": "c3", "source": "review", "strength": "weak" },
+          { "card": "c4", "source": "review", "strength": "weak" },
+          { "card": "c4", "source": "review", "strength": "weak" },
+          { "card": "c4", "source": "review", "strength": "weak" },
+          { "card": "c4", "source": "review", "strength": "weak" }
+        ]
+      },
+      "expect": {
+        "level": 2,
+        "score": 4.8,
+        "sufficient": true,
+        "pending": false
+      }
+    },
+    {
+      "id": "E34",
+      "kind": "mastery",
+      "title": "边界：知识点拆分后",
+      "rule": "R16",
+      "input": {
+        "evidence": [
+          { "q": "a", "strength": "strong", "inherited": true },
+          { "q": "b", "strength": "strong", "inherited": true },
+          { "q": "c", "strength": "strong", "inherited": true },
+          { "q": "d", "strength": "strong", "inherited": true },
+          { "q": "e", "strength": "strong", "inherited": true }
+        ]
+      },
+      "expect": {
+        "level": 3,
+        "score": 5.0,
+        "sufficient": false,
+        "pending": false
+      }
+    },
+    {
+      "id": "E35",
+      "kind": "target",
+      "title": "正常：标两种类型",
+      "rule": "R18",
+      "decision": "R01-Q5",
+      "input": {
+        "types": ["concept", "procedure"],
+        "map_target": null,
+        "personal_target": null
+      },
+      "expect": {
+        "target": 4,
+        "source": "type"
+      }
+    },
+    {
+      "id": "E36",
+      "kind": "target",
+      "title": "正常：层层覆盖",
+      "rule": "R18",
+      "input": {
+        "types": ["fact"],
+        "map_target": 3,
+        "personal_target": 5
+      },
+      "expect": {
+        "target": 5,
+        "source": "personal"
+      }
+    },
+    {
+      "id": "E37",
+      "kind": "target",
+      "title": "边界：积累拓展型",
+      "rule": "R18、R19",
+      "input": {
+        "types": ["accumulation"],
+        "map_target": null,
+        "personal_target": null
+      },
+      "expect": {
+        "target": null,
+        "source": "none",
+        "in_grid": false
+      }
+    },
+    {
+      "id": "E38",
+      "kind": "target",
+      "title": "异常：没标类型",
+      "rule": "R18",
+      "input": {
+        "types": [],
+        "map_target": null,
+        "personal_target": null
+      },
+      "expect": {
+        "target": 3,
+        "source": "untyped"
+      }
+    },
+    {
+      "id": "E39",
+      "kind": "map_stats",
+      "title": "正常＋边界：一张小地图",
+      "rule": "R19、R20",
+      "decision": "R01-Q6",
+      "input": {
+        "points": [
+          { "id": "c1", "node": "chapter" },
+          {
+            "id": "k1",
+            "types": ["concept"],
+            "in_scope": true,
+            "has_evidence": true,
+            "sufficient": true,
+            "level": 3,
+            "pending": false,
+            "target": 3
+          },
+          {
+            "id": "k2",
+            "types": ["procedure"],
+            "in_scope": true,
+            "has_evidence": true,
+            "sufficient": true,
+            "level": 2,
+            "pending": false,
+            "target": 4
+          },
+          {
+            "id": "k3",
+            "types": ["fact"],
+            "in_scope": true,
+            "has_evidence": true,
+            "sufficient": false,
+            "level": 1,
+            "pending": false,
+            "target": 2
+          },
+          {
+            "id": "k4",
+            "types": ["concept"],
+            "in_scope": true,
+            "has_evidence": false,
+            "sufficient": false,
+            "level": 0,
+            "pending": false,
+            "target": 3
+          },
+          {
+            "id": "k5",
+            "types": ["procedure"],
+            "in_scope": false,
+            "has_evidence": true,
+            "sufficient": true,
+            "level": 4,
+            "pending": false,
+            "target": 4
+          },
+          {
+            "id": "k6",
+            "types": ["concept"],
+            "in_scope": true,
+            "has_evidence": true,
+            "sufficient": false,
+            "level": 0,
+            "pending": true,
+            "target": 3
+          },
+          {
+            "id": "k7",
+            "types": ["accumulation"],
+            "in_scope": true,
+            "has_evidence": true,
+            "sufficient": true,
+            "level": 2,
+            "pending": false,
+            "target": null
+          },
+          {
+            "id": "k8",
+            "types": ["fact"],
+            "in_scope": true,
+            "has_evidence": true,
+            "sufficient": false,
+            "level": 2,
+            "pending": false,
+            "target": 2
+          },
+          {
+            "id": "k9",
+            "types": ["concept"],
+            "in_scope": true,
+            "has_evidence": true,
+            "sufficient": true,
+            "level": 3,
+            "pending": false,
+            "target": 3,
+            "retired": true
+          }
+        ]
+      },
+      "expect": {
+        "total": 7,
+        "in_scope": 6,
+        "learned": [6, 7],
+        "achieved": [1, 6],
+        "distribution": {
+          "unlearned": 1,
+          "insufficient": 3,
+          "1": 0,
+          "2": 1,
+          "3": 1,
+          "4": 0,
+          "5": 0
+        },
+        "attention": {
+          "insufficient": 3,
+          "pending": 1
+        },
+        "weak": ["k2"],
+        "cells": {
+          "k1": "L3",
+          "k2": "L2",
+          "k3": "dashed",
+          "k4": "gray",
+          "k5": "striped",
+          "k6": "dashed",
+          "k8": "dashed"
+        }
+      }
+    }
+  ]
+}
