@@ -5,7 +5,7 @@ import { IconButton } from "./Button.tsx";
 
 /** 用原生 <dialog> 的模态能力：打开时焦点进入、背景不可操作，关闭后焦点回到打开它的按钮；Esc 交给 onClose。 */
 function useModal(open: boolean, onClose: () => void) {
-  const ref = useRef<HTMLDialogElement>(null);
+  const ref = useRef<HTMLDialogElement | null>(null);
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
   useEffect(() => {
