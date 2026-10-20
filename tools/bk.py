@@ -830,6 +830,14 @@ def make_package(root: Path, cfg: dict, kind: str, task: dict | None, rnd: int, 
             if repo.exists():
                 shutil.rmtree(repo)
             prepare_repo_copy(root, cfg, repo, ref, branch or "bk-pack", attempt)
+            if task and task.get("id") == "F01" and kind in ("task", "fix"):
+                tag = "refs/tags/v3-final"
+                found = subprocess.run(["git", "show-ref", "--verify", "--quiet", tag],
+                                       cwd=root, capture_output=True)
+                if found.returncode:
+                    raise BkError("F01 出包需要 v3-final 标签，才能核对 V3 的内容一致性检查；请先恢复该备份标签。")
+                sh(["git", "fetch", "--quiet", "--no-tags", "--depth", "1",
+                    "file://" + str(root), f"{tag}:{tag}"], cwd=repo)
             meta = {"kind": kind, "version": base_ver, "base": base_commit, "task": task["id"] if task else None,
                     "title": task.get("title") if task else None, "round": rnd, "branch": branch or None,
                     "created": now(), "tool": TOOL_VERSION}
@@ -2413,11 +2421,16 @@ def cmd_selftest(args) -> None:
         (hub / "tests" / "sample.test.ts").write_text("test('a', () => {})\n", encoding="utf-8")
         (hub / "docs" / "baseline" / "rule-cards").mkdir(parents=True)
         (hub / "docs" / "baseline" / "rule-cards" / "demo-rule.md").write_text("# 规则卡：示例\n\n- 状态：草稿\n", encoding="utf-8")
+        (hub / "scripts").mkdir()
+        (hub / "scripts" / "spec_tool.py").write_text("print('v3-reference')\n", encoding="utf-8")
         g("init", "-q", "-b", "main")
         g("config", "user.name", "自检")
         g("config", "user.email", "selftest@bk.local")
         g("add", "-A")
         g("commit", "-q", "-m", "起点")
+        g("tag", "-a", "v3-final", "-m", "V3 历史参考")
+        g("rm", "-q", "scripts/spec_tool.py")
+        g("commit", "-q", "-m", "移走旧流程")
         run(["init"], hub)
         assert g("tag", "-l", "bk-v0001") == "bk-v0001"
         # 两个并行任务包
@@ -2425,6 +2438,53 @@ def cmd_selftest(args) -> None:
         run(["pack", "U02"], hub)
         outbox = tmp / "handoff" / "outbox"
         assert (outbox / "bk-v0001-U01.zip").exists() and (outbox / "bk-v0001-U02.zip").exists()
+
+        # F01 必须能查看浅克隆范围之外的 V3 脚本；普通包不额外携带历史标签。
+        for label, zpath in (("task", outbox / "bk-v0001-U01.zip"),
+                             ("version", tmp / "handoff" / "versions" / "bk-v0001.zip")):
+            check_dir = tmp / f"check-normal-{label}"
+            safe_extract(zpath, check_dir)
+            check_repo = check_dir / "repo"
+            meta = load_json(check_repo / ".bk" / "package.json")
+            assert g("tag", "-l", "v3-final", cwd=check_repo) == "", "普通包不应携带 V3 标签"
+            assert (check_repo / ".git" / "shallow").is_file(), "普通包应保留浅克隆"
+            assert g("rev-parse", "HEAD", cwd=check_repo) == meta["base"]
+        fix_ref = "bk-F01-selftest"
+        g("checkout", "-q", "-b", fix_ref)
+        (hub / "FIX-REF").write_text("F01 修复分支\n", encoding="utf-8")
+        g("add", "FIX-REF")
+        g("commit", "-q", "-m", "F01 修复引用")
+        fix_head = g("rev-parse", "HEAD")
+        g("checkout", "-q", "main")
+        cfg = load_config(hub)
+        f01 = {"id": "F01", "title": "历史参考自检"}
+        for kind, ref in (("task", "main"), ("fix", fix_ref)):
+            base = g("rev-parse", ref)
+            zpath = make_package(hub, cfg, kind, f01, 1, ref, base, "v0001", outbox,
+                                 f"selftest-F01-{kind}.zip", branch=fix_ref if kind == "fix" else "")
+            check_dir = tmp / f"check-F01-{kind}"
+            safe_extract(zpath, check_dir)
+            check_repo = check_dir / "repo"
+            assert g("tag", "-l", "v3-final", cwd=check_repo) == "v3-final", "F01 包缺少 v3-final 标签"
+            assert g("rev-parse", "refs/tags/v3-final", cwd=check_repo) == g("rev-parse", "refs/tags/v3-final")
+            assert g("show", "v3-final:scripts/spec_tool.py", cwd=check_repo) == "print('v3-reference')"
+            assert g("rev-parse", "HEAD", cwd=check_repo) == base, "抓取历史标签不应改变包的工作提交"
+            assert load_json(check_repo / ".bk" / "package.json")["base"] == base
+            if kind == "task":
+                assert (check_repo / ".git" / "shallow").is_file(), "F01 任务包应保留浅克隆"
+            else:
+                assert base == fix_head and g("branch", "--show-current", cwd=check_repo) == fix_ref
+        g("tag", "-d", "v3-final")
+        missing_zip = outbox / "selftest-F01-missing-tag.zip"
+        try:
+            make_package(hub, cfg, "task", f01, 1, "main", g("rev-parse", "HEAD"), "v0001",
+                         outbox, missing_zip.name)
+        except BkError as e:
+            assert "v3-final" in str(e)
+        else:
+            raise AssertionError("源仓库缺少 V3 标签时 F01 出包必须明确失败")
+        assert not missing_zip.exists(), "标签缺失时不能留下貌似成功的 F01 包"
+        say("✓ F01 历史标签、修复分支、浅克隆与缺失标签护栏自检通过。")
 
         def web_session(zipname, task, edit, fail=False):
             sbx = tmp / f"sbx-{task}"
