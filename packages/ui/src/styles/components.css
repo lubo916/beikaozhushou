@@ -1592,8 +1592,7 @@
   }
 
   /* ── 按容器宽度切换（数值同 size.breakpoint.*） ── */
-  @container (width < 700px) {
-    /* style-exempt: 容器查询条件不能用 CSS 变量，700 即 size.breakpoint.tablet */
+  @container /* style-exempt: 容器查询条件不能用 CSS 变量，700 即 size.breakpoint.tablet */ (width < 700px) {
     .ui-banner {
       flex-wrap: wrap;
     }
@@ -1626,21 +1625,18 @@
       content: attr(data-label);
     }
   }
-  @container (width >= 700px) {
-    /* style-exempt: 容器查询条件不能用 CSS 变量，700 即 size.breakpoint.tablet */
+  @container /* style-exempt: 容器查询条件不能用 CSS 变量，700 即 size.breakpoint.tablet */ (width >= 700px) {
     .ui-proposal__row {
       grid-template-columns: 6.5em minmax(0, 1fr);
       gap: var(--size-space-3);
     }
   }
-  @container (width >= 860px) {
-    /* style-exempt: 容器查询条件不能用 CSS 变量，860 即 size.breakpoint.content-md */
+  @container /* style-exempt: 容器查询条件不能用 CSS 变量，860 即 size.breakpoint.content-md */ (width >= 860px) {
     .ui-cols--split {
       grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
     }
   }
-  @container (width >= 1180px) {
-    /* style-exempt: 容器查询条件不能用 CSS 变量，1180 即 size.breakpoint.content-lg */
+  @container /* style-exempt: 容器查询条件不能用 CSS 变量，1180 即 size.breakpoint.content-lg */ (width >= 1180px) {
     .ui-cols--split {
       grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
       gap: var(--size-space-6);

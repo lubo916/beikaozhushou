@@ -72,7 +72,7 @@ function render(entries: readonly GlossaryEntry[], sha: string): string {
 const text = readFileSync(ROOT + SOURCE, "utf8");
 const entries = plain(parseYaml(text, SOURCE)) as GlossaryEntry[];
 const next = render(entries, createHash("sha256").update(text).digest("hex").slice(0, 12));
-let current = "";
+let current: string;
 try {
   current = readFileSync(ROOT + TARGET, "utf8");
 } catch {
