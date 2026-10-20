@@ -1,0 +1,19 @@
+{
+  "name": "@exam-prep/domain-compliance",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./core": "./core/index.ts",
+    "./server": "./server/index.ts"
+  },
+  "dependencies": {
+    "@exam-prep/contract": "workspace:*",
+    "@exam-prep/db": "workspace:*",
+    "@exam-prep/params": "workspace:*",
+    "@exam-prep/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "24.0.0",
+    "fastify": "5.4.0"
+  }
+}

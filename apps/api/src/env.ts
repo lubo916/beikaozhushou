@@ -1,4 +1,4 @@
-import { ENV_NAMES, EnvError, assertRunnable, parseEnvName, type EnvName } from "@exam-prep/domain-platform";
+import { ENV_NAMES, EnvError, assertRunnable, parseEnvName, type EnvName } from "@exam-prep/domain-platform/core";
 
 export { ENV_NAMES, EnvError, assertRunnable, parseEnvName, type EnvName };
 
