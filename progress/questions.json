@@ -119,6 +119,141 @@
       "asked": "v0003",
       "answer": "A",
       "answered": "v0003"
+    },
+    {
+      "id": "F03-Q1",
+      "task": "F03",
+      "q": "原型只定了颜色、圆角、字体，没定间距，规则又不许页面写像素数：间距怎么定？",
+      "options": [
+        "A 补一套 4 像素为单位的间距档位（页面用 p-1 到 p-12）",
+        "B 先不补，等设计给出"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0004",
+      "answer": "A",
+      "answered": "v0004"
+    },
+    {
+      "id": "F03-Q2",
+      "task": "F03",
+      "q": "组件陈列页 /dev/ui 要在学员端入口文件 App.tsx 加路由，这个文件在 F03 的修改范围外：加不加？",
+      "options": [
+        "A 加两行并在交接单写明理由",
+        "B 不加，等整合任务再接上"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0004",
+      "answer": "A",
+      "answered": "v0004"
+    },
+    {
+      "id": "F03-Q3",
+      "task": "F03",
+      "q": "术语表缺几组组件要用的叫法（提议的四个状态、三档降级等）：现在怎么办？",
+      "options": [
+        "A 先按 vocabulary.md 在代码里临时补上，标明“待补登记”",
+        "B 等术语表更新后再做"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0004",
+      "answer": "A",
+      "answered": "v0004"
+    },
+    {
+      "id": "F03-Q4",
+      "task": "F03",
+      "q": "题目可信度在界面上写“几级＋简称”，三、四级的简称用什么？",
+      "options": [
+        "A 一级 审定、二级 自有、三级 已确认生成、四级 即时生成",
+        "B 直接写全称，如“三级 已确认的生成题”"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0004",
+      "answer": "A",
+      "answered": "v0004"
+    },
+    {
+      "id": "F03-Q5",
+      "task": "F03",
+      "q": "组件陈列页在哪里能看到？",
+      "options": [
+        "A 只在本地开发和预览时出现，正式版本里没有",
+        "B 预发布环境里也能看，方便在线核对"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0004",
+      "answer": "A",
+      "answered": "v0004"
+    },
+    {
+      "id": "F03-Q6",
+      "task": "F03",
+      "q": "修好收包失败要改范围外的锁文件 pnpm-lock.yaml（热点文件）：改不改？",
+      "options": [
+        "A 授权：只给组件库补 5 条依赖记录（18 行），不新增、不升级任何包",
+        "B 不授权：留给本地 Codex 运行 pnpm install 更新"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0004",
+      "answer": "A",
+      "answered": "v0004"
+    },
+    {
+      "id": "F03-Q7",
+      "task": "F03",
+      "q": "锁文件修好后，本地收包第一次真跑检查；如果只剩排版（Prettier）不过，怎么处理？",
+      "options": [
+        "A 由本地 Codex 运行 pnpm format 后复验，只改排版、不改代码逻辑",
+        "B 出第 3 轮修复包给网页端（要先在 Claude 的设置里打开网络，才装得上排版工具）"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0004",
+      "answer": "A",
+      "answered": "v0004"
+    },
+    {
+      "id": "F03-Q8",
+      "task": "F03",
+      "q": "是否授权第三轮两处最小修复：工具无效赋值与四条既有断点豁免注释位置？",
+      "options": [
+        "A 本地两处最小修复后复验，生成结果、断点、测试及依赖版本不变",
+        "B 换 Claude 接手修复"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0004",
+      "answer": "A",
+      "answered": "v0004"
+    },
+    {
+      "id": "F03-Q9",
+      "task": "F03",
+      "q": "是否授权补齐第三轮生成、术语 lint、真实 gallery、脚本类型检查及三文件退索引的工程接线？",
+      "options": [
+        "A 授权在明确文件范围内补齐，不新增依赖、不改业务逻辑、不扩大 tools/AGENTS 修改",
+        "B 保持部分完成，另出接线任务"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0004",
+      "answer": "A",
+      "answered": "v0004"
     }
   ]
 }

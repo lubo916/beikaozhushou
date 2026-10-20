@@ -221,10 +221,19 @@
         "“今天”函数（按用户时区与日界线参数）放 packages/shared/src/today/，前后端与模拟层共用，边界有测试（凌晨 3:59 与 4:00）",
         "组件按原型调用次数排优先级（ui-rules.md 第 11 节）"
       ],
-      "status": "todo",
+      "status": "done",
       "not": [
         "页面",
         "接口"
+      ],
+      "history": [
+        {
+          "round": 3,
+          "version": "v0004",
+          "tool": "local",
+          "date": "2026-10-20 18:14",
+          "status": "done"
+        }
       ]
     },
     {
