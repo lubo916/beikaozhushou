@@ -7,7 +7,8 @@
     "R02-Q3": "A",
     "R02-Q4": "A",
     "R02-Q5": "B",
-    "R02-Q6": "A"
+    "R02-Q6": "A",
+    "R02-Q7": "A"
   },
   "conventions": [
     "每条例子是 input → expect；expect 只列要核对的字段，没列的不核对。带 variants 的例子，input.variants[i] 对应 expect.variants[i]，各自独立。",
@@ -17,7 +18,9 @@
     "评分代码：again＝忘了、hard＝难、good＝记得、easy＝轻松；类型代码：recall_card＝要点回顾、card＝卡片、recite_segment＝背诵段。评分与背诵段的代码是建议，待写进 docs/product/glossary.yaml；数据成熟度、学习范围用术语表现有代码。背诵比对四档沿用 S16 的原文（完全正确、基本正确、部分正确、错误），“漏掉”指要点没背出来。",
     "params 是 contracts/params.yaml 的现值；params_proposed 是本卡建议新增、待整合任务登记的参数。有的例子把 cap（今天的上限）设得很小，只为便于手算。",
     "carried_over、deferred_same_kp、overloaded、excluded 只给后端和测试用：学员端接口不返回积压总数（规则 R6f）。",
-    "functions 是建议的纯函数划分（放 packages/domains/learner/core/），名字可以改；pick_today 的例子直接给每项的 freq，考频怎么来见 E9。"
+    "functions 是建议的纯函数划分（放 packages/domains/learner/core/），名字可以改；pick_today 的例子直接给每项的 freq，考频怎么来见 E9。",
+    "due_count 与 by_kind 按今天已有效复习的到期项和今天待复习项的编号并集计数，同一项当天重学不重复计数。counted 表示记忆更新资格；mastery_evidence_eligible 另表示掌握证据资格，忘了与秒评均为 false（按 R01）。",
+    "新卡也按知识点去重（R02-Q7=A）。new_cards.items 是按考频、收下时间、编号排序前的候选；introduced_items_today 是当天已经出过的新卡，只有给 available 数量的旧例子假定候选知识点互不冲突。new_card_ids 是本批选中的新卡编号，new_cards 是本批数量，不计入 due_count。"
   ],
   "day": {
     "time_zone": "Asia/Shanghai",
@@ -43,7 +46,7 @@
   "functions": {
     "pick_today": "挑今天这一批（R1、R5、R6、R8）：输出 batch（现在要做的，按先后）、due_count、by_kind、deferred_same_kp、carried_over、overloaded、excluded、warmup、new_cards、mistakes_after_session",
     "freq": "考频（R7）",
-    "rate": "一次翻面评分（R2、R3a）：按钮预览、是否计入、选“忘了”之后",
+    "rate": "一次翻面评分（R2、R3a）：按钮预览、是否计入、选“忘了”之后；mastery_evidence_eligible 与 counted 分开，忘了不产生掌握证据",
     "next_due": "下次到期（R3、R4）",
     "retention": "这一项的目标保持率（R4）",
     "effective_cap": "某一天的上限（R9）",
@@ -368,7 +371,7 @@
     },
     {
       "id": "E7",
-      "title": "被顺延的项越拖越要紧，不会一直轮不到",
+      "title": "顺延后相对紧要度上升的一个例子，不代表保证有限等待",
       "kind": "正常",
       "rule": "R6",
       "fn": "pick_today",
@@ -623,7 +626,8 @@
         "after": {
           "due_at": "2026-10-21T20:10:00+08:00",
           "lapses": 1,
-          "counted": true
+          "counted": true,
+          "mastery_evidence_eligible": false
         }
       }
     },
@@ -701,12 +705,14 @@
           {
             "counted": false,
             "flag": "疑似刷过",
-            "requeue": "session_end"
+            "requeue": "session_end",
+            "mastery_evidence_eligible": false
           },
           {
             "counted": false,
             "flag": "疑似刷过",
-            "requeue": "not_today"
+            "requeue": "not_today",
+            "mastery_evidence_eligible": false
           }
         ],
         "records_written": 2,
@@ -730,7 +736,8 @@
       "expect": {
         "attempts": [
           {
-            "counted": true
+            "counted": true,
+            "mastery_evidence_eligible": true
           }
         ],
         "memory_updated": true
@@ -1023,21 +1030,26 @@
       "expect": {
         "variants": [
           {
-            "rating": "good"
+            "rating": "good",
+            "mastery_evidence_eligible": true
           },
           {
-            "rating": "hard"
+            "rating": "hard",
+            "mastery_evidence_eligible": true
           },
           {
             "rating": "again",
-            "due_day": "2026-10-22"
+            "due_day": "2026-10-22",
+            "mastery_evidence_eligible": false
           },
           {
             "rating": "again",
-            "due_day": "2026-10-22"
+            "due_day": "2026-10-22",
+            "mastery_evidence_eligible": false
           },
           {
-            "rating": "good"
+            "rating": "good",
+            "mastery_evidence_eligible": true
           }
         ]
       }
@@ -1120,6 +1132,225 @@
             "insufficient_data_hint": false
           }
         ]
+      }
+    },
+    {
+      "id": "E24",
+      "title": "完成当天重学后，到期数和分类项数不重复累计",
+      "kind": "边界",
+      "rule": "R3、R6",
+      "fn": "pick_today",
+      "input": {
+        "today": "2026-10-21",
+        "now": "2026-10-21T20:30:00+08:00",
+        "cap": 2,
+        "reviewed_today": [
+          {
+            "id": "c9",
+            "kind": "card",
+            "kps": ["k2"]
+          }
+        ],
+        "candidates": [
+          {
+            "id": "c4",
+            "kind": "recall_card",
+            "kps": ["k5"],
+            "freq": 1,
+            "recall": 0.4,
+            "due_day": "2026-10-21"
+          }
+        ]
+      },
+      "expect": {
+        "batch": ["c4"],
+        "due_count": 2,
+        "by_kind": {
+          "card": 1,
+          "recall_card": 1
+        },
+        "overloaded": false
+      }
+    },
+    {
+      "id": "E25",
+      "title": "持续高优先项可能让低考频项继续等待",
+      "kind": "边界",
+      "rule": "R6",
+      "fn": "pick_today",
+      "input": {
+        "variants": [
+          {
+            "today": "2026-10-21",
+            "cap": 1,
+            "reviewed_today": [],
+            "candidates": [
+              {
+                "id": "x",
+                "kind": "card",
+                "kps": ["kx"],
+                "freq": 1,
+                "recall": 0.01,
+                "due_day": "2026-10-15"
+              },
+              {
+                "id": "y",
+                "kind": "card",
+                "kps": ["ky"],
+                "freq": 4,
+                "recall": 0.7,
+                "due_day": "2026-10-21"
+              }
+            ]
+          },
+          {
+            "today": "2026-11-02",
+            "cap": 1,
+            "reviewed_today": [],
+            "candidates": [
+              {
+                "id": "x",
+                "kind": "card",
+                "kps": ["kx"],
+                "freq": 1,
+                "recall": 0,
+                "due_day": "2026-10-15"
+              },
+              {
+                "id": "z",
+                "kind": "card",
+                "kps": ["kz"],
+                "freq": 4,
+                "recall": 0.7,
+                "due_day": "2026-11-02"
+              }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "batch": ["y"],
+            "carried_over": ["x"]
+          },
+          {
+            "batch": ["z"],
+            "carried_over": ["x"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "E26",
+      "title": "新卡也按知识点去重，到期项优先",
+      "kind": "正常",
+      "rule": "R6、R8",
+      "fn": "pick_today",
+      "input": {
+        "today": "2026-10-21",
+        "cap": 80,
+        "reviewed_today": [],
+        "candidates": [
+          {
+            "id": "d1",
+            "kind": "card",
+            "kps": ["k1"],
+            "freq": 4,
+            "recall": 0.9,
+            "due_day": "2026-10-21"
+          }
+        ],
+        "new_cards": {
+          "available": 4,
+          "introduced_today": 0,
+          "items": [
+            {
+              "id": "n1",
+              "kind": "card",
+              "kps": ["k1"],
+              "freq": 4,
+              "accepted_at": "2026-10-20T12:00:00+08:00"
+            },
+            {
+              "id": "n2",
+              "kind": "card",
+              "kps": ["k2"],
+              "freq": 3,
+              "accepted_at": "2026-10-20T12:00:00+08:00"
+            },
+            {
+              "id": "n3",
+              "kind": "card",
+              "kps": ["k2"],
+              "freq": 2,
+              "accepted_at": "2026-10-20T12:00:00+08:00"
+            },
+            {
+              "id": "n4",
+              "kind": "card",
+              "kps": ["k3"],
+              "freq": 1,
+              "accepted_at": "2026-10-20T12:00:00+08:00"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "batch": ["d1"],
+        "due_count": 1,
+        "new_cards": 2,
+        "new_card_ids": ["n2", "n4"],
+        "overloaded": false
+      }
+    },
+    {
+      "id": "E27",
+      "title": "当天已出的新卡知识点不能再次出新卡",
+      "kind": "边界",
+      "rule": "R8",
+      "fn": "pick_today",
+      "input": {
+        "today": "2026-10-21",
+        "cap": 80,
+        "reviewed_today": [],
+        "candidates": [],
+        "new_cards": {
+          "available": 2,
+          "introduced_today": 1,
+          "introduced_items_today": [
+            {
+              "id": "n0",
+              "kind": "card",
+              "kps": ["k1"],
+              "freq": 4,
+              "accepted_at": "2026-10-20T12:00:00+08:00"
+            }
+          ],
+          "items": [
+            {
+              "id": "n1",
+              "kind": "card",
+              "kps": ["k1"],
+              "freq": 4,
+              "accepted_at": "2026-10-20T12:00:00+08:00"
+            },
+            {
+              "id": "n2",
+              "kind": "card",
+              "kps": ["k2"],
+              "freq": 3,
+              "accepted_at": "2026-10-20T12:00:00+08:00"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "batch": [],
+        "due_count": 0,
+        "new_cards": 1,
+        "new_card_ids": ["n2"],
+        "overloaded": false
       }
     }
   ]
