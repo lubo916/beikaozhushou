@@ -82,10 +82,19 @@
         "复核并继续原型勘误：docs/baseline/errata.md 已收录 4 条，新发现的追加在表尾",
         "查看 V3 的检查脚本（git show v3-final:scripts/spec_tool.py），列出仍然有用的内容一致性检查（裸阈值、术语、参数引用等），写进交接单，交给 F02、F03 移植"
       ],
-      "status": "todo",
+      "status": "done",
       "not": [
         "写任何应用代码",
         "改 tools/、progress/ 下的文件"
+      ],
+      "history": [
+        {
+          "round": 2,
+          "version": "v0002",
+          "tool": "local",
+          "date": "2026-10-20 10:32",
+          "status": "done"
+        }
       ]
     },
     {
