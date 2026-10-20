@@ -379,6 +379,96 @@
       "asked": "v0007",
       "answer": "B",
       "answered": "v0008"
+    },
+    {
+      "id": "R02-Q1",
+      "task": "R02",
+      "q": "到期错题算不算进“到期数”和每日复习上限？",
+      "options": [
+        "A 不算：到期数只算要点回顾、卡片、背诵段；到期错题单列，接在复习会话末尾做（原型 S15、S06 的画法）",
+        "B 算：错题也计入到期数，和卡片共用每日上限（metrics.md 初稿的写法）"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0009",
+      "answer": "A",
+      "answered": "v0009"
+    },
+    {
+      "id": "R02-Q2",
+      "task": "R02",
+      "q": "积压时排先后用的“考频”取哪个数？",
+      "options": [
+        "A 考情数据成熟时用考情级，不成熟时用重要度代替",
+        "B 一律用重要度"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0009",
+      "answer": "A",
+      "answered": "v0009"
+    },
+    {
+      "id": "R02-Q3",
+      "task": "R02",
+      "q": "原型写“同一知识点当天只出现一次”，要不要照做？",
+      "options": [
+        "A 照做：同一知识点当天只出最要紧的一项，其余挪到明天，不删",
+        "B 不做这条限制，同一知识点的几张卡可以同一天都出"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0009",
+      "answer": "A",
+      "answered": "v0009"
+    },
+    {
+      "id": "R02-Q4",
+      "task": "R02",
+      "q": "背诵按“段”排还是按“要点”排？",
+      "options": [
+        "A 按段排：整段背对算记得，有要点只对一部分算难，有漏掉的算忘了、明天重背",
+        "B 按要点排：每个要点各排各的时间"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0009",
+      "answer": "A",
+      "answered": "v0009"
+    },
+    {
+      "id": "R02-Q5",
+      "task": "R02",
+      "q": "到期量超过每日上限（积压）的日子还出新卡吗？",
+      "options": [
+        "A 照常出，新卡有自己的上限",
+        "B 暂停：积压日不出新卡，积压消化后自动恢复"
+      ],
+      "recommend": "B",
+      "temp": "B",
+      "status": "answered",
+      "asked": "v0009",
+      "answer": "B",
+      "answered": "v0009"
+    },
+    {
+      "id": "R02-Q6",
+      "task": "R02",
+      "q": "原型说“分值高的复习更密”，怎么实现？",
+      "options": [
+        "A 高考频的卡把目标保持率上调一点（封顶 97%），复习更密，每天复习量会略增",
+        "B 不调保持率，只在积压排序和考前保温里优先高考频"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0009",
+      "answer": "A",
+      "answered": "v0009"
     }
   ]
 }
