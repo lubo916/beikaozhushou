@@ -1,0 +1,1126 @@
+{
+  "card": "docs/baseline/rule-cards/review-scheduling.md",
+  "status": "草稿",
+  "decided": {
+    "R02-Q1": "A",
+    "R02-Q2": "A",
+    "R02-Q3": "A",
+    "R02-Q4": "A",
+    "R02-Q5": "B",
+    "R02-Q6": "A"
+  },
+  "conventions": [
+    "每条例子是 input → expect；expect 只列要核对的字段，没列的不核对。带 variants 的例子，input.variants[i] 对应 expect.variants[i]，各自独立。",
+    "时间写成带时区的 ISO 8601；“哪一天”按 day 设置、用 packages/shared/src/today 的 today() 算（默认北京时间、凌晨 4 点切日）。名字以 _day 结尾的字段是学习日 YYYY-MM-DD。",
+    "recall 是现在的预计回忆概率，fsrs_interval_days 是 ts-fsrs 按这一项的目标保持率给出的间隔天数；例子里直接给值，所以不依赖记忆算法的权重。实现时这两样由 ts-fsrs 按记忆状态算出。",
+    "freq 是考频乘数 1–4（规则 R7）；紧要度＝freq ×（1 − recall），差值小于 1e-9 算相等；小数比较都允许 1e-9 误差；保持率封顶取 learner.memory.target_retention 的可调上限 0.97。",
+    "评分代码：again＝忘了、hard＝难、good＝记得、easy＝轻松；类型代码：recall_card＝要点回顾、card＝卡片、recite_segment＝背诵段。评分与背诵段的代码是建议，待写进 docs/product/glossary.yaml；数据成熟度、学习范围用术语表现有代码。背诵比对四档沿用 S16 的原文（完全正确、基本正确、部分正确、错误），“漏掉”指要点没背出来。",
+    "params 是 contracts/params.yaml 的现值；params_proposed 是本卡建议新增、待整合任务登记的参数。有的例子把 cap（今天的上限）设得很小，只为便于手算。",
+    "carried_over、deferred_same_kp、overloaded、excluded 只给后端和测试用：学员端接口不返回积压总数（规则 R6f）。",
+    "functions 是建议的纯函数划分（放 packages/domains/learner/core/），名字可以改；pick_today 的例子直接给每项的 freq，考频怎么来见 E9。"
+  ],
+  "day": {
+    "time_zone": "Asia/Shanghai",
+    "day_start_hour": 4
+  },
+  "params": {
+    "learner.memory.target_retention": 0.9,
+    "learner.memory.min_rating_seconds": 1.5,
+    "learner.memory.min_cards_for_personal": 20,
+    "plan.review.daily_cap": 80,
+    "plan.review.new_card_daily_cap": 8,
+    "practice.recall.relearn_delay_minutes": 10
+  },
+  "params_proposed": {
+    "plan.review.temp_cap": 100,
+    "plan.review.temp_cap_days": 14,
+    "plan.review.quick_minutes": 10,
+    "plan.review.calendar_days": 30,
+    "learner.memory.warmup_days": 14,
+    "learner.memory.high_freq_level": 3,
+    "learner.memory.high_freq_retention_bonus": 0.03
+  },
+  "functions": {
+    "pick_today": "挑今天这一批（R1、R5、R6、R8）：输出 batch（现在要做的，按先后）、due_count、by_kind、deferred_same_kp、carried_over、overloaded、excluded、warmup、new_cards、mistakes_after_session",
+    "freq": "考频（R7）",
+    "rate": "一次翻面评分（R2、R3a）：按钮预览、是否计入、选“忘了”之后",
+    "next_due": "下次到期（R3、R4）",
+    "retention": "这一项的目标保持率（R4）",
+    "effective_cap": "某一天的上限（R9）",
+    "quick_slice": "短时取用（R10）",
+    "recite_rating": "背诵结果折算成评分（R11）",
+    "calendar": "复习日历的未来部分（R12）",
+    "sync_order": "离线补交的计入顺序与归属日（R13）",
+    "memory_params": "用默认还是个人记忆参数（R3c）"
+  },
+  "cases": [
+    {
+      "id": "E1",
+      "title": "没超上限：全部给出，按紧要度排",
+      "kind": "正常",
+      "rule": "R6、R7",
+      "fn": "pick_today",
+      "input": {
+        "today": "2026-10-21",
+        "cap": 80,
+        "reviewed_today": [],
+        "candidates": [
+          {
+            "id": "c1",
+            "kind": "card",
+            "kps": ["k1"],
+            "freq": 4,
+            "recall": 0.85,
+            "due_day": "2026-10-21"
+          },
+          {
+            "id": "s1",
+            "kind": "recite_segment",
+            "kps": ["k4"],
+            "freq": 1,
+            "recall": 0.45,
+            "due_day": "2026-10-19"
+          },
+          {
+            "id": "c2",
+            "kind": "card",
+            "kps": ["k2"],
+            "freq": 2,
+            "recall": 0.8,
+            "due_day": "2026-10-21"
+          },
+          {
+            "id": "r1",
+            "kind": "recall_card",
+            "kps": ["k3"],
+            "freq": 3,
+            "recall": 0.9,
+            "due_day": "2026-10-20"
+          }
+        ]
+      },
+      "expect": {
+        "batch": ["c1", "s1", "c2", "r1"],
+        "due_count": 4,
+        "by_kind": {
+          "card": 2,
+          "recite_segment": 1,
+          "recall_card": 1
+        },
+        "overloaded": false
+      }
+    },
+    {
+      "id": "E2",
+      "title": "积压：到期 5 项、上限 3，只给最要紧的 3 项，其余顺延，积压日不出新卡",
+      "kind": "正常",
+      "rule": "R6、R8",
+      "fn": "pick_today",
+      "input": {
+        "today": "2026-10-21",
+        "cap": 3,
+        "reviewed_today": [],
+        "candidates": [
+          {
+            "id": "a",
+            "kind": "card",
+            "kps": ["ka"],
+            "freq": 4,
+            "recall": 0.9,
+            "due_day": "2026-10-21"
+          },
+          {
+            "id": "b",
+            "kind": "card",
+            "kps": ["kb"],
+            "freq": 1,
+            "recall": 0.3,
+            "due_day": "2026-10-18"
+          },
+          {
+            "id": "c",
+            "kind": "card",
+            "kps": ["kc"],
+            "freq": 3,
+            "recall": 0.8,
+            "due_day": "2026-10-20"
+          },
+          {
+            "id": "d",
+            "kind": "card",
+            "kps": ["kd"],
+            "freq": 2,
+            "recall": 0.85,
+            "due_day": "2026-10-21"
+          },
+          {
+            "id": "e",
+            "kind": "card",
+            "kps": ["ke"],
+            "freq": 2,
+            "recall": 0.6,
+            "due_day": "2026-10-19"
+          }
+        ],
+        "new_cards": {
+          "available": 10,
+          "introduced_today": 0
+        }
+      },
+      "expect": {
+        "batch": ["e", "b", "c"],
+        "due_count": 3,
+        "carried_over": ["a", "d"],
+        "overloaded": true,
+        "new_cards": 0
+      }
+    },
+    {
+      "id": "E3",
+      "title": "到期数正好等于上限：不算积压，新卡照常",
+      "kind": "边界",
+      "rule": "R6、R8",
+      "fn": "pick_today",
+      "input": {
+        "today": "2026-10-21",
+        "cap": 3,
+        "reviewed_today": [],
+        "candidates": [
+          {
+            "id": "f1",
+            "kind": "card",
+            "kps": ["kf1"],
+            "freq": 3,
+            "recall": 0.7,
+            "due_day": "2026-10-21"
+          },
+          {
+            "id": "f2",
+            "kind": "card",
+            "kps": ["kf2"],
+            "freq": 2,
+            "recall": 0.6,
+            "due_day": "2026-10-21"
+          },
+          {
+            "id": "f3",
+            "kind": "card",
+            "kps": ["kf3"],
+            "freq": 1,
+            "recall": 0.5,
+            "due_day": "2026-10-21"
+          }
+        ],
+        "new_cards": {
+          "available": 10,
+          "introduced_today": 0
+        }
+      },
+      "expect": {
+        "batch": ["f1", "f2", "f3"],
+        "due_count": 3,
+        "carried_over": [],
+        "overloaded": false,
+        "new_cards": 8
+      }
+    },
+    {
+      "id": "E4",
+      "title": "紧要度相同：到期早的先，再按编号",
+      "kind": "边界",
+      "rule": "R6",
+      "fn": "pick_today",
+      "input": {
+        "today": "2026-10-21",
+        "cap": 80,
+        "reviewed_today": [],
+        "candidates": [
+          {
+            "id": "x",
+            "kind": "card",
+            "kps": ["kx"],
+            "freq": 2,
+            "recall": 0.5,
+            "due_day": "2026-10-20"
+          },
+          {
+            "id": "y",
+            "kind": "card",
+            "kps": ["ky"],
+            "freq": 4,
+            "recall": 0.75,
+            "due_day": "2026-10-21"
+          },
+          {
+            "id": "z",
+            "kind": "card",
+            "kps": ["kz"],
+            "freq": 2,
+            "recall": 0.5,
+            "due_day": "2026-10-20"
+          }
+        ]
+      },
+      "expect": {
+        "batch": ["x", "z", "y"],
+        "due_count": 3
+      }
+    },
+    {
+      "id": "E5",
+      "title": "同一知识点当天只出一项，其余挪到明天",
+      "kind": "正常",
+      "rule": "R6",
+      "fn": "pick_today",
+      "input": {
+        "today": "2026-10-21",
+        "cap": 10,
+        "reviewed_today": [],
+        "candidates": [
+          {
+            "id": "c1",
+            "kind": "card",
+            "kps": ["k1"],
+            "freq": 4,
+            "recall": 0.75,
+            "due_day": "2026-10-21"
+          },
+          {
+            "id": "c2",
+            "kind": "card",
+            "kps": ["k1"],
+            "freq": 4,
+            "recall": 0.875,
+            "due_day": "2026-10-21"
+          },
+          {
+            "id": "r1",
+            "kind": "recall_card",
+            "kps": ["k1"],
+            "freq": 4,
+            "recall": 0.9,
+            "due_day": "2026-10-21"
+          },
+          {
+            "id": "c3",
+            "kind": "card",
+            "kps": ["k2"],
+            "freq": 2,
+            "recall": 0.7,
+            "due_day": "2026-10-21"
+          }
+        ]
+      },
+      "expect": {
+        "batch": ["c1", "c3"],
+        "due_count": 2,
+        "deferred_same_kp": ["c2", "r1"],
+        "carried_over": []
+      }
+    },
+    {
+      "id": "E6",
+      "title": "“忘了”的项到点重出：排最前、不再占名额、不受同知识点限制",
+      "kind": "边界",
+      "rule": "R3、R6",
+      "fn": "pick_today",
+      "input": {
+        "today": "2026-10-21",
+        "now": "2026-10-21T20:15:00+08:00",
+        "cap": 2,
+        "reviewed_today": [
+          {
+            "id": "c9",
+            "kind": "card",
+            "kps": ["k2"],
+            "relearn_due_at": "2026-10-21T20:10:00+08:00"
+          }
+        ],
+        "candidates": [
+          {
+            "id": "c3",
+            "kind": "card",
+            "kps": ["k2"],
+            "freq": 2,
+            "recall": 0.75,
+            "due_day": "2026-10-21"
+          },
+          {
+            "id": "c4",
+            "kind": "recall_card",
+            "kps": ["k5"],
+            "freq": 1,
+            "recall": 0.4,
+            "due_day": "2026-10-21"
+          }
+        ]
+      },
+      "expect": {
+        "batch": ["c9", "c4"],
+        "due_count": 2,
+        "deferred_same_kp": ["c3"],
+        "by_kind": {
+          "card": 1,
+          "recall_card": 1
+        },
+        "overloaded": false
+      }
+    },
+    {
+      "id": "E7",
+      "title": "被顺延的项越拖越要紧，不会一直轮不到",
+      "kind": "正常",
+      "rule": "R6",
+      "fn": "pick_today",
+      "input": {
+        "variants": [
+          {
+            "today": "2026-10-21",
+            "cap": 1,
+            "reviewed_today": [],
+            "candidates": [
+              {
+                "id": "x",
+                "kind": "card",
+                "kps": ["kx"],
+                "freq": 1,
+                "recall": 0.8,
+                "due_day": "2026-10-15"
+              },
+              {
+                "id": "y",
+                "kind": "card",
+                "kps": ["ky"],
+                "freq": 4,
+                "recall": 0.9,
+                "due_day": "2026-10-21"
+              }
+            ]
+          },
+          {
+            "today": "2026-11-02",
+            "cap": 1,
+            "reviewed_today": [],
+            "candidates": [
+              {
+                "id": "x",
+                "kind": "card",
+                "kps": ["kx"],
+                "freq": 1,
+                "recall": 0.55,
+                "due_day": "2026-10-15"
+              },
+              {
+                "id": "z",
+                "kind": "card",
+                "kps": ["kz"],
+                "freq": 4,
+                "recall": 0.9,
+                "due_day": "2026-11-02"
+              }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "batch": ["y"],
+            "carried_over": ["x"]
+          },
+          {
+            "batch": ["x"],
+            "carried_over": ["z"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "E8",
+      "title": "不进队列的几种情况；到期错题不算进到期数",
+      "kind": "异常",
+      "rule": "R1",
+      "fn": "pick_today",
+      "input": {
+        "today": "2026-10-21",
+        "cap": 80,
+        "reviewed_today": [],
+        "candidates": [
+          {
+            "id": "p1",
+            "kind": "card",
+            "kps": ["kp1"],
+            "freq": 3,
+            "recall": 0.8,
+            "due_day": "2026-10-21",
+            "pending_confirm": true
+          },
+          {
+            "id": "p2",
+            "kind": "card",
+            "kps": ["kp2"],
+            "freq": 3,
+            "recall": 0.8,
+            "due_day": "2026-10-21",
+            "paused": true
+          },
+          {
+            "id": "p3",
+            "kind": "card",
+            "kps": ["kp3"],
+            "freq": 3,
+            "recall": 0.8,
+            "due_day": "2026-10-21",
+            "buried_today": true
+          },
+          {
+            "id": "p4",
+            "kind": "card",
+            "kps": ["kp4"],
+            "freq": 3,
+            "recall": 0.8,
+            "due_day": "2026-10-21",
+            "scope": "removed"
+          },
+          {
+            "id": "p5",
+            "kind": "card",
+            "kps": ["kp5"],
+            "freq": 3,
+            "recall": 0.8,
+            "due_day": "2026-10-21"
+          }
+        ],
+        "mistakes": ["m1"]
+      },
+      "expect": {
+        "batch": ["p5"],
+        "due_count": 1,
+        "excluded": {
+          "p1": "待确认",
+          "p2": "暂停",
+          "p3": "今天埋藏",
+          "p4": "我移出"
+        },
+        "mistakes_after_session": ["m1"]
+      }
+    },
+    {
+      "id": "E9",
+      "title": "考频怎么取：成熟度、学员改过的重要度、星标、多个知识点、没挂知识点",
+      "kind": "正常",
+      "rule": "R7",
+      "fn": "freq",
+      "input": {
+        "variants": [
+          {
+            "kps": [
+              {
+                "maturity": "mature",
+                "exam_level": 4,
+                "importance_default": 2
+              }
+            ]
+          },
+          {
+            "kps": [
+              {
+                "maturity": "maturing",
+                "exam_level": 4,
+                "importance_default": 2,
+                "importance_learner": 3
+              }
+            ]
+          },
+          {
+            "kps": [
+              {
+                "maturity": "usable",
+                "exam_level": 3,
+                "importance_default": 1
+              }
+            ]
+          },
+          {
+            "kps": [
+              {
+                "maturity": "cold",
+                "importance_default": 2,
+                "starred": true
+              }
+            ]
+          },
+          {
+            "kps": [
+              {
+                "maturity": "mature",
+                "exam_level": 2,
+                "importance_default": 1
+              },
+              {
+                "maturity": "cold",
+                "importance_default": 4
+              }
+            ]
+          },
+          {
+            "kps": []
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "freq": 4
+          },
+          {
+            "freq": 3
+          },
+          {
+            "freq": 3
+          },
+          {
+            "freq": 2
+          },
+          {
+            "freq": 4
+          },
+          {
+            "freq": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "E10",
+      "title": "按钮预览与选“忘了”",
+      "kind": "正常",
+      "rule": "R2、R3",
+      "fn": "rate",
+      "input": {
+        "preview_for": {
+          "now": "2026-10-21T20:00:00+08:00",
+          "fsrs_interval_days": {
+            "hard": 1,
+            "good": 4,
+            "easy": 9
+          }
+        },
+        "choose": {
+          "rating": "again",
+          "at": "2026-10-21T20:00:00+08:00",
+          "seconds": 6,
+          "lapses_before": 0
+        }
+      },
+      "expect": {
+        "preview": {
+          "again": "2026-10-21T20:10:00+08:00",
+          "hard": "2026-10-22",
+          "good": "2026-10-25",
+          "easy": "2026-10-30"
+        },
+        "after": {
+          "due_at": "2026-10-21T20:10:00+08:00",
+          "lapses": 1,
+          "counted": true
+        }
+      }
+    },
+    {
+      "id": "E11",
+      "title": "“忘了”的再出时间跨过凌晨 4 点：算明天的普通到期项",
+      "kind": "边界",
+      "rule": "R3",
+      "fn": "next_due",
+      "input": {
+        "rating": "again",
+        "reviewed_at": "2026-10-22T03:55:00+08:00"
+      },
+      "expect": {
+        "review_day": "2026-10-21",
+        "due_at": "2026-10-22T04:05:00+08:00",
+        "due_day": "2026-10-22",
+        "same_day_relearn": false
+      }
+    },
+    {
+      "id": "E12",
+      "title": "到期日按凌晨 4 点切日来算",
+      "kind": "边界",
+      "rule": "R3",
+      "fn": "next_due",
+      "input": {
+        "variants": [
+          {
+            "rating": "good",
+            "reviewed_at": "2026-10-22T02:30:00+08:00",
+            "fsrs_interval_days": 4
+          },
+          {
+            "rating": "good",
+            "reviewed_at": "2026-10-22T05:00:00+08:00",
+            "fsrs_interval_days": 4
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "review_day": "2026-10-21",
+            "due_day": "2026-10-25",
+            "due_from": "2026-10-25T04:00:00+08:00"
+          },
+          {
+            "review_day": "2026-10-22",
+            "due_day": "2026-10-26"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E13",
+      "title": "秒评：两次都太快，不计入；第一次放回队尾，第二次今天不再出",
+      "kind": "异常",
+      "rule": "R2",
+      "fn": "rate",
+      "input": {
+        "attempts": [
+          {
+            "rating": "good",
+            "seconds": 0.8
+          },
+          {
+            "rating": "good",
+            "seconds": 0.6
+          }
+        ]
+      },
+      "expect": {
+        "attempts": [
+          {
+            "counted": false,
+            "flag": "疑似刷过",
+            "requeue": "session_end"
+          },
+          {
+            "counted": false,
+            "flag": "疑似刷过",
+            "requeue": "not_today"
+          }
+        ],
+        "records_written": 2,
+        "memory_updated": false
+      }
+    },
+    {
+      "id": "E14",
+      "title": "正好 1.5 秒：计入（短于才不计）",
+      "kind": "边界",
+      "rule": "R2",
+      "fn": "rate",
+      "input": {
+        "attempts": [
+          {
+            "rating": "hard",
+            "seconds": 1.5
+          }
+        ]
+      },
+      "expect": {
+        "attempts": [
+          {
+            "counted": true
+          }
+        ],
+        "memory_updated": true
+      }
+    },
+    {
+      "id": "E15",
+      "title": "这一项的目标保持率：高考频上调，封顶 0.97",
+      "kind": "边界",
+      "rule": "R4",
+      "fn": "retention",
+      "input": {
+        "variants": [
+          {
+            "learner_target": 0.9,
+            "freq": 4
+          },
+          {
+            "learner_target": 0.95,
+            "freq": 3
+          },
+          {
+            "learner_target": 0.9,
+            "freq": 2
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "retention": 0.93
+          },
+          {
+            "retention": 0.97
+          },
+          {
+            "retention": 0.9
+          }
+        ]
+      }
+    },
+    {
+      "id": "E16",
+      "title": "下次到期落在目标日之后：不提前",
+      "kind": "正常",
+      "rule": "R4",
+      "fn": "next_due",
+      "input": {
+        "rating": "good",
+        "reviewed_at": "2026-10-21T20:00:00+08:00",
+        "fsrs_interval_days": 30,
+        "target_day": "2026-11-10"
+      },
+      "expect": {
+        "due_day": "2026-11-20",
+        "moved_before_target": false
+      }
+    },
+    {
+      "id": "E17",
+      "title": "考前保温：只用剩下的名额，排在正常到期项之后",
+      "kind": "正常",
+      "rule": "R5、R6",
+      "fn": "pick_today",
+      "input": {
+        "today": "2026-10-28",
+        "cap": 4,
+        "reviewed_today": [],
+        "candidates": [
+          {
+            "id": "n1",
+            "kind": "card",
+            "kps": ["kn1"],
+            "freq": 2,
+            "recall": 0.8,
+            "due_day": "2026-10-28"
+          },
+          {
+            "id": "n2",
+            "kind": "card",
+            "kps": ["kn2"],
+            "freq": 3,
+            "recall": 0.75,
+            "due_day": "2026-10-27"
+          }
+        ],
+        "target_day": "2026-11-10",
+        "not_due": [
+          {
+            "id": "w1",
+            "kind": "card",
+            "kps": ["kw1"],
+            "freq": 4,
+            "recall": 0.97,
+            "due_day": "2026-11-20",
+            "last_reviewed_day": "2026-10-12"
+          },
+          {
+            "id": "w2",
+            "kind": "recall_card",
+            "kps": ["kw2"],
+            "freq": 3,
+            "recall": 0.95,
+            "due_day": "2026-11-15",
+            "last_reviewed_day": "2026-10-14"
+          },
+          {
+            "id": "w3",
+            "kind": "card",
+            "kps": ["kw3"],
+            "freq": 2,
+            "recall": 0.9,
+            "due_day": "2026-11-30",
+            "last_reviewed_day": "2026-10-01"
+          },
+          {
+            "id": "w4",
+            "kind": "card",
+            "kps": ["kw4"],
+            "freq": 4,
+            "recall": 0.93,
+            "due_day": "2026-11-05",
+            "last_reviewed_day": "2026-10-20"
+          },
+          {
+            "id": "w5",
+            "kind": "card",
+            "kps": ["kw5"],
+            "freq": 4,
+            "recall": 0.99,
+            "due_day": "2026-11-25",
+            "last_reviewed_day": "2026-10-27"
+          }
+        ],
+        "new_cards": {
+          "available": 5,
+          "introduced_today": 0
+        }
+      },
+      "expect": {
+        "batch": ["n2", "n1", "w1", "w2"],
+        "warmup": ["w1", "w2"],
+        "due_count": 4,
+        "overloaded": false,
+        "new_cards": 5
+      }
+    },
+    {
+      "id": "E18",
+      "title": "临时上限：确认当天起 14 天，到期自动恢复；不会把上限调低",
+      "kind": "边界",
+      "rule": "R9",
+      "fn": "effective_cap",
+      "input": {
+        "variants": [
+          {
+            "personal_cap": 80,
+            "temp": {
+              "confirmed_day": "2026-10-21"
+            },
+            "day": "2026-10-21"
+          },
+          {
+            "personal_cap": 80,
+            "temp": {
+              "confirmed_day": "2026-10-21"
+            },
+            "day": "2026-11-03"
+          },
+          {
+            "personal_cap": 80,
+            "temp": {
+              "confirmed_day": "2026-10-21"
+            },
+            "day": "2026-11-04"
+          },
+          {
+            "personal_cap": 120,
+            "temp": {
+              "confirmed_day": "2026-10-21"
+            },
+            "day": "2026-10-21"
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "cap": 100,
+            "raise_applicable": true
+          },
+          {
+            "cap": 100
+          },
+          {
+            "cap": 80
+          },
+          {
+            "cap": 120,
+            "raise_applicable": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "E19",
+      "title": "只复习 N 分钟：从顶上往下取，下一项放不下就停；一项都放不下时只取第一项",
+      "kind": "边界",
+      "rule": "R10",
+      "fn": "quick_slice",
+      "input": {
+        "variants": [
+          {
+            "batch": [
+              {
+                "id": "a",
+                "est_seconds": 240
+              },
+              {
+                "id": "b",
+                "est_seconds": 200
+              },
+              {
+                "id": "c",
+                "est_seconds": 180
+              },
+              {
+                "id": "d",
+                "est_seconds": 60
+              }
+            ]
+          },
+          {
+            "batch": [
+              {
+                "id": "s1",
+                "est_seconds": 720
+              },
+              {
+                "id": "c1",
+                "est_seconds": 30
+              }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "take": ["a", "b"],
+            "total_seconds": 440
+          },
+          {
+            "take": ["s1"],
+            "total_seconds": 720
+          }
+        ]
+      }
+    },
+    {
+      "id": "E20",
+      "title": "背诵结果折算成评分（按段，取最差的要点）",
+      "kind": "正常",
+      "rule": "R11",
+      "fn": "recite_rating",
+      "input": {
+        "variants": [
+          {
+            "review_day": "2026-10-21",
+            "points": ["完全正确", "基本正确", "完全正确", "基本正确"]
+          },
+          {
+            "review_day": "2026-10-21",
+            "points": ["完全正确", "部分正确", "完全正确", "完全正确"]
+          },
+          {
+            "review_day": "2026-10-21",
+            "points": ["完全正确", "完全正确", "完全正确", "漏掉"]
+          },
+          {
+            "review_day": "2026-10-21",
+            "points": ["部分正确", "完全正确", "漏掉", "完全正确"]
+          },
+          {
+            "review_day": "2026-10-21",
+            "self_report": true
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "rating": "good"
+          },
+          {
+            "rating": "hard"
+          },
+          {
+            "rating": "again",
+            "due_day": "2026-10-22"
+          },
+          {
+            "rating": "again",
+            "due_day": "2026-10-22"
+          },
+          {
+            "rating": "good"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E21",
+      "title": "复习日历：排不下的滚到下一天，超过上限标过载、不写超出多少",
+      "kind": "边界",
+      "rule": "R12",
+      "fn": "calendar",
+      "input": {
+        "start_day": "2026-10-21",
+        "cap": 80,
+        "scheduled": [100, 60, 70, 90]
+      },
+      "expect": {
+        "shown": [80, 80, 70, 80],
+        "overloaded": [true, false, false, true]
+      }
+    },
+    {
+      "id": "E22",
+      "title": "离线补交：按发生时间排进记录，归属发生的那天",
+      "kind": "异常",
+      "rule": "R13",
+      "fn": "sync_order",
+      "input": {
+        "reviews": [
+          {
+            "id": "rv-b1",
+            "device": "B",
+            "item": "c1",
+            "rating": "hard",
+            "occurred_at": "2026-10-22T08:30:00+08:00",
+            "received_at": "2026-10-22T08:30:05+08:00"
+          },
+          {
+            "id": "rv-a1",
+            "device": "A",
+            "item": "c1",
+            "rating": "good",
+            "occurred_at": "2026-10-21T22:00:00+08:00",
+            "received_at": "2026-10-22T09:00:00+08:00"
+          }
+        ]
+      },
+      "expect": {
+        "replay_order": ["rv-a1", "rv-b1"],
+        "records_kept": 2,
+        "learning_day": {
+          "rv-a1": "2026-10-21",
+          "rv-b1": "2026-10-22"
+        }
+      }
+    },
+    {
+      "id": "E23",
+      "title": "复习过的项不到 20 个时用默认记忆参数",
+      "kind": "边界",
+      "rule": "R3",
+      "fn": "memory_params",
+      "input": {
+        "variants": [
+          {
+            "reviewed_items": 19
+          },
+          {
+            "reviewed_items": 20
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "use": "default",
+            "insufficient_data_hint": true
+          },
+          {
+            "use": "personal",
+            "insufficient_data_hint": false
+          }
+        ]
+      }
+    }
+  ]
+}
