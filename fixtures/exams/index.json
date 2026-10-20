@@ -1,0 +1,31 @@
+{
+  "note": "四个演示考试（vocabulary.md 第 9 节）。key 是开发工具条与 ?exam= 的切换键，exam_id 是数据里的考试 ID（即目录名，F04-Q1）。",
+  "default_key": "kj",
+  "learner": {
+    "id": "019a0007-0000-7000-8000-000000000001",
+    "display_name": "演示学员",
+    "is_guest": false
+  },
+  "exams": [
+    {
+      "key": "kj",
+      "exam_id": "junior-accounting",
+      "role": "主种子，合格线型"
+    },
+    {
+      "key": "js",
+      "exam_id": "teacher-qualification",
+      "role": "模板，合格线型"
+    },
+    {
+      "key": "en",
+      "exam_id": "cet-6",
+      "role": "分数段型"
+    },
+    {
+      "key": "ds",
+      "exam_id": "ds-final-custom",
+      "role": "自定型，故意“体检不通过”"
+    }
+  ]
+}

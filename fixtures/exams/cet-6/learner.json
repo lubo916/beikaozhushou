@@ -1,0 +1,163 @@
+{
+  "exam_id": "cet-6",
+  "note": "演示数据：演示学员在这个考试上的示例状态。规则还没实现的部分（掌握档、今日清单的排法）先用这里的值，接口标 data_source: sample。",
+  "goal": {
+    "target_score": 520,
+    "target_date": "2026-12-12",
+    "primary": false
+  },
+  "mastery": [
+    {
+      "knowledge_point_id": "019a0303-0000-7000-8000-000000000001",
+      "level": 2,
+      "target_level": 3,
+      "evidence_sufficient": true,
+      "pending_verification": false,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0303-0000-7000-8000-000000000002",
+      "level": 1,
+      "target_level": 3,
+      "evidence_sufficient": true,
+      "pending_verification": false,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0303-0000-7000-8000-000000000003",
+      "level": 3,
+      "target_level": 4,
+      "evidence_sufficient": true,
+      "pending_verification": true,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0303-0000-7000-8000-000000000004",
+      "level": 0,
+      "target_level": 3,
+      "evidence_sufficient": false,
+      "pending_verification": false,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0303-0000-7000-8000-000000000005",
+      "level": 4,
+      "target_level": 4,
+      "evidence_sufficient": true,
+      "pending_verification": false,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0303-0000-7000-8000-000000000006",
+      "level": 2,
+      "target_level": 4,
+      "evidence_sufficient": true,
+      "pending_verification": false,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0303-0000-7000-8000-000000000007",
+      "level": 1,
+      "target_level": 4,
+      "evidence_sufficient": true,
+      "pending_verification": false,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0303-0000-7000-8000-000000000008",
+      "level": 3,
+      "target_level": 4,
+      "evidence_sufficient": false,
+      "pending_verification": true,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0303-0000-7000-8000-000000000009",
+      "level": 0,
+      "target_level": 4,
+      "evidence_sufficient": false,
+      "pending_verification": false,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0303-0000-7000-8000-00000000000a",
+      "level": 2,
+      "target_level": 3,
+      "evidence_sufficient": true,
+      "pending_verification": false,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0303-0000-7000-8000-00000000000b",
+      "level": 5,
+      "target_level": 2,
+      "evidence_sufficient": true,
+      "pending_verification": false,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0303-0000-7000-8000-00000000000c",
+      "level": 1,
+      "target_level": 4,
+      "evidence_sufficient": false,
+      "pending_verification": false,
+      "in_scope": false
+    }
+  ],
+  "today_tasks": [
+    {
+      "id": "019a0306-0000-7000-8000-000000000001",
+      "segment": "consolidate",
+      "source": "due_review",
+      "title": "到期复习：形近词辨析：mitigate 与 militate",
+      "minutes": 10,
+      "question_ids": [],
+      "card_ids": [
+        "019a0305-0000-7000-8000-000000000001"
+      ],
+      "knowledge_point_ids": [
+        "019a0303-0000-7000-8000-000000000002"
+      ]
+    },
+    {
+      "id": "019a0306-0000-7000-8000-000000000002",
+      "segment": "advance",
+      "source": "practice",
+      "title": "形近词辨析：mitigate 与 militate：专项练习",
+      "minutes": 15,
+      "question_ids": [
+        "019a0304-0000-7000-8000-000000000001"
+      ],
+      "card_ids": [],
+      "knowledge_point_ids": [
+        "019a0303-0000-7000-8000-000000000002"
+      ]
+    },
+    {
+      "id": "019a0306-0000-7000-8000-000000000003",
+      "segment": "advance",
+      "source": "new_learning",
+      "title": "新学：高频学术词汇 A 组",
+      "minutes": 20,
+      "question_ids": [],
+      "card_ids": [],
+      "knowledge_point_ids": [
+        "019a0303-0000-7000-8000-000000000001"
+      ]
+    },
+    {
+      "id": "019a0306-0000-7000-8000-000000000004",
+      "segment": "closing",
+      "source": "bedtime_review",
+      "title": "睡前回顾",
+      "minutes": 5,
+      "question_ids": [],
+      "card_ids": [],
+      "knowledge_point_ids": []
+    }
+  ],
+  "mistake_retry_task": {
+    "id": "019a0306-0000-7000-8000-000000000009",
+    "minutes_per_question": 3
+  }
+}

@@ -1,0 +1,44 @@
+# 证据与掌握档（learner 领域）：证据只追加，掌握档可从证据重算；只有本领域能写这两类数据。
+components:
+  schemas:
+    EvidenceStrength:
+      type: string
+      description: 证据强度五级：强、中、弱、负、待验证
+      enum: [strong, medium, weak, negative, pending]
+    EvidenceInput:
+      type: object
+      required: [learner_id, knowledge_point_id, source, confidence, duration_ms, occurred_at]
+      properties:
+        learner_id: {$ref: "#/components/schemas/Id"}
+        knowledge_point_id: {$ref: "#/components/schemas/Id"}
+        source: {type: string}
+        source_ref: {type: string}
+        question_id: {$ref: "#/components/schemas/Id"}
+        question_version: {type: integer, minimum: 1}
+        correct: {type: boolean}
+        confidence: {$ref: "#/components/schemas/Confidence"}
+        duration_ms: {type: integer, minimum: 0}
+        hint_level: {type: integer, minimum: 0}
+        occurred_at: {$ref: "#/components/schemas/Timestamp"}
+    MasteryCell:
+      type: object
+      description: 一个知识点的掌握情况；证据不足画虚线格，范围外画斜纹格，两者都不等于不会
+      required: [knowledge_point_id, level, target_level, evidence_sufficient, pending_verification, in_scope]
+      properties:
+        knowledge_point_id: {$ref: "#/components/schemas/Id"}
+        level:
+          type: integer
+          minimum: 0
+          maximum: 5
+          description: 系统判定的掌握档序号（0 未学，5 能迁移）
+        target_level: {type: [integer, "null"], minimum: 0, maximum: 5}
+        evidence_sufficient: {type: boolean}
+        pending_verification: {type: boolean}
+        in_scope: {type: boolean}
+    MasteryGrid:
+      type: object
+      required: [map_id, cells, data_source]
+      properties:
+        map_id: {$ref: "#/components/schemas/Id"}
+        cells: {type: array, items: {$ref: "#/components/schemas/MasteryCell"}}
+        data_source: {$ref: "#/components/schemas/DataSource"}

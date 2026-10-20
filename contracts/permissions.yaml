@@ -46,3 +46,18 @@ actions:
   - id: metrics.event.track
     roles: [guest, learner]
     data_scope: self
+  - id: account.context.read
+    roles: [guest, learner]
+    data_scope: self
+  - id: content.solution.read
+    roles: [guest, learner]
+    data_scope: self
+  - id: content.card.read
+    roles: [guest, learner, lecturer, researcher, content_reviewer]
+    data_scope: public_or_own
+  - id: practice.mistake.read
+    roles: [guest, learner]
+    data_scope: self
+  - id: plan.today.read
+    roles: [guest, learner]
+    data_scope: self

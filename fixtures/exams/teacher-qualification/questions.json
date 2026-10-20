@@ -3,12 +3,13 @@
   "note": "演示数据，取自原型脚本；题目与解析的正式来源见 OQ-010",
   "questions": [
     {
-      "id": "teacher-qualification-q0001",
+      "id": "019a0204-0000-7000-8000-000000000001",
+      "version": 1,
       "question_type": "single_choice",
       "response_form": "choice",
       "credibility": "own",
-      "knowledge_points": [
-        "最近发展区"
+      "knowledge_point_ids": [
+        "019a0203-0000-7000-8000-000000000006"
       ],
       "stem": "教师在教学中常说“跳一跳，摘桃子”，这主要体现了下列哪一理论的要求？",
       "options": [
@@ -37,12 +38,13 @@
       ]
     },
     {
-      "id": "teacher-qualification-q0002",
+      "id": "019a0204-0000-7000-8000-000000000002",
+      "version": 1,
       "question_type": "discrimination",
       "response_form": "written",
       "credibility": "own",
-      "knowledge_points": [
-        "最近发展区"
+      "knowledge_point_ids": [
+        "019a0203-0000-7000-8000-000000000006"
       ],
       "stem": "简述如何培养与激发学生的学习动机。",
       "scoring_points": [
@@ -69,11 +71,11 @@
   ],
   "cards": [
     {
-      "id": "teacher-qualification-card0001",
+      "id": "019a0205-0000-7000-8000-000000000001",
+      "knowledge_point_id": "019a0203-0000-7000-8000-000000000006",
       "card_type": "问答卡",
       "front": "最近发展区是哪两种水平之间的差距？",
-      "back": "现有发展水平（独立解决问题）与即将达到的发展水平（在指导或合作下）之间的差距。提出者：维果茨基。",
-      "knowledge_point": "最近发展区"
+      "back": "现有发展水平（独立解决问题）与即将达到的发展水平（在指导或合作下）之间的差距。提出者：维果茨基。"
     }
   ]
 }

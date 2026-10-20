@@ -1,0 +1,22 @@
+{
+  "toggle": "开发工具",
+  "title": "开发工具（只在开发与测试时出现）",
+  "close": "收起",
+  "exam": "演示考试",
+  "state": "强制页面状态",
+  "clock": "模拟时刻 {{now}}（{{zone}}），学习日 {{day}}",
+  "prevDay": "前一天",
+  "nextDay": "后一天",
+  "nextHour": "往后一小时",
+  "toBoundary": "到下一个日界线前一分钟",
+  "resetClock": "回到现在",
+  "resetData": "重置演示数据",
+  "real": "走真接口的领域：{{domains}}",
+  "realNone": "全部走假数据",
+  "mockOff": "假数据没有启动：{{reason}}",
+  "contextLoading": "示范接口 /me/context：读取中",
+  "contextError": "示范接口 /me/context：没取到（{{code}}）",
+  "contextEmpty": "示范接口 /me/context：还没有目标考试",
+  "context": "示范接口 /me/context：{{user}}，目标 {{exam}}，今天 {{today}}，距目标日 {{days}} 天",
+  "sampleNote": "标着“示例数据”的接口，规则还没实现，先给演示考试里的示例值"
+}

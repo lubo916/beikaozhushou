@@ -1,8 +1,9 @@
-// Orval（0.1b 计划 C6）：contracts/openapi.yaml → packages/contract/src/generated/api/（类型、TanStack Query 钩子、MSW 模拟与 Zod 结构）。
+// Orval（0.1b 计划 C6）：合并后的契约 → packages/contract/src/generated/api/（类型、TanStack Query 钩子、MSW 模拟与 Zod 结构）。
+// 契约分文件写在 contracts/openapi/，由 tools/merge-openapi.mjs 合成 packages/contract/src/generated/openapi.json（F04）。
 // 由 pnpm contract:gen 运行（scripts/engineering/contract-gen.mjs 加生成物头并写清单），不直接调用 orval。
 import { defineConfig, type InputTransformerFn } from "orval";
 
-const INPUT = "./contracts/openapi.yaml";
+const INPUT = "./packages/contract/src/generated/openapi.json";
 const OUT = "./packages/contract/src/generated/api";
 const METHODS = new Set(["get", "put", "post", "delete", "options", "head", "patch", "trace"]);
 

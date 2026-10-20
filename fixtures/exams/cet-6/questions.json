@@ -3,12 +3,13 @@
   "note": "演示数据，取自原型脚本；题目与解析的正式来源见 OQ-010",
   "questions": [
     {
-      "id": "cet-6-q0001",
-      "question_type": "writing",
+      "id": "019a0304-0000-7000-8000-000000000001",
+      "version": 1,
+      "question_type": "reading",
       "response_form": "choice",
       "credibility": "reviewed",
-      "knowledge_points": [
-        "形近词辨析：mitigate 与 militate"
+      "knowledge_point_ids": [
+        "019a0303-0000-7000-8000-000000000002"
       ],
       "stem": "The new subsidy is intended to ______ the impact of rising costs on low-income families.",
       "options": [
@@ -37,12 +38,13 @@
       ]
     },
     {
-      "id": "cet-6-q0002",
+      "id": "019a0304-0000-7000-8000-000000000002",
+      "version": 1,
       "question_type": "writing",
       "response_form": "written",
       "credibility": "reviewed",
-      "knowledge_points": [
-        "形近词辨析：mitigate 与 militate"
+      "knowledge_point_ids": [
+        "019a0303-0000-7000-8000-000000000002"
       ],
       "stem": "以“终身学习的重要性”为题写一篇 150 至 200 词的议论文。",
       "scoring_points": [
@@ -73,11 +75,11 @@
   ],
   "cards": [
     {
-      "id": "cet-6-card0001",
+      "id": "019a0305-0000-7000-8000-000000000001",
+      "knowledge_point_id": "019a0303-0000-7000-8000-000000000002",
       "card_type": "语境卡",
       "front": "______ the impact（减轻影响）",
-      "back": "mitigate　v. 减轻，缓和。常见搭配：mitigate the impact / risk / effects。易混：militate against（不利于）。",
-      "knowledge_point": "形近词辨析：mitigate 与 militate"
+      "back": "mitigate　v. 减轻，缓和。常见搭配：mitigate the impact / risk / effects。易混：militate against（不利于）。"
     }
   ]
 }

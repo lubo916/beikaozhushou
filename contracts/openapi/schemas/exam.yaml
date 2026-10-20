@@ -1,0 +1,112 @@
+# 考试画像（exam 领域）：从 contracts/exam-profile.schema.json 移植；考试之间的差异只放这份数据（红线 1）。
+# 子章节在契约里只写到两层（更深的嵌套不展开），完整约束仍以 exam-profile.schema.json 为准。
+components:
+  schemas:
+    QuestionTypeCode:
+      type: string
+      description: 题型代码（考试画像 question_types 里的 type；叫法经考试画像映射到术语表的题型）
+      enum: [single_choice, multi_choice, true_false, indefinite_choice, choice, fill_blank, discrimination, short_answer, material_analysis, writing, translation, listening, reading, calculation, algorithm_design, case_analysis, oral, practical]
+    ResponseForm:
+      type: string
+      description: 作答形态（vocabulary.md 第 3 节的九种）
+      enum: [choice, fill, match_order, stepwise, written, material, listening, oral, practical_self]
+    EvaluationRuleType:
+      type: string
+      description: 评价规则四种：合格线型、择优型、分数段型、自定型
+      enum: [pass_line, selective, score_band, custom]
+    ExamProfile:
+      type: object
+      description: 考试画像（四个演示考试见 fixtures/exams/）
+      additionalProperties: false
+      required: [exam_id, name, kind, evaluation_rule, full_score, structure, question_types, scoring, key_dates, readiness]
+      properties:
+        exam_id:
+          type: string
+          pattern: "^[a-z0-9][a-z0-9-]{2,40}$"
+          description: 考试 ID；演示考试用 fixtures/exams/ 的目录名
+        name: {type: string, minLength: 2}
+        short_name: {type: string}
+        aliases: {type: array, items: {type: string}}
+        kind: {type: string, enum: [official, template, custom]}
+        evaluation_rule: {$ref: "#/components/schemas/ExamEvaluationRule"}
+        full_score: {type: number, minimum: 1}
+        structure: {type: array, minItems: 1, items: {$ref: "#/components/schemas/ExamSubject"}}
+        question_types: {type: array, minItems: 1, items: {$ref: "#/components/schemas/ExamQuestionType"}}
+        scoring: {$ref: "#/components/schemas/ExamScoring"}
+        duration_minutes: {type: [integer, "null"], minimum: 1}
+        key_dates: {type: array, minItems: 1, items: {$ref: "#/components/schemas/ExamKeyDate"}}
+        readiness: {$ref: "#/components/schemas/ExamReadiness"}
+        variation_extensions: {type: array, items: {type: string}}
+    ExamEvaluationRule:
+      type: object
+      additionalProperties: false
+      required: [type, description]
+      properties:
+        type: {$ref: "#/components/schemas/EvaluationRuleType"}
+        description: {type: string}
+        pass_line: {type: [number, "null"]}
+        per_subject: {type: boolean}
+        bands:
+          type: array
+          items:
+            type: object
+            required: [label, min]
+            properties:
+              label: {type: string}
+              min: {type: number}
+    ExamSubject:
+      type: object
+      additionalProperties: false
+      required: [subject, sections]
+      properties:
+        subject: {type: string}
+        sections: {type: array, items: {$ref: "#/components/schemas/ExamSection"}}
+    ExamSection:
+      type: object
+      additionalProperties: false
+      required: [name]
+      properties:
+        name: {type: string}
+        knowledge_point_count: {type: integer, minimum: 0}
+        sections: {type: array, items: {type: object}}
+    ExamQuestionType:
+      type: object
+      additionalProperties: false
+      required: [type, label, response_form]
+      properties:
+        type: {$ref: "#/components/schemas/QuestionTypeCode"}
+        label: {type: string}
+        response_form: {$ref: "#/components/schemas/ResponseForm"}
+        count: {type: [integer, "null"], minimum: 0}
+        subjective: {type: boolean}
+    ExamScoring:
+      type: object
+      additionalProperties: false
+      properties:
+        target_default: {type: [number, "null"]}
+        target_basis: {type: string}
+        rubrics: {type: array, items: {type: string}}
+    ExamKeyDate:
+      type: object
+      additionalProperties: false
+      required: [kind, date, status]
+      properties:
+        kind: {type: string, enum: [registration_open, registration_close, exam, score_release, target]}
+        date: {type: string, format: date}
+        status: {type: string, enum: [official, estimated, custom]}
+        basis: {type: string}
+    ExamReadiness:
+      type: object
+      additionalProperties: false
+      required: [map, questions, exam_intel]
+      properties:
+        map: {$ref: "#/components/schemas/ExamReadinessItem"}
+        questions: {$ref: "#/components/schemas/ExamReadinessItem"}
+        exam_intel: {$ref: "#/components/schemas/ExamReadinessItem"}
+    ExamReadinessItem:
+      type: object
+      additionalProperties: false
+      required: [level, note]
+      properties:
+        level: {type: integer, minimum: 1, maximum: 3}
+        note: {type: string}

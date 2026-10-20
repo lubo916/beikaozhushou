@@ -1,0 +1,14 @@
+# 多页共用的接口（account 领域）：paths/ 按领域分文件，由地基与后端任务维护；某一页自己的接口写 pages/<页ID>.yaml。
+paths:
+  /me/context:
+    get:
+      operationId: getMeContext
+      x-owner: account
+      x-action: account.context.read
+      summary: 当前用户、当前目标考试与今天的日期（示范接口，从契约一路走到页面）
+      responses:
+        "200":
+          description: 当前上下文
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MeContext"}

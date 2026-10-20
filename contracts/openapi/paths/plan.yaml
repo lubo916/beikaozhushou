@@ -1,0 +1,14 @@
+# 多页共用的接口（plan 领域）。
+paths:
+  /plan/today:
+    get:
+      operationId: getTodayList
+      x-owner: plan
+      x-action: plan.today.read
+      summary: 当前目标考试在今天这个学习日的今日清单（三段）
+      responses:
+        "200":
+          description: 今日清单
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/TodayList"}

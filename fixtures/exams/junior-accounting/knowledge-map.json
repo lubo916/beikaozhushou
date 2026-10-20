@@ -1,14 +1,17 @@
 {
   "exam_id": "junior-accounting",
+  "map_id": "019a0101-0000-7000-8000-000000000001",
   "map_version": 1,
   "source": "official",
   "note": "演示数据：章节与知识点数量取自原型，sample_points 为每章的示例知识点",
   "chapters": [
     {
+      "id": "019a0102-0000-7000-8000-000000000001",
       "name": "会计概述",
       "knowledge_point_count": 18,
       "sample_points": [
         {
+          "id": "019a0103-0000-7000-8000-000000000001",
           "name": "会计基本假设",
           "knowledge_types": [
             "concept"
@@ -16,6 +19,7 @@
           "default_target_level": 3
         },
         {
+          "id": "019a0103-0000-7000-8000-000000000002",
           "name": "会计信息质量要求",
           "knowledge_types": [
             "concept"
@@ -25,10 +29,12 @@
       ]
     },
     {
+      "id": "019a0102-0000-7000-8000-000000000002",
       "name": "会计基础",
       "knowledge_point_count": 30,
       "sample_points": [
         {
+          "id": "019a0103-0000-7000-8000-000000000003",
           "name": "借贷记账法",
           "knowledge_types": [
             "procedure"
@@ -38,10 +44,12 @@
       ]
     },
     {
+      "id": "019a0102-0000-7000-8000-000000000003",
       "name": "资产",
       "knowledge_point_count": 46,
       "sample_points": [
         {
+          "id": "019a0103-0000-7000-8000-000000000004",
           "name": "存货发出计价方法",
           "knowledge_types": [
             "procedure"
@@ -49,6 +57,7 @@
           "default_target_level": 4
         },
         {
+          "id": "019a0103-0000-7000-8000-000000000005",
           "name": "交易性金融资产的后续计量",
           "knowledge_types": [
             "procedure"
@@ -56,6 +65,7 @@
           "default_target_level": 4
         },
         {
+          "id": "019a0103-0000-7000-8000-000000000006",
           "name": "固定资产折旧方法",
           "knowledge_types": [
             "procedure"
@@ -65,10 +75,12 @@
       ]
     },
     {
+      "id": "019a0102-0000-7000-8000-000000000004",
       "name": "负债",
       "knowledge_point_count": 28,
       "sample_points": [
         {
+          "id": "019a0103-0000-7000-8000-000000000007",
           "name": "应付职工薪酬",
           "knowledge_types": [
             "statute"
@@ -76,6 +88,7 @@
           "default_target_level": 3
         },
         {
+          "id": "019a0103-0000-7000-8000-000000000008",
           "name": "增值税的核算",
           "knowledge_types": [
             "procedure"
@@ -85,10 +98,12 @@
       ]
     },
     {
+      "id": "019a0102-0000-7000-8000-000000000005",
       "name": "所有者权益",
       "knowledge_point_count": 14,
       "sample_points": [
         {
+          "id": "019a0103-0000-7000-8000-000000000009",
           "name": "所有者权益变动",
           "knowledge_types": [
             "fact"
@@ -98,10 +113,12 @@
       ]
     },
     {
+      "id": "019a0102-0000-7000-8000-000000000006",
       "name": "收入、费用和利润",
       "knowledge_point_count": 32,
       "sample_points": [
         {
+          "id": "019a0103-0000-7000-8000-00000000000a",
           "name": "收入确认五步法",
           "knowledge_types": [
             "procedure"
@@ -111,10 +128,12 @@
       ]
     },
     {
+      "id": "019a0102-0000-7000-8000-000000000007",
       "name": "财务报告",
       "knowledge_point_count": 22,
       "sample_points": [
         {
+          "id": "019a0103-0000-7000-8000-00000000000b",
           "name": "利润表的编制",
           "knowledge_types": [
             "procedure"
@@ -124,10 +143,12 @@
       ]
     },
     {
+      "id": "019a0102-0000-7000-8000-000000000008",
       "name": "管理会计基础",
       "knowledge_point_count": 22,
       "sample_points": [
         {
+          "id": "019a0103-0000-7000-8000-00000000000c",
           "name": "管理会计基础",
           "knowledge_types": [
             "concept"

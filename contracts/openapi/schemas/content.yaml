@@ -1,0 +1,75 @@
+# 题目与卡片（content 领域）：题目改动生成新版本，作答指向题目版本；揭晓前不给答案与解析。
+components:
+  schemas:
+    Credibility:
+      type: string
+      description: 题目可信度四级（界面写“几级＋简称”，叫法见术语表）
+      enum: [reviewed, own, generated_confirmed, generated_instant]
+    Question:
+      type: object
+      description: 题目（揭晓前不含答案与解析）
+      required: [id, version, exam_id, question_type, response_form, credibility, knowledge_point_ids, stem]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        version: {type: integer, minimum: 1}
+        exam_id: {type: string}
+        question_type: {$ref: "#/components/schemas/QuestionTypeCode"}
+        response_form: {$ref: "#/components/schemas/ResponseForm"}
+        credibility: {$ref: "#/components/schemas/Credibility"}
+        knowledge_point_ids: {type: array, minItems: 1, items: {$ref: "#/components/schemas/Id"}}
+        stem: {type: string}
+        options: {type: array, items: {type: string}}
+        label:
+          type: string
+          description: 题目的小标签，如“分录题”
+        hints: {type: array, items: {type: string}}
+    QuestionSolution:
+      type: object
+      description: 答案与解析；作答揭晓后才给，未作答时返回 PRAC_REVEAL_LOCKED
+      required: [question_id]
+      properties:
+        question_id: {$ref: "#/components/schemas/Id"}
+        answer:
+          type: array
+          description: 选择题的正确选项序号（从 0 起）
+          items: {type: integer, minimum: 0}
+        explanation: {$ref: "#/components/schemas/QuestionExplanation"}
+        option_notes:
+          type: object
+          description: 按选项序号给的错项说明
+          additionalProperties: {$ref: "#/components/schemas/OptionNote"}
+        common_wrong_option: {type: integer, minimum: 0}
+        group_miss_rate:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: 同类考生的错误率（演示数据）
+        scoring_points: {type: array, items: {$ref: "#/components/schemas/ScoringPoint"}}
+        sample_answer: {type: string}
+    QuestionExplanation:
+      type: object
+      required: [conclusion]
+      properties:
+        conclusion: {type: string}
+    OptionNote:
+      type: object
+      required: [note]
+      properties:
+        note: {type: string}
+        trap: {type: string}
+    ScoringPoint:
+      type: object
+      required: [point]
+      properties:
+        point: {type: string}
+        sample_answer_hit: {type: integer, minimum: 0}
+    Card:
+      type: object
+      description: 卡片；card_type 暂存原型里的叫法，卡型代码由卡片任务统一
+      required: [id, knowledge_point_id, card_type, front, back]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        knowledge_point_id: {$ref: "#/components/schemas/Id"}
+        card_type: {type: string}
+        front: {type: string}
+        back: {type: string}

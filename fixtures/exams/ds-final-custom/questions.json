@@ -3,12 +3,13 @@
   "note": "演示数据，取自原型脚本；题目与解析的正式来源见 OQ-010",
   "questions": [
     {
-      "id": "ds-final-custom-q0001",
+      "id": "019a0404-0000-7000-8000-000000000001",
+      "version": 1,
       "question_type": "choice",
       "response_form": "choice",
       "credibility": "own",
-      "knowledge_points": [
-        "二叉树的遍历"
+      "knowledge_point_ids": [
+        "019a0403-0000-7000-8000-000000000006"
       ],
       "stem": "已知一棵二叉树的先序序列为 ABDEC，中序序列为 DBEAC，则其后序序列为（　）。",
       "options": [
@@ -37,12 +38,13 @@
       ]
     },
     {
-      "id": "ds-final-custom-q0002",
+      "id": "019a0404-0000-7000-8000-000000000002",
+      "version": 1,
       "question_type": "short_answer",
       "response_form": "written",
       "credibility": "own",
-      "knowledge_points": [
-        "二叉树的遍历"
+      "knowledge_point_ids": [
+        "019a0403-0000-7000-8000-000000000006"
       ],
       "stem": "写出二叉树中序遍历的非递归算法，并说明栈的作用。",
       "scoring_points": [
@@ -77,11 +79,11 @@
   ],
   "cards": [
     {
-      "id": "ds-final-custom-card0001",
+      "id": "019a0405-0000-7000-8000-000000000001",
+      "knowledge_point_id": "019a0403-0000-7000-8000-000000000006",
       "card_type": "问答卡",
       "front": "哪两种遍历序列可以唯一确定一棵二叉树？",
-      "back": "先序加中序，或后序加中序。只有先序加后序不能唯一确定。",
-      "knowledge_point": "二叉树的遍历"
+      "back": "先序加中序，或后序加中序。只有先序加后序不能唯一确定。"
     }
   ]
 }

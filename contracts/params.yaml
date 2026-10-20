@@ -515,3 +515,25 @@
   rollout: none
   reason_required: true
   source_items: [S31-06]
+- name: account.day.time_zone
+  owner: account
+  description: 用户时区的默认值（IANA 时区名）；时间存 UTC，“今天”按用户时区算，学员可在设置里改（开工决定第 6 条）
+  default: Asia/Shanghai
+  range: null
+  unit: iana_time_zone
+  tunable_by: [platform, learner]
+  learner_range: null
+  rollout: none
+  reason_required: true
+  source_items: []
+- name: account.day.start_hour
+  owner: account
+  description: 日界线，当地几点切到新的一天（整点）；默认凌晨 4 点，学员只能在 0–6 点之间改（开工决定第 6 条、F04-Q2）
+  default: 4
+  range: [0, 23]
+  unit: hour
+  tunable_by: [platform, learner]
+  learner_range: [0, 6]
+  rollout: none
+  reason_required: true
+  source_items: []

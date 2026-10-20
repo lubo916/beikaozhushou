@@ -46,3 +46,6 @@ apps/*/src/generated/
 # F03：由 pnpm gen 重建的设计令牌与词汇常量
 packages/ui/src/generated/
 packages/shared/src/vocab/glossary.generated.ts
+
+# F04：pnpm gen 从 msw 复制的浏览器工作线程（学员端假数据层）
+apps/*/public/mockServiceWorker.js

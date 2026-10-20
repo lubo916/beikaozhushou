@@ -1,0 +1,53 @@
+# 今日清单（plan 领域）：分巩固、推进、收尾三段，先做推迟有损失的，再做推迟无损失的（vocabulary.md 第 4 节）。
+components:
+  schemas:
+    TodaySegment:
+      type: string
+      description: 今日清单三段（叫法见术语表 today_segment）
+      enum: [consolidate, advance, closing]
+    TaskSource:
+      type: string
+      description: 八类任务来源（叫法见术语表 task_source）
+      enum: [due_review, mistake_retry, verify_recheck, to_target, new_learning, practice, org_or_custom, bedtime_review]
+    TaskStatus:
+      type: string
+      description: 任务状态；完成看证据，手动勾选只记 seen（看过）
+      enum: [todo, in_progress, done, seen]
+    TodayTask:
+      type: object
+      required: [id, segment, source, title, minutes, status, question_ids, card_ids, knowledge_point_ids, question_count, answered_count]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        segment: {$ref: "#/components/schemas/TodaySegment"}
+        source: {$ref: "#/components/schemas/TaskSource"}
+        title: {type: string}
+        minutes:
+          type: integer
+          minimum: 0
+          description: 计划用时（分钟）
+        status: {$ref: "#/components/schemas/TaskStatus"}
+        question_ids: {type: array, items: {$ref: "#/components/schemas/Id"}}
+        card_ids: {type: array, items: {$ref: "#/components/schemas/Id"}}
+        knowledge_point_ids: {type: array, items: {$ref: "#/components/schemas/Id"}}
+        question_count:
+          type: integer
+          minimum: 0
+          description: 题组的题数，等于 question_ids 的个数
+        answered_count:
+          type: integer
+          minimum: 0
+          description: 这个学习日里已作答的题数
+    TodaySegmentGroup:
+      type: object
+      required: [segment, tasks]
+      properties:
+        segment: {$ref: "#/components/schemas/TodaySegment"}
+        tasks: {type: array, items: {$ref: "#/components/schemas/TodayTask"}}
+    TodayList:
+      type: object
+      required: [day, exam_id, segments, data_source]
+      properties:
+        day: {$ref: "#/components/schemas/LearningDay"}
+        exam_id: {type: string}
+        segments: {type: array, items: {$ref: "#/components/schemas/TodaySegmentGroup"}}
+        data_source: {$ref: "#/components/schemas/DataSource"}

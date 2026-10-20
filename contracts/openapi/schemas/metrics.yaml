@@ -1,0 +1,12 @@
+# 埋点事件（metrics 领域）：只含事件内容；学员、租户、是否游客与时区由服务端按当前身份记录。
+components:
+  schemas:
+    AnalyticsEvent:
+      type: object
+      description: 请求体带其他字段即拒绝（contracts/events.yaml 中 source 为 client 的事件）
+      additionalProperties: false
+      required: [name, properties, occurred_at]
+      properties:
+        name: {type: string}
+        properties: {type: object}
+        occurred_at: {$ref: "#/components/schemas/Timestamp"}

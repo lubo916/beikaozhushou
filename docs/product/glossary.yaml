@@ -695,3 +695,63 @@
   code: gray_rollout
   definition: 变更先对一部分人群生效、再按人群逐步放量的发布方式（P19-03）；登记 rollout 为 gray_required 的参数只经灰度调整（ADR-014）
   forbidden: []
+# F04 补登记（F03-Q3＝A：F03 先临时放在 packages/shared/src/vocab/supplement.ts 的五组叫法）
+- term: 提议状态
+  code: proposal_status
+  definition: 提议的四个状态；按钮只有“确认”和“不改”，已确认的在撤销期内可撤销
+  values:
+    - label: 待确认
+      code: pending
+    - label: 已确认
+      code: confirmed
+    - label: 不改
+      code: declined
+    - label: 已撤销
+      code: undone
+  forbidden: []
+- term: 今日清单分段
+  code: today_segment
+  definition: 今日清单的三段；巩固是推迟就有损失的，推进是推迟无损失的，收尾是当天最后的短任务
+  values:
+    - label: 巩固
+      code: consolidate
+    - label: 推进
+      code: advance
+    - label: 收尾
+      code: closing
+  forbidden: []
+- term: 降级档
+  code: degrade_tier
+  definition: 时间不够时今日清单的三档，保住连续性（剩下的可以换档）
+  values:
+    - label: 完整版
+      code: full
+    - label: 精简版
+      code: lite
+    - label: 保底版
+      code: minimal
+  forbidden: []
+- term: 三个数的问句
+  code: three_number_question
+  definition: 三个数卡片上各自回答的问题，不互相代替
+  values:
+    - label: 够不够
+      code: forecast_gap
+    - label: 走了多远
+      code: completion
+    - label: 来不来得及
+      code: health
+  forbidden: []
+- term: 可信度简称
+  code: credibility_short
+  definition: 题目可信度在界面上写“几级＋简称”时用的简称（F03-Q4＝A）
+  values:
+    - label: 审定
+      code: reviewed
+    - label: 自有
+      code: own
+    - label: 已确认生成
+      code: generated_confirmed
+    - label: 即时生成
+      code: generated_instant
+  forbidden: []

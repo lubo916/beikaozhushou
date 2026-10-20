@@ -1,0 +1,66 @@
+# 接口契约的通用部分（地基任务维护）：文档头、错误、分页、ID、时间与通用枚举。
+# 合并脚本 tools/merge-openapi.mjs 以本文件为底稿，并入 schemas/（核心数据形状）、paths/（多页共用的接口，按领域分文件）
+# 与 pages/（各页面自己的接口，页面任务各写各的），合成 packages/contract/src/generated/openapi.json 再交给 Orval。
+# 路径、operationId 或形状名重复直接报错；每个接口要写 operationId、x-owner（领域）与 x-action（contracts/permissions.yaml 的动作）。
+openapi: 3.1.0
+info:
+  title: 备考助手 API
+  version: 1.0.0
+  description: 三端共用的接口契约（docs/baseline/api-rules.md）。由 contracts/openapi/ 下的文件合并而成。
+servers:
+  - url: /api/v1
+paths: {}
+components:
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: 写操作的幂等键；同一个键的重复请求返回第一次的结果，不产生第二条记录
+      schema: {type: string, minLength: 1, maxLength: 128}
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      description: 游标分页；填上一页响应里的 next_cursor，不填表示第一页
+      schema: {type: string}
+    Limit:
+      name: limit
+      in: query
+      required: false
+      description: 每页条数，不超过参数 api.page.max_limit（服务端按参数夹住）
+      schema: {type: integer, minimum: 1}
+  responses:
+    Error:
+      description: 错误，code 取自 contracts/errors.yaml
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+  schemas:
+    Error:
+      type: object
+      description: 统一错误体；前端按 message_key 显示中文
+      required: [code, message_key, details]
+      properties:
+        code: {type: string}
+        message_key: {type: string}
+        details: {type: object}
+    Id:
+      type: string
+      format: uuid
+      description: 主键，UUIDv7 字符串（离线时客户端也能先生成）
+    Timestamp:
+      type: string
+      format: date-time
+      description: 时刻，ISO 8601 的 UTC 字符串（带 Z）
+    LearningDay:
+      type: string
+      format: date
+      description: 学习日 YYYY-MM-DD，按用户时区与日界线算（packages/shared/src/today）
+    NextCursor:
+      type: [string, "null"]
+      description: 下一页的游标；没有下一页时为 null
+    DataSource:
+      type: string
+      description: 数据来源；computed 为按已实现的规则算出，sample 为规则还没实现、先返回演示考试里的示例值（界面标“示例数据”）
+      enum: [computed, sample]

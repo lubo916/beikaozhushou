@@ -1,0 +1,17 @@
+# 多页共用的接口（exam 领域）。
+paths:
+  /exams/{examId}:
+    get:
+      operationId: getExamProfile
+      x-owner: exam
+      x-action: exam.profile.read
+      summary: 读取考试画像
+      parameters:
+        - {name: examId, in: path, required: true, schema: {type: string}}
+      responses:
+        "200":
+          description: 考试画像
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ExamProfile"}
+        "404": {$ref: "#/components/responses/Error"}
