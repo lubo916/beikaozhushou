@@ -281,8 +281,10 @@
       ],
       "recommend": "C",
       "temp": "C",
-      "status": "open",
-      "asked": "v0007"
+      "status": "answered",
+      "asked": "v0007",
+      "answer": "C",
+      "answered": "v0008"
     },
     {
       "id": "R01-Q2",
@@ -294,8 +296,10 @@
       ],
       "recommend": "B",
       "temp": "B",
-      "status": "open",
-      "asked": "v0007"
+      "status": "answered",
+      "asked": "v0007",
+      "answer": "B",
+      "answered": "v0008"
     },
     {
       "id": "R01-Q3",
@@ -308,8 +312,10 @@
       ],
       "recommend": "B",
       "temp": "B",
-      "status": "open",
-      "asked": "v0007"
+      "status": "answered",
+      "asked": "v0007",
+      "answer": "B",
+      "answered": "v0008"
     },
     {
       "id": "R01-Q4",
@@ -325,7 +331,7 @@
       "status": "answered",
       "asked": "v0007",
       "answer": "B",
-      "answered": "v0007"
+      "answered": "v0008"
     },
     {
       "id": "R01-Q5",
@@ -338,8 +344,10 @@
       ],
       "recommend": "A",
       "temp": "A",
-      "status": "open",
-      "asked": "v0007"
+      "status": "answered",
+      "asked": "v0007",
+      "answer": "A",
+      "answered": "v0008"
     },
     {
       "id": "R01-Q6",
@@ -352,8 +360,10 @@
       ],
       "recommend": "A",
       "temp": "A",
-      "status": "open",
-      "asked": "v0007"
+      "status": "answered",
+      "asked": "v0007",
+      "answer": "A",
+      "answered": "v0008"
     },
     {
       "id": "R01-Q7",
@@ -368,7 +378,7 @@
       "status": "answered",
       "asked": "v0007",
       "answer": "B",
-      "answered": "v0007"
+      "answered": "v0008"
     }
   ]
 }
