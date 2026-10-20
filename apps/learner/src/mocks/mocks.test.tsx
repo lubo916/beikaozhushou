@@ -23,6 +23,7 @@ const routes = collectRoutes(loadRouteModules());
 /** 北京时间 2026-10-21 10:00。 */
 const NOW = Date.parse("2026-10-21T02:00:00Z");
 const SCHEMAS: Record<string, unknown> = { ...zodSchemas };
+const KJ = fixtures.exams[0]?.examId ?? "";
 
 interface Parser {
   safeParse(value: unknown): { success: boolean; error?: unknown };
@@ -49,7 +50,8 @@ function setup(real: string[] = []) {
   const api = createMockApi({ db, control, routes });
   const call = (method: string, path: string, body?: unknown, headers: Record<string, string> = {}) =>
     api.handle({ method, url: `http://localhost/api/v1${path}`, headers: new Headers(headers), body });
-  return { control, db, api, call, setState: (state: string) => (search = state ? `?state=${state}` : "") };
+  const setState = (state: string) => (search = state ? `?state=${state}` : "");
+  return { control, db, api, call, setState };
 }
 
 function ok(outcome: MockOutcome, schema?: string): Json {
@@ -65,6 +67,11 @@ function ok(outcome: MockOutcome, schema?: string): Json {
   return outcome.body as Json;
 }
 
+/** 选择题作答的请求体。 */
+function choice(questionId: string, selected: number[], confidence = "sure"): Json {
+  return { question_id: questionId, question_version: 1, response: { selected }, confidence, duration_ms: 9000 };
+}
+
 function tasksOf(list: Json): Task[] {
   return (list["segments"] as { tasks: Task[] }[]).flatMap((s) => s.tasks);
 }
@@ -76,7 +83,7 @@ afterEach(() => {
 describe("假数据层：自动注册与四个演示考试", () => {
   it("domains/ 与 pages/ 下导出的路由都收上来；重复写或写了契约里没有的接口直接报错", () => {
     const ids = routes.map((r) => r.operationId);
-    for (const id of ["getMeContext", "getTodayList", "listMistakes", "submitAnswer", "getExamProfile"]) expect(ids).toContain(id);
+    for (const id of ["getMeContext", "getTodayList", "listMistakes", "submitAnswer", "getCurrentPlan"]) expect(ids).toContain(id);
     const route = defineRoute("getMeContext", () => ({}));
     expect(() => collectRoutes({ "a.ts": { routes: [route] }, "b.ts": { routes: [route] } })).toThrow(/写了两次/);
     expect(() => collectRoutes({ "c.ts": {} })).toThrow(/routes/);
@@ -89,6 +96,11 @@ describe("假数据层：自动注册与四个演示考试", () => {
       const context = ok(await call("GET", "/me/context"), "getMeContextResponse");
       expect((context["goal"] as Json)["exam_id"]).toBe(exam.examId);
       ok(await call("GET", "/plan/today"), "getTodayListResponse");
+      ok(await call("GET", "/plan/current"), "getCurrentPlanResponse");
+      ok(await call("GET", "/plan/proposals"), "listProposalsResponse");
+      ok(await call("GET", "/notes"), "listNotesResponse");
+      ok(await call("GET", "/materials"), "listMaterialsResponse");
+      ok(await call("GET", "/notifications"), "listNotificationsResponse");
       ok(await call("GET", `/exams/${exam.examId}`), "getExamProfileResponse");
       ok(await call("GET", `/exams/${exam.examId}/map`), "getKnowledgeMapResponse");
       ok(await call("GET", `/learner/mastery-grid?mapId=${exam.map.map_id}`), "getMasteryGridResponse");
@@ -112,25 +124,49 @@ describe("假数据层：自动注册与四个演示考试", () => {
   });
 });
 
-describe("假数据层：写操作、时间旅行与强制状态", () => {
-  it("做完一题，错题本与今日清单跟着变；同一个幂等键只算一次", async () => {
-    const { call } = setup();
+describe("假数据层：写操作、幂等、时间旅行与强制状态", () => {
+  it("做完一题，错题本与今日清单跟着变；同一个幂等键串行重试只算一次", async () => {
+    const { db, call } = setup();
     const practice = tasksOf(ok(await call("GET", "/plan/today"))).find((t) => t.source === "practice");
     const questionId = practice?.question_ids[0] ?? "";
     expect(practice?.status).toBe("todo");
-    const submit = () =>
-      call(
-        "POST",
-        "/practice/answers",
-        { question_id: questionId, question_version: 1, response: { selected: [1] }, confidence: "sure", duration_ms: 9000 },
-        { "Idempotency-Key": "k-1" },
-      );
+    const submit = () => call("POST", "/practice/answers", choice(questionId, [1]), { "Idempotency-Key": "k-1" });
     const first = ok(await submit());
     expect(first["correct"]).toBe(false);
     expect(first["mistake_id"]).toEqual(expect.any(String));
     expect(ok(await submit())["attempt_id"]).toBe(first["attempt_id"]);
+    expect(db.attempts(KJ)).toHaveLength(1);
     const mistakes = ok(await call("GET", "/practice/mistakes"));
-    expect((mistakes["items"] as Json[]).map((m) => [m["question_id"], m["status"], m["wrong_count"]])).toEqual([[questionId, "new", 1]]);
+    const rows = (mistakes["items"] as Json[]).map((m) => [m["question_id"], m["status"], m["wrong_count"]]);
+    expect(rows).toEqual([[questionId, "new", 1]]);
+    const after = tasksOf(ok(await call("GET", "/plan/today"))).find((t) => t.id === practice?.id);
+    expect(after).toMatchObject({ status: "done", answered_count: 1 });
+  });
+
+  it("同一个幂等键并发提交两次只执行一次：作答编号相同、只有一条作答、错题只记一次", async () => {
+    const { db, call } = setup();
+    const question = fixtures.exams[0]?.questions.find((q) => q.response_form === "choice");
+    const submit = () => call("POST", "/practice/answers", choice(question?.id ?? "", [1]), { "Idempotency-Key": "k-2" });
+    const [a, b] = await Promise.all([submit(), submit()]);
+    expect(ok(a)["attempt_id"]).toBe(ok(b)["attempt_id"]);
+    expect(db.attempts(KJ)).toHaveLength(1);
+    const mistakes = ok(await call("GET", "/practice/mistakes"));
+    expect((mistakes["items"] as Json[]).map((m) => m["wrong_count"])).toEqual([1]);
+  });
+
+  it("重置演示数据会清掉幂等记录：同一个键重新写入真的再写一次，错题本与今日清单都查得到", async () => {
+    const { db, call } = setup();
+    const practice = tasksOf(ok(await call("GET", "/plan/today"))).find((t) => t.source === "practice");
+    const questionId = practice?.question_ids[0] ?? "";
+    const submit = () => call("POST", "/practice/answers", choice(questionId, [1]), { "Idempotency-Key": "k-3" });
+    const before = ok(await submit());
+    db.reset();
+    expect(db.attempts(KJ)).toHaveLength(0);
+    const again = ok(await submit());
+    expect(again["attempt_id"]).not.toBe(before["attempt_id"]);
+    expect(db.attempts(KJ)).toHaveLength(1);
+    const mistakes = ok(await call("GET", "/practice/mistakes"));
+    expect((mistakes["items"] as Json[]).map((m) => m["id"])).toEqual([again["mistake_id"]]);
     const after = tasksOf(ok(await call("GET", "/plan/today"))).find((t) => t.id === practice?.id);
     expect(after).toMatchObject({ status: "done", answered_count: 1 });
   });
@@ -142,9 +178,8 @@ describe("假数据层：写操作、时间旅行与强制状态", () => {
     expect(ok(await call("GET", "/me/context"))["today"]).toBe("2026-10-20");
     control.travelTo(dayStart("2026-10-21", settings).getTime());
     expect(ok(await call("GET", "/me/context"))["today"]).toBe("2026-10-21");
-    const exam = fixtures.exams[0];
-    const question = exam?.questions.find((q) => q.response_form === "choice");
-    await call("POST", "/practice/answers", { question_id: question?.id, question_version: 1, response: { selected: [3] }, confidence: "vague", duration_ms: 1 });
+    const question = fixtures.exams[0]?.questions.find((q) => q.response_form === "choice");
+    await call("POST", "/practice/answers", choice(question?.id ?? "", [3], "vague"));
     const gap = param("practice.mistake.review_intervals")[0] ?? 1;
     const retryOn = (list: Json) => tasksOf(list).find((t) => t.source === "mistake_retry");
     control.travelTo(dayStart(addDays("2026-10-21", gap - 1), settings).getTime());
@@ -166,6 +201,7 @@ describe("假数据层：写操作、时间旅行与强制状态", () => {
     expect((await call("GET", "/plan/today")).kind).toBe("hang");
     setState("empty");
     expect(ok(await call("GET", "/practice/mistakes"))["items"]).toEqual([]);
+    expect(ok(await call("GET", "/notifications"), "listNotificationsResponse")["items"]).toEqual([]);
     expect(ok(await call("GET", "/me/context"))["goal"]).toBeUndefined();
     setState("restricted");
     const restricted = await call("GET", "/plan/today");
@@ -187,13 +223,20 @@ describe("示范接口与数据刷新", () => {
     const { api } = setup();
     vi.stubGlobal("fetch", async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
-      const outcome = await api.handle({ method: init?.method ?? "GET", url: new URL(url, "http://localhost").href, headers: new Headers(init?.headers), body: undefined });
+      const outcome = await api.handle({
+        method: init?.method ?? "GET",
+        url: new URL(url, "http://localhost").href,
+        headers: new Headers(init?.headers),
+        body: undefined,
+      });
       if (outcome.kind !== "json") throw new TypeError("network");
-      return new Response(JSON.stringify(outcome.body), { status: outcome.status, headers: { "content-type": "application/json" } });
+      const headers = { "content-type": "application/json" };
+      return new Response(JSON.stringify(outcome.body), { status: outcome.status, headers });
     });
     function Probe() {
       const query = contract.useGetMeContext();
-      return <p>{query.data === undefined ? "…" : `${query.data.today} ${query.data.goal?.exam_name ?? ""}`}</p>;
+      const text = query.data === undefined ? "…" : `${query.data.today} ${query.data.goal?.exam_name ?? ""}`;
+      return <p>{text}</p>;
     }
     const host = document.createElement("div");
     document.body.append(host);

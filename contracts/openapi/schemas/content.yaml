@@ -73,3 +73,53 @@ components:
         card_type: {type: string}
         front: {type: string}
         back: {type: string}
+    NoteType:
+      type: string
+      description: 笔记类型五种：综合、口诀、释义、要点、易错（叫法见术语表 note_type）
+      enum: [general, mnemonic, definition, key_points, pitfall]
+    Note:
+      type: object
+      description: 笔记；AI 生成的在界面上带“AI 生成”标识，复制、下载、导出时也带
+      required: [id, exam_id, note_type, title, body, knowledge_point_ids, ai_generated, created_at, updated_at]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        exam_id: {type: string}
+        note_type: {$ref: "#/components/schemas/NoteType"}
+        title: {type: string}
+        body: {type: string}
+        knowledge_point_ids: {type: array, items: {$ref: "#/components/schemas/Id"}}
+        ai_generated: {type: boolean}
+        created_at: {$ref: "#/components/schemas/Timestamp"}
+        updated_at: {$ref: "#/components/schemas/Timestamp"}
+    NotePage:
+      type: object
+      required: [items, next_cursor, data_source]
+      properties:
+        items: {type: array, items: {$ref: "#/components/schemas/Note"}}
+        next_cursor: {$ref: "#/components/schemas/NextCursor"}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+    MaterialAccess:
+      type: string
+      description: 资料接入方式三种：可解析、只映射、只外链（叫法见术语表 material）
+      enum: [parsable, mapped_only, link_only]
+    Material:
+      type: object
+      description: 学员接入的资料（书、课、题、文件与链接）；资料覆盖到的知识点用于地图的“资料覆盖”着色
+      required: [id, exam_id, title, access, knowledge_point_ids, created_at]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        exam_id: {type: string}
+        title: {type: string}
+        access: {$ref: "#/components/schemas/MaterialAccess"}
+        url:
+          type: string
+          description: 只外链的资料给原链接
+        knowledge_point_ids: {type: array, items: {$ref: "#/components/schemas/Id"}}
+        created_at: {$ref: "#/components/schemas/Timestamp"}
+    MaterialPage:
+      type: object
+      required: [items, next_cursor, data_source]
+      properties:
+        items: {type: array, items: {$ref: "#/components/schemas/Material"}}
+        next_cursor: {$ref: "#/components/schemas/NextCursor"}
+        data_source: {$ref: "#/components/schemas/DataSource"}

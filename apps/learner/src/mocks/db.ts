@@ -1,6 +1,7 @@
 // 内存仓库（api-rules 第 4 节）：启动时装入四个演示考试；写操作真的改变内存数据——做完一题，错题本与今日清单跟着变。
 // 规则还没实现的部分（掌握档、证据强度、今日清单的排法、错题回炉与验收）先用 fixtures 的示例值或最简单的占位做法，
 // 返回里标 data_source: "sample"；规则卡落地后（B 任务）改调 packages/domains/<领域>/core 的纯函数，存储仍在这里。
+// 幂等记录也存在这里（真实后端同样随数据一起保存），重置演示数据时一起清掉。
 import { ApiError } from "@exam-prep/contract/errors";
 import { PARAMS, param, type ParamName } from "@exam-prep/params";
 import { addDays, diffDays, today, type DaySettings, type LearningDay } from "@exam-prep/shared/today";
@@ -10,7 +11,15 @@ import { uuidv7 } from "./uuid.ts";
 
 const SAMPLE = "sample";
 const SEGMENTS = ["consolidate", "advance", "closing"] as const;
-const SOLUTION_KEYS = ["answer", "explanation", "option_notes", "common_wrong_option", "group_miss_rate", "scoring_points", "sample_answer"];
+const SOLUTION_KEYS = [
+  "answer",
+  "explanation",
+  "option_notes",
+  "common_wrong_option",
+  "group_miss_rate",
+  "scoring_points",
+  "sample_answer",
+];
 const QUESTION_OPTIONAL_KEYS = ["options", "label", "hints"];
 const CONFIDENCES: readonly string[] = ["sure", "vague", "guess", "off"];
 const STRENGTH_ORDER: readonly string[] = ["weak", "medium", "strong"];
@@ -18,7 +27,8 @@ const CURSOR_RE = /^o(\d+)$/;
 
 type Body = Record<string, unknown>;
 
-interface Attempt {
+/** 一条作答（只追加）。 */
+export interface AttemptRecord {
   readonly id: string;
   readonly questionId: string;
   readonly day: LearningDay;
@@ -41,14 +51,15 @@ interface MistakeRecord {
 }
 
 interface ExamState {
-  readonly attempts: Attempt[];
+  readonly attempts: AttemptRecord[];
   readonly mistakes: Map<string, MistakeRecord>;
 }
 
 const isRecord = (value: unknown): value is Body => typeof value === "object" && value !== null && !Array.isArray(value);
 
 function pick(source: Readonly<Record<string, unknown>>, keys: readonly string[]): Body {
-  return Object.fromEntries(keys.filter((key) => source[key] !== undefined).map((key) => [key, source[key]]));
+  const present = keys.filter((key) => source[key] !== undefined);
+  return Object.fromEntries(present.map((key) => [key, source[key]]));
 }
 
 function sameAnswer(selected: readonly number[], answer: readonly number[]): boolean {
@@ -66,6 +77,29 @@ function sampleStrength(graded: boolean, correct: boolean | null, confidence: st
   const caps: Readonly<Record<string, string>> = param("learner.evidence.credibility_caps");
   const cap = caps[credibility] ?? base;
   return STRENGTH_ORDER.indexOf(cap) < STRENGTH_ORDER.indexOf(base) ? cap : base;
+}
+
+/** 这道错题今天要不要回炉：到期了，或者今天已经按期做过（做过也留在清单里，显示已完成）。 */
+function isDue(mistake: MistakeRecord, day: LearningDay): boolean {
+  if (mistake.status === "graduated" || mistake.createdDay === day) return false;
+  return mistake.nextDueDay <= day || mistake.lastRetryDay === day;
+}
+
+function newestFirst(a: MistakeRecord, b: MistakeRecord): number {
+  return b.createdAt.localeCompare(a.createdAt);
+}
+
+/** 游标分页（api-rules 第 1 节）：游标对前端不透明；每页条数不超过参数 api.page.max_limit。 */
+function page(items: readonly unknown[], cursor: string | null, limit: string | null): Body {
+  const max = param("api.page.max_limit");
+  const asked = limit === null ? max : Number(limit);
+  if (!Number.isInteger(asked) || asked < 1) throw new ApiError("COMMON_VALIDATION", { field: "limit" });
+  const match = cursor === null ? null : CURSOR_RE.exec(cursor);
+  if (cursor !== null && match === null) throw new ApiError("COMMON_VALIDATION", { field: "cursor" });
+  const start = match === null ? 0 : Number(match[1]);
+  const end = start + Math.min(asked, max);
+  const next = end < items.length ? `o${end}` : null;
+  return { items: items.slice(start, end), next_cursor: next, data_source: SAMPLE };
 }
 
 function taskView(task: TaskFixture, answered: ReadonlySet<string>): Body {
@@ -107,15 +141,31 @@ export class MockDb {
   readonly fixtures: DemoFixtures;
   readonly #states = new Map<string, ExamState>();
   readonly #events: unknown[] = [];
+  readonly #replies = new Map<string, Promise<unknown>>();
 
   constructor(fixtures: DemoFixtures) {
     this.fixtures = fixtures;
   }
 
-  /** 清掉作答、错题与埋点，回到刚装入演示数据时的样子。 */
+  /** 清掉作答、错题、埋点与幂等记录，回到刚装入演示数据时的样子。 */
   reset(): void {
     this.#states.clear();
     this.#events.length = 0;
+    this.#replies.clear();
+  }
+
+  /** 幂等（api-rules 第 1 节）：同一个键只执行一次；正在执行的也算，并发的重复请求拿到同一个结果。 */
+  once<T>(key: string, run: () => Promise<T>): Promise<T> {
+    const existing = this.#replies.get(key);
+    if (existing !== undefined) return existing as Promise<T>;
+    const pending = run();
+    this.#replies.set(key, pending);
+    return pending;
+  }
+
+  /** 某个考试的全部作答（只追加；给测试与排查用）。 */
+  attempts(examId: string): readonly AttemptRecord[] {
+    return [...this.#state(examId).attempts];
   }
 
   /** 用户时区与日界线：参数 account.day.time_zone、account.day.start_hour（F04 登记；学员自己改过的设置以后由 account 领域给）。 */
@@ -234,7 +284,8 @@ export class MockDb {
     for (const exam of this.fixtures.exams) {
       const candidates = exam.questions.filter((q) => q.knowledge_point_ids.includes(pointId));
       if (candidates.length === 0) continue;
-      const doneToday = new Set(this.#state(exam.examId).attempts.filter((a) => a.day === day).map((a) => a.questionId));
+      const attempts = this.#state(exam.examId).attempts;
+      const doneToday = new Set(attempts.filter((a) => a.day === day).map((a) => a.questionId));
       const next = candidates.find((q) => !doneToday.has(q.id)) ?? candidates[0];
       if (next !== undefined) return this.questionView(next.id);
     }
@@ -254,13 +305,14 @@ export class MockDb {
       throw new ApiError("COMMON_VALIDATION", { field: "question_version", expected: question.version });
     }
     const response = isRecord(body["response"]) ? body["response"] : {};
-    const selected = Array.isArray(response["selected"]) ? response["selected"].filter((v): v is number => Number.isInteger(v)) : [];
+    const raw = Array.isArray(response["selected"]) ? response["selected"] : [];
+    const selected = raw.filter((v): v is number => Number.isInteger(v));
     const graded = question.response_form === "choice" && question.answer !== undefined;
     const correct = graded && question.answer !== undefined ? sameAnswer(selected, question.answer) : null;
     const day = this.learningDay(now);
     const at = new Date(now).toISOString();
     const state = this.#state(exam.examId);
-    const attempt: Attempt = { id: uuidv7(now), questionId, day, correct };
+    const attempt: AttemptRecord = { id: uuidv7(now), questionId, day, correct };
     state.attempts.push(attempt);
     const mistake = graded ? this.#recordMistake(state, exam, question, correct === true, day, at) : null;
     return {
@@ -276,7 +328,14 @@ export class MockDb {
   }
 
   /** 错题的占位做法（示例；正式规则见规则卡 R03）：做错进错题本，按参数 practice.mistake.review_intervals 安排回炉。 */
-  #recordMistake(state: ExamState, exam: DemoExam, question: QuestionFixture, correct: boolean, day: LearningDay, at: string): MistakeRecord | null {
+  #recordMistake(
+    state: ExamState,
+    exam: DemoExam,
+    question: QuestionFixture,
+    correct: boolean,
+    day: LearningDay,
+    at: string,
+  ): MistakeRecord | null {
     const intervals = param("practice.mistake.review_intervals");
     const gap = (step: number): number => intervals[Math.min(step, intervals.length - 1)] ?? 0;
     const existing = state.mistakes.get(question.id);
@@ -320,9 +379,7 @@ export class MockDb {
     const state = this.#state(exam.examId);
     const answered = new Set(state.attempts.filter((a) => a.day === day).map((a) => a.questionId));
     const tasks = exam.learner.today_tasks.map((task) => taskView(task, answered));
-    const due = [...state.mistakes.values()].filter(
-      (m) => m.status !== "graduated" && m.createdDay !== day && (m.nextDueDay <= day || m.lastRetryDay === day),
-    );
+    const due = [...state.mistakes.values()].filter((m) => isDue(m, day));
     if (due.length > 0) {
       const template = exam.learner.mistake_retry_task;
       const retry: TaskFixture = {
@@ -337,26 +394,35 @@ export class MockDb {
       };
       tasks.unshift(taskView(retry, answered));
     }
-    return {
-      day,
-      exam_id: exam.examId,
-      segments: SEGMENTS.map((segment) => ({ segment, tasks: tasks.filter((t) => t.segment === segment) })),
-      data_source: SAMPLE,
-    };
+    const segments = SEGMENTS.map((segment) => ({ segment, tasks: tasks.filter((t) => t.segment === segment) }));
+    return { day, exam_id: exam.examId, segments, data_source: SAMPLE };
   }
 
-  /** 错题列表：新的在前，游标分页；每页条数不超过参数 api.page.max_limit。 */
+  /** 错题列表：新的在前，游标分页。 */
   listMistakes(exam: DemoExam, cursor: string | null, limit: string | null): Body {
-    const max = param("api.page.max_limit");
-    const asked = limit === null ? max : Number(limit);
-    if (!Number.isInteger(asked) || asked < 1) throw new ApiError("COMMON_VALIDATION", { field: "limit" });
-    const size = Math.min(asked, max);
-    const match = cursor === null ? null : CURSOR_RE.exec(cursor);
-    if (cursor !== null && match === null) throw new ApiError("COMMON_VALIDATION", { field: "cursor" });
-    const start = match === null ? 0 : Number(match[1]);
-    const all = [...this.#state(exam.examId).mistakes.values()].sort((a, b) => (a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0));
-    const next = start + size < all.length ? `o${start + size}` : null;
-    return { items: all.slice(start, start + size).map(mistakeView), next_cursor: next, data_source: SAMPLE };
+    const all = [...this.#state(exam.examId).mistakes.values()].sort(newestFirst);
+    return page(all.map(mistakeView), cursor, limit);
+  }
+
+  /** 学习计划（示例值；计划引擎落地前标 data_source: sample）。 */
+  currentPlan(exam: DemoExam): Body {
+    return { ...exam.learner.plan, data_source: SAMPLE };
+  }
+
+  listProposals(exam: DemoExam, cursor: string | null, limit: string | null): Body {
+    return page(exam.learner.proposals, cursor, limit);
+  }
+
+  listNotes(exam: DemoExam, cursor: string | null, limit: string | null): Body {
+    return page(exam.learner.notes, cursor, limit);
+  }
+
+  listMaterials(exam: DemoExam, cursor: string | null, limit: string | null): Body {
+    return page(exam.learner.materials, cursor, limit);
+  }
+
+  listNotifications(exam: DemoExam, cursor: string | null, limit: string | null): Body {
+    return page(exam.learner.notifications, cursor, limit);
   }
 
   /** 掌握方格（示例值）：fixtures 里有的用示例，没有的按未学、证据不足。 */
@@ -364,19 +430,20 @@ export class MockDb {
     const exam = this.fixtures.exams.find((e) => e.map.map_id === mapId);
     if (exam === undefined) throw new ApiError("COMMON_NOT_FOUND", { map_id: mapId });
     const seeds = new Map(exam.learner.mastery.map((m) => [m.knowledge_point_id, m]));
-    const cells = exam.map.chapters.flatMap((chapter) =>
-      chapter.sample_points.map((point) => {
+    const cells: Body[] = [];
+    for (const chapter of exam.map.chapters) {
+      for (const point of chapter.sample_points) {
         const seed = seeds.get(point.id);
-        return {
+        cells.push({
           knowledge_point_id: point.id,
           level: seed?.level ?? 0,
           target_level: seed?.target_level ?? point.default_target_level ?? null,
           evidence_sufficient: seed?.evidence_sufficient ?? false,
           pending_verification: seed?.pending_verification ?? false,
           in_scope: seed?.in_scope ?? true,
-        };
-      }),
-    );
+        });
+      }
+    }
     return { map_id: mapId, cells, data_source: SAMPLE };
   }
 

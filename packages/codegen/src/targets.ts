@@ -557,7 +557,20 @@ const vocab: ToolTarget = {
 };
 
 /** 按顺序执行：错误码在接口代码之前（请求函数引用错误码）；契约先合并，Orval 再读合并结果。 */
-export const TARGETS: readonly Target[] = [params, errors, permissions, metrics, pages, models, tokens, vocab, openapi, orval, mswWorker, prisma];
+export const TARGETS: readonly Target[] = [
+  params,
+  errors,
+  permissions,
+  metrics,
+  pages,
+  models,
+  tokens,
+  vocab,
+  openapi,
+  orval,
+  mswWorker,
+  prisma,
+];
 
 /** 文件名（不含扩展名），一致性检查用。 */
 export function stem(path: string): string {

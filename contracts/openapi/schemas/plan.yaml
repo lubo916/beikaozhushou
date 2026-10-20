@@ -51,3 +51,77 @@ components:
         exam_id: {type: string}
         segments: {type: array, items: {$ref: "#/components/schemas/TodaySegmentGroup"}}
         data_source: {$ref: "#/components/schemas/DataSource"}
+    MixMode:
+      type: string
+      description: 配比模式：按性价比、复习优先、新学优先（叫法见术语表 mix_mode）
+      enum: [roi, review_first, new_first]
+    ScopeCounts:
+      type: object
+      description: 学习范围三态（跟随默认、我加入、我移出，术语表 scope_state）各有多少个知识点
+      required: [default, added, removed]
+      properties:
+        default: {type: integer, minimum: 0}
+        added: {type: integer, minimum: 0}
+        removed: {type: integer, minimum: 0}
+    Plan:
+      type: object
+      description: 学习计划（带版本）：轮次、配比模式、每日可用时间与学习范围；改目标、范围、轮次只以提议出现
+      required: [id, exam_id, version, round_index, round_count, round_name, mix_mode, daily_minutes, scope_counts, target_date, updated_at, data_source]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        exam_id: {type: string}
+        version: {type: integer, minimum: 1}
+        round_index:
+          type: integer
+          minimum: 1
+          description: 第几轮（界面写“第 N 轮 打基础”）
+        round_count: {type: integer, minimum: 1}
+        round_name:
+          type: string
+          description: 轮次名，只用打基础、攻重点、刷题冲刺、考前七天
+        mix_mode: {$ref: "#/components/schemas/MixMode"}
+        daily_minutes:
+          type: integer
+          minimum: 0
+          description: 每日可用学习时间（分钟），来自时间预算
+        scope_counts: {$ref: "#/components/schemas/ScopeCounts"}
+        target_date: {type: string, format: date}
+        updated_at: {$ref: "#/components/schemas/Timestamp"}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+    ProposalStatus:
+      type: string
+      description: 提议的四个状态：待确认、已确认、不改、已撤销（叫法见术语表 proposal_status）
+      enum: [pending, confirmed, declined, undone]
+    Proposal:
+      type: object
+      description: 提议（一等对象）：固定四行改什么、为什么、代价、不改会怎样；按钮只有“确认”和“不改”
+      required: [id, exam_id, status, source, change, reason, cost, if_declined, created_at]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        exam_id: {type: string}
+        status: {$ref: "#/components/schemas/ProposalStatus"}
+        source:
+          type: string
+          description: 提出方；AI 执行者用 contracts/ai/actors.yaml 的 id（如 planner），复盘与测评的代码待登记
+        change:
+          type: string
+          description: 改什么
+        reason:
+          type: string
+          description: 为什么
+        cost:
+          type: string
+          description: 代价
+        if_declined:
+          type: string
+          description: 不改会怎样
+        created_at: {$ref: "#/components/schemas/Timestamp"}
+        undo_until:
+          $ref: "#/components/schemas/Timestamp"
+    ProposalPage:
+      type: object
+      required: [items, next_cursor, data_source]
+      properties:
+        items: {type: array, items: {$ref: "#/components/schemas/Proposal"}}
+        next_cursor: {$ref: "#/components/schemas/NextCursor"}
+        data_source: {$ref: "#/components/schemas/DataSource"}

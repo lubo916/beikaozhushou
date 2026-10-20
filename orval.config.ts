@@ -2,22 +2,17 @@
 // 契约分文件写在 contracts/openapi/，由 tools/merge-openapi.mjs 合成 packages/contract/src/generated/openapi.json（F04）。
 // 由 pnpm contract:gen 运行（scripts/engineering/contract-gen.mjs 加生成物头并写清单），不直接调用 orval。
 import { defineConfig, type InputTransformerFn } from "orval";
+import { normalizeSchemas } from "./packages/contract/src/openapi-normalize.ts";
 
 const INPUT = "./packages/contract/src/generated/openapi.json";
 const OUT = "./packages/contract/src/generated/api";
 const METHODS = new Set(["get", "put", "post", "delete", "options", "head", "patch", "trace"]);
 
-/** 将 OpenAPI 3.1 的自由对象、无元素约束数组展开为 Orval 7 可生成的等价形式。 */
-function normalizeSchemas(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(normalizeSchemas);
-  if (value === null || typeof value !== "object") return value;
-  const normalized = Object.fromEntries(Object.entries(value).map(([key, item]) => [key, normalizeSchemas(item)]));
-  if (normalized["type"] === "array" && !("items" in normalized)) normalized["items"] = {};
-  if (normalized["type"] === "object" && !("properties" in normalized) && !("additionalProperties" in normalized)) {
-    normalized["additionalProperties"] = true;
-  }
-  return normalized;
-}
+// 生成的 MSW 假数据里 format: date 的写法：Orval 默认用 split("T")[0]，在 noUncheckedIndexedAccess 下推断成 string | undefined，
+// 不能赋给必填的日期字段；改成一定是字符串的 slice(0, 10)。
+// Orval 只把这个函数的源码写进 endpoints.msw.ts（那里自己引入 faker），配置里不执行它。
+declare const faker: { date: { past(): Date } };
+const DATE_MOCK = () => faker.date.past().toISOString().slice(0, 10);
 
 /** 不对端开放的接口（x-internal: true）不生成客户端代码。 */
 const dropInternal: InputTransformerFn = (input) => {
@@ -47,7 +42,7 @@ export default defineConfig({
       override: {
         mutator: { path: "./packages/contract/src/fetcher.ts", name: "customFetch" },
         fetch: { includeHttpResponseReturnType: false },
-        mock: { required: true, numberMin: 0, numberMax: 1000 },
+        mock: { required: true, numberMin: 0, numberMax: 1000, format: { date: DATE_MOCK } },
       },
     },
   },

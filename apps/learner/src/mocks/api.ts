@@ -1,5 +1,5 @@
 // 学员端假数据接口（api-rules 第 4、5 节）：一个 handle 接住 /api/v1 下的全部请求——先按 ?state= 统一处理强制状态，
-// 再看所属领域是否走真接口（VITE_REAL），最后交给自动注册的假数据路由；写操作按 Idempotency-Key 只算一次。
+// 再看所属领域是否走真接口（VITE_REAL），最后交给自动注册的假数据路由；写操作按 Idempotency-Key 只算一次（并发的也算）。
 // 纯逻辑，不依赖 MSW：浏览器里由 @exam-prep/contract/mock-browser 接到 Service Worker，测试直接调用。
 import { ApiError, isApiError } from "@exam-prep/contract/errors";
 import type { MockOutcome, MockRequest } from "@exam-prep/contract/mock-browser";
@@ -56,10 +56,15 @@ function errorOutcome(error: ApiError): MockOutcome {
   return { kind: "json", status: error.status, body: error.toBody(), headers: {} };
 }
 
+/** 空态的通用写法：分页列表（响应里有 items）给空列表；其他接口用路由的 empty 写法，没写就照常返回。 */
+function emptyPage(body: unknown): unknown {
+  const items = typeof body === "object" && body !== null ? (body as Record<string, unknown>)["items"] : undefined;
+  return Array.isArray(items) ? { ...(body as object), items: [], next_cursor: null } : body;
+}
+
 export function createMockApi({ db, control, routes }: MockApiOptions): MockApi {
   const operations = compile();
   const byId = new Map<OperationId, MockRoute>(routes.map((route) => [route.operationId, route]));
-  const replies = new Map<string, MockOutcome>();
 
   const find = (method: string, path: string) => {
     for (const op of operations) {
@@ -79,7 +84,8 @@ export function createMockApi({ db, control, routes }: MockApiOptions): MockApi 
     const variant = VARIANT_STATES.includes(forced) ? route.variants?.[forced as VariantState] : undefined;
     if (forced === "restricted" && variant === undefined) return errorOutcome(new ApiError("COMMON_FORBIDDEN", { forced_state: forced }));
     try {
-      const body: unknown = await (variant ?? route.resolve)(ctx);
+      const resolved: unknown = await (variant ?? route.resolve)(ctx);
+      const body = forced === "empty" && variant === undefined ? emptyPage(resolved) : resolved;
       const sample = typeof body === "object" && body !== null && (body as Record<string, unknown>)["data_source"] === "sample";
       const headers: Record<string, string> = sample ? { "x-data-source": "sample" } : {};
       if (body === undefined) return { kind: "empty", status: route.status ?? STATUS_NO_CONTENT, headers };
@@ -107,10 +113,6 @@ export function createMockApi({ db, control, routes }: MockApiOptions): MockApi 
     if (route === undefined || found.op.internal) {
       return errorOutcome(new ApiError("COMMON_NOT_FOUND", { operation_id: found.op.id, reason: "no_mock" }));
     }
-    const key = request.headers.get("idempotency-key");
-    const replayKey = key !== null && key !== "" && WRITE_METHODS.has(method) ? `${found.op.id}:${key}` : null;
-    const previous = replayKey === null ? undefined : replies.get(replayKey);
-    if (previous !== undefined) return previous;
     const now = control.now();
     const ctx: MockContext = {
       db,
@@ -123,9 +125,10 @@ export function createMockApi({ db, control, routes }: MockApiOptions): MockApi 
       body: request.body,
       headers: request.headers,
     };
-    const outcome = await run(route, ctx, forced);
-    if (replayKey !== null) replies.set(replayKey, outcome);
-    return outcome;
+    const key = request.headers.get("idempotency-key");
+    if (key === null || key === "" || !WRITE_METHODS.has(method)) return run(route, ctx, forced);
+    // 幂等：同一个键只执行一次，正在执行的也算；记录在内存仓库里，重置演示数据时一起清掉
+    return db.once(`${found.op.id}:${key}`, () => run(route, ctx, forced));
   }
 
   return { handle };

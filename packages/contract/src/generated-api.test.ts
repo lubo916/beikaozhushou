@@ -3,8 +3,24 @@ import { QueryClient } from "@tanstack/react-query";
 import { setupServer } from "msw/node";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getGetParamsQueryOptions } from "./generated/api/endpoints.ts";
-import { getGetParamsMockHandler, getGetQuestionResponseMock, getTrackEventMockHandler } from "./generated/api/endpoints.msw.ts";
-import { getParamsResponse, getQuestionResponse, trackEventBody } from "./generated/api/endpoints.zod.ts";
+import {
+  getGetCurrentPlanResponseMock,
+  getGetMeContextResponseMock,
+  getGetParamsMockHandler,
+  getGetQuestionResponseMock,
+  getGetTodayListResponseMock,
+  getListMistakesResponseMock,
+  getTrackEventMockHandler,
+} from "./generated/api/endpoints.msw.ts";
+import {
+  getCurrentPlanResponse,
+  getMeContextResponse,
+  getParamsResponse,
+  getQuestionResponse,
+  getTodayListResponse,
+  listMistakesResponse,
+  trackEventBody,
+} from "./generated/api/endpoints.zod.ts";
 
 describe("Orval 生成物与 Zod 4、MSW 的接线", () => {
   afterEach(() => {
@@ -55,5 +71,14 @@ describe("Orval 生成物与 Zod 4、MSW 的接线", () => {
     } finally {
       server.close();
     }
+  });
+
+  it("生成的 MSW 假数据里 format: date 的字段是 YYYY-MM-DD，能通过 Zod（orval.config.ts 覆盖了 Orval 的默认写法）", () => {
+    faker.seed(2);
+    expect(getMeContextResponse.safeParse(getGetMeContextResponseMock()).success).toBe(true);
+    expect(getTodayListResponse.safeParse(getGetTodayListResponseMock()).success).toBe(true);
+    expect(listMistakesResponse.safeParse(getListMistakesResponseMock()).success).toBe(true);
+    expect(getCurrentPlanResponse.safeParse(getGetCurrentPlanResponseMock()).success).toBe(true);
+    expect(getGetMeContextResponseMock().today).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 });

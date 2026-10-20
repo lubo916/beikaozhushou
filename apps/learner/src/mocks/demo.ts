@@ -93,6 +93,12 @@ export interface LearnerFixture {
   readonly mastery: readonly MasteryFixture[];
   readonly today_tasks: readonly TaskFixture[];
   readonly mistake_retry_task: { readonly id: string; readonly minutes_per_question: number };
+  /** 计划、提议、笔记、资料、通知的示例（结构见契约 Plan、Proposal、Note、Material、Notification）。 */
+  readonly plan: Readonly<Record<string, unknown>>;
+  readonly proposals: readonly unknown[];
+  readonly notes: readonly unknown[];
+  readonly materials: readonly unknown[];
+  readonly notifications: readonly unknown[];
 }
 
 export interface DemoExam {

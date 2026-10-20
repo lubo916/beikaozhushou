@@ -36,6 +36,10 @@ export interface MockRoute {
   readonly variants?: Partial<Record<VariantState, MockResolver>>;
 }
 
-export function defineRoute(operationId: OperationId, resolve: MockResolver, options: Omit<MockRoute, "operationId" | "resolve"> = {}): MockRoute {
+export function defineRoute(
+  operationId: OperationId,
+  resolve: MockResolver,
+  options: Omit<MockRoute, "operationId" | "resolve"> = {},
+): MockRoute {
   return { ...options, operationId, resolve };
 }

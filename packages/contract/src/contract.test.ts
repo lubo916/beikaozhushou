@@ -42,15 +42,34 @@ const EXAMS = [
   { profile: dsProfile, map: dsMap, content: dsQuestions, learner: dsLearner },
 ];
 
-const SOLUTION_KEYS = ["answer", "explanation", "option_notes", "common_wrong_option", "group_miss_rate", "scoring_points", "sample_answer"];
-const OPTIONS: MergeOptions = { owners: ["exam", "plan"], actions: ["exam.profile.read", "plan.today.read"], errors: ["COMMON_NOT_FOUND"] };
+const SEGMENTS = ["consolidate", "advance", "closing"];
+const SOLUTION_KEYS = [
+  "answer",
+  "explanation",
+  "option_notes",
+  "common_wrong_option",
+  "group_miss_rate",
+  "scoring_points",
+  "sample_answer",
+];
+const OPTIONS: MergeOptions = {
+  owners: ["exam", "plan"],
+  actions: ["exam.profile.read", "plan.today.read"],
+  errors: ["COMMON_NOT_FOUND"],
+};
 const COMMON: ContractFile = {
   path: "contracts/openapi/_common.yaml",
-  doc: { openapi: "3.1.0", info: { title: "t", version: "1" }, servers: [{ url: "/api/v1" }], components: { schemas: { Id: { type: "string" } } } },
+  doc: {
+    openapi: "3.1.0",
+    info: { title: "t", version: "1" },
+    servers: [{ url: "/api/v1" }],
+    components: { schemas: { Id: { type: "string" } } },
+  },
 };
 
 function op(operationId: string, extra: Record<string, unknown> = {}): Record<string, unknown> {
-  return { operationId, "x-owner": "exam", "x-action": "exam.profile.read", responses: { "200": { description: "ok" } }, ...extra };
+  const base = { operationId, "x-owner": "exam", "x-action": "exam.profile.read", responses: { "200": { description: "ok" } } };
+  return { ...base, ...extra };
 }
 
 function problemsOf(files: ContractFile[]): string[] {
@@ -65,14 +84,12 @@ function problemsOf(files: ContractFile[]): string[] {
 
 describe("接口契约合并（tools/merge-openapi.mjs，api-rules 第 2 节）", () => {
   it("分文件合成一份：路径、形状与接口一览都在", () => {
-    const result = mergeOpenapi(
-      COMMON,
-      [
-        { path: "contracts/openapi/schemas/exam.yaml", doc: { components: { schemas: { Exam: { type: "object" } } } } },
-        { path: "contracts/openapi/paths/exam.yaml", doc: { paths: { "/exams/{examId}": { get: op("getExam", { "x-errors": ["COMMON_NOT_FOUND"] }) } } } },
-      ],
-      OPTIONS,
-    );
+    const errors = { "x-errors": ["COMMON_NOT_FOUND"] };
+    const files: ContractFile[] = [
+      { path: "contracts/openapi/schemas/exam.yaml", doc: { components: { schemas: { Exam: { type: "object" } } } } },
+      { path: "contracts/openapi/paths/exam.yaml", doc: { paths: { "/exams/{examId}": { get: op("getExam", errors) } } } },
+    ];
+    const result = mergeOpenapi(COMMON, files, OPTIONS);
     expect(result.basePath).toBe("/api/v1");
     expect(Object.keys(result.spec["paths"] as object)).toEqual(["/exams/{examId}"]);
     expect(result.operations.map((o) => [o.operationId, o.method, o.owner])).toEqual([["getExam", "GET", "exam"]]);
@@ -92,27 +109,24 @@ describe("接口契约合并（tools/merge-openapi.mjs，api-rules 第 2 节）"
   });
 
   it("领域、权限动作、错误码、引用、x-invalidates 与页面私有形状的写法都受检查", () => {
-    const problems = problemsOf([
-      {
-        path: "contracts/openapi/pages/S06.yaml",
-        doc: {
-          components: { schemas: { TodayView: { $ref: "#/components/schemas/Missing" } } },
-          paths: {
-            "/x": { get: op("getX", { "x-owner": "nope", "x-action": "nope.read", "x-errors": ["NOPE"], "x-invalidates": ["getY"] }) },
-          },
-        },
-      },
-    ]);
+    const extra = { "x-owner": "nope", "x-action": "nope.read", "x-errors": ["NOPE"], "x-invalidates": ["getY"] };
+    const doc = {
+      components: { schemas: { TodayView: { $ref: "#/components/schemas/Missing" } } },
+      paths: { "/x": { get: op("getX", extra) } },
+    };
+    const problems = problemsOf([{ path: "contracts/openapi/pages/S06.yaml", doc }]);
     for (const hint of ["x-owner", "x-action", "x-errors", "x-invalidates", "找不到对应的形状", "要以页 ID S06 开头"]) {
-      expect(problems.some((p) => p.includes(hint)), `应提示 ${hint}：${problems.join("；")}`).toBe(true);
+      const found = problems.some((p) => p.includes(hint));
+      expect(found, `应提示 ${hint}：${problems.join("；")}`).toBe(true);
     }
   });
 
   it("仓库里的契约已合并：前缀与请求函数一致，x-invalidates 指向已有接口", () => {
     expect(API_PREFIX).toBe(API_BASE_PATH);
     expect(OPERATIONS.getMeContext).toMatchObject({ method: "GET", path: "/me/context", owner: "account" });
+    const known = Object.keys(OPERATIONS);
     for (const info of Object.values(OPERATIONS)) {
-      for (const target of info.invalidates) expect(Object.keys(OPERATIONS)).toContain(target);
+      for (const target of info.invalidates) expect(known).toContain(target);
     }
   });
 });
@@ -131,20 +145,31 @@ describe("四个演示考试的数据（fixtures/exams/）", () => {
       for (const question of content.questions) {
         expectValid("getQuestionResponse", { ...question, exam_id: exam }, `${exam} 的题目 ${question.id}`);
         const record: Record<string, unknown> = question;
-        const solution = Object.fromEntries(SOLUTION_KEYS.filter((k) => record[k] !== undefined).map((k) => [k, record[k]]));
+        const present = SOLUTION_KEYS.filter((k) => record[k] !== undefined);
+        const solution = Object.fromEntries(present.map((k) => [k, record[k]]));
         expectValid("getQuestionSolutionResponse", { question_id: question.id, ...solution }, `${exam} 的解析 ${question.id}`);
       }
       for (const card of content.cards) expectValid("getCardResponse", card, `${exam} 的卡片 ${card.id}`);
     }
   });
 
-  it("示例学员状态（掌握方格、今日任务）通过生成的 Zod 校验", () => {
+  it("示例学员状态（掌握方格、今日任务、计划、提议、笔记、资料、通知）通过生成的 Zod 校验", () => {
     for (const { profile, map, learner } of EXAMS) {
       const exam = profile.exam_id;
-      expectValid("getMasteryGridResponse", { map_id: map.map_id, cells: learner.mastery, data_source: "sample" }, `${exam} 的掌握方格`);
+      const grid = { map_id: map.map_id, cells: learner.mastery, data_source: "sample" };
+      expectValid("getMasteryGridResponse", grid, `${exam} 的掌握方格`);
       const tasks = learner.today_tasks.map((t) => ({ ...t, status: "todo", question_count: t.question_ids.length, answered_count: 0 }));
-      const segments = ["consolidate", "advance", "closing"].map((segment) => ({ segment, tasks: tasks.filter((t) => t.segment === segment) }));
-      expectValid("getTodayListResponse", { day: "2026-10-21", exam_id: exam, segments, data_source: "sample" }, `${exam} 的今日任务`);
+      const bySegment = (segment: string) => ({ segment, tasks: tasks.filter((t) => t.segment === segment) });
+      const today = { day: "2026-10-21", exam_id: exam, segments: SEGMENTS.map(bySegment), data_source: "sample" };
+      expectValid("getTodayListResponse", today, `${exam} 的今日任务`);
+      expectValid("getCurrentPlanResponse", { ...learner.plan, data_source: "sample" }, `${exam} 的学习计划`);
+      const pages: [string, unknown[]][] = [
+        ["listProposalsResponse", learner.proposals],
+        ["listNotesResponse", learner.notes],
+        ["listMaterialsResponse", learner.materials],
+        ["listNotificationsResponse", learner.notifications],
+      ];
+      for (const [name, items] of pages) expectValid(name, { items, next_cursor: null, data_source: "sample" }, `${exam} 的 ${name}`);
     }
   });
 
@@ -153,15 +178,21 @@ describe("四个演示考试的数据（fixtures/exams/）", () => {
       const exam = profile.exam_id;
       const points = new Map(map.chapters.flatMap((c) => c.sample_points).map((p) => [p.id, p.name]));
       const questions = new Map(content.questions.map((q) => [q.id, q]));
-      for (const q of content.questions) for (const id of q.knowledge_point_ids) expect(points.has(id), `${exam} 题目 ${q.id} 的知识点`).toBe(true);
-      for (const c of content.cards) expect(points.has(c.knowledge_point_id), `${exam} 卡片 ${c.id} 的知识点`).toBe(true);
-      for (const m of learner.mastery) expect(points.has(m.knowledge_point_id), `${exam} 掌握方格的知识点`).toBe(true);
+      const refs = [
+        ...content.questions.flatMap((q) => q.knowledge_point_ids),
+        ...content.cards.map((c) => c.knowledge_point_id),
+        ...learner.mastery.map((m) => m.knowledge_point_id),
+        ...learner.notes.flatMap((n) => n.knowledge_point_ids),
+        ...learner.materials.flatMap((m) => m.knowledge_point_ids),
+      ];
+      for (const id of refs) expect(points.has(id), `${exam} 引用的知识点 ${id}`).toBe(true);
       for (const task of learner.today_tasks) {
         for (const id of task.knowledge_point_ids) expect(points.has(id), `${exam} 任务 ${task.title} 的知识点`).toBe(true);
         for (const id of task.question_ids) {
           const question = questions.get(id);
           expect(question, `${exam} 任务 ${task.title} 的题目 ${id}`).toBeDefined();
-          expect(task.knowledge_point_ids.some((kp) => question?.knowledge_point_ids.includes(kp)), `${exam} 题组与题目的知识点`).toBe(true);
+          const shared = task.knowledge_point_ids.some((kp) => question?.knowledge_point_ids.includes(kp));
+          expect(shared, `${exam} 题组与题目的知识点`).toBe(true);
           const name = points.get(question?.knowledge_point_ids[0] ?? "") ?? "";
           expect(task.title.includes(name), `${exam} 题组名“${task.title}”要写题目的知识点“${name}”`).toBe(true);
         }

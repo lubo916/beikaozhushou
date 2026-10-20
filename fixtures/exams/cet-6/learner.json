@@ -159,5 +159,115 @@
   "mistake_retry_task": {
     "id": "019a0306-0000-7000-8000-000000000009",
     "minutes_per_question": 3
-  }
+  },
+  "plan": {
+    "id": "019a0308-0000-7000-8000-000000000001",
+    "exam_id": "cet-6",
+    "version": 1,
+    "round_index": 1,
+    "round_count": 4,
+    "round_name": "打基础",
+    "mix_mode": "roi",
+    "daily_minutes": 60,
+    "scope_counts": {
+      "default": 11,
+      "added": 0,
+      "removed": 1
+    },
+    "target_date": "2026-12-12",
+    "updated_at": "2026-10-20T00:00:00Z"
+  },
+  "proposals": [
+    {
+      "id": "019a0309-0000-7000-8000-000000000001",
+      "exam_id": "cet-6",
+      "status": "pending",
+      "source": "planner",
+      "change": "把“翻译：长句拆分”移出学习范围",
+      "reason": "这个知识点考频低、离目标档还远，先保住性价比更高的部分",
+      "cost": "预测分区间的最可能值会略低一点",
+      "if_declined": "今日清单会继续给它排新学，占用复习时间",
+      "created_at": "2026-10-20T22:00:00Z"
+    }
+  ],
+  "notes": [
+    {
+      "id": "019a030a-0000-7000-8000-000000000001",
+      "exam_id": "cet-6",
+      "note_type": "key_points",
+      "title": "形近词辨析：mitigate 与 militate：要点",
+      "body": "mitigate　v. 减轻，缓和。常见搭配：mitigate the impact / risk / effects。易混：militate against（不利于）。",
+      "knowledge_point_ids": [
+        "019a0303-0000-7000-8000-000000000002"
+      ],
+      "ai_generated": false,
+      "created_at": "2026-10-18T12:00:00Z",
+      "updated_at": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "019a030a-0000-7000-8000-000000000002",
+      "exam_id": "cet-6",
+      "note_type": "pitfall",
+      "title": "形近词辨析：mitigate 与 militate：易错",
+      "body": "militate 常与 against 连用，意为“妨碍、不利于”，后面不能直接跟 the impact 作宾语。",
+      "knowledge_point_ids": [
+        "019a0303-0000-7000-8000-000000000002"
+      ],
+      "ai_generated": true,
+      "created_at": "2026-10-19T12:00:00Z",
+      "updated_at": "2026-10-19T12:00:00Z"
+    }
+  ],
+  "materials": [
+    {
+      "id": "019a030b-0000-7000-8000-000000000001",
+      "exam_id": "cet-6",
+      "title": "六级教材（纸书，按页码映射）",
+      "access": "mapped_only",
+      "knowledge_point_ids": [
+        "019a0303-0000-7000-8000-000000000001",
+        "019a0303-0000-7000-8000-000000000002",
+        "019a0303-0000-7000-8000-000000000003",
+        "019a0303-0000-7000-8000-000000000004"
+      ],
+      "created_at": "2026-10-15T12:00:00Z"
+    },
+    {
+      "id": "019a030b-0000-7000-8000-000000000002",
+      "exam_id": "cet-6",
+      "title": "六级讲义（电子文件，可全文阅读）",
+      "access": "parsable",
+      "knowledge_point_ids": [
+        "019a0303-0000-7000-8000-000000000002"
+      ],
+      "created_at": "2026-10-16T12:00:00Z"
+    },
+    {
+      "id": "019a030b-0000-7000-8000-000000000003",
+      "exam_id": "cet-6",
+      "title": "六级考试公告（外链）",
+      "access": "link_only",
+      "url": "https://example.org/exam-notice",
+      "knowledge_point_ids": [],
+      "created_at": "2026-10-17T12:00:00Z"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "019a030c-0000-7000-8000-000000000001",
+      "title": "有一条提议等你确认",
+      "body": "计划引擎给出了一条调整学习范围的提议，确认后才生效。",
+      "read": false,
+      "link": "/plan",
+      "created_at": "2026-10-20T22:00:00Z"
+    },
+    {
+      "id": "019a030c-0000-7000-8000-000000000002",
+      "title": "目标日提醒",
+      "body": "大学英语六级的目标日是 2026-12-12，可在考试日历里查看。",
+      "read": true,
+      "link": "/today",
+      "created_at": "2026-10-15T09:00:00Z"
+    }
+  ]
 }

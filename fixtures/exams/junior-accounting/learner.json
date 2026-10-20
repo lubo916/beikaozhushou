@@ -159,5 +159,113 @@
   "mistake_retry_task": {
     "id": "019a0106-0000-7000-8000-000000000009",
     "minutes_per_question": 3
-  }
+  },
+  "plan": {
+    "id": "019a0108-0000-7000-8000-000000000001",
+    "exam_id": "junior-accounting",
+    "version": 1,
+    "round_index": 1,
+    "round_count": 4,
+    "round_name": "打基础",
+    "mix_mode": "roi",
+    "daily_minutes": 60,
+    "scope_counts": {
+      "default": 11,
+      "added": 0,
+      "removed": 1
+    },
+    "target_date": "2027-05-16",
+    "updated_at": "2026-10-20T00:00:00Z"
+  },
+  "proposals": [
+    {
+      "id": "019a0109-0000-7000-8000-000000000001",
+      "exam_id": "junior-accounting",
+      "status": "pending",
+      "source": "planner",
+      "change": "把“管理会计基础”移出学习范围",
+      "reason": "这个知识点考频低、离目标档还远，先保住性价比更高的部分",
+      "cost": "预测分区间的最可能值会略低一点",
+      "if_declined": "今日清单会继续给它排新学，占用复习时间",
+      "created_at": "2026-10-20T22:00:00Z"
+    }
+  ],
+  "notes": [
+    {
+      "id": "019a010a-0000-7000-8000-000000000001",
+      "exam_id": "junior-accounting",
+      "note_type": "key_points",
+      "title": "交易性金融资产的后续计量：要点",
+      "body": "计入投资收益（借方），不进成本。对照：债权投资、其他权益工具投资的交易费用计入成本。",
+      "knowledge_point_ids": [
+        "019a0103-0000-7000-8000-000000000005"
+      ],
+      "ai_generated": false,
+      "created_at": "2026-10-18T12:00:00Z",
+      "updated_at": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "019a010a-0000-7000-8000-000000000002",
+      "exam_id": "junior-accounting",
+      "note_type": "pitfall",
+      "title": "交易性金融资产的后续计量：易错",
+      "body": "你把交易费用也算进了成本。那是“债权投资、其他权益工具投资”的做法；交易性金融资产的交易费用不进成本。",
+      "knowledge_point_ids": [
+        "019a0103-0000-7000-8000-000000000005"
+      ],
+      "ai_generated": true,
+      "created_at": "2026-10-19T12:00:00Z",
+      "updated_at": "2026-10-19T12:00:00Z"
+    }
+  ],
+  "materials": [
+    {
+      "id": "019a010b-0000-7000-8000-000000000001",
+      "exam_id": "junior-accounting",
+      "title": "初级会计教材（纸书，按页码映射）",
+      "access": "mapped_only",
+      "knowledge_point_ids": [
+        "019a0103-0000-7000-8000-000000000001",
+        "019a0103-0000-7000-8000-000000000002"
+      ],
+      "created_at": "2026-10-15T12:00:00Z"
+    },
+    {
+      "id": "019a010b-0000-7000-8000-000000000002",
+      "exam_id": "junior-accounting",
+      "title": "初级会计讲义（电子文件，可全文阅读）",
+      "access": "parsable",
+      "knowledge_point_ids": [
+        "019a0103-0000-7000-8000-000000000005"
+      ],
+      "created_at": "2026-10-16T12:00:00Z"
+    },
+    {
+      "id": "019a010b-0000-7000-8000-000000000003",
+      "exam_id": "junior-accounting",
+      "title": "初级会计考试公告（外链）",
+      "access": "link_only",
+      "url": "https://example.org/exam-notice",
+      "knowledge_point_ids": [],
+      "created_at": "2026-10-17T12:00:00Z"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "019a010c-0000-7000-8000-000000000001",
+      "title": "有一条提议等你确认",
+      "body": "计划引擎给出了一条调整学习范围的提议，确认后才生效。",
+      "read": false,
+      "link": "/plan",
+      "created_at": "2026-10-20T22:00:00Z"
+    },
+    {
+      "id": "019a010c-0000-7000-8000-000000000002",
+      "title": "目标日提醒",
+      "body": "初级会计职称的目标日是 2027-05-16，可在考试日历里查看。",
+      "read": true,
+      "link": "/today",
+      "created_at": "2026-10-15T09:00:00Z"
+    }
+  ]
 }

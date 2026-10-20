@@ -47,3 +47,33 @@ paths:
             application/json:
               schema: {$ref: "#/components/schemas/Card"}
         "404": {$ref: "#/components/responses/Error"}
+  /notes:
+    get:
+      operationId: listNotes
+      x-owner: content
+      x-action: content.note.read
+      summary: 笔记列表（当前目标考试，游标分页）
+      parameters:
+        - {$ref: "#/components/parameters/Cursor"}
+        - {$ref: "#/components/parameters/Limit"}
+      responses:
+        "200":
+          description: 一页笔记
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/NotePage"}
+  /materials:
+    get:
+      operationId: listMaterials
+      x-owner: content
+      x-action: content.material.read
+      summary: 资料列表（当前目标考试，游标分页）
+      parameters:
+        - {$ref: "#/components/parameters/Cursor"}
+        - {$ref: "#/components/parameters/Limit"}
+      responses:
+        "200":
+          description: 一页资料
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MaterialPage"}

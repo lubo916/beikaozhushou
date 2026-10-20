@@ -9,7 +9,7 @@ import { Button, Card, Segmented } from "@exam-prep/ui";
 import { shiftDays } from "../clock.ts";
 import type { DevControl } from "../control.ts";
 import type { MockDb } from "../db.ts";
-import type { DemoFixtures } from "../demo.ts";
+import type { DemoExam, DemoFixtures } from "../demo.ts";
 import copy from "./copy.zh-CN.json";
 
 const MINUTE_MS = 60_000;
@@ -17,6 +17,10 @@ const HOUR_MS = 60 * MINUTE_MS;
 
 function fill(template: string, values: Readonly<Record<string, string | number>>): string {
   return template.replace(/\{\{(\w+)\}\}/g, (whole: string, key: string) => String(values[key] ?? whole));
+}
+
+function examLabel(exam: DemoExam): string {
+  return `${exam.key} ${exam.profile.short_name ?? exam.profile.name}`;
 }
 
 /** 改 ?state= 后整页重新打开：页面与接口层读到的是同一个状态。 */
@@ -30,15 +34,15 @@ function applyState(code: string): void {
 function ContextLine() {
   const query = useGetMeContext();
   if (query.isPending) return <p>{copy.contextLoading}</p>;
-  if (query.isError) return <p>{fill(copy.contextError, { code: isApiError(query.error) ? query.error.code : String(query.error) })}</p>;
+  if (query.isError) {
+    const code = isApiError(query.error) ? query.error.code : String(query.error);
+    return <p>{fill(copy.contextError, { code })}</p>;
+  }
   const data = query.data;
   const goal = data?.goal;
   if (data === undefined || goal === undefined) return <p>{copy.contextEmpty}</p>;
-  return (
-    <p>
-      {fill(copy.context, { user: data.user.display_name, exam: goal.exam_name, today: data.today, days: goal.days_to_target })}
-    </p>
-  );
+  const values = { user: data.user.display_name, exam: goal.exam_name, today: data.today, days: goal.days_to_target };
+  return <p>{fill(copy.context, values)}</p>;
 }
 
 export interface DevToolbarProps {
@@ -52,12 +56,13 @@ export function DevToolbar({ control, db, fixtures, failure }: DevToolbarProps) 
   const [open, setOpen] = useState(false);
   useSyncExternalStore(control.subscribe, control.version);
   const queryClient = useQueryClient();
-  const refresh = (): void => {
-    void queryClient.invalidateQueries();
-  };
   const settings = db.daySettings();
   const now = control.now();
   const day = db.learningDay(now);
+  const run = (act: () => void): void => {
+    act();
+    void queryClient.invalidateQueries();
+  };
 
   if (!open) {
     return (
@@ -68,12 +73,9 @@ export function DevToolbar({ control, db, fixtures, failure }: DevToolbarProps) 
       </div>
     );
   }
-  const examOptions = fixtures.exams.map((exam) => ({ value: exam.key, label: `${exam.key} ${exam.profile.short_name ?? exam.profile.name}` }));
+  const examOptions = fixtures.exams.map((exam) => ({ value: exam.key, label: examLabel(exam) }));
+  const chooseExam = (key: string) => run(() => control.setExam(key));
   const real = [...control.realDomains];
-  const run = (act: () => void): void => {
-    act();
-    refresh();
-  };
   const actions = [
     { label: copy.prevDay, act: () => shiftDays(control, settings, -1) },
     { label: copy.nextDay, act: () => shiftDays(control, settings, 1) },
@@ -93,16 +95,7 @@ export function DevToolbar({ control, db, fixtures, failure }: DevToolbarProps) 
         }
       >
         {failure !== null && <p>{fill(copy.mockOff, { reason: failure })}</p>}
-        <Segmented
-          label={copy.exam}
-          size="sm"
-          options={examOptions}
-          value={control.examKey()}
-          onChange={(key) => {
-            control.setExam(key);
-            refresh();
-          }}
-        />
+        <Segmented label={copy.exam} size="sm" options={examOptions} value={control.examKey()} onChange={chooseExam} />
         <label className="flex flex-wrap gap-2">
           {copy.state}
           <select value={control.forcedState()} onChange={(event) => applyState(event.target.value)}>

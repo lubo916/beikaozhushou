@@ -61,3 +61,18 @@ actions:
   - id: plan.today.read
     roles: [guest, learner]
     data_scope: self
+  - id: plan.plan.read
+    roles: [guest, learner]
+    data_scope: self
+  - id: plan.proposal.read
+    roles: [guest, learner]
+    data_scope: self
+  - id: content.note.read
+    roles: [guest, learner]
+    data_scope: self
+  - id: content.material.read
+    roles: [guest, learner]
+    data_scope: self
+  - id: engagement.notification.read
+    roles: [guest, learner]
+    data_scope: self
