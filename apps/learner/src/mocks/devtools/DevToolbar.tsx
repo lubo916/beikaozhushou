@@ -66,7 +66,7 @@ export function DevToolbar({ control, db, fixtures, failure }: DevToolbarProps) 
 
   if (!open) {
     return (
-      <div className="fixed bottom-0 left-0 z-50 p-2">
+      <div className="fixed bottom-[0] left-[0] z-50 p-2">
         <Button size="sm" onClick={() => setOpen(true)}>
           {copy.toggle}
         </Button>
@@ -85,7 +85,7 @@ export function DevToolbar({ control, db, fixtures, failure }: DevToolbarProps) 
     { label: copy.resetData, act: () => db.reset() },
   ];
   return (
-    <div className="fixed bottom-0 left-0 z-50 p-2">
+    <div className="fixed bottom-[0] left-[0] z-50 p-2">
       <Card
         title={copy.title}
         actions={

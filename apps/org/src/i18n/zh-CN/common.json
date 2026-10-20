@@ -1,0 +1,100 @@
+{
+  "app": {
+    "product": "备考助手",
+    "end": "机构端"
+  },
+  "shell": {
+    "skip": "跳到正文",
+    "nav": { "label": "主导航" },
+    "drawer": { "title": "全部页面" },
+    "top": {
+      "openNav": "打开分组导航",
+      "crumb": "{{end}} · {{group}}",
+      "notice": "通知",
+      "noticeSoon": "通知中心即将上线。",
+      "logout": "退出登录",
+      "logoutSoon": "退出登录要等账号接入后才能用，即将上线。"
+    },
+    "switch": {
+      "label": "机构与校区",
+      "hint": "切换",
+      "soon": "多校区切换与汇总即将上线：上级看汇总，下级只看本级。"
+    },
+    "user": {
+      "badge": "我",
+      "name": "当前账号",
+      "note": "登录接入后显示姓名与角色"
+    }
+  },
+  "group": {
+    "overview": "总览",
+    "enroll": "招生",
+    "academic": "教务",
+    "teaching": "教学",
+    "service": "服务",
+    "research": "教研",
+    "data": "数据",
+    "settings": "设置"
+  },
+  "groupRail": {
+    "overview": "总览",
+    "enroll": "招生",
+    "academic": "教务",
+    "teaching": "教学",
+    "service": "服务",
+    "research": "教研",
+    "data": "数据",
+    "settings": "设置"
+  },
+  "groupBadge": {
+    "overview": "总",
+    "enroll": "招",
+    "academic": "务",
+    "teaching": "教",
+    "service": "服",
+    "research": "研",
+    "data": "数",
+    "settings": "设"
+  },
+  "page": {
+    "O01": "机构工作台",
+    "O02": "招生与线索",
+    "O03": "班级与学员",
+    "O04": "学员 {{degrees}}°",
+    "O05": "排课、考勤与直播",
+    "O06": "教学计划与作业",
+    "O07": "班级考试与讲评",
+    "O08": "督学预警",
+    "O09": "批改工作台",
+    "O10": "答疑与机构助教",
+    "O11": "内容、地图与题库",
+    "O12": "结业、认证与续报",
+    "O13": "数据中心",
+    "O14": "品牌与多端",
+    "O15": "组织、权限与开放接口",
+    "O16": "订阅与用量"
+  },
+  "stub": {
+    "badge": "开发中",
+    "eyebrow": "{{group}} · {{id}}",
+    "description": "页面正在建设中：外壳和路由已经就位，正式内容由本页的页面任务来做（机构端先做简版）。",
+    "features": {
+      "title": "原型里的功能点",
+      "line": "P{{level}} {{label}}：{{amount}}",
+      "p0": "必做",
+      "p1": "增强",
+      "p2": "远期（先不做）",
+      "unit": "项",
+      "note": "数量来自原型；逐项说明用下面的 spec 命令查看。"
+    },
+    "proto": {
+      "title": "对照原型",
+      "body": "在本地仓库里运行下面的命令，看原型截图（手机、平板、桌面三档）与页面说明："
+    }
+  },
+  "notFound": {
+    "title": "没有这个页面",
+    "body": "地址可能写错了，或者这个页面换了位置。",
+    "action": "回到机构工作台"
+  }
+}

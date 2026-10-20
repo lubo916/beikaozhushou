@@ -1,24 +1,6 @@
-import { useTranslation } from "react-i18next";
-import { Route, Routes } from "react-router";
-import { devRoutes } from "./dev/routes.tsx";
+import { AppRoutes } from "./router/AppRoutes.tsx";
 
-/** 学员端骨架：占位页显示产品名“备考助手”；外壳、导航与页面状态由 PLAT-01 加入（页面清单见 generated/pages.ts，由 pnpm gen 生成）。 */
+/** 学员端：外壳、导航与 35 页路由（F05）。路径在 routes.ts，页面登记在 router/pages.ts，页面在 pages/<页ID>/。 */
 export function App() {
-  return (
-    <Routes>
-      {devRoutes}
-      <Route path="*" element={<Home />} />
-    </Routes>
-  );
-}
-
-function Home() {
-  const { t } = useTranslation();
-  return (
-    <main className="min-h-dvh bg-bg-canvas font-sans text-body text-ink-primary">
-      <p>{t("app.product")}</p>
-      <h1 className="text-title font-bold">{t("app.title")}</h1>
-      <p>{t("app.placeholder")}</p>
-    </main>
-  );
+  return <AppRoutes />;
 }

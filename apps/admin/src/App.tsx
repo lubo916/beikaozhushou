@@ -1,11 +1,11 @@
-import { useTranslation } from "react-i18next";
+import { AppRoutes } from "./router/AppRoutes.tsx";
+import { BrowserRouter } from "./router/history.tsx";
 
-/** 占位应用：本端在后续分期开放，0.1b 只显示“尚未开放”。 */
+/** 外壳与全部页面的路由空壳（F05）。路径在 routes.ts，页面登记在 router/pages.ts，页面在 pages/<页ID>/。 */
 export function App() {
-  const { t } = useTranslation();
   return (
-    <main className="min-h-dvh bg-bg-canvas font-sans text-body text-ink-secondary">
-      <p>{t("app.notOpen")}</p>
-    </main>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }
