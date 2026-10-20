@@ -20,7 +20,7 @@
     "分数按写出来的值核对，允许 1e-9 误差；折算分、与目标线的差四舍五入保留 1 位小数；分钟和百分比四舍五入到整数（.5 进位）；名字以 _pct 结尾的是百分比的整数部分。",
     "建议代码（待整合任务写进 docs/product/glossary.yaml）：规格 full 全真套卷、half 半卷、stage 阶段测评、custom 定制卷；会话状态 in_progress 作答中、awaiting_sync 等补交、submitted 已交卷、abandoned 中途放弃；把握度没选写 none；知识点诊断按钮 tackle 攻坚、retest 补测；提议来源 assessment 测评；模式 paper 纸笔。",
     "术语表现有代码：失分归因 loss_attribution（unfinished、expression_loss、not_learned、wrong_guess、careless、forgot）；把握度 sure、vague、guess；错因 error_cause；可信度 reviewed、own、generated_confirmed、generated_instant；性价比阶梯 roi_tier（s–d）；提议状态 proposal_status。题型和部分用考试画像 question_types 的代码。",
-    "题目、知识点用 q1、k1 这样的简写，实际是 UUID。custom_pick 的 kps.group 直接给出知识点在哪一组：weak＝薄弱名单（R01 R20）、open_mistake＝有没毕业的错题（R03）、learned＝其余有证据的；gap＝还差几档；questions 没写 last_done 表示没做过，没写 credibility 的是 reviewed。",
+    "题目、知识点用 q1、k1 这样的简写，实际是 UUID。custom_pick 的 kps.group 直接给出知识点在哪一组：weak＝薄弱名单（R01 R20）、open_mistake＝有没毕业的错题（R03）、learned＝其余有证据的；gap＝还差几档；questions 没写 last_done 表示没做过，没写 credibility 的是 reviewed。spec 为 stage 时按 R4：只出 chapters 里的知识点，kps 写 chapter 和 has_evidence，不看 group。",
     "attribute 的 start_snapshot 是开考那一刻的档位快照（R26）；questions 没写 answered 的都是已答，score 是得分，expression_loss 是批改给出的表达扣分；by_category、by_question 的单位是分。",
     "params 为空：本卡没有直接用到 contracts/params.yaml 里已有的参数；params_proposed 是建议新增、待整合任务登记的参数（规则卡参数表“待整合登记”各行），例子都按这些默认值算。",
     "带 decision 的例子对应你已拍板的问题（decided）；带 pending 的例子按 temp_decisions 的临时默认写，expect_if_B 是改选 B 时要变的字段。",
@@ -1917,6 +1917,74 @@
         "status": "abandoned",
         "answered": 0,
         "formal_score": false
+      }
+    },
+    {
+      "id": "E44",
+      "kind": "边界",
+      "title": "自组阶段测评",
+      "rule": "R4",
+      "fn": "custom_pick",
+      "input": {
+        "spec": "stage",
+        "chapters": ["资产"],
+        "now": "2026-10-21T20:00:00+08:00",
+        "need": {
+          "single_choice": 3
+        },
+        "kps": [
+          {
+            "id": "k1",
+            "chapter": "资产",
+            "has_evidence": false,
+            "importance": 4
+          },
+          {
+            "id": "k2",
+            "chapter": "资产",
+            "has_evidence": true,
+            "importance": 3
+          },
+          {
+            "id": "k3",
+            "chapter": "资产",
+            "has_evidence": true,
+            "importance": 2
+          },
+          {
+            "id": "k9",
+            "chapter": "负债",
+            "has_evidence": true,
+            "group": "weak",
+            "importance": 4
+          }
+        ],
+        "questions": [
+          {
+            "id": "q1",
+            "type": "single_choice",
+            "kps": ["k1"]
+          },
+          {
+            "id": "q2",
+            "type": "single_choice",
+            "kps": ["k2"]
+          },
+          {
+            "id": "q3",
+            "type": "single_choice",
+            "kps": ["k3"]
+          },
+          {
+            "id": "q9",
+            "type": "single_choice",
+            "kps": ["k9"]
+          }
+        ]
+      },
+      "expect": {
+        "picked": ["q1", "q2", "q3"],
+        "shortage": 0
       }
     }
   ]
