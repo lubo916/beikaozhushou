@@ -776,7 +776,7 @@
       "id": "E16",
       "title": "下次到期落在目标日之后：不提前",
       "kind": "正常",
-      "rule": "R4",
+      "rule": "R4、R5",
       "fn": "next_due",
       "input": {
         "rating": "good",
