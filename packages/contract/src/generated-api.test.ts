@@ -3,8 +3,24 @@ import { QueryClient } from "@tanstack/react-query";
 import { setupServer } from "msw/node";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getGetParamsQueryOptions } from "./generated/api/endpoints.ts";
-import { getGetParamsMockHandler, getGetQuestionResponseMock, getTrackEventMockHandler } from "./generated/api/endpoints.msw.ts";
-import { getParamsResponse, getQuestionResponse, trackEventBody } from "./generated/api/endpoints.zod.ts";
+import {
+  getGetCurrentPlanResponseMock,
+  getGetMeContextResponseMock,
+  getGetParamsMockHandler,
+  getGetQuestionResponseMock,
+  getGetTodayListResponseMock,
+  getListMistakesResponseMock,
+  getTrackEventMockHandler,
+} from "./generated/api/endpoints.msw.ts";
+import {
+  getCurrentPlanResponse,
+  getMeContextResponse,
+  getParamsResponse,
+  getQuestionResponse,
+  getTodayListResponse,
+  listMistakesResponse,
+  trackEventBody,
+} from "./generated/api/endpoints.zod.ts";
 
 describe("Orval 生成物与 Zod 4、MSW 的接线", () => {
   afterEach(() => {
@@ -19,9 +35,9 @@ describe("Orval 生成物与 Zod 4、MSW 的接线", () => {
     expect(trackEventBody.safeParse({ properties: {}, occurred_at: event.occurred_at }).success).toBe(false);
   });
 
-  it("未限制元素类型的数组可解析非空 JSON 数组，生成的 MSW 题目也通过 Zod", () => {
-    const question = { options: [{ label: "A" }, "B", 1, null] };
-    expect(getQuestionResponse.parse(question)).toEqual(question);
+  it("参数取值里的自由数组原样通过，生成的 MSW 题目也通过 Zod", () => {
+    const values = { "plan.disconnect.tiers_days": [3, 14], mixed: [{ label: "A" }, "B", 1, null] };
+    expect(getParamsResponse.parse(values)).toEqual(values);
     faker.seed(1);
     expect(getQuestionResponse.safeParse(getGetQuestionResponseMock()).success).toBe(true);
   });
@@ -34,18 +50,18 @@ describe("Orval 生成物与 Zod 4、MSW 的接线", () => {
     if (typeof queryFn !== "function") throw new Error("没有生成 queryFn");
     const signal = new AbortController().signal;
     await queryFn({ client: new QueryClient(), queryKey: options.queryKey, signal, meta: undefined });
-    expect(fetchMock).toHaveBeenCalledWith("/api/params", expect.objectContaining({ method: "GET", signal }));
+    expect(fetchMock).toHaveBeenCalledWith("/api/v1/params", expect.objectContaining({ method: "GET", signal }));
   });
 
-  it("生成的 MSW handler 能响应 /api/params 与无响应体的 /api/events", async () => {
+  it("生成的 MSW handler 能响应 /api/v1/params 与无响应体的 /api/v1/events", async () => {
     const values = { "planner.daily_goal": 12 };
     const server = setupServer(getGetParamsMockHandler(values), getTrackEventMockHandler());
     server.listen({ onUnhandledRequest: "error" });
     try {
-      const params = await fetch("http://localhost/api/params");
+      const params = await fetch("http://localhost/api/v1/params");
       expect(params.status).toBe(200);
       expect(getParamsResponse.parse(await params.json())).toEqual(values);
-      const event = await fetch("http://localhost/api/events", {
+      const event = await fetch("http://localhost/api/v1/events", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ name: "page.view", properties: {}, occurred_at: "2026-01-01T00:00:00Z" }),
@@ -55,5 +71,14 @@ describe("Orval 生成物与 Zod 4、MSW 的接线", () => {
     } finally {
       server.close();
     }
+  });
+
+  it("生成的 MSW 假数据里 format: date 的字段是 YYYY-MM-DD，能通过 Zod（orval.config.ts 覆盖了 Orval 的默认写法）", () => {
+    faker.seed(2);
+    expect(getMeContextResponse.safeParse(getGetMeContextResponseMock()).success).toBe(true);
+    expect(getTodayListResponse.safeParse(getGetTodayListResponseMock()).success).toBe(true);
+    expect(listMistakesResponse.safeParse(getListMistakesResponseMock()).success).toBe(true);
+    expect(getCurrentPlanResponse.safeParse(getGetCurrentPlanResponseMock()).success).toBe(true);
+    expect(getGetMeContextResponseMock().today).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 });

@@ -1,0 +1,69 @@
+# 知识地图（map 领域）：地图、章与知识点；知识点 ID 永不复用（data-model.md 一向门决定 2）。
+components:
+  schemas:
+    KnowledgeType:
+      type: string
+      description: 知识类型（vocabulary.md 第 2 节；叫法见术语表 knowledge_type）
+      enum: [concept, fact, statute, procedure, application, essay, oral, practical, accumulation]
+    MapSource:
+      type: string
+      description: 地图来源三种：官方、模板、自建
+      enum: [official, template, custom]
+    KnowledgeMap:
+      type: object
+      description: 一个考试的知识地图（带版本）；演示数据每章只给几个示例知识点
+      required: [map_id, exam_id, map_version, source, chapters]
+      properties:
+        map_id: {$ref: "#/components/schemas/Id"}
+        exam_id: {type: string}
+        map_version: {type: integer, minimum: 1}
+        source: {$ref: "#/components/schemas/MapSource"}
+        note: {type: string}
+        chapters: {type: array, items: {$ref: "#/components/schemas/KnowledgeChapter"}}
+    KnowledgeChapter:
+      type: object
+      required: [id, name, knowledge_point_count, sample_points]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        knowledge_point_count:
+          type: integer
+          minimum: 0
+          description: 本章知识点总数
+        sample_points:
+          type: array
+          description: 本章已有详细数据的知识点
+          items: {$ref: "#/components/schemas/KnowledgePointSummary"}
+    KnowledgePointSummary:
+      type: object
+      required: [id, name, knowledge_types]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        knowledge_types:
+          type: array
+          minItems: 1
+          maxItems: 2
+          items: {$ref: "#/components/schemas/KnowledgeType"}
+        default_target_level:
+          type: [integer, "null"]
+          minimum: 0
+          maximum: 5
+          description: 按知识类型给的默认目标档；积累拓展型不设
+    KnowledgePoint:
+      type: object
+      description: 单个知识点及其所在的章
+      required: [id, name, knowledge_types, map_id, exam_id, chapter_id, chapter_name]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        knowledge_types:
+          type: array
+          minItems: 1
+          maxItems: 2
+          items: {$ref: "#/components/schemas/KnowledgeType"}
+        default_target_level: {type: [integer, "null"], minimum: 0, maximum: 5}
+        map_id: {$ref: "#/components/schemas/Id"}
+        exam_id: {type: string}
+        chapter_id: {$ref: "#/components/schemas/Id"}
+        chapter_name: {type: string}

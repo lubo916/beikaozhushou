@@ -1,0 +1,69 @@
+# 作答与错题（practice 领域）：作答只追加；错题四个状态，“顽固”“待订正”“到期回炉”是标签（vocabulary.md 第 3 节）。
+components:
+  schemas:
+    Confidence:
+      type: string
+      description: 把握度；sure 确定、vague 模糊、guess 蒙的，off 表示学员关闭了把握度（关闭后正确作答最高只记中证据）
+      enum: [sure, vague, guess, off]
+    AnswerSubmission:
+      type: object
+      required: [question_id, question_version, response, confidence, duration_ms]
+      properties:
+        question_id: {$ref: "#/components/schemas/Id"}
+        question_version: {type: integer, minimum: 1}
+        response: {$ref: "#/components/schemas/AnswerResponse"}
+        confidence: {$ref: "#/components/schemas/Confidence"}
+        duration_ms: {type: integer, minimum: 0}
+        hint_level: {type: integer, minimum: 0}
+    AnswerResponse:
+      type: object
+      description: 学员的作答；选择题填 selected（选项序号），文字题填 text
+      properties:
+        selected: {type: array, items: {type: integer, minimum: 0}}
+        text: {type: string}
+    AnswerResult:
+      type: object
+      description: 揭晓结果；揭晓后不能改答案
+      required: [attempt_id, question_id, graded, correct, evidence_strength, mistake_id, solution, data_source]
+      properties:
+        attempt_id: {$ref: "#/components/schemas/Id"}
+        question_id: {$ref: "#/components/schemas/Id"}
+        graded:
+          type: boolean
+          description: 是否已自动判分；主观题要等批改
+        correct: {type: [boolean, "null"]}
+        evidence_strength: {$ref: "#/components/schemas/EvidenceStrength"}
+        mistake_id:
+          type: [string, "null"]
+          description: 这次作答进了错题本时为错题 ID
+        solution: {$ref: "#/components/schemas/QuestionSolution"}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+    MistakeStatus:
+      type: string
+      description: 错题四个状态：新增、回炉中、待验收、已毕业
+      enum: [new, retrying, awaiting_check, graduated]
+    Mistake:
+      type: object
+      required: [id, question_id, exam_id, knowledge_point_ids, status, tags, wrong_count, correct_streak, created_at, last_answered_at, next_due_day]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        question_id: {$ref: "#/components/schemas/Id"}
+        exam_id: {type: string}
+        knowledge_point_ids: {type: array, items: {$ref: "#/components/schemas/Id"}}
+        status: {$ref: "#/components/schemas/MistakeStatus"}
+        tags:
+          type: array
+          description: 标签（顽固、待订正、到期回炉）不是状态；标签代码由错题任务登记
+          items: {type: string}
+        wrong_count: {type: integer, minimum: 1}
+        correct_streak: {type: integer, minimum: 0}
+        created_at: {$ref: "#/components/schemas/Timestamp"}
+        last_answered_at: {$ref: "#/components/schemas/Timestamp"}
+        next_due_day: {$ref: "#/components/schemas/LearningDay"}
+    MistakePage:
+      type: object
+      required: [items, next_cursor, data_source]
+      properties:
+        items: {type: array, items: {$ref: "#/components/schemas/Mistake"}}
+        next_cursor: {$ref: "#/components/schemas/NextCursor"}
+        data_source: {$ref: "#/components/schemas/DataSource"}

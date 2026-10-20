@@ -1,0 +1,42 @@
+# 当前用户与上下文（account 领域）：“今天”按用户时区与日界线算（参数 account.day.time_zone、account.day.start_hour）。
+components:
+  schemas:
+    MeUser:
+      type: object
+      required: [id, display_name, is_guest]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        display_name: {type: string}
+        is_guest: {type: boolean}
+    MeGoal:
+      type: object
+      description: 当前目标考试
+      required: [exam_id, exam_name, short_name, evaluation_rule, target_score, target_date, days_to_target, map_id]
+      properties:
+        exam_id: {type: string}
+        exam_name: {type: string}
+        short_name: {type: string}
+        evaluation_rule: {$ref: "#/components/schemas/EvaluationRuleType"}
+        target_score: {type: [number, "null"]}
+        target_date: {type: string, format: date}
+        days_to_target:
+          type: integer
+          description: 距目标日的天数（按学习日算，已过为负数）
+        map_id: {$ref: "#/components/schemas/Id"}
+    MeContext:
+      type: object
+      description: 当前用户、当前目标考试与今天的日期；各页共用的上下文，还没有目标时不给 goal
+      required: [user, today, now, time_zone, day_start_hour]
+      properties:
+        user: {$ref: "#/components/schemas/MeUser"}
+        goal: {$ref: "#/components/schemas/MeGoal"}
+        today: {$ref: "#/components/schemas/LearningDay"}
+        now: {$ref: "#/components/schemas/Timestamp"}
+        time_zone:
+          type: string
+          description: 用户时区（IANA 名），默认值是参数 account.day.time_zone
+        day_start_hour:
+          type: integer
+          minimum: 0
+          maximum: 23
+          description: 日界线（当地几点切到新的一天），默认值是参数 account.day.start_hour

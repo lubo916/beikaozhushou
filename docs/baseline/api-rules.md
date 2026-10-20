@@ -54,6 +54,29 @@ contracts/openapi/
 
 - 每个写操作在契约里注明“会影响哪些数据”；前端在写操作成功后让对应的查询失效（TanStack Query 的 invalidateQueries），由样板页给出写法。
 - 常见的连锁：作答 → 错题、掌握档、今日清单、地图；完成任务 → 今日清单、三个数；确认提议 → 计划、今日清单。
+- 写法样例（F04）：契约里给写操作写 `x-invalidates`，合并后进生成的接口一览 `OPERATIONS`；页面在写操作成功后调用 `invalidateAfter`，假数据层与真接口都照这一份。
+
+  ```yaml
+  # contracts/openapi/paths/practice.yaml
+  /practice/answers:
+    post:
+      operationId: submitAnswer
+      x-invalidates: [listMistakes, getTodayList, getMasteryGrid, getQuestionSolution]
+  ```
+
+  ```ts
+  // apps/learner/src/pages/S18/data.ts（示意）
+  import { useQueryClient } from "@tanstack/react-query";
+  import { useSubmitAnswer } from "@exam-prep/contract";
+  import { invalidateAfter } from "../../api/refresh.ts";
+
+  export function useAnswer() {
+    const queryClient = useQueryClient();
+    return useSubmitAnswer({ mutation: { onSuccess: () => invalidateAfter(queryClient, "submitAnswer") } });
+  }
+  ```
+
+- 作答之后，内存仓库里的错题本与今日清单已经变了；失效后，用到这些数据的页面会自动重新取，不用手动刷新。
 
 ## 7 后端写法要点
 

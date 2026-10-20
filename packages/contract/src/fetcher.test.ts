@@ -11,12 +11,12 @@ describe("fetcher（生成钩子的请求函数）", () => {
     vi.unstubAllGlobals();
   });
 
-  it("2xx 返回解析后的响应体，路径加 /api 前缀", async () => {
+  it("2xx 返回解析后的响应体，路径加 /api/v1 前缀", async () => {
     const fetchMock = vi.fn(async () => json(200, { ok: true }));
     vi.stubGlobal("fetch", fetchMock);
     await expect(customFetch<{ ok: boolean }>("/params", { method: "GET" })).resolves.toEqual({ ok: true });
-    expect(fetchMock).toHaveBeenCalledWith("/api/params", { method: "GET" });
-    expect(resolveUrl("/api/events")).toBe("/api/events");
+    expect(fetchMock).toHaveBeenCalledWith("/api/v1/params", { method: "GET" });
+    expect(resolveUrl("/api/v1/events")).toBe("/api/v1/events");
   });
 
   it("没有响应体的 2xx 返回 undefined", async () => {

@@ -1,0 +1,15 @@
+# 多页共用的接口（platform 领域）。
+paths:
+  /params:
+    get:
+      operationId: getParams
+      x-owner: platform
+      x-action: platform.params.read
+      x-public: true
+      summary: 读取全部登记参数的当前生效值（已夹在登记区间内）；无需登录
+      responses:
+        "200":
+          description: 参数取值
+          content:
+            application/json:
+              schema: {type: object, additionalProperties: true}

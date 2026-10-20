@@ -1,0 +1,270 @@
+{
+  "exam_id": "ds-final-custom",
+  "note": "演示数据：演示学员在这个考试上的示例状态。规则还没实现的部分（掌握档、今日清单的排法）先用这里的值，接口标 data_source: sample。",
+  "goal": {
+    "target_score": 85,
+    "target_date": "2027-01-08",
+    "primary": false
+  },
+  "mastery": [
+    {
+      "knowledge_point_id": "019a0403-0000-7000-8000-000000000001",
+      "level": 2,
+      "target_level": 4,
+      "evidence_sufficient": true,
+      "pending_verification": false,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0403-0000-7000-8000-000000000002",
+      "level": 1,
+      "target_level": 3,
+      "evidence_sufficient": true,
+      "pending_verification": false,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0403-0000-7000-8000-000000000003",
+      "level": 3,
+      "target_level": 4,
+      "evidence_sufficient": true,
+      "pending_verification": true,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0403-0000-7000-8000-000000000004",
+      "level": 0,
+      "target_level": 4,
+      "evidence_sufficient": false,
+      "pending_verification": false,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0403-0000-7000-8000-000000000005",
+      "level": 4,
+      "target_level": 3,
+      "evidence_sufficient": true,
+      "pending_verification": false,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0403-0000-7000-8000-000000000006",
+      "level": 2,
+      "target_level": 4,
+      "evidence_sufficient": true,
+      "pending_verification": false,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0403-0000-7000-8000-000000000007",
+      "level": 1,
+      "target_level": 4,
+      "evidence_sufficient": true,
+      "pending_verification": false,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0403-0000-7000-8000-000000000008",
+      "level": 3,
+      "target_level": 2,
+      "evidence_sufficient": false,
+      "pending_verification": true,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0403-0000-7000-8000-000000000009",
+      "level": 0,
+      "target_level": 4,
+      "evidence_sufficient": false,
+      "pending_verification": false,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0403-0000-7000-8000-00000000000a",
+      "level": 2,
+      "target_level": 3,
+      "evidence_sufficient": true,
+      "pending_verification": false,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0403-0000-7000-8000-00000000000b",
+      "level": 5,
+      "target_level": 2,
+      "evidence_sufficient": true,
+      "pending_verification": false,
+      "in_scope": true
+    },
+    {
+      "knowledge_point_id": "019a0403-0000-7000-8000-00000000000c",
+      "level": 1,
+      "target_level": 3,
+      "evidence_sufficient": false,
+      "pending_verification": false,
+      "in_scope": false
+    }
+  ],
+  "today_tasks": [
+    {
+      "id": "019a0406-0000-7000-8000-000000000001",
+      "segment": "consolidate",
+      "source": "due_review",
+      "title": "到期复习：二叉树的遍历",
+      "minutes": 10,
+      "question_ids": [],
+      "card_ids": [
+        "019a0405-0000-7000-8000-000000000001"
+      ],
+      "knowledge_point_ids": [
+        "019a0403-0000-7000-8000-000000000006"
+      ]
+    },
+    {
+      "id": "019a0406-0000-7000-8000-000000000002",
+      "segment": "advance",
+      "source": "practice",
+      "title": "二叉树的遍历：专项练习",
+      "minutes": 15,
+      "question_ids": [
+        "019a0404-0000-7000-8000-000000000001"
+      ],
+      "card_ids": [],
+      "knowledge_point_ids": [
+        "019a0403-0000-7000-8000-000000000006"
+      ]
+    },
+    {
+      "id": "019a0406-0000-7000-8000-000000000003",
+      "segment": "advance",
+      "source": "new_learning",
+      "title": "新学：时间复杂度分析",
+      "minutes": 20,
+      "question_ids": [],
+      "card_ids": [],
+      "knowledge_point_ids": [
+        "019a0403-0000-7000-8000-000000000001"
+      ]
+    },
+    {
+      "id": "019a0406-0000-7000-8000-000000000004",
+      "segment": "closing",
+      "source": "bedtime_review",
+      "title": "睡前回顾",
+      "minutes": 5,
+      "question_ids": [],
+      "card_ids": [],
+      "knowledge_point_ids": []
+    }
+  ],
+  "mistake_retry_task": {
+    "id": "019a0406-0000-7000-8000-000000000009",
+    "minutes_per_question": 3
+  },
+  "plan": {
+    "id": "019a0408-0000-7000-8000-000000000001",
+    "exam_id": "ds-final-custom",
+    "version": 1,
+    "round_index": 1,
+    "round_count": 4,
+    "round_name": "打基础",
+    "mix_mode": "roi",
+    "daily_minutes": 60,
+    "scope_counts": {
+      "default": 11,
+      "added": 0,
+      "removed": 1
+    },
+    "target_date": "2027-01-08",
+    "updated_at": "2026-10-20T00:00:00Z"
+  },
+  "proposals": [
+    {
+      "id": "019a0409-0000-7000-8000-000000000001",
+      "exam_id": "ds-final-custom",
+      "status": "pending",
+      "source": "planner",
+      "change": "把“排序算法比较”移出学习范围",
+      "reason": "这个知识点考频低、离目标档还远，先保住性价比更高的部分",
+      "cost": "预测分区间的最可能值会略低一点",
+      "if_declined": "今日清单会继续给它排新学，占用复习时间",
+      "created_at": "2026-10-20T22:00:00Z"
+    }
+  ],
+  "notes": [
+    {
+      "id": "019a040a-0000-7000-8000-000000000001",
+      "exam_id": "ds-final-custom",
+      "note_type": "key_points",
+      "title": "二叉树的遍历：要点",
+      "body": "先序加中序，或后序加中序。只有先序加后序不能唯一确定。",
+      "knowledge_point_ids": [
+        "019a0403-0000-7000-8000-000000000006"
+      ],
+      "ai_generated": false,
+      "created_at": "2026-10-18T12:00:00Z",
+      "updated_at": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "019a040a-0000-7000-8000-000000000002",
+      "exam_id": "ds-final-custom",
+      "note_type": "pitfall",
+      "title": "二叉树的遍历：易错",
+      "body": "后序遍历最后访问的一定是根 A，序列必须以 A 结尾。你把根放在了右子树 C 之前。",
+      "knowledge_point_ids": [
+        "019a0403-0000-7000-8000-000000000006"
+      ],
+      "ai_generated": true,
+      "created_at": "2026-10-19T12:00:00Z",
+      "updated_at": "2026-10-19T12:00:00Z"
+    }
+  ],
+  "materials": [
+    {
+      "id": "019a040b-0000-7000-8000-000000000001",
+      "exam_id": "ds-final-custom",
+      "title": "数据结构教材（纸书，按页码映射）",
+      "access": "mapped_only",
+      "knowledge_point_ids": [
+        "019a0403-0000-7000-8000-000000000001"
+      ],
+      "created_at": "2026-10-15T12:00:00Z"
+    },
+    {
+      "id": "019a040b-0000-7000-8000-000000000002",
+      "exam_id": "ds-final-custom",
+      "title": "数据结构讲义（电子文件，可全文阅读）",
+      "access": "parsable",
+      "knowledge_point_ids": [
+        "019a0403-0000-7000-8000-000000000006"
+      ],
+      "created_at": "2026-10-16T12:00:00Z"
+    },
+    {
+      "id": "019a040b-0000-7000-8000-000000000003",
+      "exam_id": "ds-final-custom",
+      "title": "数据结构考试公告（外链）",
+      "access": "link_only",
+      "url": "https://example.org/exam-notice",
+      "knowledge_point_ids": [],
+      "created_at": "2026-10-17T12:00:00Z"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "019a040c-0000-7000-8000-000000000001",
+      "title": "有一条提议等你确认",
+      "body": "计划引擎给出了一条调整学习范围的提议，确认后才生效。",
+      "read": false,
+      "link": "/plan",
+      "created_at": "2026-10-20T22:00:00Z"
+    },
+    {
+      "id": "019a040c-0000-7000-8000-000000000002",
+      "title": "目标日提醒",
+      "body": "《数据结构》期末考的目标日是 2027-01-08，可在考试日历里查看。",
+      "read": true,
+      "link": "/today",
+      "created_at": "2026-10-15T09:00:00Z"
+    }
+  ]
+}

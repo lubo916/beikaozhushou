@@ -1,0 +1,22 @@
+# 通知（engagement 领域）：站内消息；提醒与断连回归不展示累计未完成量（vocabulary.md 第 11 节）。
+components:
+  schemas:
+    Notification:
+      type: object
+      required: [id, title, body, read, created_at]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        title: {type: string}
+        body: {type: string}
+        read: {type: boolean}
+        link:
+          type: string
+          description: 点开后去的站内路径（路由表里的路径，如 /plan）
+        created_at: {$ref: "#/components/schemas/Timestamp"}
+    NotificationPage:
+      type: object
+      required: [items, next_cursor, data_source]
+      properties:
+        items: {type: array, items: {$ref: "#/components/schemas/Notification"}}
+        next_cursor: {$ref: "#/components/schemas/NextCursor"}
+        data_source: {$ref: "#/components/schemas/DataSource"}

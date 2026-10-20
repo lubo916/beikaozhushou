@@ -1,0 +1,38 @@
+# 多页共用的接口（learner 领域）。
+paths:
+  /learner/evidence:
+    post:
+      operationId: recordEvidence
+      x-owner: learner
+      x-action: learner.evidence.record
+      x-internal: true
+      summary: 领域服务代表学员写入一条证据（不对端开放）
+      parameters:
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/EvidenceInput"}
+      responses:
+        "200":
+          description: 写入结果与重算后的档位
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MasteryCell"}
+        "422": {$ref: "#/components/responses/Error"}
+  /learner/mastery-grid:
+    get:
+      operationId: getMasteryGrid
+      x-owner: learner
+      x-action: learner.mastery.read
+      summary: 读取一张地图的掌握方格
+      parameters:
+        - {name: mapId, in: query, required: true, schema: {$ref: "#/components/schemas/Id"}}
+      responses:
+        "200":
+          description: 方格
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MasteryGrid"}
+        "404": {$ref: "#/components/responses/Error"}

@@ -3,12 +3,13 @@
   "note": "演示数据，取自原型脚本；题目与解析的正式来源见 OQ-010",
   "questions": [
     {
-      "id": "junior-accounting-q0001",
+      "id": "019a0104-0000-7000-8000-000000000001",
+      "version": 1,
       "question_type": "single_choice",
       "response_form": "choice",
       "credibility": "reviewed",
-      "knowledge_points": [
-        "交易性金融资产的后续计量"
+      "knowledge_point_ids": [
+        "019a0103-0000-7000-8000-000000000005"
       ],
       "stem": "甲公司购入一项交易性金融资产，支付价款 206 万元，其中包含已宣告但尚未发放的现金股利 6 万元；另支付交易费用 1 万元。该资产的入账金额为（　）万元。",
       "options": [
@@ -37,12 +38,13 @@
       ]
     },
     {
-      "id": "junior-accounting-q0002",
+      "id": "019a0104-0000-7000-8000-000000000002",
+      "version": 1,
       "question_type": "short_answer",
       "response_form": "written",
       "credibility": "reviewed",
-      "knowledge_points": [
-        "交易性金融资产的后续计量"
+      "knowledge_point_ids": [
+        "019a0103-0000-7000-8000-000000000005"
       ],
       "stem": "编制甲公司购入该资产、以及月末公允价值上升 12 万元时的会计分录。",
       "scoring_points": [
@@ -73,11 +75,11 @@
   ],
   "cards": [
     {
-      "id": "junior-accounting-card0001",
+      "id": "019a0105-0000-7000-8000-000000000001",
+      "knowledge_point_id": "019a0103-0000-7000-8000-000000000005",
       "card_type": "辨析卡",
       "front": "交易性金融资产取得时的交易费用，计入哪里？",
-      "back": "计入投资收益（借方），不进成本。对照：债权投资、其他权益工具投资的交易费用计入成本。",
-      "knowledge_point": "交易性金融资产的后续计量"
+      "back": "计入投资收益（借方），不进成本。对照：债权投资、其他权益工具投资的交易费用计入成本。"
     }
   ]
 }

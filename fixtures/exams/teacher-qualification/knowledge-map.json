@@ -1,14 +1,17 @@
 {
   "exam_id": "teacher-qualification",
+  "map_id": "019a0201-0000-7000-8000-000000000001",
   "map_version": 1,
   "source": "template",
   "note": "演示数据：章节与知识点数量取自原型，sample_points 为每章的示例知识点",
   "chapters": [
     {
+      "id": "019a0202-0000-7000-8000-000000000001",
       "name": "教育基础知识和基本原理",
       "knowledge_point_count": 30,
       "sample_points": [
         {
+          "id": "019a0203-0000-7000-8000-000000000001",
           "name": "教育的本质与功能",
           "knowledge_types": [
             "concept"
@@ -18,10 +21,12 @@
       ]
     },
     {
+      "id": "019a0202-0000-7000-8000-000000000002",
       "name": "中学课程",
       "knowledge_point_count": 14,
       "sample_points": [
         {
+          "id": "019a0203-0000-7000-8000-000000000002",
           "name": "课程类型",
           "knowledge_types": [
             "fact"
@@ -31,10 +36,12 @@
       ]
     },
     {
+      "id": "019a0202-0000-7000-8000-000000000003",
       "name": "中学教学",
       "knowledge_point_count": 26,
       "sample_points": [
         {
+          "id": "019a0203-0000-7000-8000-000000000003",
           "name": "教学原则",
           "knowledge_types": [
             "concept"
@@ -42,6 +49,7 @@
           "default_target_level": 4
         },
         {
+          "id": "019a0203-0000-7000-8000-000000000004",
           "name": "教学评价类型",
           "knowledge_types": [
             "concept"
@@ -49,6 +57,7 @@
           "default_target_level": 3
         },
         {
+          "id": "019a0203-0000-7000-8000-000000000005",
           "name": "材料分析：教学原则的运用",
           "knowledge_types": [
             "application"
@@ -58,10 +67,12 @@
       ]
     },
     {
+      "id": "019a0202-0000-7000-8000-000000000004",
       "name": "中学生学习心理",
       "knowledge_point_count": 28,
       "sample_points": [
         {
+          "id": "019a0203-0000-7000-8000-000000000006",
           "name": "最近发展区",
           "knowledge_types": [
             "concept"
@@ -69,6 +80,7 @@
           "default_target_level": 4
         },
         {
+          "id": "019a0203-0000-7000-8000-000000000007",
           "name": "学习动机理论",
           "knowledge_types": [
             "concept"
@@ -76,6 +88,7 @@
           "default_target_level": 3
         },
         {
+          "id": "019a0203-0000-7000-8000-000000000008",
           "name": "知识的迁移",
           "knowledge_types": [
             "concept"
@@ -85,10 +98,12 @@
       ]
     },
     {
+      "id": "019a0202-0000-7000-8000-000000000005",
       "name": "中学生发展心理",
       "knowledge_point_count": 22,
       "sample_points": [
         {
+          "id": "019a0203-0000-7000-8000-000000000009",
           "name": "皮亚杰认知发展阶段",
           "knowledge_types": [
             "fact"
@@ -98,10 +113,12 @@
       ]
     },
     {
+      "id": "019a0202-0000-7000-8000-000000000006",
       "name": "中学生心理辅导",
       "knowledge_point_count": 14,
       "sample_points": [
         {
+          "id": "019a0203-0000-7000-8000-00000000000a",
           "name": "心理健康教育",
           "knowledge_types": [
             "concept"
@@ -111,10 +128,12 @@
       ]
     },
     {
+      "id": "019a0202-0000-7000-8000-000000000007",
       "name": "中学德育",
       "knowledge_point_count": 22,
       "sample_points": [
         {
+          "id": "019a0203-0000-7000-8000-00000000000b",
           "name": "德育原则与方法",
           "knowledge_types": [
             "statute"
@@ -124,10 +143,12 @@
       ]
     },
     {
+      "id": "019a0202-0000-7000-8000-000000000008",
       "name": "中学班级管理与教师心理",
       "knowledge_point_count": 30,
       "sample_points": [
         {
+          "id": "019a0203-0000-7000-8000-00000000000c",
           "name": "班级管理模式",
           "knowledge_types": [
             "concept"

@@ -1,0 +1,79 @@
+# 多页共用的接口（content 领域）。
+paths:
+  /questions/{questionId}:
+    get:
+      operationId: getQuestion
+      x-owner: content
+      x-action: content.question.read
+      summary: 读取题目（揭晓前不含答案与解析）
+      parameters:
+        - {name: questionId, in: path, required: true, schema: {$ref: "#/components/schemas/Id"}}
+      responses:
+        "200":
+          description: 题目
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Question"}
+        "404": {$ref: "#/components/responses/Error"}
+  /questions/{questionId}/solution:
+    get:
+      operationId: getQuestionSolution
+      x-owner: content
+      x-action: content.solution.read
+      x-errors: [PRAC_REVEAL_LOCKED]
+      summary: 读取答案与解析（作答揭晓后才给）
+      parameters:
+        - {name: questionId, in: path, required: true, schema: {$ref: "#/components/schemas/Id"}}
+      responses:
+        "200":
+          description: 答案与解析
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/QuestionSolution"}
+        "404": {$ref: "#/components/responses/Error"}
+        "409": {$ref: "#/components/responses/Error"}
+  /cards/{cardId}:
+    get:
+      operationId: getCard
+      x-owner: content
+      x-action: content.card.read
+      summary: 读取卡片
+      parameters:
+        - {name: cardId, in: path, required: true, schema: {$ref: "#/components/schemas/Id"}}
+      responses:
+        "200":
+          description: 卡片
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Card"}
+        "404": {$ref: "#/components/responses/Error"}
+  /notes:
+    get:
+      operationId: listNotes
+      x-owner: content
+      x-action: content.note.read
+      summary: 笔记列表（当前目标考试，游标分页）
+      parameters:
+        - {$ref: "#/components/parameters/Cursor"}
+        - {$ref: "#/components/parameters/Limit"}
+      responses:
+        "200":
+          description: 一页笔记
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/NotePage"}
+  /materials:
+    get:
+      operationId: listMaterials
+      x-owner: content
+      x-action: content.material.read
+      summary: 资料列表（当前目标考试，游标分页）
+      parameters:
+        - {$ref: "#/components/parameters/Cursor"}
+        - {$ref: "#/components/parameters/Limit"}
+      responses:
+        "200":
+          description: 一页资料
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MaterialPage"}

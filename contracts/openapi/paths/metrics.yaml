@@ -1,0 +1,19 @@
+# 多页共用的接口（metrics 领域）。
+paths:
+  /events:
+    post:
+      operationId: trackEvent
+      x-owner: metrics
+      x-action: metrics.event.track
+      summary: 上报学员端埋点事件（contracts/events.yaml 中 source 为 client 的事件）
+      parameters:
+        - {name: Idempotency-Key, in: header, required: false, schema: {type: string, minLength: 1, maxLength: 128}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/AnalyticsEvent"}
+      responses:
+        "202": {description: 已接收；同一幂等键的重复请求返回第一次的结果}
+        "403": {$ref: "#/components/responses/Error"}
+        "422": {$ref: "#/components/responses/Error"}

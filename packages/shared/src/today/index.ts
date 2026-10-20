@@ -13,8 +13,9 @@ export interface DaySettings {
 }
 
 /**
- * 临时默认（开工决定第 6 条：凌晨 4 点切到新的一天，默认北京时间，用户可改）。
- * contracts/params.yaml 还没有日界线参数：F03 提出、F04 登记（data-model.md）；登记后调用方改从参数访问器取值，删除本常量。
+ * 默认值（开工决定第 6 条：凌晨 4 点切到新的一天，默认北京时间，用户可改）。F04 已登记为参数 account.day.time_zone 与
+ * account.day.start_hour（学员可改 0–6 点，F04-Q2）：调用方从参数访问器取值，假数据层已改用参数。本常量只留给组件陈列页与现有测试，
+ * 与参数一致由 apps/learner/src/mocks 的测试守着；整合任务改完陈列页后删除。
  */
 export const DEFAULT_DAY_SETTINGS: DaySettings = { timeZone: "Asia/Shanghai", dayStartHour: 4 };
 

@@ -1,0 +1,32 @@
+# 多页共用的接口（map 领域）。
+paths:
+  /exams/{examId}/map:
+    get:
+      operationId: getKnowledgeMap
+      x-owner: map
+      x-action: map.knowledge_point.read
+      summary: 读取考试的知识地图（章与知识点）
+      parameters:
+        - {name: examId, in: path, required: true, schema: {type: string}}
+      responses:
+        "200":
+          description: 知识地图
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/KnowledgeMap"}
+        "404": {$ref: "#/components/responses/Error"}
+  /maps/points/{pointId}:
+    get:
+      operationId: getKnowledgePoint
+      x-owner: map
+      x-action: map.knowledge_point.read
+      summary: 读取知识点及其所属章节
+      parameters:
+        - {name: pointId, in: path, required: true, schema: {$ref: "#/components/schemas/Id"}}
+      responses:
+        "200":
+          description: 知识点
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/KnowledgePoint"}
+        "404": {$ref: "#/components/responses/Error"}

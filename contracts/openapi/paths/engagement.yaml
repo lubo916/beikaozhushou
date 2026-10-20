@@ -1,0 +1,17 @@
+# 多页共用的接口（engagement 领域）。
+paths:
+  /notifications:
+    get:
+      operationId: listNotifications
+      x-owner: engagement
+      x-action: engagement.notification.read
+      summary: 站内通知列表（新的在前，游标分页）
+      parameters:
+        - {$ref: "#/components/parameters/Cursor"}
+        - {$ref: "#/components/parameters/Limit"}
+      responses:
+        "200":
+          description: 一页通知
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/NotificationPage"}

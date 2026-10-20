@@ -1,7 +1,7 @@
 // pnpm gen 的生成目标。files 类由本包读来源直接生成；tool 类复用令牌、词汇、Orval 与 Prisma 的生成器。
 // 生成物都不进 git（.gitignore），由 main.ts 在 dev、test、build、typecheck、lint 之前自动生成。
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { copyFileSync, existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { basename, join } from "node:path";
 import { header, literal, normalize, sha12 } from "./emit.ts";
 import { Num, parseYaml, type YamlValue } from "./yaml.ts";
@@ -458,14 +458,65 @@ function exec(root: string, command: string, args: string[], title: string): voi
   }
 }
 
+/** 递归列出目录下某种扩展名的文件（仓库相对路径，排好序）。 */
+function filesUnder(root: string, dir: string, ext: string): string[] {
+  if (!existsSync(join(root, dir))) return [];
+  return readdirSync(join(root, dir))
+    .sort()
+    .flatMap((name) => {
+      const rel = `${dir}/${name}`;
+      if (statSync(join(root, rel)).isDirectory()) return filesUnder(root, rel, ext);
+      return name.endsWith(ext) ? [rel] : [];
+    });
+}
+
+/** 接口契约合并（F04）：contracts/openapi/ 分文件 → 一份 OpenAPI 与接口一览，Orval 读前者。 */
+const openapi: ToolTarget = {
+  kind: "tool",
+  name: "openapi",
+  title: "接口契约合并",
+  inputs: (root) => [
+    ...filesUnder(root, "contracts/openapi", ".yaml"),
+    "contracts/permissions.yaml",
+    "contracts/errors.yaml",
+    "tools/merge-openapi.mjs",
+    "packages/contract/src/openapi-merge.ts",
+    "packages/codegen/src/yaml.ts",
+  ],
+  outDir: "packages/contract/src/generated",
+  outputs: ["packages/contract/src/generated/openapi.json", "packages/contract/src/generated/operations.ts"],
+  bin: "tools/merge-openapi.mjs",
+  run: (root) => exec(root, process.execPath, ["tools/merge-openapi.mjs"], "接口契约合并"),
+};
+
 const orval: ToolTarget = {
   kind: "tool",
   name: "orval",
   title: "接口代码（Orval）",
-  inputs: () => ["contracts/openapi.yaml", "orval.config.ts", "scripts/engineering/contract-gen.mjs", "node_modules/orval/package.json"],
+  inputs: () => [
+    "packages/contract/src/generated/openapi.json",
+    "orval.config.ts",
+    "scripts/engineering/contract-gen.mjs",
+    "node_modules/orval/package.json",
+  ],
   outDir: "packages/contract/src/generated/api",
   bin: "node_modules/.bin/orval",
   run: (root) => exec(root, process.execPath, ["scripts/engineering/contract-gen.mjs"], "接口代码生成"),
+};
+
+/** 学员端假数据层的 MSW 浏览器工作线程（F04）：从本仓库安装的 msw 复制到 public/，版本跟着依赖走，不进 git。 */
+const MSW_WORKER_SOURCE = "packages/contract/node_modules/msw/lib/mockServiceWorker.js";
+const MSW_WORKER_TARGET = "apps/learner/public/mockServiceWorker.js";
+
+const mswWorker: ToolTarget = {
+  kind: "tool",
+  name: "msw",
+  title: "MSW 浏览器工作线程",
+  inputs: () => ["packages/contract/node_modules/msw/package.json"],
+  outDir: "apps/learner/public",
+  outputs: [MSW_WORKER_TARGET],
+  bin: MSW_WORKER_SOURCE,
+  run: (root) => copyFileSync(join(root, MSW_WORKER_SOURCE), join(root, MSW_WORKER_TARGET)),
 };
 
 const prisma: ToolTarget = {
@@ -505,8 +556,21 @@ const vocab: ToolTarget = {
   run: (root) => exec(root, process.execPath, ["tools/gen-vocab.ts"], "词汇常量生成"),
 };
 
-/** 按顺序执行：错误码在接口代码之前（请求函数引用错误码）。 */
-export const TARGETS: readonly Target[] = [params, errors, permissions, metrics, pages, models, tokens, vocab, orval, prisma];
+/** 按顺序执行：错误码在接口代码之前（请求函数引用错误码）；契约先合并，Orval 再读合并结果。 */
+export const TARGETS: readonly Target[] = [
+  params,
+  errors,
+  permissions,
+  metrics,
+  pages,
+  models,
+  tokens,
+  vocab,
+  openapi,
+  orval,
+  mswWorker,
+  prisma,
+];
 
 /** 文件名（不含扩展名），一致性检查用。 */
 export function stem(path: string): string {

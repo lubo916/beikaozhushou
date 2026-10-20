@@ -7,7 +7,10 @@
     "./errors": "./src/errors.ts",
     "./permissions": "./src/generated/permissions.ts",
     "./zod": "./src/generated/api/endpoints.zod.ts",
-    "./msw": "./src/generated/api/endpoints.msw.ts"
+    "./msw": "./src/generated/api/endpoints.msw.ts",
+    "./operations": "./src/generated/operations.ts",
+    "./openapi.json": "./src/generated/openapi.json",
+    "./mock-browser": "./src/mock-browser.ts"
   },
   "dependencies": {
     "@tanstack/react-query": "5.85.0",

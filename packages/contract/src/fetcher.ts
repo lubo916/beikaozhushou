@@ -1,8 +1,8 @@
 import { ApiError, type ApiErrorDetails } from "./api-error.ts";
 import { ERROR_CODES, isErrorCode, type ErrorCode } from "./generated/error-codes.ts";
 
-/** 接口前缀：前后端同域，/api 转给 API 服务（ADR-026 决定 6）。 */
-export const API_BASE_PATH = "/api";
+/** 接口前缀：前后端同域，/api 转给 API 服务（ADR-026 决定 6）；F04 起带版本 /api/v1（契约 _common.yaml 的 servers）。 */
+export const API_BASE_PATH = "/api/v1";
 
 /** 生成的钩子统一经此发请求（Orval 的 mutator）：2xx 返回解析后的响应体，非 2xx 抛出 ApiError。 */
 export async function customFetch<T>(url: string, init: RequestInit = {}): Promise<T> {

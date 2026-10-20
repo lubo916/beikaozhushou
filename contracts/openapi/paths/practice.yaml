@@ -1,0 +1,56 @@
+# 多页共用的接口（practice 领域）。写操作用 x-invalidates 写明会影响哪些数据（api-rules 第 6 节）。
+paths:
+  /practice/next:
+    get:
+      operationId: nextQuestion
+      x-owner: practice
+      x-action: content.question.read
+      summary: 为指定知识点取下一道题
+      parameters:
+        - {name: pointId, in: query, required: true, schema: {$ref: "#/components/schemas/Id"}}
+      responses:
+        "200":
+          description: 题目
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Question"}
+        "404": {$ref: "#/components/responses/Error"}
+  /practice/answers:
+    post:
+      operationId: submitAnswer
+      x-owner: practice
+      x-action: practice.answer.submit
+      x-errors: [PRAC_REVEAL_LOCKED, PRAC_CONFIDENCE_REQUIRED, COMMON_VALIDATION]
+      x-invalidates: [listMistakes, getTodayList, getMasteryGrid, getQuestionSolution]
+      summary: 提交作答并揭晓；同一幂等键重复提交返回第一次的结果
+      parameters:
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/AnswerSubmission"}
+      responses:
+        "200":
+          description: 揭晓结果
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/AnswerResult"}
+        "404": {$ref: "#/components/responses/Error"}
+        "409": {$ref: "#/components/responses/Error"}
+        "422": {$ref: "#/components/responses/Error"}
+  /practice/mistakes:
+    get:
+      operationId: listMistakes
+      x-owner: practice
+      x-action: practice.mistake.read
+      summary: 错题列表（当前目标考试，新的在前，游标分页）
+      parameters:
+        - {$ref: "#/components/parameters/Cursor"}
+        - {$ref: "#/components/parameters/Limit"}
+      responses:
+        "200":
+          description: 一页错题
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MistakePage"}

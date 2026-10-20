@@ -1,0 +1,41 @@
+# 多页共用的接口（plan 领域）。
+paths:
+  /plan/today:
+    get:
+      operationId: getTodayList
+      x-owner: plan
+      x-action: plan.today.read
+      summary: 当前目标考试在今天这个学习日的今日清单（三段）
+      responses:
+        "200":
+          description: 今日清单
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/TodayList"}
+  /plan/current:
+    get:
+      operationId: getCurrentPlan
+      x-owner: plan
+      x-action: plan.plan.read
+      summary: 当前目标考试的学习计划（轮次、配比模式、每日可用时间、学习范围）
+      responses:
+        "200":
+          description: 学习计划
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Plan"}
+  /plan/proposals:
+    get:
+      operationId: listProposals
+      x-owner: plan
+      x-action: plan.proposal.read
+      summary: 提议列表（当前目标考试，新的在前，游标分页）
+      parameters:
+        - {$ref: "#/components/parameters/Cursor"}
+        - {$ref: "#/components/parameters/Limit"}
+      responses:
+        "200":
+          description: 一页提议
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ProposalPage"}
