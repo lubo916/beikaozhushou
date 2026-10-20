@@ -1,0 +1,1859 @@
+{
+  "card": "docs/baseline/rule-cards/account-lifecycle.md",
+  "status": "草稿",
+  "decided": {
+    "R08-Q1": "A",
+    "R08-Q2": "C",
+    "R08-Q3": "B",
+    "R08-Q4": "A",
+    "R08-Q5": "A",
+    "R08-Q6": "A"
+  },
+  "pending": {
+    "R08-Q7": "A",
+    "R08-Q8": "B"
+  },
+  "conventions": [
+    "每条例子是 input → expect；expect 只列要核对的字段，没列的不核对。带 variants 的例子，input.variants[i] 对应 expect.variants[i]，各自独立；input 里 variants 以外的字段是各变体共用的。",
+    "时间写成带时区的 ISO 8601（例子都用北京时间）；“哪一天”按 day 设置、用 packages/shared/src/today 的 today() 算（凌晨 4 点切日）。名字以 _day 结尾的字段是学习日 YYYY-MM-DD；birth_month 是出生年月 YYYY-MM。",
+    "满 N 岁的日子＝出生年加 N 年、出生月的下一个月的 1 日（R6）。年龄段代码 unconfirmed、under_min、minor、adult 与账号状态 active、restricted、cooling_off、deleted 取自 packages/db 的 account.prisma。",
+    "合并模式：upgrade_in_place＝游客原地转正、merge_into＝并入已有账号、hold＝先不合并、already_merged＝已合并过。下线原因：other_device＝其他设备让你下线、credential_changed＝改了密码或换绑了手机号、platform_forced＝平台为保护账号让所有设备下线。这些代码是建议，待写进 docs/product/glossary.yaml。",
+    "删除范围的处理代码：delete 删除、invalidate 作废、keep_legal 按法定要求保留、keep_deidentified 去掉身份后保留、keep_unchanged 原样保留、deidentify_for_class_stats 去掉身份只进班级统计、purge_copies 机构侧副本在 compliance.revoke.purge_days 天内删除。",
+    "时刻比较：验证码“5 分钟内有效”指早于发出时刻加 5 分钟；“隔 60 秒”“满 30 天”“到期满时刻”“到受限到期时刻”都含正好那一刻；密码输错的 60 分钟窗口含正好 60 分钟前那次。",
+    "带 pending 字段的例子（E9、E31）按待拍板问题的临时默认写，拍板结果不同就改例子。"
+  ],
+  "day": {
+    "time_zone": "Asia/Shanghai",
+    "day_start_hour": 4
+  },
+  "params": {
+    "account.deregister.cooling_days": 15,
+    "account.day.time_zone": "Asia/Shanghai",
+    "account.day.start_hour": 4,
+    "compliance.revoke.purge_days": 30,
+    "engagement.quiet_hours": ["22:00", "08:00"]
+  },
+  "params_proposed": {
+    "account.minor.quiet_window": ["22:00", "06:00"],
+    "account.age.min_service_age": 14,
+    "account.age.adult_age": 18,
+    "account.guest.retention_days": 30,
+    "account.session.max_devices": 3,
+    "account.otp.ttl_minutes": 5,
+    "account.otp.max_attempts": 5,
+    "account.otp.resend_seconds": 60,
+    "account.otp.daily_max_per_phone": 10,
+    "account.login.fail_window_minutes": 60,
+    "account.login.fail_notify_count": 5,
+    "account.login.fail_lock_count": 10,
+    "account.login.lock_hours": 24,
+    "account.password.min_length": 8
+  },
+  "functions": {
+    "age_confirm": "首屏选年龄段（R1–R4）：是否收下、年龄段、要不要填出生年月、满 18 岁的日子",
+    "age_band_on": "某一刻的年龄段（R6）：满 18 岁自动转成年",
+    "access": "未成年人模式、三个开关与不推送底线（R1、R4、R5、R8）",
+    "self_change_age": "本人改年龄段或出生年月（R7）",
+    "quiet_hours": "实际不推送的时段，安全提醒何时送达（R8）",
+    "age_reconfirm": "已登录账号再确认年龄段时选了“14 岁以下”（R4，R08-Q7）",
+    "guest_start": "点“先体验，不注册”（R1、R4、R9）",
+    "guest_purge": "游客是否到期清除（R10）",
+    "merge": "游客登录时的转正或合并（R11–R16）",
+    "merge_age": "合并时的年龄段（R17）",
+    "login": "登录结果、设备上限、受限屏、登录后去哪（R19、R22、R23、R28）",
+    "consent": "协议与隐私政策的同意记录（R18）",
+    "otp_check": "验证码校验（R20）",
+    "otp_send": "验证码发送限制（R20）",
+    "reset_password": "忘记密码的提示与发送（R24）",
+    "password_fail": "密码输错的通知与受限（R22）",
+    "revoke": "哪些设备下线、原因代码（R24–R26）",
+    "remote_login_confirm": "异地登录确认（R27）",
+    "phone_gate": "待绑手机号的账号能做什么（R21，R08-Q8）",
+    "deregister": "申请、冷静期内登录、撤销、期满（R29–R33）",
+    "deletion_scope": "期满删除的范围（R34、R35）"
+  },
+  "cases": [
+    {
+      "id": "E1",
+      "title": "首屏选“18 岁及以上”",
+      "kind": "正常",
+      "rule": "R1、R2",
+      "fn": "age_confirm",
+      "input": {
+        "today_day": "2026-10-21",
+        "choice": "adult"
+      },
+      "expect": {
+        "accepted": true,
+        "age_band": "adult",
+        "minor_mode": false,
+        "ask_birth_month": false
+      }
+    },
+    {
+      "id": "E2",
+      "title": "选“14 至 17 岁”并填出生年月",
+      "kind": "正常",
+      "rule": "R2、R3、R6",
+      "fn": "age_confirm",
+      "input": {
+        "today_day": "2026-10-21",
+        "choice": "minor",
+        "birth_month": "2010-03"
+      },
+      "expect": {
+        "accepted": true,
+        "age_band": "minor",
+        "minor_mode": true,
+        "birth_month": "2010-03",
+        "adult_from_day": "2028-04-01"
+      }
+    },
+    {
+      "id": "E3",
+      "title": "选“14 岁以下”",
+      "kind": "异常",
+      "rule": "R4",
+      "fn": "age_confirm",
+      "input": {
+        "today_day": "2026-10-21",
+        "choice": "under_min"
+      },
+      "expect": {
+        "age_band": "under_min",
+        "service": false,
+        "create_guest": false,
+        "create_account": false,
+        "server_record": false
+      }
+    },
+    {
+      "id": "E4",
+      "title": "出生年月和所选年龄段对不对得上",
+      "kind": "边界",
+      "rule": "R3、R6",
+      "fn": "age_confirm",
+      "input": {
+        "today_day": "2026-10-21",
+        "choice": "minor",
+        "variants": [
+          {
+            "birth_month": "2008-09"
+          },
+          {
+            "birth_month": "2008-10"
+          },
+          {
+            "birth_month": "2012-09"
+          },
+          {
+            "birth_month": "2012-10"
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "accepted": false,
+            "reason": "birth_month_mismatch",
+            "computed_band": "adult"
+          },
+          {
+            "accepted": true,
+            "age_band": "minor",
+            "adult_from_day": "2026-11-01"
+          },
+          {
+            "accepted": true,
+            "age_band": "minor",
+            "adult_from_day": "2030-10-01"
+          },
+          {
+            "accepted": false,
+            "reason": "birth_month_mismatch",
+            "computed_band": "under_min"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "title": "满 18 岁自动转成年",
+      "kind": "边界",
+      "rule": "R6",
+      "fn": "age_band_on",
+      "input": {
+        "age_band": "minor",
+        "variants": [
+          {
+            "birth_month": "2008-10",
+            "now": "2026-10-31T23:00:00+08:00"
+          },
+          {
+            "birth_month": "2008-10",
+            "now": "2026-11-01T03:59:00+08:00"
+          },
+          {
+            "birth_month": "2008-10",
+            "now": "2026-11-01T04:00:00+08:00"
+          },
+          {
+            "birth_month": "2008-12",
+            "now": "2026-12-31T12:00:00+08:00"
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "age_band": "minor",
+            "minor_mode": true
+          },
+          {
+            "age_band": "minor",
+            "minor_mode": true
+          },
+          {
+            "age_band": "adult",
+            "minor_mode": false,
+            "event": "auto_adult"
+          },
+          {
+            "age_band": "minor",
+            "minor_mode": true,
+            "adult_from_day": "2027-01-01"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "title": "各年龄段的开关",
+      "kind": "正常",
+      "rule": "R1、R4、R5、R8",
+      "fn": "access",
+      "input": {
+        "variants": [
+          {
+            "kind": "registered",
+            "age_band": "adult"
+          },
+          {
+            "kind": "registered",
+            "age_band": "minor"
+          },
+          {
+            "kind": "registered",
+            "age_band": "unconfirmed"
+          },
+          {
+            "age_band": "under_min"
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "service": true,
+            "minor_mode": false,
+            "allow": {
+              "social": true,
+              "payment": true,
+              "video_analysis": true
+            },
+            "quiet_floor": null
+          },
+          {
+            "service": true,
+            "minor_mode": true,
+            "allow": {
+              "social": false,
+              "payment": false,
+              "video_analysis": false
+            },
+            "quiet_floor": ["22:00", "06:00"]
+          },
+          {
+            "service": true,
+            "minor_mode": true,
+            "allow": {
+              "social": false,
+              "payment": false,
+              "video_analysis": false
+            },
+            "quiet_floor": ["22:00", "06:00"],
+            "requires_age_confirmation": true
+          },
+          {
+            "service": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "E7",
+      "title": "未成年人想自己改年龄段",
+      "kind": "异常",
+      "rule": "R5、R7",
+      "fn": "self_change_age",
+      "input": {
+        "current": {
+          "age_band": "minor",
+          "birth_month": "2010-03"
+        },
+        "variants": [
+          {
+            "request": {
+              "age_band": "adult"
+            }
+          },
+          {
+            "request": {
+              "birth_month": "2008-01"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "allowed": false,
+            "via": "manual_verification"
+          },
+          {
+            "allowed": false,
+            "via": "manual_verification"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E8",
+      "title": "实际不推送的时段",
+      "kind": "边界",
+      "rule": "R8",
+      "fn": "quiet_hours",
+      "input": {
+        "variants": [
+          {
+            "minor_mode": true,
+            "learner_quiet_hours": ["22:00", "08:00"]
+          },
+          {
+            "minor_mode": true,
+            "learner_quiet_hours": ["23:00", "07:00"]
+          },
+          {
+            "minor_mode": false,
+            "learner_quiet_hours": ["23:00", "07:00"]
+          },
+          {
+            "minor_mode": true,
+            "learner_quiet_hours": ["21:00", "05:00"]
+          },
+          {
+            "minor_mode": true,
+            "learner_quiet_hours": ["22:00", "08:00"],
+            "push": {
+              "kind": "security",
+              "at": "2026-10-21T23:30:00+08:00"
+            }
+          },
+          {
+            "minor_mode": false,
+            "learner_quiet_hours": ["22:00", "08:00"],
+            "push": {
+              "kind": "security",
+              "at": "2026-10-21T23:30:00+08:00"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "quiet": ["22:00", "08:00"]
+          },
+          {
+            "quiet": ["22:00", "07:00"]
+          },
+          {
+            "quiet": ["23:00", "07:00"]
+          },
+          {
+            "quiet": ["21:00", "06:00"]
+          },
+          {
+            "deliver_at": "2026-10-22T06:00:00+08:00",
+            "activity_logged_at": "2026-10-21T23:30:00+08:00"
+          },
+          {
+            "deliver_at": "2026-10-21T23:30:00+08:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E9",
+      "title": "已登录账号再确认时选了“14 岁以下”",
+      "kind": "异常",
+      "rule": "R4",
+      "fn": "age_reconfirm",
+      "pending": "R08-Q7",
+      "input": {
+        "account": {
+          "kind": "registered",
+          "age_band": "adult",
+          "status": "active"
+        },
+        "answer": "under_min",
+        "variants": [
+          {
+            "second_confirm": false
+          },
+          {
+            "second_confirm": true
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "state": "awaiting_second_confirm",
+            "offer_export": true,
+            "changed": false
+          },
+          {
+            "age_band": "under_min",
+            "service": false,
+            "revoke": "all",
+            "delete": "now",
+            "cooling_off": false,
+            "scope": "R34"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E10",
+      "title": "点“先体验，不注册”",
+      "kind": "边界",
+      "rule": "R1、R4、R9",
+      "fn": "guest_start",
+      "input": {
+        "variants": [
+          {
+            "age_band": null
+          },
+          {
+            "age_band": "minor",
+            "birth_month": "2010-03"
+          },
+          {
+            "age_band": "adult"
+          },
+          {
+            "age_band": "under_min"
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "allowed": false,
+            "reason": "age_band_required"
+          },
+          {
+            "allowed": true,
+            "kind": "guest",
+            "age_band": "minor",
+            "minor_mode": true
+          },
+          {
+            "allowed": true,
+            "kind": "guest",
+            "age_band": "adult",
+            "minor_mode": false
+          },
+          {
+            "allowed": false,
+            "reason": "no_service",
+            "server_record": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "E11",
+      "title": "游客多久不用就清除",
+      "kind": "边界",
+      "rule": "R10、R12",
+      "fn": "guest_purge",
+      "input": {
+        "retention_days": 30,
+        "variants": [
+          {
+            "guest": {
+              "id": "g1",
+              "last_active_at": "2026-09-21T10:00:00+08:00",
+              "merged_into": null
+            },
+            "now": "2026-10-21T09:59:59+08:00"
+          },
+          {
+            "guest": {
+              "id": "g1",
+              "last_active_at": "2026-09-21T10:00:00+08:00",
+              "merged_into": null
+            },
+            "now": "2026-10-21T10:00:00+08:00"
+          },
+          {
+            "guest": {
+              "id": "g2",
+              "last_active_at": "2026-09-21T10:00:00+08:00",
+              "merged_into": "u1"
+            },
+            "now": "2026-10-21T10:00:00+08:00"
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "purge": false,
+            "purge_at": "2026-10-21T10:00:00+08:00"
+          },
+          {
+            "purge": true,
+            "scope": "guest_and_all_data"
+          },
+          {
+            "purge": false,
+            "reason": "merged"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E12",
+      "title": "游客用新手机号登录：原地转正",
+      "kind": "正常",
+      "rule": "R11、R18",
+      "fn": "merge",
+      "input": {
+        "guest": {
+          "id": "g1",
+          "age_band": "adult",
+          "goals": [
+            {
+              "exam": "cet-6",
+              "primary": true
+            }
+          ]
+        },
+        "credential": {
+          "type": "phone",
+          "value": "13800000001"
+        },
+        "found_account": null,
+        "consent_ticked": true
+      },
+      "expect": {
+        "mode": "upgrade_in_place",
+        "account_id": "g1",
+        "kind": "registered",
+        "copied_records": 0,
+        "consent_records": ["user_agreement", "privacy_policy"]
+      }
+    },
+    {
+      "id": "E13",
+      "title": "并入已有账号，主目标不是同一个考试",
+      "kind": "正常",
+      "rule": "R11、R12、R13、R16",
+      "fn": "merge",
+      "input": {
+        "guest": {
+          "id": "g1",
+          "age_band": "adult",
+          "goals": [
+            {
+              "exam": "cet-6",
+              "primary": true
+            }
+          ],
+          "records": {
+            "answers": 40,
+            "evidence": 52
+          }
+        },
+        "found_account": {
+          "id": "u1",
+          "status": "active",
+          "age_band": "adult",
+          "goals": [
+            {
+              "exam": "junior-accounting",
+              "primary": true
+            }
+          ]
+        }
+      },
+      "expect": {
+        "mode": "merge_into",
+        "account_id": "u1",
+        "guest_merged_into": "u1",
+        "goals_after": [
+          {
+            "exam": "junior-accounting",
+            "primary": true
+          },
+          {
+            "exam": "cet-6",
+            "primary": false
+          }
+        ],
+        "notice": "secondary_goal_added",
+        "appended": {
+          "answers": 40,
+          "evidence": 52
+        },
+        "recompute": ["mastery", "memory", "forecast", "completion", "health"],
+        "summary": {
+          "goals_added": 1,
+          "answers_appended": 40
+        }
+      }
+    },
+    {
+      "id": "E14",
+      "title": "两边是同一个考试",
+      "kind": "边界",
+      "rule": "R12、R13",
+      "fn": "merge",
+      "input": {
+        "guest": {
+          "id": "g1",
+          "age_band": "adult",
+          "goals": [
+            {
+              "exam": "junior-accounting",
+              "primary": true,
+              "target_score": 75,
+              "plan": "plan-g"
+            }
+          ],
+          "records": {
+            "answers": 25
+          }
+        },
+        "found_account": {
+          "id": "u1",
+          "status": "active",
+          "age_band": "adult",
+          "goals": [
+            {
+              "exam": "junior-accounting",
+              "primary": true,
+              "target_score": 60,
+              "plan": "plan-u"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "mode": "merge_into",
+        "goals_after": [
+          {
+            "exam": "junior-accounting",
+            "primary": true,
+            "target_score": 60,
+            "plan": "plan-u"
+          }
+        ],
+        "dropped": ["guest_goal:junior-accounting", "plan:plan-g"],
+        "appended": {
+          "answers": 25
+        }
+      }
+    },
+    {
+      "id": "E15",
+      "title": "账号还没有目标",
+      "kind": "正常",
+      "rule": "R13、R14",
+      "fn": "merge",
+      "input": {
+        "guest": {
+          "id": "g1",
+          "age_band": "adult",
+          "goals": [
+            {
+              "exam": "cet-6",
+              "primary": true,
+              "plan": "plan-g"
+            }
+          ],
+          "prefs": {
+            "daily_minutes": 90,
+            "reminders": "guest-set"
+          }
+        },
+        "found_account": {
+          "id": "u1",
+          "status": "active",
+          "age_band": "adult",
+          "goals": [],
+          "prefs": {
+            "daily_minutes": null,
+            "reminders": "account-set"
+          }
+        }
+      },
+      "expect": {
+        "mode": "merge_into",
+        "goals_after": [
+          {
+            "exam": "cet-6",
+            "primary": true,
+            "plan": "plan-g"
+          }
+        ],
+        "prefs_after": {
+          "daily_minutes": 90,
+          "reminders": "account-set"
+        }
+      }
+    },
+    {
+      "id": "E16",
+      "title": "同一个对象两边都有",
+      "kind": "边界",
+      "rule": "R14",
+      "fn": "merge",
+      "input": {
+        "guest": {
+          "id": "g1",
+          "recall_cards": [
+            {
+              "id": "c-g",
+              "kp": "k7",
+              "reviews": [
+                {
+                  "id": "r3",
+                  "at": "2026-10-12T21:00:00+08:00"
+                }
+              ]
+            }
+          ],
+          "mistakes": [
+            {
+              "id": "m-g",
+              "question": "q9",
+              "answers": ["a2"]
+            }
+          ]
+        },
+        "found_account": {
+          "id": "u1",
+          "status": "active",
+          "recall_cards": [
+            {
+              "id": "c-a",
+              "kp": "k7",
+              "reviews": [
+                {
+                  "id": "r1",
+                  "at": "2026-10-10T09:00:00+08:00"
+                },
+                {
+                  "id": "r2",
+                  "at": "2026-10-15T09:00:00+08:00"
+                }
+              ]
+            }
+          ],
+          "mistakes": [
+            {
+              "id": "m-a",
+              "question": "q9",
+              "answers": ["a1"]
+            }
+          ]
+        }
+      },
+      "expect": {
+        "recall_cards": {
+          "kept": "c-a",
+          "appended_reviews": ["r3"],
+          "replay_order": ["r1", "r3", "r2"],
+          "not_added": ["c-g"]
+        },
+        "mistakes": {
+          "kept": "m-a",
+          "appended_answers": ["a2"],
+          "status": "recompute_by_R03"
+        }
+      }
+    },
+    {
+      "id": "E17",
+      "title": "要并入的账号不正常",
+      "kind": "异常",
+      "rule": "R11、R33",
+      "fn": "merge",
+      "input": {
+        "guest": {
+          "id": "g1",
+          "age_band": "adult"
+        },
+        "credential": {
+          "type": "phone",
+          "value": "13800000002"
+        },
+        "variants": [
+          {
+            "found_account": {
+              "id": "u2",
+              "status": "cooling_off"
+            }
+          },
+          {
+            "found_account": {
+              "id": "u3",
+              "status": "restricted"
+            }
+          },
+          {
+            "found_account": {
+              "id": "u4",
+              "status": "deleted"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "mode": "hold",
+            "guest_unchanged": true,
+            "login_outcome": "cooling_off"
+          },
+          {
+            "mode": "hold",
+            "guest_unchanged": true,
+            "login_outcome": "restricted"
+          },
+          {
+            "mode": "upgrade_in_place",
+            "account_id": "g1",
+            "old_data_restored": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "E18",
+      "title": "重复合并",
+      "kind": "边界",
+      "rule": "R15",
+      "fn": "merge",
+      "input": {
+        "guest": {
+          "id": "g1",
+          "merged_into": "u1"
+        },
+        "variants": [
+          {
+            "target": "u1"
+          },
+          {
+            "target": "u2"
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "mode": "already_merged",
+            "account_id": "u1",
+            "appended": {
+              "answers": 0,
+              "evidence": 0
+            }
+          },
+          {
+            "mode": "already_merged",
+            "account_id": "u1",
+            "refused": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "E19",
+      "title": "合并时年龄段不一致",
+      "kind": "边界",
+      "rule": "R17、R7",
+      "fn": "merge_age",
+      "input": {
+        "today_day": "2026-10-21",
+        "variants": [
+          {
+            "account": {
+              "age_band": "adult"
+            },
+            "guest": {
+              "age_band": "minor",
+              "birth_month": "2010-03"
+            }
+          },
+          {
+            "account": {
+              "age_band": "minor",
+              "birth_month": "2010-03"
+            },
+            "guest": {
+              "age_band": "adult"
+            }
+          },
+          {
+            "account": {
+              "age_band": "unconfirmed"
+            },
+            "guest": {
+              "age_band": "minor",
+              "birth_month": "2010-03"
+            }
+          },
+          {
+            "account": {
+              "age_band": "adult"
+            },
+            "guest": {
+              "age_band": "adult"
+            }
+          },
+          {
+            "account": {
+              "age_band": "adult"
+            },
+            "guest": {
+              "age_band": "minor",
+              "birth_month": "2010-03"
+            },
+            "answer": {
+              "choice": "adult"
+            }
+          },
+          {
+            "account": {
+              "age_band": "adult"
+            },
+            "guest": {
+              "age_band": "minor",
+              "birth_month": "2010-03"
+            },
+            "answer": {
+              "choice": "minor",
+              "birth_month": "2010-03"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "reconfirm": true,
+            "until_answer": "minor"
+          },
+          {
+            "reconfirm": false,
+            "result": "minor",
+            "birth_month": "2010-03"
+          },
+          {
+            "reconfirm": false,
+            "result": "minor",
+            "birth_month": "2010-03"
+          },
+          {
+            "reconfirm": false,
+            "result": "adult"
+          },
+          {
+            "result": "adult"
+          },
+          {
+            "result": "minor",
+            "birth_month": "2010-03"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E20",
+      "title": "老用户登录后去哪",
+      "kind": "正常",
+      "rule": "R28",
+      "fn": "login",
+      "input": {
+        "account": {
+          "status": "active",
+          "age_band": "adult"
+        },
+        "consent_current": true,
+        "variants": [
+          {
+            "has_goal": true,
+            "last_position": {
+              "page": "S18",
+              "ref": "q-123",
+              "exists": true
+            }
+          },
+          {
+            "has_goal": true,
+            "last_position": {
+              "page": "S18",
+              "ref": "q-123",
+              "exists": false
+            }
+          },
+          {
+            "has_goal": false,
+            "last_position": null
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "outcome": "ok",
+            "landing": "S06",
+            "restore": {
+              "page": "S18",
+              "ref": "q-123"
+            }
+          },
+          {
+            "outcome": "ok",
+            "landing": "S06",
+            "restore": null
+          },
+          {
+            "outcome": "ok",
+            "landing": "S02"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E21",
+      "title": "回访登录页用新号码注册",
+      "kind": "边界",
+      "rule": "R19、R1、R18",
+      "fn": "login",
+      "input": {
+        "method": "phone_otp",
+        "otp": "ok",
+        "found_account": null,
+        "device_age_choice": null,
+        "consent_ticked": true
+      },
+      "expect": {
+        "outcome": "ok",
+        "created": {
+          "kind": "registered",
+          "age_band": "unconfirmed",
+          "minor_mode": true
+        },
+        "consent_records": ["user_agreement", "privacy_policy"],
+        "next": "age_confirm"
+      }
+    },
+    {
+      "id": "E22",
+      "title": "协议同意",
+      "kind": "异常",
+      "rule": "R18",
+      "fn": "consent",
+      "input": {
+        "current": {
+          "user_agreement": "v3",
+          "privacy_policy": "v5"
+        },
+        "variants": [
+          {
+            "ticked": false,
+            "agreed": {}
+          },
+          {
+            "ticked": true,
+            "agreed": {}
+          },
+          {
+            "ticked": true,
+            "agreed": {
+              "user_agreement": "v3",
+              "privacy_policy": "v4"
+            }
+          },
+          {
+            "logged_in": true,
+            "agreed": {
+              "user_agreement": "v3",
+              "privacy_policy": "v4"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "outcome": "need_consent",
+            "session_created": false
+          },
+          {
+            "outcome": "ok",
+            "records": [
+              {
+                "doc": "user_agreement",
+                "version": "v3"
+              },
+              {
+                "doc": "privacy_policy",
+                "version": "v5"
+              }
+            ]
+          },
+          {
+            "outcome": "ok",
+            "records": [
+              {
+                "doc": "privacy_policy",
+                "version": "v5"
+              }
+            ]
+          },
+          {
+            "outcome": "need_reconsent",
+            "docs": ["privacy_policy"],
+            "allowed_meanwhile": ["export", "deregister"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "E23",
+      "title": "设备已达上限",
+      "kind": "边界",
+      "rule": "R23、R26",
+      "fn": "login",
+      "input": {
+        "account": {
+          "status": "active"
+        },
+        "online": ["d1", "d2", "d3"],
+        "new_device": "d4",
+        "variants": [
+          {
+            "max_devices": 3,
+            "choose": "d1"
+          },
+          {
+            "max_devices": 3,
+            "choose": null
+          },
+          {
+            "max_devices": 5
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "listed": ["d1", "d2", "d3"],
+            "outcome": "ok",
+            "revoked": [
+              {
+                "device": "d1",
+                "reason": "other_device"
+              }
+            ]
+          },
+          {
+            "listed": ["d1", "d2", "d3"],
+            "outcome": "cancelled",
+            "session_created": false
+          },
+          {
+            "outcome": "ok",
+            "revoked": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "E24",
+      "title": "验证码校验",
+      "kind": "边界",
+      "rule": "R20",
+      "fn": "otp_check",
+      "input": {
+        "sent_at": "2026-10-21T10:00:00+08:00",
+        "variants": [
+          {
+            "entered_at": "2026-10-21T10:04:59+08:00",
+            "correct": true,
+            "wrong_before": 0
+          },
+          {
+            "entered_at": "2026-10-21T10:05:00+08:00",
+            "correct": true,
+            "wrong_before": 0
+          },
+          {
+            "entered_at": "2026-10-21T10:02:00+08:00",
+            "correct": false,
+            "wrong_before": 3
+          },
+          {
+            "entered_at": "2026-10-21T10:02:00+08:00",
+            "correct": false,
+            "wrong_before": 4
+          },
+          {
+            "entered_at": "2026-10-21T10:03:00+08:00",
+            "correct": true,
+            "wrong_before": 5
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "result": "ok"
+          },
+          {
+            "result": "expired"
+          },
+          {
+            "result": "wrong",
+            "attempts_left": 1
+          },
+          {
+            "result": "wrong",
+            "invalidated": true
+          },
+          {
+            "result": "invalidated",
+            "need_new_code": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "E25",
+      "title": "验证码发送限制",
+      "kind": "边界",
+      "rule": "R20",
+      "fn": "otp_send",
+      "input": {
+        "variants": [
+          {
+            "last_sent_at": "2026-10-21T10:00:00+08:00",
+            "now": "2026-10-21T10:00:59+08:00",
+            "sent_today": 1
+          },
+          {
+            "last_sent_at": "2026-10-21T10:00:00+08:00",
+            "now": "2026-10-21T10:01:00+08:00",
+            "sent_today": 1
+          },
+          {
+            "last_sent_at": "2026-10-21T09:00:00+08:00",
+            "now": "2026-10-21T10:00:00+08:00",
+            "sent_today": 9
+          },
+          {
+            "last_sent_at": "2026-10-21T09:00:00+08:00",
+            "now": "2026-10-21T10:00:00+08:00",
+            "sent_today": 10
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "send": false,
+            "wait_seconds": 1
+          },
+          {
+            "send": true
+          },
+          {
+            "send": true
+          },
+          {
+            "send": false,
+            "reason": "daily_limit"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E26",
+      "title": "忘记密码：不透露号码是否注册",
+      "kind": "异常",
+      "rule": "R24",
+      "fn": "reset_password",
+      "input": {
+        "variants": [
+          {
+            "phone_registered": true
+          },
+          {
+            "phone_registered": false
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "message_key": "account.reset.code_sent_if_registered",
+            "sms_sent": true
+          },
+          {
+            "message_key": "account.reset.code_sent_if_registered",
+            "sms_sent": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "E27",
+      "title": "密码输错的通知与受限",
+      "kind": "边界",
+      "rule": "R22",
+      "fn": "password_fail",
+      "input": {
+        "window_minutes": 60,
+        "variants": [
+          {
+            "fails": [
+              "2026-10-21T10:00:00+08:00",
+              "2026-10-21T10:10:00+08:00",
+              "2026-10-21T10:20:00+08:00",
+              "2026-10-21T10:30:00+08:00",
+              "2026-10-21T10:40:00+08:00"
+            ],
+            "now": "2026-10-21T10:40:00+08:00"
+          },
+          {
+            "fails": [
+              "2026-10-21T10:00:00+08:00",
+              "2026-10-21T10:05:00+08:00",
+              "2026-10-21T10:10:00+08:00",
+              "2026-10-21T10:15:00+08:00",
+              "2026-10-21T10:20:00+08:00",
+              "2026-10-21T10:25:00+08:00",
+              "2026-10-21T10:30:00+08:00",
+              "2026-10-21T10:35:00+08:00",
+              "2026-10-21T10:40:00+08:00",
+              "2026-10-21T10:45:00+08:00"
+            ],
+            "now": "2026-10-21T10:45:00+08:00"
+          },
+          {
+            "fails": [
+              "2026-10-21T10:00:00+08:00",
+              "2026-10-21T10:20:00+08:00",
+              "2026-10-21T10:40:00+08:00",
+              "2026-10-21T11:00:00+08:00",
+              "2026-10-21T11:20:00+08:00",
+              "2026-10-21T11:40:00+08:00",
+              "2026-10-21T12:00:00+08:00",
+              "2026-10-21T12:20:00+08:00",
+              "2026-10-21T12:40:00+08:00",
+              "2026-10-21T13:00:00+08:00"
+            ],
+            "now": "2026-10-21T13:00:00+08:00"
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "count_in_window": 5,
+            "notify": true,
+            "restricted": false
+          },
+          {
+            "count_in_window": 10,
+            "restricted": true,
+            "restricted_until": "2026-10-22T10:45:00+08:00",
+            "export_allowed": true
+          },
+          {
+            "max_in_any_window": 4,
+            "notify": false,
+            "restricted": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "E28",
+      "title": "受限期间登录",
+      "kind": "异常",
+      "rule": "R22",
+      "fn": "login",
+      "input": {
+        "account": {
+          "status": "restricted",
+          "restriction": {
+            "reason": "abnormal_login",
+            "until": "2026-10-12T09:30:00+08:00"
+          }
+        },
+        "variants": [
+          {
+            "now": "2026-10-11T20:00:00+08:00"
+          },
+          {
+            "now": "2026-10-12T09:30:00+08:00"
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "outcome": "restricted",
+            "until": "2026-10-12T09:30:00+08:00",
+            "actions": ["appeal", "export"],
+            "learning": false
+          },
+          {
+            "outcome": "ok",
+            "status": "active"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E29",
+      "title": "哪些设备下线",
+      "kind": "正常",
+      "rule": "R24、R25、R26",
+      "fn": "revoke",
+      "input": {
+        "online": ["d1", "d2", "d3"],
+        "variants": [
+          {
+            "action": "password_change",
+            "on": "d1"
+          },
+          {
+            "action": "phone_rebind",
+            "on": "d2"
+          },
+          {
+            "action": "password_reset",
+            "on": "d4"
+          },
+          {
+            "action": "platform_forced"
+          },
+          {
+            "action": "owner_remove",
+            "on": "d1",
+            "target": "d3"
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "revoked": ["d2", "d3"],
+            "reason": "credential_changed"
+          },
+          {
+            "revoked": ["d1", "d3"],
+            "reason": "credential_changed"
+          },
+          {
+            "revoked": ["d1", "d2", "d3"],
+            "reason": "credential_changed"
+          },
+          {
+            "revoked": ["d1", "d2", "d3"],
+            "reason": "platform_forced"
+          },
+          {
+            "revoked": ["d3"],
+            "reason": "other_device"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E30",
+      "title": "异地登录确认",
+      "kind": "正常",
+      "rule": "R27",
+      "fn": "remote_login_confirm",
+      "input": {
+        "event": {
+          "at": "2026-10-09T21:14:00+08:00",
+          "city": "杭州",
+          "device": "安卓手机 App"
+        },
+        "variants": [
+          {
+            "answer": "me"
+          },
+          {
+            "answer": "not_me"
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "common_city_added": "杭州"
+          },
+          {
+            "next": "change_password_now",
+            "after_change": {
+              "revoke": "all_other",
+              "reason": "credential_changed"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "E31",
+      "title": "只用微信或 Apple、没绑手机号",
+      "kind": "边界",
+      "rule": "R21",
+      "fn": "phone_gate",
+      "pending": "R08-Q8",
+      "input": {
+        "phone": null,
+        "variants": [
+          {
+            "credentials": ["wechat"],
+            "action": "study"
+          },
+          {
+            "credentials": ["wechat"],
+            "action": "pay"
+          },
+          {
+            "credentials": ["wechat"],
+            "action": "manage_devices"
+          },
+          {
+            "credentials": ["wechat"],
+            "action": "deregister"
+          },
+          {
+            "credentials": ["apple"],
+            "action": "deregister"
+          },
+          {
+            "credentials": ["apple"],
+            "action": "pay"
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "allowed": true
+          },
+          {
+            "allowed": false,
+            "need": "bind_phone"
+          },
+          {
+            "allowed": false,
+            "need": "bind_phone"
+          },
+          {
+            "allowed": false,
+            "need": "bind_phone"
+          },
+          {
+            "allowed": true,
+            "verify": "apple_reauth"
+          },
+          {
+            "allowed": false,
+            "need": "bind_phone"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E32",
+      "title": "申请注销",
+      "kind": "正常",
+      "rule": "R29、R30",
+      "fn": "deregister",
+      "input": {
+        "op": "apply",
+        "now": "2026-10-05T10:00:00+08:00",
+        "status": "active",
+        "identity": "verified"
+      },
+      "expect": {
+        "status": "cooling_off",
+        "applied_day": "2026-10-05",
+        "expires_at": "2026-10-20T10:00:00+08:00",
+        "revoke": "all",
+        "learning_reminders": "stopped"
+      }
+    },
+    {
+      "id": "E33",
+      "title": "冷静期内登录（原型例子）",
+      "kind": "正常",
+      "rule": "R31",
+      "fn": "deregister",
+      "input": {
+        "op": "login",
+        "applied_at": "2026-10-05T10:00:00+08:00",
+        "expires_at": "2026-10-20T10:00:00+08:00",
+        "now": "2026-10-11T08:02:00+08:00"
+      },
+      "expect": {
+        "outcome": "cooling_off",
+        "days_left": 9,
+        "auto_cancel": false,
+        "actions": ["cancel", "continue", "export"]
+      }
+    },
+    {
+      "id": "E34",
+      "title": "凌晨 4 点前申请",
+      "kind": "边界",
+      "rule": "R30、R31",
+      "fn": "deregister",
+      "input": {
+        "op": "apply_then_login",
+        "applied_at": "2026-10-05T02:30:00+08:00",
+        "now": "2026-10-11T09:00:00+08:00"
+      },
+      "expect": {
+        "applied_day": "2026-10-04",
+        "expires_at": "2026-10-20T02:30:00+08:00",
+        "expiry_day": "2026-10-19",
+        "days_left": 8
+      }
+    },
+    {
+      "id": "E35",
+      "title": "期满那一刻",
+      "kind": "边界",
+      "rule": "R31、R33",
+      "fn": "deregister",
+      "input": {
+        "op": "tick",
+        "expires_at": "2026-10-20T10:00:00+08:00",
+        "variants": [
+          {
+            "now": "2026-10-20T03:00:00+08:00"
+          },
+          {
+            "now": "2026-10-20T09:59:59+08:00"
+          },
+          {
+            "now": "2026-10-20T10:00:00+08:00"
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "days_left": 1,
+            "delete_due": false
+          },
+          {
+            "days_left": 0,
+            "delete_due": false,
+            "hint": "today_at",
+            "hint_time": "10:00"
+          },
+          {
+            "delete_due": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "E36",
+      "title": "撤销后再申请",
+      "kind": "正常",
+      "rule": "R32、R30",
+      "fn": "deregister",
+      "input": {
+        "applied_at": "2026-10-05T10:00:00+08:00",
+        "expires_at": "2026-10-20T10:00:00+08:00",
+        "variants": [
+          {
+            "op": "cancel",
+            "now": "2026-10-11T08:05:00+08:00"
+          },
+          {
+            "op": "apply",
+            "now": "2026-10-12T09:00:00+08:00",
+            "status": "active",
+            "identity": "verified"
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "status": "active",
+            "deleted_anything": false
+          },
+          {
+            "status": "cooling_off",
+            "expires_at": "2026-10-27T09:00:00+08:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E37",
+      "title": "验证服务不可用时申请注销",
+      "kind": "异常",
+      "rule": "R29",
+      "fn": "deregister",
+      "input": {
+        "op": "apply",
+        "now": "2026-10-05T10:00:00+08:00",
+        "status": "active",
+        "identity": "service_unavailable"
+      },
+      "expect": {
+        "outcome": "refused",
+        "reason": "verify_unavailable",
+        "status": "active"
+      }
+    },
+    {
+      "id": "E38",
+      "title": "期满删除的范围",
+      "kind": "正常",
+      "rule": "R34、R35",
+      "fn": "deletion_scope",
+      "input": {
+        "kinds": [
+          "goals",
+          "plans",
+          "time_budget",
+          "materials",
+          "notes",
+          "annotations",
+          "cards",
+          "answers",
+          "evidence",
+          "mastery",
+          "review_records",
+          "mistakes",
+          "forecasts",
+          "tutor_conversations",
+          "tutor_memory",
+          "mood_checkins",
+          "crisis_records",
+          "settings",
+          "devices_and_login_records",
+          "permission_usage",
+          "notifications",
+          "phone",
+          "birth_month",
+          "third_party_bindings",
+          "recycle_bin",
+          "share_links",
+          "orders_invoices",
+          "audit_logs",
+          "consent_records",
+          "analytics_events",
+          "metric_snapshots",
+          "org_task_data",
+          "org_copies_personal_learning",
+          "org_copies_inferred"
+        ]
+      },
+      "expect": {
+        "actions": {
+          "goals": "delete",
+          "plans": "delete",
+          "time_budget": "delete",
+          "materials": "delete",
+          "notes": "delete",
+          "annotations": "delete",
+          "cards": "delete",
+          "answers": "delete",
+          "evidence": "delete",
+          "mastery": "delete",
+          "review_records": "delete",
+          "mistakes": "delete",
+          "forecasts": "delete",
+          "tutor_conversations": "delete",
+          "tutor_memory": "delete",
+          "mood_checkins": "delete",
+          "crisis_records": "delete",
+          "settings": "delete",
+          "devices_and_login_records": "delete",
+          "permission_usage": "delete",
+          "notifications": "delete",
+          "phone": "delete",
+          "birth_month": "delete",
+          "third_party_bindings": "delete",
+          "recycle_bin": "delete",
+          "share_links": "invalidate",
+          "orders_invoices": "keep_legal",
+          "audit_logs": "keep_deidentified",
+          "consent_records": "keep_deidentified",
+          "analytics_events": "keep_deidentified",
+          "metric_snapshots": "keep_unchanged",
+          "org_task_data": "deidentify_for_class_stats",
+          "org_copies_personal_learning": "purge_copies",
+          "org_copies_inferred": "purge_copies"
+        },
+        "phone_released": true,
+        "purge_copies_within_days": 30,
+        "legal_review": ["crisis_records", "orders_invoices"]
+      }
+    },
+    {
+      "id": "E39",
+      "title": "连带删与不连带",
+      "kind": "边界",
+      "rule": "R12、R34",
+      "fn": "deletion_scope",
+      "input": {
+        "account": "u1",
+        "merged_guests": ["g1"],
+        "imports_by_others": [
+          {
+            "user": "u9",
+            "from": "share_link",
+            "set": "cards-1"
+          }
+        ]
+      },
+      "expect": {
+        "delete": ["u1", "g1_originals"],
+        "keep": ["u9:cards-1"]
+      }
+    }
+  ]
+}
