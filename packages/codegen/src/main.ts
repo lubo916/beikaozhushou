@@ -1,6 +1,6 @@
 // pnpm gen：生成物的唯一入口（docs/baseline/tech.md「生成物」）。生成物不进 git，dev、test、build、typecheck、lint 之前自动运行。
 // 用法：node packages/codegen/src/main.ts [--check] [--only=params,errors,...]
-//   --check  只比对、不写盘：本包生成的逐字比对；Orval、Prisma 看输入与输出是否和上次生成时一致。不一致时退出码 1。
+//   --check  只比对、不写盘：本包生成的逐字比对；工具目标看输入与输出是否和上次生成时一致。不一致时退出码 1。
 //   --only   只跑列出的目标（镜像构建只生成服务端需要的部分；一致性测试只跑不需要依赖的部分）。
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
@@ -59,13 +59,18 @@ function runFiles(target: FileTarget, check: boolean): string[] {
 /** 工具生成：输入与输出都和上次一致时跳过；返回过期（或刚更新）的目录。 */
 function runTool(target: ToolTarget, check: boolean, stamps: Record<string, Stamp>): string[] {
   const inputs = digest(target.inputs(ROOT));
-  const files = listDir(target.outDir);
+  const files = target.outputs ? [...target.outputs] : listDir(target.outDir);
   const prev = stamps[target.name];
-  if (files.length > 0 && prev?.inputs === inputs && prev.outputs === digest(files)) return [];
+  if (files.length > 0 && files.every((rel) => existsSync(join(ROOT, rel))) && prev?.inputs === inputs && prev.outputs === digest(files))
+    return [];
   if (check) return [target.outDir];
   if (!existsSync(join(ROOT, target.bin))) throw new Error(`${target.title}：找不到 ${target.bin}，先运行 pnpm install`);
+  mkdirSync(join(ROOT, target.outDir), { recursive: true });
   target.run(ROOT);
-  stamps[target.name] = { inputs: digest(target.inputs(ROOT)), outputs: digest(listDir(target.outDir)) };
+  stamps[target.name] = {
+    inputs: digest(target.inputs(ROOT)),
+    outputs: digest(target.outputs ? [...target.outputs] : listDir(target.outDir)),
+  };
   return [target.outDir];
 }
 

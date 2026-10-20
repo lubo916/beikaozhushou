@@ -1,6 +1,5 @@
-// pnpm gen 的生成目标。files 类由本包读来源直接生成（纯读文件，没装依赖也能跑）；tool 类调用 Orval、Prisma。
+// pnpm gen 的生成目标。files 类由本包读来源直接生成；tool 类复用令牌、词汇、Orval 与 Prisma 的生成器。
 // 生成物都不进 git（.gitignore），由 main.ts 在 dev、test、build、typecheck、lint 之前自动生成。
-// 设计令牌（packages/ui/src/generated/）的生成方式由 F03 定，暂不在这里。
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { basename, join } from "node:path";
@@ -30,6 +29,8 @@ export interface ToolTarget {
   readonly inputs: (root: string) => string[];
   /** 工具写入的目录（仓库相对路径）。 */
   readonly outDir: string;
+  /** 只生成部分文件时明确列出，避免把同目录的手写文件算作生成物。 */
+  readonly outputs?: readonly string[];
   /** 工具的命令（仓库相对路径）；找不到时提示先 pnpm install。 */
   readonly bin: string;
   readonly run: (root: string) => void;
@@ -477,8 +478,35 @@ const prisma: ToolTarget = {
   run: (root) => exec(root, join(root, "node_modules/.bin/prisma"), ["generate"], "Prisma 客户端生成"),
 };
 
+const tokens: ToolTarget = {
+  kind: "tool",
+  name: "tokens",
+  title: "设计令牌",
+  inputs: () => [
+    "design/tokens.json",
+    "design/tokens.resolver.json",
+    "packages/ui/scripts/gen-tokens.ts",
+    "packages/ui/scripts/tokens-build.ts",
+  ],
+  outDir: "packages/ui/src/generated",
+  outputs: ["packages/ui/src/generated/tokens.css", "packages/ui/src/generated/tailwind-theme.css"],
+  bin: "packages/ui/scripts/gen-tokens.ts",
+  run: (root) => exec(root, process.execPath, ["packages/ui/scripts/gen-tokens.ts"], "设计令牌生成"),
+};
+
+const vocab: ToolTarget = {
+  kind: "tool",
+  name: "vocab",
+  title: "词汇常量",
+  inputs: () => ["docs/product/glossary.yaml", "tools/gen-vocab.ts", "packages/codegen/src/yaml.ts"],
+  outDir: "packages/shared/src/vocab",
+  outputs: ["packages/shared/src/vocab/glossary.generated.ts"],
+  bin: "tools/gen-vocab.ts",
+  run: (root) => exec(root, process.execPath, ["tools/gen-vocab.ts"], "词汇常量生成"),
+};
+
 /** 按顺序执行：错误码在接口代码之前（请求函数引用错误码）。 */
-export const TARGETS: readonly Target[] = [params, errors, permissions, metrics, pages, models, orval, prisma];
+export const TARGETS: readonly Target[] = [params, errors, permissions, metrics, pages, models, tokens, vocab, orval, prisma];
 
 /** 文件名（不含扩展名），一致性检查用。 */
 export function stem(path: string): string {

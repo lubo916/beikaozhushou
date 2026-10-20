@@ -57,7 +57,7 @@ design/prototype/        冻结原型（只读；用 bk spec / bk proto 看）
 | 工具库 | date-fns 4 + @date-fns/tz、decimal.js（金额存整数分）、uuid v7、原生 fetch | moment、dayjs、axios、got；雪花 ID；浮点算钱 |
 | 测试 | Vitest 4、Playwright、MSW、ESLint 10 扁平配置、Prettier、dependency-cruiser | Jest、Cypress、madge；.eslintrc |
 | 运维 | Docker + compose、阿里云 ACR/ECS/RDS/OSS、Caddy、日志服务、GlitchTip | PM2；登服务器手改 |
-| 设计令牌 | design/tokens.json（DTCG）生成 CSS 变量与 Tailwind 主题（生成方式 F03 定；要用 Terrazzo 先登记） | 页面里写颜色值 |
+| 设计令牌 | design/tokens.json（DTCG）生成 CSS 变量与 Tailwind 主题（F03 使用仓库内纯 TS 生成器；要用 Terrazzo 先登记） | 页面里写颜色值 |
 | 导出 | Playwright 打印 PDF ＋ pdf-lib（写 AI 标识）、exceljs、docx | |
 | 支付与云服务 | 微信支付 APIv3（JSAPI、H5、Native）、支付宝官方 SDK；阿里云 OSS 私有桶＋临时凭证、短信、内容安全、文字识别、文档智能、智能语音、视频点播 | |
 
@@ -107,7 +107,7 @@ design/prototype/        冻结原型（只读；用 bk spec / bk proto 看）
 
 ## 生成物
 
-生成物都由 `pnpm gen`（packages/codegen）生成，不进 git；`dev`、`dev:real`、`lint`、`typecheck`、`test`、`build`、`test:db`、`e2e:smoke` 之前自动运行。这样并行的任务不会在生成文件上冲突。
+生成物都由 `pnpm gen`（packages/codegen）生成，不进 git；`dev`、`dev:real`、`lint`、`typecheck`、`test`、`build`、`test:db`、`e2e:smoke`、`gallery` 之前自动运行。这样并行的任务不会在生成文件上冲突。
 
 | 目标 | 来源 | 生成到 |
 |---|---|---|
@@ -118,10 +118,14 @@ design/prototype/        冻结原型（只读；用 bk spec / bk proto 看）
 | models 表元数据 | packages/db/prisma/schema/*.prisma | packages/db/src/generated/models.ts |
 | orval 接口代码 | contracts/openapi.yaml（经 scripts/engineering/contract-gen.mjs） | packages/contract/src/generated/api/ |
 | prisma 客户端 | packages/db/prisma/schema/ | packages/db/generated/prisma/ |
+| tokens 设计令牌与 Tailwind 4 主题 | design/tokens.json、design/tokens.resolver.json | packages/ui/src/generated/tokens.css、tailwind-theme.css |
+| vocab 词汇常量 | docs/product/glossary.yaml | packages/shared/src/vocab/glossary.generated.ts |
 
 - 前六项由 packages/codegen 直接读来源生成（自带只认登记文件写法的 YAML 解析器，不用装依赖）；与 V3 旧生成物逐行比对过，除第一行文件头外完全一致。Orval 与 Prisma 两项要先 pnpm install，来源与输出都没变时跳过（记录在 .cache/codegen/）。
 - `pnpm gen:check` 只比对不写盘，过期或被手改就报错；`--only=<目标,…>` 只跑部分目标（镜像构建用）。
-- 设计令牌（packages/ui/src/generated/）的生成方式由 F03 定，F03 接管前仍在 git 里。
+- F03 的 tokens、vocab 目标复用仓库已有脚本，不需新增依赖；冷启动创建输出目录，记录来源与明确输出文件的摘要，缺失或被手改后会重新生成。这三个生成文件不进 git。
+- `pnpm lint` 通过 `lint:copy` 运行词汇、状态名与档位名、禁用词和规则文案裸数字检查；`pnpm typecheck` 同时检查 packages/ui/scripts 下的生成脚本、守卫与测试。
+- `pnpm gallery` 在现有 Chromium、WebKit、Firefox 环境打开 /dev/ui，检查 375、834、1280 三档布局和交互，直接生成真实截图到 .test-results/gallery/；它不是占位命令，也不依赖默认关闭的快照对比。
 
 ## 网页沙箱（claude.ai 代码执行）注意事项
 
