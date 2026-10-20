@@ -2,8 +2,8 @@ import { randomUUID } from "node:crypto";
 import { fastify, type FastifyBaseLogger, type FastifyInstance, type FastifyServerOptions } from "fastify";
 import type {} from "@exam-prep/db/fastify";
 import { getPrisma, type PrismaClient } from "@exam-prep/db/client";
-import { metricsRoutes } from "@exam-prep/domain-metrics";
-import { platformRoutes } from "@exam-prep/domain-platform";
+import { metricsRoutes } from "@exam-prep/domain-metrics/server";
+import { platformRoutes } from "@exam-prep/domain-platform/server";
 import { setParamSource, type ParamSource } from "@exam-prep/params";
 import { fixedIdentityFromEnv, registerContext, type IdentitySource } from "./context.ts";
 import { assertRunnable, getEnv, type EnvName } from "./env.ts";
@@ -48,6 +48,8 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   registerContext(app, identity);
   registerRoleCheck(app);
   registerErrorHandling(app);
+  // 健康检查：/health 给本地预览与部署探活；/healthz 是旧地址，compose.staging.yaml 与 Playwright 仍在用
+  app.get("/health", { config: { infra: true } }, async () => ({ status: "ok", env }));
   app.get("/healthz", { config: { infra: true } }, async () => ({ status: "ok", env }));
   await app.register(platformRoutes, { prefix: API_PREFIX });
   await app.register(metricsRoutes, { prefix: API_PREFIX });

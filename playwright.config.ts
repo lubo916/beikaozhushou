@@ -1,10 +1,19 @@
-// Playwright（0.1b 计划 A6）：testDir 为 tests/e2e；webServer 同时起 api 与学员端；三个浏览器项目。
+// Playwright（0.1b 计划 A6）：testDir 为 tests/e2e；webServer 同时起 api 与学员端；三个浏览器项目（网页沙箱只跑 Chromium）。
 // 结果写 .test-results/playwright.json，可用 python3 scripts/engineering/test_results.py merge 合并进 results.json。截图基线只在固定版本的 Linux 镜像中生成与比对（tests/e2e/Dockerfile）。
+import { existsSync } from "node:fs";
 import { defineConfig, devices } from "@playwright/test";
 
 const API_PORT = process.env["E2E_API_PORT"] || "3100";
 const LEARNER_PORT = process.env["E2E_LEARNER_PORT"] || "5173";
 const CI = Boolean(process.env["CI"]);
+// 网页沙箱（claude.ai，有 /mnt/user-data）只带 Chromium，在那里只跑 Chromium；本地与 CI 跑三个浏览器。E2E_BROWSERS 可显式指定（逗号分隔）。
+const WEB_SANDBOX = existsSync("/mnt/user-data");
+const BROWSERS = (process.env["E2E_BROWSERS"] || (WEB_SANDBOX ? "chromium" : "chromium,webkit,firefox")).split(",");
+const PROJECTS = [
+  { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+  { name: "webkit", use: { ...devices["Desktop Safari"] } },
+  { name: "firefox", use: { ...devices["Desktop Firefox"] } },
+];
 
 export default defineConfig({
   testDir: "tests/e2e",
@@ -16,11 +25,7 @@ export default defineConfig({
   ignoreSnapshots: process.env["EXAM_PREP_SCREENSHOT_IMAGE"] !== "1",
   snapshotPathTemplate: "{testDir}/__screenshots__/{testFilePath}/{arg}-{projectName}{ext}",
   use: { baseURL: `http://127.0.0.1:${LEARNER_PORT}`, trace: "retain-on-failure" },
-  projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-    { name: "webkit", use: { ...devices["Desktop Safari"] } },
-    { name: "firefox", use: { ...devices["Desktop Firefox"] } },
-  ],
+  projects: PROJECTS.filter((project) => BROWSERS.includes(project.name)),
   webServer: [
     {
       command: "node apps/api/src/main.ts",
