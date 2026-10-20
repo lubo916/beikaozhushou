@@ -48,7 +48,7 @@ export function GroupLinks({ group, labelledBy, onNavigate }: GroupLinksProps) {
             onClick={onNavigate}
             className={({ isActive }) =>
               cx(
-                "block rounded-sm px-3 py-2",
+                "block rounded-sm px-3 py-1",
                 isActive
                   ? "bg-brand-primary-soft font-bold text-brand-primary-ink"
                   : "text-ink-secondary hover:bg-bg-sunk hover:text-ink-primary",

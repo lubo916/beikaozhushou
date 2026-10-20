@@ -82,7 +82,7 @@ export function AppShell() {
               </a>
               <div className="flex h-full">
                 {standard && <SideNav page={page} onboarding={onboarding} user={context?.user} />}
-                <div className="flex min-w-0 flex-1 flex-col">
+                <div className="flex min-w-[0] flex-1 flex-col">
                   {standard && (
                     <TopBar
                       page={page}
@@ -96,7 +96,7 @@ export function AppShell() {
                   {mode === "guided" && page !== undefined && <GuidedBar page={page} />}
                   {mode === "immersive" && <ImmersiveBar name={name} onSlot={setSlot} />}
                   {mode === "standalone" && <StandaloneBar />}
-                  <div className="relative min-h-0 flex-1">
+                  <div className="relative min-h-[0] flex-1">
                     <main id="main" tabIndex={-1} className="h-full overflow-y-auto px-4 py-4 @tablet:px-6 @tablet:py-6">
                       <DevViewBar page={page} view={view} />
                       <Suspense fallback={<PageState state="loading" pageName={name} />}>

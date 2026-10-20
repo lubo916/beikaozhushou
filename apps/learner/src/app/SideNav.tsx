@@ -45,10 +45,10 @@ export function SideNav({ page, onboarding, user }: SideNavProps) {
       className="relative z-20 hidden h-full w-(--shell-rail-width) shrink-0 flex-col border-r border-line-soft bg-bg-surface @tablet:flex @desktop:w-(--shell-sidebar-width)"
     >
       <div className="flex items-baseline justify-center gap-2 px-2 py-4 @desktop:justify-start @desktop:px-5">
-        <span className="text-center font-serif font-bold text-brand-primary-ink @desktop:text-title">{t("app.product")}</span>
+        <span className="text-center font-serif text-title leading-[1.2] font-bold text-brand-primary-ink">{t("app.product")}</span>
         <span className="hidden text-small text-ink-tertiary @desktop:inline">{t("app.end")}</span>
       </div>
-      <div className="flex min-h-0 flex-1 flex-col gap-1 px-2 pb-4 @desktop:overflow-y-auto @desktop:px-3">
+      <div className="flex min-h-[0] flex-1 flex-col gap-1 px-2 pb-4 @desktop:overflow-y-auto @desktop:px-3">
         {visibleGroups(onboarding).map((group) => {
           const labelId = `${baseId}-${group}`;
           const active = page?.group === group;
@@ -101,7 +101,7 @@ function UserCard({ user }: { user: MeContext["user"] }) {
         {initial}
       </span>
       <span className="sr-only @desktop:hidden">{user.display_name}</span>
-      <span className="hidden min-w-0 flex-col @desktop:flex">
+      <span className="hidden min-w-[0] flex-col @desktop:flex">
         <span className="truncate font-bold">{user.display_name}</span>
         <span className="truncate text-small text-ink-tertiary">{user.is_guest ? t("shell.user.guest") : t("shell.user.member")}</span>
       </span>

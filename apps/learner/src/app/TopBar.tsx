@@ -11,7 +11,7 @@ import { ShellIcon, type ShellIconName } from "./icons.tsx";
 import { useToast } from "./toast.tsx";
 
 const ICON_BUTTON =
-  "inline-flex size-10 items-center justify-center rounded-md border border-line-strong bg-bg-surface text-ink-secondary hover:text-ink-primary";
+  "inline-flex size-10 items-center justify-center rounded-md border border-line-strong bg-bg-surface text-title text-ink-secondary hover:text-ink-primary";
 
 export interface TopBarProps {
   readonly page: PageMeta | undefined;
@@ -38,7 +38,7 @@ export function TopBar({ page, name, context, showTutor, onOpenNav, onOpenTutor 
           <ShellIcon name="menu" />
         </button>
       </span>
-      <div className="min-w-0 flex-1">
+      <div className="min-w-[0] flex-1">
         <p className="hidden truncate text-small text-ink-tertiary @tablet:block">
           {page === undefined ? t("app.end") : t("shell.top.crumb", { end: t("app.end"), group: t(`group.${page.group}`) })}
         </p>
@@ -103,7 +103,7 @@ function GoalSwitch({ context }: { context: MeContext | undefined }) {
       title={t("shell.goal.manage")}
       aria-label={t("shell.goal.aria", { exam: goal.exam_name, days })}
       className={cx(
-        "inline-flex min-w-0 shrink items-center gap-2 rounded-full border border-line-strong bg-bg-sunk py-1 pr-3 pl-1 text-small",
+        "inline-flex min-w-[0] shrink items-center gap-2 rounded-full border border-line-strong bg-bg-sunk py-1 pr-3 pl-1 text-small",
       )}
     >
       <span className="truncate rounded-full bg-brand-primary px-2 py-1 font-bold text-bg-surface">{goal.short_name}</span>
