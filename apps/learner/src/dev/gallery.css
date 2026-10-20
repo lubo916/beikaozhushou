@@ -1,0 +1,153 @@
+/* 组件陈列页的版式（只用令牌）。 */
+.dev-gallery {
+  min-block-size: 100dvh;
+  background: var(--color-bg-canvas);
+}
+.dev-gallery__bar {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--size-space-2) var(--size-space-4);
+  padding: var(--size-space-3) var(--size-space-4);
+  border-block-end: var(--size-stroke-thin) solid var(--color-line-soft);
+  background: var(--color-bg-surface);
+}
+.dev-gallery__brand {
+  font-family: var(--font-family-serif);
+}
+.dev-gallery__frame {
+  margin-inline: auto;
+  max-inline-size: calc(var(--size-viewport-desktop) + var(--size-space-12));
+}
+.dev-gallery__frame--mobile {
+  max-inline-size: var(--size-viewport-min);
+  border-inline: var(--size-stroke-thin) dashed var(--color-line-strong);
+}
+.dev-gallery__frame--tablet {
+  max-inline-size: var(--size-viewport-tablet);
+  border-inline: var(--size-stroke-thin) dashed var(--color-line-strong);
+}
+.dev-gallery__frame--desktop {
+  max-inline-size: var(--size-viewport-desktop);
+  border-inline: var(--size-stroke-thin) dashed var(--color-line-strong);
+}
+.dev-gallery__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-space-8);
+  padding: var(--size-space-6) var(--size-space-4) var(--size-space-12);
+}
+.dev-toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-space-2);
+}
+.dev-toc__link {
+  padding: var(--size-space-1) var(--size-space-3);
+  border: var(--size-stroke-thin) solid var(--color-line-soft);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  color: var(--color-brand-primary-ink);
+  font-size: var(--font-size-small);
+  text-decoration: none;
+}
+.dev-toc__link:hover,
+.dev-toc__link:focus-visible {
+  border-color: var(--color-brand-primary);
+  outline: none;
+}
+.dev-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-space-3);
+  scroll-margin-block-start: var(--size-space-12);
+}
+.dev-section__title {
+  margin: 0;
+  font-family: var(--font-family-serif);
+  font-size: calc(var(--font-size-title) * 0.82);
+  font-weight: var(--font-weight-bold);
+}
+.dev-section__note,
+.dev-note {
+  margin: 0;
+  color: var(--color-ink-tertiary);
+  font-size: var(--font-size-small);
+}
+.dev-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--size-space-12) * 6)), 1fr));
+  align-items: start;
+  gap: var(--size-space-4);
+}
+.dev-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--size-space-2);
+}
+.dev-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dev-swatches,
+.dev-spaces {
+  display: grid;
+  gap: var(--size-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dev-swatch,
+.dev-space {
+  display: flex;
+  align-items: center;
+  gap: var(--size-space-3);
+  font-size: var(--font-size-small);
+}
+.dev-swatch__chip {
+  flex-shrink: 0;
+  inline-size: var(--size-space-8);
+  block-size: var(--size-space-6);
+  border: var(--size-stroke-thin) solid var(--color-line-soft);
+  border-radius: var(--radius-sm);
+}
+.dev-space code {
+  inline-size: var(--size-space-12);
+}
+.dev-space__bar {
+  block-size: var(--size-space-3);
+  border-radius: calc(var(--radius-sm) / 2);
+  background: var(--color-brand-primary);
+}
+.dev-type {
+  margin: 0 0 var(--size-space-2);
+}
+.dev-type--title {
+  font-family: var(--font-family-serif);
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-bold);
+}
+.dev-type--small {
+  color: var(--color-ink-secondary);
+  font-size: var(--font-size-small);
+}
+.dev-radius {
+  padding: var(--size-space-2) var(--size-space-3);
+  border: var(--size-stroke-thin) solid var(--color-line-strong);
+  background: var(--color-bg-sunk);
+  font-size: var(--font-size-small);
+}
+.dev-radius--md {
+  border-radius: var(--radius-md);
+}
+.dev-radius--sm {
+  border-radius: var(--radius-sm);
+}

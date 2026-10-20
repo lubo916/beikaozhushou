@@ -1,0 +1,90 @@
+{
+  "action": {
+    "retry": "重试",
+    "report": "反馈问题",
+    "confirm": "确认",
+    "decline": "不改",
+    "undo": "撤销",
+    "close": "关闭",
+    "dismiss": "知道了",
+    "start": "开始",
+    "fix": "去修复"
+  },
+  "state": {
+    "default_page": "这一页",
+    "loading": {
+      "label": "正在加载{{page}}",
+      "slow": "还在加载，网络可能有点慢；已保存的内容不受影响。"
+    },
+    "empty": {
+      "title": "这里还没有内容",
+      "body": "有了内容会显示在这里。"
+    },
+    "error": {
+      "title": "{{page}}没能加载",
+      "body": "{{page}}的数据暂时没取到：网络或服务异常。已保存的内容不受影响，点“重试”即可；连续失败会自动上报。",
+      "body_staff": "服务暂时异常，已保存的内容不受影响；重试或稍后再来。"
+    },
+    "offline": {
+      "title": "现在没有联网",
+      "body": "已缓存的内容可以继续用；需要联网的部分恢复网络后再试，学习记录联网后补记。"
+    },
+    "restricted": {
+      "title": "这部分暂时用不了",
+      "body": "原因和出路写在下面，其他功能照常可用。"
+    },
+    "insufficient_data": {
+      "title": "数据还不够，先不下结论",
+      "body": "下面是目前的原始计数。",
+      "counts": "原始计数"
+    },
+    "locked": {
+      "title": "这一块暂时锁定",
+      "body": "修好下面的问题就会解锁，其他功能照常可用。"
+    }
+  },
+  "ai": {
+    "label": "AI 生成"
+  },
+  "ladder": {
+    "system": "系统判定",
+    "self": "自评",
+    "target": "目标",
+    "self_pending": "自评待检验",
+    "uncertain": "证据不足，不等于不会",
+    "change_target": "改目标档",
+    "summary": "{{system}}：{{systemLabel}}；{{target}}：{{targetLabel}}；{{gap}}"
+  },
+  "grid": {
+    "uncertain": "证据不足，不等于不会",
+    "out_of_scope": "范围外",
+    "legend": "图例"
+  },
+  "kp": {
+    "importance": "重要度 {{level}} 级（共 {{max}} 级）",
+    "starred": "我的星标"
+  },
+  "proposal": {
+    "title": "调整提议",
+    "what": "改什么",
+    "why": "为什么",
+    "cost": "代价",
+    "if_not": "不改会怎样"
+  },
+  "evidence": {
+    "correct": "做对",
+    "wrong": "做错",
+    "partial": "部分对"
+  },
+  "task": {
+    "done": "已完成",
+    "seen": "看过",
+    "doing": "进行中"
+  },
+  "reason": {
+    "lead": "为什么是它"
+  },
+  "table": {
+    "empty": "没有数据"
+  }
+}

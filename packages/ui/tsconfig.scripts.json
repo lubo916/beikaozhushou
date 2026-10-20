@@ -1,0 +1,7 @@
+{
+  "extends": "../../tsconfig.node.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "../../node_modules/.cache/tsc-ui-scripts/tsconfig.tsbuildinfo"
+  },
+  "include": ["scripts/**/*.ts"]
+}

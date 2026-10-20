@@ -12,15 +12,15 @@
     "gen:check": "node packages/codegen/src/main.ts --check",
     "dev": "pnpm run gen && pnpm --parallel --filter @exam-prep/learner --filter @exam-prep/org --filter @exam-prep/admin --filter @exam-prep/api run dev",
     "dev:real": "pnpm run gen && VITE_REAL=${VITE_REAL-} pnpm --parallel --filter @exam-prep/learner --filter @exam-prep/org --filter @exam-prep/admin --filter @exam-prep/api --filter @exam-prep/worker run dev",
-    "lint": "pnpm run gen && prettier --check . && eslint --max-warnings=0 . && pnpm run deps:graph && python3 scripts/engineering/check_style_literals.py && python3 scripts/engineering/check_dependencies.py",
+    "lint": "pnpm run gen && prettier --check . && eslint --max-warnings=0 . && pnpm run deps:graph && python3 scripts/engineering/check_style_literals.py && python3 scripts/engineering/check_dependencies.py && pnpm run lint:copy",
     "format": "prettier --write .",
-    "typecheck": "pnpm run gen && tsc -b",
+    "typecheck": "pnpm run gen && tsc -b && tsc -p packages/ui/tsconfig.scripts.json",
     "test": "pnpm run gen && vitest run --project node --project browser && python3 scripts/engineering/test_results.py tooling",
     "test:unit": "vitest run --project node",
     "test:db": "pnpm run gen && vitest run --project db",
     "build": "pnpm run gen && pnpm --filter @exam-prep/learner --filter @exam-prep/org --filter @exam-prep/admin run build",
     "e2e:smoke": "pnpm run gen && playwright test tests/e2e/smoke",
-    "gallery": "echo 组件陈列页（/dev/ui）由 F03 建立，现在是占位命令",
+    "gallery": "pnpm run gen && playwright test tests/e2e/gallery.spec.ts",
     "deps:graph": "depcruise --config .dependency-cruiser.cjs apps packages",
     "deps:check": "python3 scripts/engineering/check_dependencies.py",
     "contract:gen": "node scripts/engineering/contract-gen.mjs",
@@ -32,7 +32,8 @@
     "db:seed": "node --env-file-if-exists=.env packages/db/src/seed-cli.ts",
     "dev:api": "pnpm --filter @exam-prep/api dev",
     "dev:worker": "pnpm --filter @exam-prep/worker dev",
-    "dev:learner": "pnpm --filter @exam-prep/learner dev"
+    "dev:learner": "pnpm --filter @exam-prep/learner dev",
+    "lint:copy": "vitest run --project node packages/ui/scripts/repo-guards.test.ts"
   },
   "dependencies": {
     "prisma": "7.0.0"
