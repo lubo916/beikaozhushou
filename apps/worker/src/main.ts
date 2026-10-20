@@ -1,7 +1,7 @@
 // worker 进程入口：node apps/worker/src/main.ts（Node 24 直接运行 TS）。BullMQ 连接 Redis；健康检查 GET /healthz。
 import { Redis } from "ioredis";
 import { pino } from "pino";
-import { assertRunnable, parseEnvName } from "@exam-prep/domain-platform";
+import { assertRunnable, parseEnvName } from "@exam-prep/domain-platform/core";
 import { createHealthServer } from "./health.ts";
 import { PROCESSORS, startWorkers } from "./runtime.ts";
 

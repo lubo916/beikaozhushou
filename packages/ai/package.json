@@ -1,0 +1,8 @@
+{
+  "name": "@exam-prep/ai",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./core": "./core/index.ts"
+  }
+}

@@ -57,9 +57,66 @@ importers:
       '@exam-prep/contract':
         specifier: workspace:*
         version: link:../../packages/contract
+      '@exam-prep/domain-account':
+        specifier: workspace:*
+        version: link:../../packages/domains/account
+      '@exam-prep/domain-aigov':
+        specifier: workspace:*
+        version: link:../../packages/domains/aigov
+      '@exam-prep/domain-billing':
+        specifier: workspace:*
+        version: link:../../packages/domains/billing
+      '@exam-prep/domain-compliance':
+        specifier: workspace:*
+        version: link:../../packages/domains/compliance
+      '@exam-prep/domain-content':
+        specifier: workspace:*
+        version: link:../../packages/domains/content
+      '@exam-prep/domain-engagement':
+        specifier: workspace:*
+        version: link:../../packages/domains/engagement
+      '@exam-prep/domain-exam':
+        specifier: workspace:*
+        version: link:../../packages/domains/exam
+      '@exam-prep/domain-grading':
+        specifier: workspace:*
+        version: link:../../packages/domains/grading
+      '@exam-prep/domain-learner':
+        specifier: workspace:*
+        version: link:../../packages/domains/learner
+      '@exam-prep/domain-map':
+        specifier: workspace:*
+        version: link:../../packages/domains/map
+      '@exam-prep/domain-metrics':
+        specifier: workspace:*
+        version: link:../../packages/domains/metrics
+      '@exam-prep/domain-moderation':
+        specifier: workspace:*
+        version: link:../../packages/domains/moderation
+      '@exam-prep/domain-org':
+        specifier: workspace:*
+        version: link:../../packages/domains/org
+      '@exam-prep/domain-plan':
+        specifier: workspace:*
+        version: link:../../packages/domains/plan
+      '@exam-prep/domain-platform':
+        specifier: workspace:*
+        version: link:../../packages/domains/platform
+      '@exam-prep/domain-practice':
+        specifier: workspace:*
+        version: link:../../packages/domains/practice
+      '@exam-prep/domain-support':
+        specifier: workspace:*
+        version: link:../../packages/domains/support
+      '@exam-prep/domain-tutor':
+        specifier: workspace:*
+        version: link:../../packages/domains/tutor
       '@exam-prep/params':
         specifier: workspace:*
         version: link:../../packages/params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@exam-prep/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -99,7 +156,7 @@ importers:
         version: 7.1.0(@types/node@24.0.0)(jiti@2.7.0)(lightningcss@1.30.2)(yaml@2.9.1)
       vitest:
         specifier: 4.0.0
-        version: 4.0.0(@types/node@24.0.0)(@vitest/browser-playwright@4.0.0)(jiti@2.7.0)(lightningcss@1.30.2)(msw@2.10.0(@types/node@24.0.0)(typescript@5.9.3))(yaml@2.9.1)
+        version: 4.0.0(@types/node@24.0.0)(@vitest/browser-playwright@4.0.0)(jiti@2.7.0)(lightningcss@1.30.2)(msw@2.10.0(@types/node@24.0.0)(typescript@6.0.3))(yaml@2.9.1)
 
   apps/api:
     dependencies:
@@ -109,15 +166,66 @@ importers:
       '@exam-prep/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@exam-prep/domain-account':
+        specifier: workspace:*
+        version: link:../../packages/domains/account
+      '@exam-prep/domain-aigov':
+        specifier: workspace:*
+        version: link:../../packages/domains/aigov
+      '@exam-prep/domain-billing':
+        specifier: workspace:*
+        version: link:../../packages/domains/billing
+      '@exam-prep/domain-compliance':
+        specifier: workspace:*
+        version: link:../../packages/domains/compliance
+      '@exam-prep/domain-content':
+        specifier: workspace:*
+        version: link:../../packages/domains/content
+      '@exam-prep/domain-engagement':
+        specifier: workspace:*
+        version: link:../../packages/domains/engagement
+      '@exam-prep/domain-exam':
+        specifier: workspace:*
+        version: link:../../packages/domains/exam
+      '@exam-prep/domain-grading':
+        specifier: workspace:*
+        version: link:../../packages/domains/grading
+      '@exam-prep/domain-learner':
+        specifier: workspace:*
+        version: link:../../packages/domains/learner
+      '@exam-prep/domain-map':
+        specifier: workspace:*
+        version: link:../../packages/domains/map
       '@exam-prep/domain-metrics':
         specifier: workspace:*
         version: link:../../packages/domains/metrics
+      '@exam-prep/domain-moderation':
+        specifier: workspace:*
+        version: link:../../packages/domains/moderation
+      '@exam-prep/domain-org':
+        specifier: workspace:*
+        version: link:../../packages/domains/org
+      '@exam-prep/domain-plan':
+        specifier: workspace:*
+        version: link:../../packages/domains/plan
       '@exam-prep/domain-platform':
         specifier: workspace:*
         version: link:../../packages/domains/platform
+      '@exam-prep/domain-practice':
+        specifier: workspace:*
+        version: link:../../packages/domains/practice
+      '@exam-prep/domain-support':
+        specifier: workspace:*
+        version: link:../../packages/domains/support
+      '@exam-prep/domain-tutor':
+        specifier: workspace:*
+        version: link:../../packages/domains/tutor
       '@exam-prep/params':
         specifier: workspace:*
         version: link:../../packages/params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       fastify:
         specifier: 5.4.0
         version: 5.4.0
@@ -134,9 +242,66 @@ importers:
       '@exam-prep/contract':
         specifier: workspace:*
         version: link:../../packages/contract
+      '@exam-prep/domain-account':
+        specifier: workspace:*
+        version: link:../../packages/domains/account
+      '@exam-prep/domain-aigov':
+        specifier: workspace:*
+        version: link:../../packages/domains/aigov
+      '@exam-prep/domain-billing':
+        specifier: workspace:*
+        version: link:../../packages/domains/billing
+      '@exam-prep/domain-compliance':
+        specifier: workspace:*
+        version: link:../../packages/domains/compliance
+      '@exam-prep/domain-content':
+        specifier: workspace:*
+        version: link:../../packages/domains/content
+      '@exam-prep/domain-engagement':
+        specifier: workspace:*
+        version: link:../../packages/domains/engagement
+      '@exam-prep/domain-exam':
+        specifier: workspace:*
+        version: link:../../packages/domains/exam
+      '@exam-prep/domain-grading':
+        specifier: workspace:*
+        version: link:../../packages/domains/grading
+      '@exam-prep/domain-learner':
+        specifier: workspace:*
+        version: link:../../packages/domains/learner
+      '@exam-prep/domain-map':
+        specifier: workspace:*
+        version: link:../../packages/domains/map
+      '@exam-prep/domain-metrics':
+        specifier: workspace:*
+        version: link:../../packages/domains/metrics
+      '@exam-prep/domain-moderation':
+        specifier: workspace:*
+        version: link:../../packages/domains/moderation
+      '@exam-prep/domain-org':
+        specifier: workspace:*
+        version: link:../../packages/domains/org
+      '@exam-prep/domain-plan':
+        specifier: workspace:*
+        version: link:../../packages/domains/plan
+      '@exam-prep/domain-platform':
+        specifier: workspace:*
+        version: link:../../packages/domains/platform
+      '@exam-prep/domain-practice':
+        specifier: workspace:*
+        version: link:../../packages/domains/practice
+      '@exam-prep/domain-support':
+        specifier: workspace:*
+        version: link:../../packages/domains/support
+      '@exam-prep/domain-tutor':
+        specifier: workspace:*
+        version: link:../../packages/domains/tutor
       '@exam-prep/params':
         specifier: workspace:*
         version: link:../../packages/params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@exam-prep/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -182,16 +347,73 @@ importers:
         version: 7.1.0(@types/node@24.0.0)(jiti@2.7.0)(lightningcss@1.30.2)(yaml@2.9.1)
       vitest:
         specifier: 4.0.0
-        version: 4.0.0(@types/node@24.0.0)(@vitest/browser-playwright@4.0.0)(jiti@2.7.0)(lightningcss@1.30.2)(msw@2.10.0(@types/node@24.0.0)(typescript@5.9.3))(yaml@2.9.1)
+        version: 4.0.0(@types/node@24.0.0)(@vitest/browser-playwright@4.0.0)(jiti@2.7.0)(lightningcss@1.30.2)(msw@2.10.0(@types/node@24.0.0)(typescript@6.0.3))(yaml@2.9.1)
 
   apps/org:
     dependencies:
       '@exam-prep/contract':
         specifier: workspace:*
         version: link:../../packages/contract
+      '@exam-prep/domain-account':
+        specifier: workspace:*
+        version: link:../../packages/domains/account
+      '@exam-prep/domain-aigov':
+        specifier: workspace:*
+        version: link:../../packages/domains/aigov
+      '@exam-prep/domain-billing':
+        specifier: workspace:*
+        version: link:../../packages/domains/billing
+      '@exam-prep/domain-compliance':
+        specifier: workspace:*
+        version: link:../../packages/domains/compliance
+      '@exam-prep/domain-content':
+        specifier: workspace:*
+        version: link:../../packages/domains/content
+      '@exam-prep/domain-engagement':
+        specifier: workspace:*
+        version: link:../../packages/domains/engagement
+      '@exam-prep/domain-exam':
+        specifier: workspace:*
+        version: link:../../packages/domains/exam
+      '@exam-prep/domain-grading':
+        specifier: workspace:*
+        version: link:../../packages/domains/grading
+      '@exam-prep/domain-learner':
+        specifier: workspace:*
+        version: link:../../packages/domains/learner
+      '@exam-prep/domain-map':
+        specifier: workspace:*
+        version: link:../../packages/domains/map
+      '@exam-prep/domain-metrics':
+        specifier: workspace:*
+        version: link:../../packages/domains/metrics
+      '@exam-prep/domain-moderation':
+        specifier: workspace:*
+        version: link:../../packages/domains/moderation
+      '@exam-prep/domain-org':
+        specifier: workspace:*
+        version: link:../../packages/domains/org
+      '@exam-prep/domain-plan':
+        specifier: workspace:*
+        version: link:../../packages/domains/plan
+      '@exam-prep/domain-platform':
+        specifier: workspace:*
+        version: link:../../packages/domains/platform
+      '@exam-prep/domain-practice':
+        specifier: workspace:*
+        version: link:../../packages/domains/practice
+      '@exam-prep/domain-support':
+        specifier: workspace:*
+        version: link:../../packages/domains/support
+      '@exam-prep/domain-tutor':
+        specifier: workspace:*
+        version: link:../../packages/domains/tutor
       '@exam-prep/params':
         specifier: workspace:*
         version: link:../../packages/params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@exam-prep/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -231,13 +453,73 @@ importers:
         version: 7.1.0(@types/node@24.0.0)(jiti@2.7.0)(lightningcss@1.30.2)(yaml@2.9.1)
       vitest:
         specifier: 4.0.0
-        version: 4.0.0(@types/node@24.0.0)(@vitest/browser-playwright@4.0.0)(jiti@2.7.0)(lightningcss@1.30.2)(msw@2.10.0(@types/node@24.0.0)(typescript@5.9.3))(yaml@2.9.1)
+        version: 4.0.0(@types/node@24.0.0)(@vitest/browser-playwright@4.0.0)(jiti@2.7.0)(lightningcss@1.30.2)(msw@2.10.0(@types/node@24.0.0)(typescript@6.0.3))(yaml@2.9.1)
 
   apps/worker:
     dependencies:
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@exam-prep/domain-account':
+        specifier: workspace:*
+        version: link:../../packages/domains/account
+      '@exam-prep/domain-aigov':
+        specifier: workspace:*
+        version: link:../../packages/domains/aigov
+      '@exam-prep/domain-billing':
+        specifier: workspace:*
+        version: link:../../packages/domains/billing
+      '@exam-prep/domain-compliance':
+        specifier: workspace:*
+        version: link:../../packages/domains/compliance
+      '@exam-prep/domain-content':
+        specifier: workspace:*
+        version: link:../../packages/domains/content
+      '@exam-prep/domain-engagement':
+        specifier: workspace:*
+        version: link:../../packages/domains/engagement
+      '@exam-prep/domain-exam':
+        specifier: workspace:*
+        version: link:../../packages/domains/exam
+      '@exam-prep/domain-grading':
+        specifier: workspace:*
+        version: link:../../packages/domains/grading
+      '@exam-prep/domain-learner':
+        specifier: workspace:*
+        version: link:../../packages/domains/learner
+      '@exam-prep/domain-map':
+        specifier: workspace:*
+        version: link:../../packages/domains/map
+      '@exam-prep/domain-metrics':
+        specifier: workspace:*
+        version: link:../../packages/domains/metrics
+      '@exam-prep/domain-moderation':
+        specifier: workspace:*
+        version: link:../../packages/domains/moderation
+      '@exam-prep/domain-org':
+        specifier: workspace:*
+        version: link:../../packages/domains/org
+      '@exam-prep/domain-plan':
+        specifier: workspace:*
+        version: link:../../packages/domains/plan
       '@exam-prep/domain-platform':
         specifier: workspace:*
         version: link:../../packages/domains/platform
+      '@exam-prep/domain-practice':
+        specifier: workspace:*
+        version: link:../../packages/domains/practice
+      '@exam-prep/domain-support':
+        specifier: workspace:*
+        version: link:../../packages/domains/support
+      '@exam-prep/domain-tutor':
+        specifier: workspace:*
+        version: link:../../packages/domains/tutor
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../packages/params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       bullmq:
         specifier: 5.50.0
         version: 5.50.0
@@ -256,6 +538,8 @@ importers:
         version: 4.0.0(@types/node@24.0.0)(@vitest/browser-playwright@4.0.0)(jiti@2.7.0)(lightningcss@1.30.2)(msw@2.10.0(@types/node@24.0.0)(typescript@6.0.3))(yaml@2.9.1)
 
   evals: {}
+
+  packages/ai: {}
 
   packages/contract:
     dependencies:
@@ -304,7 +588,306 @@ importers:
         specifier: 4.0.0
         version: 4.0.0(@types/node@24.0.0)(@vitest/browser-playwright@4.0.0)(jiti@2.7.0)(lightningcss@1.30.2)(msw@2.10.0(@types/node@24.0.0)(typescript@6.0.3))(yaml@2.9.1)
 
+  packages/domains/account:
+    dependencies:
+      '@exam-prep/contract':
+        specifier: workspace:*
+        version: link:../../contract
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../shared
+    devDependencies:
+      '@types/node':
+        specifier: 24.0.0
+        version: 24.0.0
+      fastify:
+        specifier: 5.4.0
+        version: 5.4.0
+
+  packages/domains/aigov:
+    dependencies:
+      '@exam-prep/contract':
+        specifier: workspace:*
+        version: link:../../contract
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../shared
+    devDependencies:
+      '@types/node':
+        specifier: 24.0.0
+        version: 24.0.0
+      fastify:
+        specifier: 5.4.0
+        version: 5.4.0
+
+  packages/domains/billing:
+    dependencies:
+      '@exam-prep/contract':
+        specifier: workspace:*
+        version: link:../../contract
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../shared
+    devDependencies:
+      '@types/node':
+        specifier: 24.0.0
+        version: 24.0.0
+      fastify:
+        specifier: 5.4.0
+        version: 5.4.0
+
+  packages/domains/compliance:
+    dependencies:
+      '@exam-prep/contract':
+        specifier: workspace:*
+        version: link:../../contract
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../shared
+    devDependencies:
+      '@types/node':
+        specifier: 24.0.0
+        version: 24.0.0
+      fastify:
+        specifier: 5.4.0
+        version: 5.4.0
+
+  packages/domains/content:
+    dependencies:
+      '@exam-prep/contract':
+        specifier: workspace:*
+        version: link:../../contract
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../shared
+    devDependencies:
+      '@types/node':
+        specifier: 24.0.0
+        version: 24.0.0
+      fastify:
+        specifier: 5.4.0
+        version: 5.4.0
+
+  packages/domains/engagement:
+    dependencies:
+      '@exam-prep/contract':
+        specifier: workspace:*
+        version: link:../../contract
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../shared
+    devDependencies:
+      '@types/node':
+        specifier: 24.0.0
+        version: 24.0.0
+      fastify:
+        specifier: 5.4.0
+        version: 5.4.0
+
+  packages/domains/exam:
+    dependencies:
+      '@exam-prep/contract':
+        specifier: workspace:*
+        version: link:../../contract
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../shared
+    devDependencies:
+      '@types/node':
+        specifier: 24.0.0
+        version: 24.0.0
+      fastify:
+        specifier: 5.4.0
+        version: 5.4.0
+
+  packages/domains/grading:
+    dependencies:
+      '@exam-prep/contract':
+        specifier: workspace:*
+        version: link:../../contract
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../shared
+    devDependencies:
+      '@types/node':
+        specifier: 24.0.0
+        version: 24.0.0
+      fastify:
+        specifier: 5.4.0
+        version: 5.4.0
+
+  packages/domains/learner:
+    dependencies:
+      '@exam-prep/contract':
+        specifier: workspace:*
+        version: link:../../contract
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../shared
+    devDependencies:
+      '@types/node':
+        specifier: 24.0.0
+        version: 24.0.0
+      fastify:
+        specifier: 5.4.0
+        version: 5.4.0
+
+  packages/domains/map:
+    dependencies:
+      '@exam-prep/contract':
+        specifier: workspace:*
+        version: link:../../contract
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../shared
+    devDependencies:
+      '@types/node':
+        specifier: 24.0.0
+        version: 24.0.0
+      fastify:
+        specifier: 5.4.0
+        version: 5.4.0
+
   packages/domains/metrics:
+    dependencies:
+      '@exam-prep/contract':
+        specifier: workspace:*
+        version: link:../../contract
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../shared
+    devDependencies:
+      '@types/node':
+        specifier: 24.0.0
+        version: 24.0.0
+      fastify:
+        specifier: 5.4.0
+        version: 5.4.0
+
+  packages/domains/moderation:
+    dependencies:
+      '@exam-prep/contract':
+        specifier: workspace:*
+        version: link:../../contract
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../shared
+    devDependencies:
+      '@types/node':
+        specifier: 24.0.0
+        version: 24.0.0
+      fastify:
+        specifier: 5.4.0
+        version: 5.4.0
+
+  packages/domains/org:
+    dependencies:
+      '@exam-prep/contract':
+        specifier: workspace:*
+        version: link:../../contract
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../shared
+    devDependencies:
+      '@types/node':
+        specifier: 24.0.0
+        version: 24.0.0
+      fastify:
+        specifier: 5.4.0
+        version: 5.4.0
+
+  packages/domains/plan:
+    dependencies:
+      '@exam-prep/contract':
+        specifier: workspace:*
+        version: link:../../contract
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../shared
     devDependencies:
       '@types/node':
         specifier: 24.0.0
@@ -314,6 +897,85 @@ importers:
         version: 5.4.0
 
   packages/domains/platform:
+    dependencies:
+      '@exam-prep/contract':
+        specifier: workspace:*
+        version: link:../../contract
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../shared
+    devDependencies:
+      '@types/node':
+        specifier: 24.0.0
+        version: 24.0.0
+      fastify:
+        specifier: 5.4.0
+        version: 5.4.0
+
+  packages/domains/practice:
+    dependencies:
+      '@exam-prep/contract':
+        specifier: workspace:*
+        version: link:../../contract
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../shared
+    devDependencies:
+      '@types/node':
+        specifier: 24.0.0
+        version: 24.0.0
+      fastify:
+        specifier: 5.4.0
+        version: 5.4.0
+
+  packages/domains/support:
+    dependencies:
+      '@exam-prep/contract':
+        specifier: workspace:*
+        version: link:../../contract
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../shared
+    devDependencies:
+      '@types/node':
+        specifier: 24.0.0
+        version: 24.0.0
+      fastify:
+        specifier: 5.4.0
+        version: 5.4.0
+
+  packages/domains/tutor:
+    dependencies:
+      '@exam-prep/contract':
+        specifier: workspace:*
+        version: link:../../contract
+      '@exam-prep/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@exam-prep/params':
+        specifier: workspace:*
+        version: link:../../params
+      '@exam-prep/shared':
+        specifier: workspace:*
+        version: link:../../shared
     devDependencies:
       '@types/node':
         specifier: 24.0.0
@@ -323,6 +985,8 @@ importers:
         version: 5.4.0
 
   packages/params: {}
+
+  packages/shared: {}
 
   packages/ui: {}
 

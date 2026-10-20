@@ -5,7 +5,7 @@
 1. 工作区每个 package.json 的依赖都在允许清单中，版本写精确版本（不写 ^、~、范围、标签或预发布版本），
    大版本落在登记的大版本内；工作区包之间写 workspace:*。
 2. 禁用清单中的包不出现在任何 package.json；配置陷阱（.eslintrc、tailwind.config、npm/yarn/Bun/Deno 的文件）不出现。
-3. package.json 不写 pnpm 字段（pnpm 11 不读）；根 package.json 的 packageManager 为登记的 pnpm 大版本、engines.node 为登记的 Node 大版本；
+3. package.json 不写 pnpm 字段（pnpm 11 不读）；根 package.json 的 packageManager 为登记的 pnpm 大版本、engines.node 包含登记的 Node 大版本；
    根目录有 pnpm-lock.yaml（锁文件由 pnpm install 生成）。
 用法：python3 scripts/engineering/check_dependencies.py [仓库根]
 """
@@ -59,6 +59,29 @@ def _line_ok(version: str, line) -> bool:
     if line is None:
         return True
     return version == line or version.startswith(f"{line}.")
+
+
+_CMP_RE = re.compile(r"^(>=|<=|>|<|=)?v?(\d+)(?:\.(\d+))?(?:\.(\d+))?$")
+_OPS = {">=": lambda v, w: v >= w, ">": lambda v, w: v > w, "<=": lambda v, w: v <= w, "<": lambda v, w: v < w}
+
+
+def _satisfies(version: tuple, m: re.Match) -> bool:
+    parts = [int(x) for x in m.group(2, 3, 4) if x is not None]
+    op = m.group(1) or "="
+    if op == "=":
+        return list(version[: len(parts)]) == parts
+    return _OPS[op](version, tuple(parts + [0] * (3 - len(parts))))
+
+
+def _admits(spec: str, major: int) -> bool:
+    """engines.node 的写法是否允许某个 Node 大版本（F02 起写 >=22.18：开发兼容 22，本地与线上用 24）。
+    只认 >=、>、<=、<、= 组成的简单写法与 ||；认不出的写法按不允许处理。"""
+    probes = [(major, minor, 0) for minor in (0, 12, 99)]
+    for alt in spec.split("||"):
+        cmps = [_CMP_RE.match(p) for p in alt.split()]
+        if cmps and all(cmps) and any(all(_satisfies(v, m) for m in cmps) for v in probes):
+            return True
+    return False
 
 
 def _allowed_entry(name: str, policy: dict):
@@ -126,8 +149,8 @@ def check(root: Path = ROOT, policy: dict | None = None) -> list[str]:
         if not m or int(m.group(1)) != int(rt.get("pnpm", 0)):
             out.append(f"package.json：packageManager 应为 pnpm@{rt.get('pnpm')}.x.y 的精确版本，实际为 {pm or '（未写）'}")
         node = str((root_pkg.get("engines") or {}).get("node") or "")
-        if not re.search(rf"(?<!\d){rt.get('node')}(?!\d)", node):
-            out.append(f"package.json：engines.node 应限定 Node {rt.get('node')}，实际为 {node or '（未写）'}")
+        if not _admits(node, int(rt.get("node", 0))):
+            out.append(f"package.json：engines.node 应包含 Node {rt.get('node')}（本地与线上），实际为 {node or '（未写）'}")
         if not (root / "pnpm-lock.yaml").exists():
             out.append("pnpm-lock.yaml：缺少锁文件；运行 pnpm install 生成并提交")
     banned_files = policy.get("banned_files") or {}
