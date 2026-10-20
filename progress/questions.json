@@ -393,7 +393,7 @@
       "status": "answered",
       "asked": "v0009",
       "answer": "A",
-      "answered": "v0009"
+      "answered": "v0010"
     },
     {
       "id": "R02-Q2",
@@ -408,7 +408,7 @@
       "status": "answered",
       "asked": "v0009",
       "answer": "A",
-      "answered": "v0009"
+      "answered": "v0010"
     },
     {
       "id": "R02-Q3",
@@ -423,7 +423,7 @@
       "status": "answered",
       "asked": "v0009",
       "answer": "A",
-      "answered": "v0009"
+      "answered": "v0010"
     },
     {
       "id": "R02-Q4",
@@ -438,7 +438,7 @@
       "status": "answered",
       "asked": "v0009",
       "answer": "A",
-      "answered": "v0009"
+      "answered": "v0010"
     },
     {
       "id": "R02-Q5",
@@ -453,7 +453,7 @@
       "status": "answered",
       "asked": "v0009",
       "answer": "B",
-      "answered": "v0009"
+      "answered": "v0010"
     },
     {
       "id": "R02-Q6",
@@ -468,7 +468,22 @@
       "status": "answered",
       "asked": "v0009",
       "answer": "A",
-      "answered": "v0009"
+      "answered": "v0010"
+    },
+    {
+      "id": "R02-Q7",
+      "task": "R02",
+      "q": "同一知识点当天只出一项是否也限制新卡？",
+      "options": [
+        "A 新卡也去重，与到期项共享当天已出现知识点，到期项优先",
+        "B 新卡例外，可与同知识点到期项同日出现"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0010",
+      "answer": "A",
+      "answered": "v0010"
     }
   ]
 }
