@@ -22,7 +22,9 @@ describe("可访问性与动效", () => {
     expect(button?.matches(":focus-visible")).toBe(true);
     const style = getComputedStyle(button as Element);
     expect(style.outlineStyle).toBe("solid");
-    expect(style.outlineWidth).toBe("2px");
+    const thick = getComputedStyle(document.documentElement).getPropertyValue("--size-stroke-thick").trim();
+    expect(thick).not.toBe("");
+    expect(style.outlineWidth).toBe(thick);
   });
 
   it("尊重“减少动效”：样式里有统一关掉动画与过渡的规则", () => {
