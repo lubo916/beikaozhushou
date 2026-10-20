@@ -106,7 +106,10 @@ const params: FileTarget = {
       ];
       return { name: text(e, "name", where), line: `  ${JSON.stringify(text(e, "name", where))}: { ${fields.join(", ")} },` };
     });
-    unique(rows.map((r) => r.name), src);
+    unique(
+      rows.map((r) => r.name),
+      src,
+    );
     const note = "参数登记的数据与类型；访问器在 packages/params/index.ts（手写）。integer：YAML 默认值为整数时为 true。";
     const body = [
       "export const PARAMS = {",
@@ -142,7 +145,10 @@ const errors: FileTarget = {
       const messageKey = literal(text(e, "message_key", where));
       return { code, line: `  ${JSON.stringify(code)}: { httpStatus: ${status.value}, messageKey: ${messageKey} },` };
     });
-    unique(rows.map((r) => r.code), src);
+    unique(
+      rows.map((r) => r.code),
+      src,
+    );
     const note = "错误码登记：HTTP 状态与文案键；响应体为 {code, message_key, details}（docs/baseline/api-rules.md）。";
     const body = [
       "export const ERROR_CODES = {",
@@ -181,7 +187,10 @@ const permissions: FileTarget = {
       for (const role of allowed) if (!Object.hasOwn(roles, role)) throw new Error(`${where}：角色 ${role} 没有在 roles 里登记`);
       return { id: text(e, "id", where), line: `  ${JSON.stringify(text(e, "id", where))}: ${literal(allowed)},` };
     });
-    unique(actions.map((a) => a.id), src);
+    unique(
+      actions.map((a) => a.id),
+      src,
+    );
     const note = "角色与动作：每个动作允许的人类角色（AI 执行者与领域服务的调用方不在这里，见 contracts/ai/actors.yaml）。";
     const body = [
       `export const ROLES = ${literal(Object.keys(roles))} as const;`,
@@ -241,7 +250,10 @@ const metrics: FileTarget = {
       ];
       return { name: text(e, "name", where), line: `  ${JSON.stringify(text(e, "name", where))}: { ${fields.join(", ")} },` };
     });
-    unique(events.map((e) => e.name), evSrc);
+    unique(
+      events.map((e) => e.name),
+      evSrc,
+    );
     const propertyUnion = EVENT_PROPERTY_TYPES.map((t) => JSON.stringify(t)).join(" | ");
     const evNote = "埋点事件登记：source 为 client 的事件由学员端经 trackEvent 上报，为 server 的只由服务端记录。";
     const evBody = [
@@ -278,7 +290,10 @@ const metrics: FileTarget = {
       ];
       return { id: text(e, "id", where), line: `  ${JSON.stringify(text(e, "id", where))}: { ${fields.join(", ")} },` };
     });
-    unique(rows.map((r) => r.id), mSrc);
+    unique(
+      rows.map((r) => r.id),
+      mSrc,
+    );
     const mNote = "指标口径登记：名称、归属、口径出处、单位、刷新方式、展示页、最小样本与目标值。";
     const mBody = [
       "export const METRICS = {",
@@ -318,7 +333,10 @@ const pages: FileTarget = {
       const fields = `id: ${literal(text(e, "id", where))}, title: ${literal(text(e, "title", where))}, mode: ${literal(mode)}`;
       return `  { ${fields}, views: [${views.join(", ")}] },`;
     });
-    unique(entries.map((e, i) => text(e, "id", files[i] ?? dir)), dir);
+    unique(
+      entries.map((e, i) => text(e, "id", files[i] ?? dir)),
+      dir,
+    );
     const modeUnion = [...modes]
       .sort()
       .map((m) => JSON.stringify(m))

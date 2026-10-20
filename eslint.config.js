@@ -61,6 +61,7 @@ const nodeGlobals = {
 export default [
   {
     ignores: [
+      ".bk/**",
       "**/node_modules/**",
       "**/dist/**",
       "**/generated/**",

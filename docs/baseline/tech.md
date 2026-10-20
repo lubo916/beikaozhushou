@@ -102,7 +102,7 @@ design/prototype/        冻结原型（只读；用 bk spec / bk proto 看）
 | vitest | 4.0.0 |
 | zod | 4.1.0 |
 
-按 pnpm-lock.yaml 填写（各包直接依赖的确切版本）。F02 的网页沙箱没能联网，没有实际安装；F01 第 2 轮已在本地按同一份锁文件装成功，F02 只给锁文件补登记了新增的工作区包，没有改任何第三方包的版本。本地收包（bk in）安装后若有出入，以安装结果为准改这里。
+各包直接依赖的确切版本已在 F02 本地第 2 轮按冻结锁文件安装核对（pnpm 11.0.0、Node 24.22.0）。第 1 轮网页沙箱未能联网安装；本地沿用既有缓存成功安装全部 31 个工作区包，没有新增依赖或改变第三方库版本。
 还没装、等用到时由整合任务加的：Zustand、React Hook Form、shadcn/ui、lucide、sonner、motion、TipTap、react-markdown、ECharts、vite-plugin-pwa、idb、Better Auth、date-fns、decimal.js、uuid、ts-fsrs、openai、导出相关的库。
 
 ## 生成物
