@@ -1,6 +1,8 @@
-/* 三端共用的样式入口：令牌变量（generated/tokens.css，基础值在 :root，修饰器按 data-* 属性覆盖）
-   与 Tailwind 4 主题映射（generated/tailwind-theme.css：清空默认调色板与默认间距，只留登记的令牌类）。
-   各端的 styles.css 先导入 tailwindcss，再导入本文件；颜色、间距、圆角、字号只用令牌（docs/conventions/ui.md 规则 1）。 */
+/* 三端共用的样式入口：令牌变量（generated/tokens.css，基础值在 :root，修饰器按 data-* 属性覆盖）、
+   Tailwind 4 主题映射（generated/tailwind-theme.css：清空默认主题，只留登记的令牌类；间距用 size.space 阶梯）
+   与公共组件样式（styles/components.css）。令牌生成物由 node packages/ui/scripts/gen-tokens.ts 从 design/tokens.json 生成，勿手改。
+   各端的 styles.css 先导入 tailwindcss，再导入本文件；颜色、间距、圆角、字号只用令牌（ui-rules.md 第 1 节）。 */
 @import "./generated/tokens.css";
 @import "./generated/tailwind-theme.css";
+@import "./styles/components.css";
 @source "./";
