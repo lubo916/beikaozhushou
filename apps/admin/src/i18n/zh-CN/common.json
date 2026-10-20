@@ -20,7 +20,6 @@
       "logoutSoon": "退出登录要等账号接入后才能用，即将上线。"
     },
     "switch": {
-      "hint": "运营",
       "envs": {
         "development": "开发环境",
         "test": "测试环境",
