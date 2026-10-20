@@ -36,3 +36,8 @@ packages/contract/src/generated/
 # 冻结原型的截图按需由 bk proto 生成到 .bk/proto，旧导出不再入库
 design/screens/shots/
 design/screens/slices/
+# pnpm gen 的生成物（F02）：不进 git，dev、test、build、typecheck、lint 之前由 packages/codegen 生成
+packages/params/registry.generated.ts
+packages/db/src/generated/
+packages/domains/*/core/generated/
+apps/*/src/generated/
