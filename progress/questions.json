@@ -571,8 +571,10 @@
       ],
       "recommend": "A",
       "temp": "A",
-      "status": "open",
-      "asked": "v0011"
+      "status": "answered",
+      "asked": "v0011",
+      "answer": "A",
+      "answered": "v0011"
     }
   ]
 }
