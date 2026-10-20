@@ -265,8 +265,10 @@
       ],
       "recommend": "A",
       "temp": "A",
-      "status": "open",
-      "asked": "v0005"
+      "status": "answered",
+      "asked": "v0005",
+      "answer": "A 先采用五类补充演示数据，后续由对应页面任务对照原型逐页替换；保留示例数据标记。用户本轮已明确按推荐。",
+      "answered": "v0005"
     }
   ]
 }
