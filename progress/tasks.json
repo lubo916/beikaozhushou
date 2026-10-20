@@ -350,9 +350,18 @@
         "导师浮标与抽屉的外壳（内容留给 U28）",
         "交接单数据块写 \"pages\": {\"*\": \"shell\"}"
       ],
-      "status": "todo",
+      "status": "done",
       "not": [
         "页面内容"
+      ],
+      "history": [
+        {
+          "round": 1,
+          "version": "v0012",
+          "tool": "claude-web",
+          "date": "2026-10-21 06:57",
+          "status": "done"
+        }
       ]
     },
     {

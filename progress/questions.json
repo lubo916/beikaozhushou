@@ -575,6 +575,96 @@
       "asked": "v0011",
       "answer": "A",
       "answered": "v0011"
+    },
+    {
+      "id": "F05-Q1",
+      "task": "F05",
+      "q": "学员端入口 App.tsx 不在本任务的可改范围，接外壳要不要改它（连同两个旧占位测试）？",
+      "options": [
+        "A 改一行接上外壳，旧测试改成检查新外壳，交接单写明",
+        "B 不改，外壳建好但暂时看不到，等整合任务来接"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0012",
+      "answer": "A",
+      "answered": "v0012"
+    },
+    {
+      "id": "F05-Q2",
+      "task": "F05",
+      "q": "开发时“切视图（?view=）”放在哪？",
+      "options": [
+        "A 外壳里加一条只在开发时出现的切视图条，F04 的开发工具不动，以后由整合任务合并",
+        "B 直接改 F04 的开发工具条，四个功能合成一个（越界）"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0012",
+      "answer": "A",
+      "answered": "v0012"
+    },
+    {
+      "id": "F05-Q3",
+      "task": "F05",
+      "q": "沙箱下载不了 Prisma 引擎，正式检查卡住，怎么办？",
+      "options": [
+        "A 想办法在网页端把完整检查跑通",
+        "B 按“部分完成”交，由本地复验"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0012",
+      "answer": "A",
+      "answered": "v0012"
+    },
+    {
+      "id": "F05-Q4",
+      "task": "F05",
+      "q": "F04 的开发工具条整个跑到了屏幕外（位置样式不生效），要不要在本轮修？",
+      "options": [
+        "A 修：改范围外的一行，并加防再犯的测试",
+        "B 不修，留给整合任务"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0012",
+      "answer": "A",
+      "answered": "v0012"
+    },
+    {
+      "id": "F05-Q5",
+      "task": "F05",
+      "q": "扩展包页面（S21 口头表达训练、S26 报考决策）要不要先放进导航？接口还没告诉外壳当前考试开了哪些扩展包。",
+      "options": [
+        "A 先不放进导航（地址能直接打开），等接口给出扩展信息再按考试显示",
+        "B 先在导航里全部显示，方便演示"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0012",
+      "answer": "A",
+      "answered": "v0012"
+    },
+    {
+      "id": "F05-Q6",
+      "task": "F05",
+      "q": "入门引导页（备考目标、时间与资料、摸底开始页、起点报告）要不要显示“问导师”浮标？",
+      "options": [
+        "A 不显示：和原型一致，入门只留“上一步”“跳过”",
+        "B 显示：新用户卡住时可以随时问"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0012",
+      "answer": "A",
+      "answered": "v0012"
     }
   ]
 }
