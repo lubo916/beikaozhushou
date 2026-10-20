@@ -13,12 +13,12 @@ export interface DevControlOptions {
   readonly examKeys: readonly string[];
   readonly defaultExamKey: string;
   /** 走真接口的领域（VITE_REAL=plan,practice）。 */
-  readonly realDomains?: readonly string[];
+  readonly realDomains?: readonly string[] | undefined;
   /** 当前页面地址的查询串，用来读 ?state=；默认为空。 */
-  readonly search?: () => string;
+  readonly search?: (() => string) | undefined;
   /** 真实时钟（毫秒）；默认 Date.now。 */
-  readonly clock?: () => number;
-  readonly store?: ControlStore;
+  readonly clock?: (() => number) | undefined;
+  readonly store?: ControlStore | undefined;
 }
 
 const EXAM_KEY = "bk.dev.exam";

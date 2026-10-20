@@ -40,10 +40,10 @@ components:
           additionalProperties: {$ref: "#/components/schemas/OptionNote"}
         common_wrong_option: {type: integer, minimum: 0}
         group_miss_rate:
-          type: number
+          type: [number, "null"]
           minimum: 0
           maximum: 1
-          description: 同类考生的错误率（演示数据）
+          description: 同类考生的错误率（演示数据）；自建考试没有同类考生时为 null
         scoring_points: {type: array, items: {$ref: "#/components/schemas/ScoringPoint"}}
         sample_answer: {type: string}
     QuestionExplanation:
