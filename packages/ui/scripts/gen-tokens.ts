@@ -31,7 +31,9 @@ const stale = (Object.keys(OUTPUTS) as (keyof typeof OUTPUTS)[]).filter((key) =>
 if (stale.length === 0) {
   process.stdout.write("令牌生成物：已是最新\n");
 } else if (check) {
-  process.stdout.write(`✗ ${stale.map((key) => OUTPUTS[key]).join("、")} 与 ${TOKENS} 不一致：运行 node packages/ui/scripts/gen-tokens.ts\n`);
+  process.stdout.write(
+    `✗ ${stale.map((key) => OUTPUTS[key]).join("、")} 与 ${TOKENS} 不一致：运行 node packages/ui/scripts/gen-tokens.ts\n`,
+  );
   process.exitCode = 1;
 } else {
   for (const key of stale) writeFileSync(ROOT + OUTPUTS[key], built[key]);

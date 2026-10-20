@@ -13,7 +13,9 @@ afterEach(async () => {
 describe("对话框、抽屉与底部面板", () => {
   it("对话框：按 open 打开关闭，标题与说明关联，Esc（cancel）交给 onClose", async () => {
     const onClose = vi.fn();
-    view = await mount(<Dialog open={false} onClose={onClose} title="确认调整" description="会挪动 2 项任务" actions={<Button>确认</Button>} />);
+    view = await mount(
+      <Dialog open={false} onClose={onClose} title="确认调整" description="会挪动 2 项任务" actions={<Button>确认</Button>} />,
+    );
     const dialog = view.host.querySelector("dialog");
     expect(dialog?.open).toBe(false);
     await view.rerender(<Dialog open onClose={onClose} title="确认调整" description="会挪动 2 项任务" actions={<Button>确认</Button>} />);

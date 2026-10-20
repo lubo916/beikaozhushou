@@ -47,7 +47,11 @@ describe("业务公共组件", () => {
     ];
     view = await mount(<MasteryGrid label="第一章" cells={cells} onSelect={onSelect} />);
     const buttons = [...view.host.querySelectorAll<HTMLButtonElement>(".ui-grid__cells button")];
-    expect(buttons.map((b) => b.getAttribute("aria-label"))).toEqual(["会计等式：已掌握", "资产：证据不足，不等于不会", "外币折算：范围外"]);
+    expect(buttons.map((b) => b.getAttribute("aria-label"))).toEqual([
+      "会计等式：已掌握",
+      "资产：证据不足，不等于不会",
+      "外币折算：范围外",
+    ]);
     expect(buttons.map((b) => b.tabIndex)).toEqual([0, -1, -1]);
     buttons[0]?.focus();
     await press(buttons[0], "ArrowRight");
@@ -106,7 +110,14 @@ describe("业务公共组件", () => {
     const onStart = vi.fn();
     view = await mount(
       <TaskGroup segment="consolidate">
-        <TaskStrip source="due_review" segment="consolidate" title="会计要素回忆卡" minutes={12} reasons={["今天到期", "考频 4 级"]} onStart={onStart} />
+        <TaskStrip
+          source="due_review"
+          segment="consolidate"
+          title="会计要素回忆卡"
+          minutes={12}
+          reasons={["今天到期", "考频 4 级"]}
+          onStart={onStart}
+        />
         <TaskStrip source="mistake_retry" title="错题：资产的确认" minutes={8} state="done" />
         <TaskStrip source="new_learning" title="第二章阅读" minutes={95} state="seen" />
       </TaskGroup>,
@@ -126,10 +137,30 @@ describe("业务公共组件", () => {
     const onUndo = vi.fn();
     view = await mount(
       <>
-        <KpCard name="会计等式" path="第一章 › 会计要素" system={2} target={3} gap={1} importance={3} types={["concept"]} scope="added" starred reasons={["还差 1 档"]} href="/kp/1" />
+        <KpCard
+          name="会计等式"
+          path="第一章 › 会计要素"
+          system={2}
+          target={3}
+          gap={1}
+          importance={3}
+          types={["concept"]}
+          scope="added"
+          starred
+          reasons={["还差 1 档"]}
+          href="/kp/1"
+        />
         <Importance level={2} />
         <ul>
-          <EvidenceRow when="10月20日 14:05" title="单选第 3 题" result="correct" confidence="vague" strength="pending" credibility="reviewed" note="秒答，换个问法再考" />
+          <EvidenceRow
+            when="10月20日 14:05"
+            title="单选第 3 题"
+            result="correct"
+            confidence="vague"
+            strength="pending"
+            credibility="reviewed"
+            note="秒答，换个问法再考"
+          />
         </ul>
         <ReasonTags reasons={["考频 4 级"]} aiPolished />
         <UndoBar message="已把 2 项顺延到明天" hint="7 天内可撤销" onUndo={onUndo} />

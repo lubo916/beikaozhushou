@@ -110,7 +110,14 @@ const WIDTHS: { value: Width; label: string }[] = [
   { value: "desktop", label: "桌面 1280" },
 ];
 const COLORS = ["bg-canvas", "bg-surface", "bg-sunk", "ink-primary", "ink-secondary", "ink-tertiary", "line-strong", "line-soft"];
-const BRAND_COLORS = ["brand-primary", "brand-primary-ink", "brand-primary-soft", "status-warning", "status-warning-soft", "status-warning-line"];
+const BRAND_COLORS = [
+  "brand-primary",
+  "brand-primary-ink",
+  "brand-primary-soft",
+  "status-warning",
+  "status-warning-soft",
+  "status-warning-line",
+];
 const STATUS_COLORS = ["status-danger", "status-danger-soft", "status-success", "status-success-soft", "status-ai", "status-ai-soft"];
 const SPACES = ["1", "2", "3", "4", "5", "6", "8", "10", "12"];
 const ABNORMAL = PAGE_STATE_CODES.filter((code): code is AbnormalState => code !== "normal");
@@ -164,7 +171,20 @@ function stateProps(page: "S06" | "S10", state: AbnormalState, retry: () => void
 }
 
 function demoCells(): MasteryCell[] {
-  const names = ["会计等式", "资产", "负债", "所有者权益", "收入", "费用", "利润", "借贷记账法", "会计科目", "账户结构", "试算平衡", "原始凭证"];
+  const names = [
+    "会计等式",
+    "资产",
+    "负债",
+    "所有者权益",
+    "收入",
+    "费用",
+    "利润",
+    "借贷记账法",
+    "会计科目",
+    "账户结构",
+    "试算平衡",
+    "原始凭证",
+  ];
   return Array.from({ length: 36 }, (_, index) => ({
     id: `kp-${index}`,
     name: `${names[index % names.length] ?? ""}${index >= names.length ? `（${Math.floor(index / names.length) + 1}）` : ""}`,
@@ -179,7 +199,9 @@ export function Gallery() {
   const [width, setWidth] = useState<Width>("auto");
   const [display, setDisplay] = useState<string[]>([]);
   const [statePage, setStatePage] = useState<"S06" | "S10">("S06");
-  const [pageState, setPageState] = useState<PageStateCode>(() => pageStateFromSearch(window.location.search, { enabled: import.meta.env.DEV }));
+  const [pageState, setPageState] = useState<PageStateCode>(() =>
+    pageStateFromSearch(window.location.search, { enabled: import.meta.env.DEV }),
+  );
   const [proposal, setProposal] = useState<ProposalStatusCode>("pending");
   const [target, setTarget] = useState<MasteryRank>(3);
   const [tier, setTier] = useState<DegradeTierCode>("full");
@@ -209,7 +231,12 @@ export function Gallery() {
   const tz = DEFAULT_DAY_SETTINGS.timeZone;
   const boundary = dayStart(BOUNDARY_DAY, DEFAULT_DAY_SETTINGS).getTime();
   const minute = 60_000;
-  const proposalRows = { what: "把周六的新学挪到周日上午", why: "周六的时间格只剩 20 分钟，排不下 45 分钟的新学", cost: "周日多学 25 分钟", ifNot: "周六的任务做不完，会挤到下周" };
+  const proposalRows = {
+    what: "把周六的新学挪到周日上午",
+    why: "周六的时间格只剩 20 分钟，排不下 45 分钟的新学",
+    cost: "周日多学 25 分钟",
+    ifNot: "周六的任务做不完，会挤到下周",
+  };
 
   return (
     <div className="dev-gallery ui-root">
@@ -241,7 +268,11 @@ export function Gallery() {
             ))}
           </nav>
 
-          <Section id="tokens" title="设计令牌" note="唯一来源 design/tokens.json；改令牌后运行 node packages/ui/scripts/gen-tokens.ts。页面里不写颜色值与像素。">
+          <Section
+            id="tokens"
+            title="设计令牌"
+            note="唯一来源 design/tokens.json；改令牌后运行 node packages/ui/scripts/gen-tokens.ts。页面里不写颜色值与像素。"
+          >
             <div className="dev-grid">
               <Card title="底色、文字与分隔线" headingLevel={3}>
                 <ul className="dev-swatches">
@@ -293,21 +324,33 @@ export function Gallery() {
             </div>
           </Section>
 
-          <Section id="format" title="显示格式与“今天”" note="所有页面用同一组格式函数（packages/shared/src/format）；“今天”按用户时区与凌晨 4 点日界线算。">
+          <Section
+            id="format"
+            title="显示格式与“今天”"
+            note="所有页面用同一组格式函数（packages/shared/src/format）；“今天”按用户时区与凌晨 4 点日界线算。"
+          >
             <Card headingLevel={3} title="同一个数，各页显示一样">
               <KeyValueList
                 items={[
                   { key: "duration", label: "时长", value: `${formatDuration(45)} · ${formatDuration(90)} · ${formatDuration(120)}` },
                   { key: "seconds", label: "用时", value: `${formatSeconds(38)} · ${formatSeconds(65)}` },
                   { key: "date", label: "日期与时间", value: `${formatDate(now, { timeZone: tz, weekday: true })} ${formatTime(now, tz)}` },
-                  { key: "relative", label: "相对日期", value: `${formatRelativeDay(addDays(learningDay, 1), learningDay)} · ${formatRelativeDay(addDays(learningDay, 3), learningDay)}` },
+                  {
+                    key: "relative",
+                    label: "相对日期",
+                    value: `${formatRelativeDay(addDays(learningDay, 1), learningDay)} · ${formatRelativeDay(addDays(learningDay, 3), learningDay)}`,
+                  },
                   { key: "percent", label: "百分比", value: formatPercent(0.625) },
                   { key: "score", label: "分数", value: `${formatScore(61.5)} · ${formatScore(60, { total: 100 })}` },
                   { key: "range", label: "区间", value: formatRange(57, 65, "分") },
                   { key: "gap", label: "档位差", value: `${formatTierGap(2)} · ${formatTierGap(0)}` },
                   { key: "count", label: "计数", value: formatCount(1234, "题") },
                   { key: "today", label: "现在是哪个学习日", value: formatDate(learningDay, { weekday: true }) },
-                  { key: "before", label: "10月21日 03:59（北京时间）", value: `算 ${formatDate(today(boundary - minute, DEFAULT_DAY_SETTINGS))}` },
+                  {
+                    key: "before",
+                    label: "10月21日 03:59（北京时间）",
+                    value: `算 ${formatDate(today(boundary - minute, DEFAULT_DAY_SETTINGS))}`,
+                  },
                   { key: "after", label: "10月21日 04:00（北京时间）", value: `算 ${formatDate(today(boundary, DEFAULT_DAY_SETTINGS))}` },
                 ]}
               />
@@ -316,7 +359,12 @@ export function Gallery() {
 
           <Section id="card" title="面板" note="原型里用得最多的部件：标题、补充、动作、内容、页脚；七种底色。">
             <div className="dev-grid">
-              <Card title="完成度" meta={THREE_NUMBER_QUESTION.completion} actions={<Button size="sm">详情</Button>} footer="口径：学习范围内的工作量已完成多少">
+              <Card
+                title="完成度"
+                meta={THREE_NUMBER_QUESTION.completion}
+                actions={<Button size="sm">详情</Button>}
+                footer="口径：学习范围内的工作量已完成多少"
+              >
                 学习范围内共 312 个知识点，已完成 131 个的工作量。
               </Card>
               {(["sunk", "brand", "warning", "danger", "success", "ai"] as const).map((tone) => (
@@ -425,16 +473,40 @@ export function Gallery() {
               />
             </Card>
             <Card>
-              <DataTable caption="空表" captionVisible rowKey={() => ""} rows={[]} empty="还没有关联题目" columns={[{ key: "a", header: "题目", render: () => "" }]} />
+              <DataTable
+                caption="空表"
+                captionVisible
+                rowKey={() => ""}
+                rows={[]}
+                empty="还没有关联题目"
+                columns={[{ key: "a", header: "题目", render: () => "" }]}
+              />
             </Card>
           </Section>
 
           <Section id="stat" title="统计卡（三个数）" note="三个数各答一问，不互相代替；数字只显示接口返回的值。">
             <Card>
               <StatGroup>
-                <Stat label={VOCAB.three_numbers.forecast_gap} question={THREE_NUMBER_QUESTION.forecast_gap} value={formatRange(57, 65)} unit="分" hint="最可能 61 分，离目标线还差 3 分" />
-                <Stat label={VOCAB.three_numbers.completion} question={THREE_NUMBER_QUESTION.completion} value={formatPercent(0.42)} tone="brand" />
-                <Stat label={VOCAB.three_numbers.health} question={THREE_NUMBER_QUESTION.health} value={formatPercent(0.9)} tone="warning" hint="近期速度 ÷ 按期需要的速度" />
+                <Stat
+                  label={VOCAB.three_numbers.forecast_gap}
+                  question={THREE_NUMBER_QUESTION.forecast_gap}
+                  value={formatRange(57, 65)}
+                  unit="分"
+                  hint="最可能 61 分，离目标线还差 3 分"
+                />
+                <Stat
+                  label={VOCAB.three_numbers.completion}
+                  question={THREE_NUMBER_QUESTION.completion}
+                  value={formatPercent(0.42)}
+                  tone="brand"
+                />
+                <Stat
+                  label={VOCAB.three_numbers.health}
+                  question={THREE_NUMBER_QUESTION.health}
+                  value={formatPercent(0.9)}
+                  tone="warning"
+                  hint="近期速度 ÷ 按期需要的速度"
+                />
               </StatGroup>
             </Card>
           </Section>
@@ -491,17 +563,27 @@ export function Gallery() {
             </Card>
           </Section>
 
-          <Section id="ai" title="AI 标识与理由标签" note="AI 生成的内容一律带显式标识；从这里复制出去的文字开头带“【AI 生成】”。导师不可用时理由显示模板句、不带标识。">
+          <Section
+            id="ai"
+            title="AI 标识与理由标签"
+            note="AI 生成的内容一律带显式标识；从这里复制出去的文字开头带“【AI 生成】”。导师不可用时理由显示模板句、不带标识。"
+          >
             <div className="dev-row">
               <AiBadge />
               <AiBadge size="xs" />
             </div>
-            <AiContent note="导师生成，未经你确认">会计等式“资产 = 负债 + 所有者权益”反映某一时点的财务状况；做题时先判断是静态等式还是动态等式。</AiContent>
+            <AiContent note="导师生成，未经你确认">
+              会计等式“资产 = 负债 + 所有者权益”反映某一时点的财务状况；做题时先判断是静态等式还是动态等式。
+            </AiContent>
             <ReasonTags reasons={["考频 4 级", "历年 2–4 分", "还差 1 档"]} aiPolished />
             <ReasonTags reasons={["今天到期", "上次答错"]} />
           </Section>
 
-          <Section id="proposal" title="提议卡" note={`固定四行；按钮只有“${COPY.action.confirm}”和“${COPY.action.decline}”；确认后在期限内可撤销（期限从参数读取）。第一张可以点。`}>
+          <Section
+            id="proposal"
+            title="提议卡"
+            note={`固定四行；按钮只有“${COPY.action.confirm}”和“${COPY.action.decline}”；确认后在期限内可撤销（期限从参数读取）。第一张可以点。`}
+          >
             <div className="dev-grid">
               <ProposalCard
                 {...proposalRows}
@@ -521,7 +603,11 @@ export function Gallery() {
             </Button>
           </Section>
 
-          <Section id="states" title={`页面状态（七态加${VOCAB.page_state.locked}）`} note="每个页面都用同一个状态组件；开发时也可以在网址后面加 ?state=offline 之类直接看。文案取自 bk spec 的“七态”一节。">
+          <Section
+            id="states"
+            title={`页面状态（七态加${VOCAB.page_state.locked}）`}
+            note="每个页面都用同一个状态组件；开发时也可以在网址后面加 ?state=offline 之类直接看。文案取自 bk spec 的“七态”一节。"
+          >
             <div className="dev-row">
               <Segmented
                 label="页面"
@@ -542,7 +628,11 @@ export function Gallery() {
               />
             </div>
             <Card>
-              <PageStates state={pageState} pageName={copy[statePage].page} {...(pageState === "normal" ? {} : stateProps(statePage, pageState, bump))}>
+              <PageStates
+                state={pageState}
+                pageName={copy[statePage].page}
+                {...(pageState === "normal" ? {} : stateProps(statePage, pageState, bump))}
+              >
                 <p>这里是{copy[statePage].page}的内容。</p>
               </PageStates>
             </Card>
@@ -555,7 +645,11 @@ export function Gallery() {
             </div>
           </Section>
 
-          <Section id="ladder" title="掌握阶梯" note="同时标出系统判定、自评与目标档；差几档用接口给的值；证据不足画虚线并写明“不等于不会”。">
+          <Section
+            id="ladder"
+            title="掌握阶梯"
+            note="同时标出系统判定、自评与目标档；差几档用接口给的值；证据不足画虚线并写明“不等于不会”。"
+          >
             <div className="dev-grid">
               <Card title="还差 2 档（自评待检验）" headingLevel={3}>
                 <MasteryLadder system={2} self={3} selfPending target={4} gap={2} />
@@ -581,7 +675,11 @@ export function Gallery() {
             </div>
           </Section>
 
-          <Section id="grid" title="掌握方格" note="每格一个知识点；虚线格是证据不足、斜纹格是范围外，两者都不等于“不会”。点格子或用方向键移动。">
+          <Section
+            id="grid"
+            title="掌握方格"
+            note="每格一个知识点；虚线格是证据不足、斜纹格是范围外，两者都不等于“不会”。点格子或用方向键移动。"
+          >
             <Card>
               <MasteryGrid label="第一章 会计概述" cells={demoCells()} onSelect={setPicked} />
               <p className="dev-note">{picked ? `点了：${picked}` : "还没点格子"}</p>
@@ -602,8 +700,28 @@ export function Gallery() {
                 href="#kp"
                 action={<Button size="sm">加入今日</Button>}
               />
-              <KpCard name="资产的确认条件" path="第一章 › 会计要素" system={0} target={3} gap={3} evidenceSufficient={false} importance={3} types={["fact"]} scope="added" starred />
-              <KpCard name="外币折算" path="第九章 › 外币业务" system={1} target={2} gap={1} importance={1} scope="removed" onSelect={bump} />
+              <KpCard
+                name="资产的确认条件"
+                path="第一章 › 会计要素"
+                system={0}
+                target={3}
+                gap={3}
+                evidenceSufficient={false}
+                importance={3}
+                types={["fact"]}
+                scope="added"
+                starred
+              />
+              <KpCard
+                name="外币折算"
+                path="第九章 › 外币业务"
+                system={1}
+                target={2}
+                gap={1}
+                importance={1}
+                scope="removed"
+                onSelect={bump}
+              />
             </div>
             <Card flush title="我的证据" headingLevel={3}>
               <List>
@@ -642,19 +760,48 @@ export function Gallery() {
             </Card>
           </Section>
 
-          <Section id="task" title="今日任务条" note="先做推迟有损失的，再做推迟无损失的；完成看证据，手动勾选只记“看过”。理由里的数字只来自算法。">
+          <Section
+            id="task"
+            title="今日任务条"
+            note="先做推迟有损失的，再做推迟无损失的；完成看证据，手动勾选只记“看过”。理由里的数字只来自算法。"
+          >
             <div className="dev-row">
               <Button variant="primary">继续</Button>
               <Button>{interpolate(copy.demo.short_mode, { minutes: param("plan.short_mode.minutes") })}</Button>
             </div>
             <Card>
               <TaskGroup segment="consolidate" meta={formatDuration(35)}>
-                <TaskStrip source="due_review" segment="consolidate" title="会计要素回忆卡 8 张" minutes={12} reasons={["今天到期", "遗忘风险高"]} onStart={bump} href="#task" />
+                <TaskStrip
+                  source="due_review"
+                  segment="consolidate"
+                  title="会计要素回忆卡 8 张"
+                  minutes={12}
+                  reasons={["今天到期", "遗忘风险高"]}
+                  onStart={bump}
+                  href="#task"
+                />
                 <TaskStrip source="mistake_retry" segment="consolidate" title="错题：资产的确认条件" minutes={8} state="done" />
-                <TaskStrip source="verify_recheck" segment="consolidate" title="换个问法再考：收入的特征" minutes={5} reasons={["上次秒答"]} onStart={bump} />
+                <TaskStrip
+                  source="verify_recheck"
+                  segment="consolidate"
+                  title="换个问法再考：收入的特征"
+                  minutes={5}
+                  reasons={["上次秒答"]}
+                  onStart={bump}
+                />
               </TaskGroup>
               <TaskGroup segment="advance" meta={formatDuration(70)}>
-                <TaskStrip source="new_learning" segment="advance" title="第二章 会计科目（读后即测）" minutes={40} reasons={["考频 4 级", "提分性价比 A"]} aiPolished state="doing" onStart={bump} startLabel="继续" />
+                <TaskStrip
+                  source="new_learning"
+                  segment="advance"
+                  title="第二章 会计科目（读后即测）"
+                  minutes={40}
+                  reasons={["考频 4 级", "提分性价比 A"]}
+                  aiPolished
+                  state="doing"
+                  onStart={bump}
+                  startLabel="继续"
+                />
                 <TaskStrip source="practice" segment="advance" title="借贷记账法练习 10 题" minutes={20} state="seen" />
                 <TaskStrip source="org_or_custom" segment="advance" title="机构作业：第一章小测" minutes={10} onStart={bump} />
               </TaskGroup>
@@ -677,7 +824,11 @@ export function Gallery() {
                 与你相关的节点提醒。
               </Banner>
             )}
-            {notices.includes("danger") && <Banner tone="danger" title="这次作答没保存上">联网后会自动重试。</Banner>}
+            {notices.includes("danger") && (
+              <Banner tone="danger" title="这次作答没保存上">
+                联网后会自动重试。
+              </Banner>
+            )}
             {notices.includes("ai") && (
               <Banner tone="ai" title="导师暂不可用" onDismiss={() => setNotices((list) => list.filter((n) => n !== "ai"))}>
                 清单与复习照常；理由先显示模板句。
@@ -711,7 +862,11 @@ export function Gallery() {
             </div>
           </Section>
 
-          <Section id="overlay" title="对话框、抽屉与底部面板" note="打开时焦点进入、背景不能操作，Esc 或点遮罩关闭（确认框只能点按钮），关闭后焦点回到原按钮。">
+          <Section
+            id="overlay"
+            title="对话框、抽屉与底部面板"
+            note="打开时焦点进入、背景不能操作，Esc 或点遮罩关闭（确认框只能点按钮），关闭后焦点回到原按钮。"
+          >
             <div className="dev-row">
               <Button onClick={() => setOverlay("dialog")}>打开对话框</Button>
               <Button onClick={() => setOverlay("alert")}>打开确认框</Button>
@@ -755,7 +910,12 @@ export function Gallery() {
                 ))}
               </List>
             </Drawer>
-            <Drawer open={overlay === "right"} onClose={() => setOverlay(null)} title="通知" footer={<Button onClick={() => setOverlay(null)}>全部已读</Button>}>
+            <Drawer
+              open={overlay === "right"}
+              onClose={() => setOverlay(null)}
+              title="通知"
+              footer={<Button onClick={() => setOverlay(null)}>全部已读</Button>}
+            >
               <p>报名还剩 5 天截止。</p>
             </Drawer>
             <BottomSheet open={overlay === "sheet"} onClose={() => setOverlay(null)} title="问导师">
@@ -763,7 +923,11 @@ export function Gallery() {
             </BottomSheet>
           </Section>
 
-          <Section id="layout" title="页面双栏（容器查询）" note="内容区宽度 ≥ 860 时左右两栏，≥ 1180 时主栏更宽，窄了上下排；切换“预览宽度”可以看到变化。">
+          <Section
+            id="layout"
+            title="页面双栏（容器查询）"
+            note="内容区宽度 ≥ 860 时左右两栏，≥ 1180 时主栏更宽，窄了上下排；切换“预览宽度”可以看到变化。"
+          >
             <Columns
               main={
                 <Card title="左栏：阶梯卡" headingLevel={3}>

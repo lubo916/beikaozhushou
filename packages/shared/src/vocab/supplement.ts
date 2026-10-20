@@ -18,7 +18,12 @@ export type DegradeTierCode = keyof typeof DEGRADE_TIER;
 export const THREE_NUMBER_QUESTION = { forecast_gap: "够不够", completion: "走了多远", health: "来不来得及" } as const;
 
 /** 题目可信度的界面简称（vocabulary.md 第 3 节：界面写“几级＋简称”）；三、四级的简称待拍板（F03 交接单问题）。 */
-export const CREDIBILITY_SHORT = { reviewed: "审定", own: "自有", generated_confirmed: "已确认生成", generated_instant: "即时生成" } as const;
+export const CREDIBILITY_SHORT = {
+  reviewed: "审定",
+  own: "自有",
+  generated_confirmed: "已确认生成",
+  generated_instant: "即时生成",
+} as const;
 
 /** AI 生成内容的统一叫法（vocabulary.md 第 8 节）；复制、下载、导出时也带上。 */
 export const AI_GENERATED = "AI 生成";

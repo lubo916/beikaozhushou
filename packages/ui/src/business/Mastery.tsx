@@ -39,11 +39,20 @@ export function MasteryLadder(props: MasteryLadderProps) {
   if (variant === "mini") {
     return (
       <span className={cx("ui-ladder-mini", !evidenceSufficient && "ui-ladder-mini--uncertain", className)}>
-        <span className="ui-ladder-mini__track" role="img" aria-label={evidenceSufficient ? summary : `${summary}；${COPY.ladder.uncertain}`}>
+        <span
+          className="ui-ladder-mini__track"
+          role="img"
+          aria-label={evidenceSufficient ? summary : `${summary}；${COPY.ladder.uncertain}`}
+        >
           {MASTERY_RANKS.map((rank) => (
             <span
               key={rank}
-              className={cx("ui-ladder-mini__seg", `ui-m-${system}`, rank <= system && "ui-ladder-mini__seg--on", rank === target && "ui-ladder-mini__seg--target")}
+              className={cx(
+                "ui-ladder-mini__seg",
+                `ui-m-${system}`,
+                rank <= system && "ui-ladder-mini__seg--on",
+                rank === target && "ui-ladder-mini__seg--target",
+              )}
             />
           ))}
         </span>

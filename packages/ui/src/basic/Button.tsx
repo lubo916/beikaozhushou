@@ -21,9 +21,26 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
   block?: boolean | undefined;
 }
 
-export function Button({ variant = "secondary", size = "md", type = "button", busy = false, icon, block = false, className, disabled, children, ...rest }: ButtonProps) {
+export function Button({
+  variant = "secondary",
+  size = "md",
+  type = "button",
+  busy = false,
+  icon,
+  block = false,
+  className,
+  disabled,
+  children,
+  ...rest
+}: ButtonProps) {
   return (
-    <button {...rest} type={type} className={cx(buttonClass(variant, size, block), className)} disabled={disabled === true || busy} aria-busy={busy || undefined}>
+    <button
+      {...rest}
+      type={type}
+      className={cx(buttonClass(variant, size, block), className)}
+      disabled={disabled === true || busy}
+      aria-busy={busy || undefined}
+    >
       {icon !== undefined && (
         <span className="ui-btn__icon" aria-hidden="true">
           {icon}

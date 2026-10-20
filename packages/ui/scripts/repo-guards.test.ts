@@ -37,7 +37,8 @@ function copyFiles(): string[] {
 
 function copyStrings(value: unknown, path: readonly string[] = []): { key: string; text: string }[] {
   if (typeof value === "string") return [{ key: path.join("."), text: value }];
-  if (value !== null && typeof value === "object") return Object.entries(value).flatMap(([key, child]) => copyStrings(child, [...path, key]));
+  if (value !== null && typeof value === "object")
+    return Object.entries(value).flatMap(([key, child]) => copyStrings(child, [...path, key]));
   return [];
 }
 

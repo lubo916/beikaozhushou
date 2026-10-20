@@ -67,7 +67,15 @@ export function ProgressBar({ value, label, showLabel = true, valueText, tone = 
           <span className="ui-progress__value">{text}</span>
         </div>
       )}
-      <div role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent} aria-valuetext={text} className="ui-progress__track">
+      <div
+        role="progressbar"
+        aria-label={label}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={percent}
+        aria-valuetext={text}
+        className="ui-progress__track"
+      >
         <span className="ui-progress__bar" style={{ width: `${percent}%` }} />
       </div>
     </div>

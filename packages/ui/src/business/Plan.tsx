@@ -40,7 +40,21 @@ const PROPOSAL_TONE = { pending: "warning", confirmed: "success", declined: "neu
 
 /** 提议卡：AI 或系统对计划、范围、目标、轮次的修改建议，只有“确认”和“不改”；确认后在期限内可撤销。 */
 export function ProposalCard(props: ProposalCardProps) {
-  const { title = COPY.proposal.title, what, why, cost, ifNot, status, onConfirm, onDecline, onUndo, undoHint, aiGenerated = false, busy = false, className } = props;
+  const {
+    title = COPY.proposal.title,
+    what,
+    why,
+    cost,
+    ifNot,
+    status,
+    onConfirm,
+    onDecline,
+    onUndo,
+    undoHint,
+    aiGenerated = false,
+    busy = false,
+    className,
+  } = props;
   const rows = [
     { key: "what", label: COPY.proposal.what, value: what },
     { key: "why", label: COPY.proposal.why, value: why },
@@ -138,7 +152,19 @@ export interface TaskStripProps {
 
 /** 今日任务条：来源、标题、理由、用时与“开始”。 */
 export function TaskStrip(props: TaskStripProps) {
-  const { source, segment, title, minutes, reasons = [], aiPolished = false, state = "todo", href, onStart, startLabel = COPY.action.start, className } = props;
+  const {
+    source,
+    segment,
+    title,
+    minutes,
+    reasons = [],
+    aiPolished = false,
+    state = "todo",
+    href,
+    onStart,
+    startLabel = COPY.action.start,
+    className,
+  } = props;
   const finished = state === "done" || state === "seen";
   return (
     <li className={cx("ui-task", segment !== undefined && `ui-task--${segment}`, `ui-task--${state}`, className)}>

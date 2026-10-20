@@ -18,7 +18,19 @@ export interface CardProps extends Omit<HTMLAttributes<HTMLElement>, "title"> {
 }
 
 /** 面板（原型里调用最多的部件）：标题、动作、内容、页脚。 */
-export function Card({ title, meta, actions, footer, tone = "default", headingLevel = 2, as: Tag = "section", flush = false, className, children, ...rest }: CardProps) {
+export function Card({
+  title,
+  meta,
+  actions,
+  footer,
+  tone = "default",
+  headingLevel = 2,
+  as: Tag = "section",
+  flush = false,
+  className,
+  children,
+  ...rest
+}: CardProps) {
   const headingId = useId();
   const Heading = `h${headingLevel}` as const;
   return (

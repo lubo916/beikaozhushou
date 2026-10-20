@@ -155,7 +155,9 @@ describe("基础组件", () => {
       { key: "name", header: "知识点", label: "知识点", render: (row: { name: string }) => row.name },
       { key: "n", header: "次数", align: "end" as const, render: () => "3" },
     ];
-    view = await mount(<DataTable caption="关联题目" columns={columns} rows={[{ name: "会计等式" }]} rowKey={(row) => row.name} stackOnNarrow />);
+    view = await mount(
+      <DataTable caption="关联题目" columns={columns} rows={[{ name: "会计等式" }]} rowKey={(row) => row.name} stackOnNarrow />,
+    );
     expect(view.host.querySelector("caption")?.textContent).toBe("关联题目");
     expect(view.host.querySelector("th")?.getAttribute("scope")).toBe("col");
     expect(view.host.querySelector("td")?.getAttribute("data-label")).toBe("知识点");

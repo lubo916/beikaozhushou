@@ -42,7 +42,17 @@ export interface DialogProps {
 }
 
 /** 对话框。 */
-export function Dialog({ open, onClose, title, description, children, actions, role = "dialog", closeLabel = COPY.action.close, className }: DialogProps) {
+export function Dialog({
+  open,
+  onClose,
+  title,
+  description,
+  children,
+  actions,
+  role = "dialog",
+  closeLabel = COPY.action.close,
+  className,
+}: DialogProps) {
   const ref = useModal(open, onClose);
   const titleId = useId();
   const descriptionId = useId();

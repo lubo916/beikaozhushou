@@ -106,7 +106,16 @@ export interface DataTableProps<R> {
 }
 
 /** 表格：宽了在自身容器里横向滚动（可用键盘滚动）。 */
-export function DataTable<R>({ caption, captionVisible = false, columns, rows, rowKey, empty, stackOnNarrow = false, className }: DataTableProps<R>) {
+export function DataTable<R>({
+  caption,
+  captionVisible = false,
+  columns,
+  rows,
+  rowKey,
+  empty,
+  stackOnNarrow = false,
+  className,
+}: DataTableProps<R>) {
   return (
     <div className={cx("ui-table-wrap", className)} role="region" aria-label={caption} tabIndex={0}>
       <table className={cx("ui-table", stackOnNarrow && "ui-table--stack")}>
@@ -155,7 +164,17 @@ export interface BarItem {
 }
 
 /** 横条图：一组可比较的数（如错因分布）。 */
-export function BarList({ label, items, max, className }: { label: string; items: readonly BarItem[]; max?: number | undefined; className?: string | undefined }) {
+export function BarList({
+  label,
+  items,
+  max,
+  className,
+}: {
+  label: string;
+  items: readonly BarItem[];
+  max?: number | undefined;
+  className?: string | undefined;
+}) {
   const top = max ?? Math.max(0, ...items.map((item) => item.value));
   return (
     <ul className={cx("ui-bars", className)} aria-label={label}>

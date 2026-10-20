@@ -49,7 +49,19 @@
   }
 
   /* 焦点可见：键盘操作时一律画主色焦点框 */
-  :where(.ui-btn, .ui-iconbtn, .ui-seg__opt, .ui-tab, .ui-tabpanel, .ui-chip, .ui-row__main--action, .ui-grid__cell, .ui-kp__name, .ui-task__title, .ui-table-wrap):focus-visible {
+  :where(
+    .ui-btn,
+    .ui-iconbtn,
+    .ui-seg__opt,
+    .ui-tab,
+    .ui-tabpanel,
+    .ui-chip,
+    .ui-row__main--action,
+    .ui-grid__cell,
+    .ui-kp__name,
+    .ui-task__title,
+    .ui-table-wrap
+  ):focus-visible {
     outline: var(--size-stroke-thick) solid var(--color-brand-primary);
     outline-offset: var(--size-stroke-thick);
   }
@@ -1580,7 +1592,8 @@
   }
 
   /* ── 按容器宽度切换（数值同 size.breakpoint.*） ── */
-  @container (width < 700px) { /* style-exempt: 容器查询条件不能用 CSS 变量，700 即 size.breakpoint.tablet */
+  @container (width < 700px) {
+    /* style-exempt: 容器查询条件不能用 CSS 变量，700 即 size.breakpoint.tablet */
     .ui-banner {
       flex-wrap: wrap;
     }
@@ -1613,18 +1626,21 @@
       content: attr(data-label);
     }
   }
-  @container (width >= 700px) { /* style-exempt: 容器查询条件不能用 CSS 变量，700 即 size.breakpoint.tablet */
+  @container (width >= 700px) {
+    /* style-exempt: 容器查询条件不能用 CSS 变量，700 即 size.breakpoint.tablet */
     .ui-proposal__row {
       grid-template-columns: 6.5em minmax(0, 1fr);
       gap: var(--size-space-3);
     }
   }
-  @container (width >= 860px) { /* style-exempt: 容器查询条件不能用 CSS 变量，860 即 size.breakpoint.content-md */
+  @container (width >= 860px) {
+    /* style-exempt: 容器查询条件不能用 CSS 变量，860 即 size.breakpoint.content-md */
     .ui-cols--split {
       grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
     }
   }
-  @container (width >= 1180px) { /* style-exempt: 容器查询条件不能用 CSS 变量，1180 即 size.breakpoint.content-lg */
+  @container (width >= 1180px) {
+    /* style-exempt: 容器查询条件不能用 CSS 变量，1180 即 size.breakpoint.content-lg */
     .ui-cols--split {
       grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
       gap: var(--size-space-6);

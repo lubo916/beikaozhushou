@@ -42,7 +42,8 @@ export function cssValue(value: Json, known: ReadonlySet<string>): string | null
   }
   if (typeof value === "number") return String(value);
   if (Array.isArray(value)) return value.map((v) => (typeof v === "string" && /\s/.test(v) ? `"${v}"` : String(v))).join(", ");
-  if (isObject(value) && typeof value["value"] === "number" && typeof value["unit"] === "string") return `${value["value"]}${value["unit"]}`;
+  if (isObject(value) && typeof value["value"] === "number" && typeof value["unit"] === "string")
+    return `${value["value"]}${value["unit"]}`;
   return null;
 }
 

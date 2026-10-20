@@ -55,7 +55,23 @@ export interface KpCardProps {
 
 /** 知识点小卡：名称、所属、迷你阶梯、属性标签与理由。 */
 export function KpCard(props: KpCardProps) {
-  const { name, path, system, target, gap, evidenceSufficient, importance, types = [], scope, starred = false, reasons = [], href, onSelect, action, className } = props;
+  const {
+    name,
+    path,
+    system,
+    target,
+    gap,
+    evidenceSufficient,
+    importance,
+    types = [],
+    scope,
+    starred = false,
+    reasons = [],
+    href,
+    onSelect,
+    action,
+    className,
+  } = props;
   let title: ReactNode = <span className="ui-kp__name">{name}</span>;
   if (href !== undefined) {
     title = (
@@ -107,7 +123,13 @@ export function KpCard(props: KpCardProps) {
   );
 }
 
-const STRENGTH_TONE: Record<EvidenceStrengthCode, TagTone> = { strong: "success", medium: "brand", weak: "neutral", negative: "danger", pending: "warning" };
+const STRENGTH_TONE: Record<EvidenceStrengthCode, TagTone> = {
+  strong: "success",
+  medium: "brand",
+  weak: "neutral",
+  negative: "danger",
+  pending: "warning",
+};
 
 export interface EvidenceRowProps {
   /** 何时（已格式化，如“10月20日 14:05”）。 */

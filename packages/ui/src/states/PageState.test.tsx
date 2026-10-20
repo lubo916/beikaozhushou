@@ -21,7 +21,9 @@ describe("页面状态（七态）", () => {
     view = await mount(<PageState state="error" pageName="今日" onRetry={onRetry} onReport={onReport} />);
     expect(view.host.querySelector("[role=alert]")).not.toBeNull();
     expect(view.host.querySelector("h2")?.textContent).toBe("今日没能加载");
-    expect(view.host.textContent).toContain("今日的数据暂时没取到：网络或服务异常。已保存的内容不受影响，点“重试”即可；连续失败会自动上报。");
+    expect(view.host.textContent).toContain(
+      "今日的数据暂时没取到：网络或服务异常。已保存的内容不受影响，点“重试”即可；连续失败会自动上报。",
+    );
     const buttons = [...view.host.querySelectorAll("button")];
     expect(buttons.map((button) => button.textContent)).toEqual(["重试", "反馈问题"]);
     await click(buttons[0]);
@@ -62,7 +64,9 @@ describe("页面状态（七态）", () => {
   });
 
   it("数据不足：只给原始计数并说明还差什么", async () => {
-    view = await mount(<PageState state="insufficient_data" counts={[{ key: "n", label: "已作答", value: "6 题" }]} missing="再做 4 题后给出结论" />);
+    view = await mount(
+      <PageState state="insufficient_data" counts={[{ key: "n", label: "已作答", value: "6 题" }]} missing="再做 4 题后给出结论" />,
+    );
     expect(view.host.querySelector("dt")?.textContent).toBe("已作答");
     expect(view.host.textContent).toContain("再做 4 题后给出结论");
   });

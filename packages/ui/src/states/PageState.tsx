@@ -56,7 +56,18 @@ function SlowHint({ seconds }: { seconds: number }) {
 
 /** 页面状态（七态里除正常以外的六种，加锁定）：每个页面都用它，不各写一套。 */
 export function PageState(props: PageStateProps) {
-  const { state, pageName = COPY.state.default_page, title, body, action, onRetry, onReport, audience = "learner", compact = false, className } = props;
+  const {
+    state,
+    pageName = COPY.state.default_page,
+    title,
+    body,
+    action,
+    onRetry,
+    onReport,
+    audience = "learner",
+    compact = false,
+    className,
+  } = props;
   const page = { page: pageName };
   if (state === "loading") {
     return (
@@ -70,7 +81,10 @@ export function PageState(props: PageStateProps) {
   const copy = COPY.state[state];
   const defaultBody = state === "error" && audience === "staff" ? COPY.state.error.body_staff : copy.body;
   return (
-    <div role={state === "error" ? "alert" : "status"} className={cx("ui-state", `ui-state--${state}`, compact && "ui-state--compact", className)}>
+    <div
+      role={state === "error" ? "alert" : "status"}
+      className={cx("ui-state", `ui-state--${state}`, compact && "ui-state--compact", className)}
+    >
       <span className="ui-state__icon" aria-hidden="true">
         <Icon name={ICONS[state]} />
       </span>
