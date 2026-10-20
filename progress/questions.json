@@ -44,6 +44,81 @@
       "asked": "v0002",
       "answer": "A",
       "answered": "v0002"
+    },
+    {
+      "id": "F02-Q1",
+      "task": "F02",
+      "q": "学员端占位页的大标题怎么写？",
+      "options": [
+        "A 大标题保留“学员端”，上方加一行产品名“备考助手”，现有测试不改",
+        "B 大标题改成“备考助手”，同时改两处旧测试的期望"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0003",
+      "answer": "A",
+      "answered": "v0003"
+    },
+    {
+      "id": "F02-Q2",
+      "task": "F02",
+      "q": "Node 最低版本写多少？",
+      "options": [
+        "A 照任务单写 22.12：用 22.12～22.17 的人会启动不了接口服务",
+        "B 写 22.18：项目直接运行 .ts 文件，22.18 起 Node 才默认支持"
+      ],
+      "recommend": "B",
+      "temp": "B",
+      "status": "answered",
+      "asked": "v0003",
+      "answer": "B",
+      "answered": "v0003"
+    },
+    {
+      "id": "F02-Q3",
+      "task": "F02",
+      "q": "验收要求改的几个文件不在 F02 的可改清单里（都不是热点文件），改不改？",
+      "options": [
+        "A 改，交接单逐个写理由",
+        "B 不改，这几条验收留给整合任务"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0003",
+      "answer": "A",
+      "answered": "v0003"
+    },
+    {
+      "id": "F02-Q4",
+      "task": "F02",
+      "q": "设计令牌的生成物谁来移出 git？",
+      "options": [
+        "A 留给 F03（它定令牌的生成方式），F02 不动",
+        "B F02 先写临时生成器把它移出 git"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0003",
+      "answer": "A",
+      "answered": "v0003"
+    },
+    {
+      "id": "F02-Q5",
+      "task": "F02",
+      "q": "这一包没能在沙箱里装依赖跑检查，接下来怎么验？",
+      "options": [
+        "A 直接交给本地 Codex 收包：bk in 会装依赖、跑完整验证，没过就开第 2 轮",
+        "B 先新开一个对话（网络开关在新对话才生效）上传这个结果包，让 Claude 联网补跑网页验证、修好再交本地"
+      ],
+      "recommend": "B",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0003",
+      "answer": "A",
+      "answered": "v0003"
     }
   ]
 }

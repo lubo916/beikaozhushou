@@ -159,9 +159,18 @@
         "移植 F01 列出的 V3 内容一致性检查（能做成 lint 或测试的就做）"
       ],
       "pages": [],
-      "status": "todo",
+      "status": "done",
       "not": [
         "页面与业务代码"
+      ],
+      "history": [
+        {
+          "round": 2,
+          "version": "v0003",
+          "tool": "local",
+          "date": "2026-10-20 12:53",
+          "status": "done"
+        }
       ]
     },
     {
