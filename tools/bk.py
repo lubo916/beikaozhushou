@@ -693,6 +693,11 @@ def excluded(rel: str, name: str, patterns: list[str]) -> bool:
 
 
 def add_tree(zf: zipfile.ZipFile, src: Path, prefix: str, exclude: list[str], keep: list[str]) -> None:
+    # 生成源码若已提交，接收方也需要它；仅豁免 generated/，不豁免其他排除规则。
+    tracked = set(sh(["git", "ls-files", "-z"], cwd=src).stdout.split("\0")) if "generated/" in exclude else set()
+    generated_dirs = {parent.as_posix() for rel in tracked for parent in Path(rel).parents
+                      if parent.name == "generated"}
+    other_exclude = [pat for pat in exclude if pat != "generated/"]
     for dirpath, dirnames, filenames in os.walk(src):
         d = Path(dirpath)
         rel_d = d.relative_to(src).as_posix()
@@ -701,14 +706,19 @@ def add_tree(zf: zipfile.ZipFile, src: Path, prefix: str, exclude: list[str], ke
             dirnames[:] = []
         if not rel_d.startswith(".git/"):
             dirnames[:] = [x for x in dirnames
-                           if rel_d + x in (".git", ".bk") or not excluded(rel_d + x + "/", x, exclude)]
+                           if rel_d + x in (".git", ".bk") or not excluded(rel_d + x + "/", x, exclude)
+                           or (rel_d + x in generated_dirs
+                               and not excluded(rel_d + x + "/", x, other_exclude))]
         for fn in filenames:
             rel = rel_d + fn
             if rel.startswith(".bk/"):
                 if rel != ".bk/package.json":
                     continue
-            elif not rel.startswith(".git/") and excluded(rel, fn, exclude) and fn not in keep and rel not in keep:
-                continue
+            elif not rel.startswith(".git/"):
+                if "generated/" in exclude and "generated" in Path(rel).parts[:-1] and rel not in tracked:
+                    continue
+                if excluded(rel, fn, exclude) and fn not in keep and rel not in keep:
+                    continue
             full = d / fn
             if full.is_symlink() and not full.exists():
                 continue
@@ -2421,12 +2431,24 @@ def cmd_selftest(args) -> None:
         (hub / "tests" / "sample.test.ts").write_text("test('a', () => {})\n", encoding="utf-8")
         (hub / "docs" / "baseline" / "rule-cards").mkdir(parents=True)
         (hub / "docs" / "baseline" / "rule-cards" / "demo-rule.md").write_text("# 规则卡：示例\n\n- 状态：草稿\n", encoding="utf-8")
+        # 已提交的生成源码必须随包交付；生成目录中的本地缓存仍排除。
+        generated_files = {
+            "app/S01/generated/kept.ts": "export const generated = 1;\n",
+            "app/S01/generated/deep/kept.ts": "export const nested = 2;\n",
+            "app/S01/generated/.env.example": "DEMO=example\n",
+        }
+        for rel, content in generated_files.items():
+            p = hub / rel
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(content, encoding="utf-8")
+        (hub / ".gitignore").write_text("generated/\n", encoding="utf-8")
         (hub / "scripts").mkdir()
         (hub / "scripts" / "spec_tool.py").write_text("print('v3-reference')\n", encoding="utf-8")
         g("init", "-q", "-b", "main")
         g("config", "user.name", "自检")
         g("config", "user.email", "selftest@bk.local")
         g("add", "-A")
+        g("add", "-f", *generated_files)
         g("commit", "-q", "-m", "起点")
         g("tag", "-a", "v3-final", "-m", "V3 历史参考")
         g("rm", "-q", "scripts/spec_tool.py")
@@ -2449,6 +2471,34 @@ def cmd_selftest(args) -> None:
             assert g("tag", "-l", "v3-final", cwd=check_repo) == "", "普通包不应携带 V3 标签"
             assert (check_repo / ".git" / "shallow").is_file(), "普通包应保留浅克隆"
             assert g("rev-parse", "HEAD", cwd=check_repo) == meta["base"]
+            for rel, content in generated_files.items():
+                assert (check_repo / rel).is_file(), f"打包漏掉已跟踪的生成文件：{rel}"
+                assert (check_repo / rel).read_text(encoding="utf-8") == content
+            assert not g("status", "--porcelain", cwd=check_repo), "任务包和版本包解压后应无文件缺失"
+        # 即使误跟踪了这些虚构配置/依赖，generated 例外也不能绕过原有排除规则。
+        filter_repo = tmp / "filter-check"
+        filter_repo.mkdir()
+        g("init", "-q", "-b", "main", cwd=filter_repo)
+        blocked_files = [
+            "app/generated/.env", "app/generated/.env.local", "app/generated/debug.log",
+            "app/generated/node_modules/dependency.ts", "app/generated/.cache/data",
+            "app/generated/dist/bundle.js", "app/node_modules/generated/dependency.ts",
+            "app/.cache/generated/data", "app/generated/private/hidden.ts",
+        ]
+        allowed_files = ["app/generated/source.ts", "app/generated/.env.example"]
+        for rel in blocked_files + allowed_files:
+            p = filter_repo / rel
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text("selftest-placeholder\n", encoding="utf-8")
+        g("add", "-f", "--", *blocked_files, *allowed_files, cwd=filter_repo)
+        (filter_repo / "app/generated/cache.ts").write_text("untracked\n", encoding="utf-8")
+        with zipfile.ZipFile(tmp / "filter-check.zip", "w") as zf:
+            add_tree(zf, filter_repo, "repo/", DEFAULT_CONFIG["exclude"] + ["app/generated/private/"],
+                     DEFAULT_CONFIG["keep_env_files"])
+            names = set(zf.namelist())
+        assert all("repo/" + rel in names for rel in allowed_files)
+        assert all("repo/" + rel not in names for rel in blocked_files + ["app/generated/cache.ts"])
+        say("✓ 已跟踪生成文件随包交付，环境配置、依赖、缓存及显式排除继续生效。")
         fix_ref = "bk-F01-selftest"
         g("checkout", "-q", "-b", fix_ref)
         (hub / "FIX-REF").write_text("F01 修复分支\n", encoding="utf-8")
@@ -2511,7 +2561,18 @@ def cmd_selftest(args) -> None:
             (repo / "app" / "node_modules").mkdir(parents=True, exist_ok=True)
             (repo / "app" / "node_modules" / "big.bin").write_bytes(b"0" * 1000)
             (repo / ".env").write_text("SECRET=1\n", encoding="utf-8")
-            run(["done"], repo, wenv)
+            for rel in ("cache.ts", "deep/cache.ts", ".env", ".env.local",
+                        "node_modules/dependency.ts", ".cache/data", "dist/bundle.js", "debug.log"):
+                p = repo / "app/S01/generated" / rel
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_text("selftest-local-only\n", encoding="utf-8")
+            for suffix, flags in (("ckpt", ["--checkpoint"]), ("done", [])):
+                run(["done", *flags], repo, wenv)
+                with zipfile.ZipFile(tmp / "downloads" / f"bk-v0001-{task}-r1-{suffix}.zip") as zf:
+                    for rel, content in generated_files.items():
+                        assert zf.read("repo/" + rel).decode("utf-8") == content
+                    generated_names = {n for n in zf.namelist() if "/generated/" in n}
+                    assert generated_names == {"repo/" + rel for rel in generated_files}, "结果包或检查点混入未跟踪的生成物"
             return repo
 
         web_session("bk-v0001-U01.zip", "U01", {"app/S01/index.ts": "export const a = 1;\n"})
