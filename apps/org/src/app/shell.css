@@ -1,0 +1,5 @@
+/* 机构端与平台后台外壳的两个固定尺寸（与学员端相同）（ui-rules 第 2 节）。令牌表还没有外壳尺寸，先在这里定义；交接单建议加进 design/tokens.json 的 size.shell。 */
+:root {
+  --shell-sidebar-width: 236px; /* style-exempt: 桌面侧栏宽度，ui-rules 第 2 节写定，令牌表暂缺 */
+  --shell-rail-width: 72px; /* style-exempt: 平板图标栏宽度，ui-rules 第 2 节写定，令牌表暂缺 */
+}
