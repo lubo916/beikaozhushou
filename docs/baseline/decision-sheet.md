@@ -1,7 +1,7 @@
 # 开工决策单
 
-> 开工前要用户定的 15 件事，每条都带默认值。F00 切换完成后，Codex 把它逐条念给用户（每条一句大白话），用户回“全部按默认”，或“按默认，第 X 条改成……”。
-> 记录：写一张决定卡 docs/decisions/D-<日期>-kickoff.md，列出 15 条最终结论，用户改过的条目标“用户改”。F01 会据此核对地基文档。
+> 开工前要用户定的 15 件事与默认值。状态：已定稿——用户 2026-10-20 回复“全部按默认”，结论见 docs/decisions/D-2026-10-20-kickoff.md；以后要改某一条，另写一张决定卡。
+> 各条在地基文档里的落点：第 2 条见 golden-paths.md；第 3、12 条见 ui-rules.md 第 11 节；第 4 条见 00-index.md 与 errata.md；第 5 条见 vocabulary.md 第 3 节；第 6 条见 data-model.md 第 4 节；第 7 条见 data-model.md 第 3 节与 rule-cards/README.md；第 10 条见 data-model.md 第 5 节；第 1、13、14 条见 tech.md 与 00-index.md；第 8、9、11、15 条是协作安排，不进地基文档。
 
 | # | 事项 | 默认 |
 |---|---|---|

@@ -6,39 +6,14 @@
   "node_major": 24,
   "max_rounds": 3,
   "schema_frozen": false,
-  "freeze_paths": [
-    "packages/db/prisma/migrations/**"
-  ],
+  "freeze_paths": ["packages/db/prisma/migrations/**"],
   "pack_depth": 30,
   "prototype": "design/prototype/prototype.html",
-  "shared_ok": [
-    "fixtures/**",
-    "packages/db/prisma/migrations/**",
-    "docs/decisions/**",
-    "tests/rules/**"
-  ],
+  "shared_ok": ["fixtures/**", "packages/db/prisma/migrations/**", "docs/decisions/**", "tests/rules/**"],
   "verify": {
-    "quick": [
-      "lint",
-      "typecheck",
-      "test"
-    ],
-    "web": [
-      "lint",
-      "typecheck",
-      "test",
-      "build",
-      "e2e:smoke"
-    ],
-    "full": [
-      "lint",
-      "typecheck",
-      "test",
-      "build",
-      "test:db",
-      "e2e:smoke",
-      "gallery"
-    ]
+    "quick": ["lint", "typecheck", "test"],
+    "web": ["lint", "typecheck", "test", "build", "e2e:smoke"],
+    "full": ["lint", "typecheck", "test", "build", "test:db", "e2e:smoke", "gallery"]
   },
   "run": {
     "mock": "pnpm dev",
@@ -101,11 +76,7 @@
       ]
     },
     "rule": {
-      "owns": [
-        "docs/baseline/rule-cards/{rule}.md",
-        "tests/rules/{rule}.cases.json",
-        "docs/decisions/**"
-      ],
+      "owns": ["docs/baseline/rule-cards/{rule}.md", "tests/rules/{rule}.cases.json", "docs/decisions/**"],
       "reads": [
         "AGENTS.md",
         "docs/baseline/rule-cards/README.md",
@@ -126,9 +97,7 @@
         "需要你拍板的点写进交接单问题（选项、推荐、临时默认），规则卡里对应位置标“待拍板：任务编号-Qn”",
         "与原型文字、vocabulary.md、metrics.md 一致；有冲突的列出来"
       ],
-      "not": [
-        "写业务代码"
-      ]
+      "not": ["写业务代码"]
     },
     "backend": {
       "owns": [
@@ -168,10 +137,7 @@
         "改了表结构就有迁移；数据库测试在本地 full 验证里跑（网页端跑不了就在交接单写明）",
         "交接单写清：本地 bk run --real 之后打开哪里、看到什么；数据块 pages 把接通的页面写成 api"
       ],
-      "not": [
-        "改别的领域的内部代码（需要它提供能力就写进交接单）",
-        "在页面里重算业务数字"
-      ]
+      "not": ["改别的领域的内部代码（需要它提供能力就写进交接单）", "在页面里重算业务数字"]
     },
     "foundation": {
       "reads": [],
@@ -181,23 +147,12 @@
       "proto": false
     },
     "ops": {
-      "owns": [
-        "**"
-      ],
-      "reads": [
-        "AGENTS.md",
-        "docs/baseline/tech.md"
-      ]
+      "owns": ["**"],
+      "reads": ["AGENTS.md", "docs/baseline/tech.md"]
     },
     "fix": {
-      "reads": [
-        "AGENTS.md"
-      ],
-      "lookup": [
-        "docs/baseline/",
-        "progress/reports/（相关任务的交接单）",
-        "progress/changelog.md（最近改了什么）"
-      ]
+      "reads": ["AGENTS.md"],
+      "lookup": ["docs/baseline/", "progress/reports/（相关任务的交接单）", "progress/changelog.md（最近改了什么）"]
     }
   }
 }

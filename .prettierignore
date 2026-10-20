@@ -29,3 +29,5 @@ deploy
 *.yml
 *.py
 scripts/engineering/dependency-policy.json
+# bk 自动维护的进度登记与看板，不手工格式化
+/progress/
