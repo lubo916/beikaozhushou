@@ -1,6 +1,6 @@
 {
   "card": "docs/baseline/rule-cards/review-scheduling.md",
-  "status": "草稿",
+  "status": "已定稿",
   "decided": {
     "R02-Q1": "A",
     "R02-Q2": "A",
@@ -71,7 +71,9 @@
           {
             "id": "c1",
             "kind": "card",
-            "kps": ["k1"],
+            "kps": [
+              "k1"
+            ],
             "freq": 4,
             "recall": 0.85,
             "due_day": "2026-10-21"
@@ -79,7 +81,9 @@
           {
             "id": "s1",
             "kind": "recite_segment",
-            "kps": ["k4"],
+            "kps": [
+              "k4"
+            ],
             "freq": 1,
             "recall": 0.45,
             "due_day": "2026-10-19"
@@ -87,7 +91,9 @@
           {
             "id": "c2",
             "kind": "card",
-            "kps": ["k2"],
+            "kps": [
+              "k2"
+            ],
             "freq": 2,
             "recall": 0.8,
             "due_day": "2026-10-21"
@@ -95,7 +101,9 @@
           {
             "id": "r1",
             "kind": "recall_card",
-            "kps": ["k3"],
+            "kps": [
+              "k3"
+            ],
             "freq": 3,
             "recall": 0.9,
             "due_day": "2026-10-20"
@@ -103,7 +111,12 @@
         ]
       },
       "expect": {
-        "batch": ["c1", "s1", "c2", "r1"],
+        "batch": [
+          "c1",
+          "s1",
+          "c2",
+          "r1"
+        ],
         "due_count": 4,
         "by_kind": {
           "card": 2,
@@ -127,7 +140,9 @@
           {
             "id": "a",
             "kind": "card",
-            "kps": ["ka"],
+            "kps": [
+              "ka"
+            ],
             "freq": 4,
             "recall": 0.9,
             "due_day": "2026-10-21"
@@ -135,7 +150,9 @@
           {
             "id": "b",
             "kind": "card",
-            "kps": ["kb"],
+            "kps": [
+              "kb"
+            ],
             "freq": 1,
             "recall": 0.3,
             "due_day": "2026-10-18"
@@ -143,7 +160,9 @@
           {
             "id": "c",
             "kind": "card",
-            "kps": ["kc"],
+            "kps": [
+              "kc"
+            ],
             "freq": 3,
             "recall": 0.8,
             "due_day": "2026-10-20"
@@ -151,7 +170,9 @@
           {
             "id": "d",
             "kind": "card",
-            "kps": ["kd"],
+            "kps": [
+              "kd"
+            ],
             "freq": 2,
             "recall": 0.85,
             "due_day": "2026-10-21"
@@ -159,7 +180,9 @@
           {
             "id": "e",
             "kind": "card",
-            "kps": ["ke"],
+            "kps": [
+              "ke"
+            ],
             "freq": 2,
             "recall": 0.6,
             "due_day": "2026-10-19"
@@ -171,9 +194,16 @@
         }
       },
       "expect": {
-        "batch": ["e", "b", "c"],
+        "batch": [
+          "e",
+          "b",
+          "c"
+        ],
         "due_count": 3,
-        "carried_over": ["a", "d"],
+        "carried_over": [
+          "a",
+          "d"
+        ],
         "overloaded": true,
         "new_cards": 0
       }
@@ -192,7 +222,9 @@
           {
             "id": "f1",
             "kind": "card",
-            "kps": ["kf1"],
+            "kps": [
+              "kf1"
+            ],
             "freq": 3,
             "recall": 0.7,
             "due_day": "2026-10-21"
@@ -200,7 +232,9 @@
           {
             "id": "f2",
             "kind": "card",
-            "kps": ["kf2"],
+            "kps": [
+              "kf2"
+            ],
             "freq": 2,
             "recall": 0.6,
             "due_day": "2026-10-21"
@@ -208,7 +242,9 @@
           {
             "id": "f3",
             "kind": "card",
-            "kps": ["kf3"],
+            "kps": [
+              "kf3"
+            ],
             "freq": 1,
             "recall": 0.5,
             "due_day": "2026-10-21"
@@ -220,7 +256,11 @@
         }
       },
       "expect": {
-        "batch": ["f1", "f2", "f3"],
+        "batch": [
+          "f1",
+          "f2",
+          "f3"
+        ],
         "due_count": 3,
         "carried_over": [],
         "overloaded": false,
@@ -241,7 +281,9 @@
           {
             "id": "x",
             "kind": "card",
-            "kps": ["kx"],
+            "kps": [
+              "kx"
+            ],
             "freq": 2,
             "recall": 0.5,
             "due_day": "2026-10-20"
@@ -249,7 +291,9 @@
           {
             "id": "y",
             "kind": "card",
-            "kps": ["ky"],
+            "kps": [
+              "ky"
+            ],
             "freq": 4,
             "recall": 0.75,
             "due_day": "2026-10-21"
@@ -257,7 +301,9 @@
           {
             "id": "z",
             "kind": "card",
-            "kps": ["kz"],
+            "kps": [
+              "kz"
+            ],
             "freq": 2,
             "recall": 0.5,
             "due_day": "2026-10-20"
@@ -265,7 +311,11 @@
         ]
       },
       "expect": {
-        "batch": ["x", "z", "y"],
+        "batch": [
+          "x",
+          "z",
+          "y"
+        ],
         "due_count": 3
       }
     },
@@ -283,7 +333,9 @@
           {
             "id": "c1",
             "kind": "card",
-            "kps": ["k1"],
+            "kps": [
+              "k1"
+            ],
             "freq": 4,
             "recall": 0.75,
             "due_day": "2026-10-21"
@@ -291,7 +343,9 @@
           {
             "id": "c2",
             "kind": "card",
-            "kps": ["k1"],
+            "kps": [
+              "k1"
+            ],
             "freq": 4,
             "recall": 0.875,
             "due_day": "2026-10-21"
@@ -299,7 +353,9 @@
           {
             "id": "r1",
             "kind": "recall_card",
-            "kps": ["k1"],
+            "kps": [
+              "k1"
+            ],
             "freq": 4,
             "recall": 0.9,
             "due_day": "2026-10-21"
@@ -307,7 +363,9 @@
           {
             "id": "c3",
             "kind": "card",
-            "kps": ["k2"],
+            "kps": [
+              "k2"
+            ],
             "freq": 2,
             "recall": 0.7,
             "due_day": "2026-10-21"
@@ -315,9 +373,15 @@
         ]
       },
       "expect": {
-        "batch": ["c1", "c3"],
+        "batch": [
+          "c1",
+          "c3"
+        ],
         "due_count": 2,
-        "deferred_same_kp": ["c2", "r1"],
+        "deferred_same_kp": [
+          "c2",
+          "r1"
+        ],
         "carried_over": []
       }
     },
@@ -335,7 +399,9 @@
           {
             "id": "c9",
             "kind": "card",
-            "kps": ["k2"],
+            "kps": [
+              "k2"
+            ],
             "relearn_due_at": "2026-10-21T20:10:00+08:00"
           }
         ],
@@ -343,7 +409,9 @@
           {
             "id": "c3",
             "kind": "card",
-            "kps": ["k2"],
+            "kps": [
+              "k2"
+            ],
             "freq": 2,
             "recall": 0.75,
             "due_day": "2026-10-21"
@@ -351,7 +419,9 @@
           {
             "id": "c4",
             "kind": "recall_card",
-            "kps": ["k5"],
+            "kps": [
+              "k5"
+            ],
             "freq": 1,
             "recall": 0.4,
             "due_day": "2026-10-21"
@@ -359,9 +429,14 @@
         ]
       },
       "expect": {
-        "batch": ["c9", "c4"],
+        "batch": [
+          "c9",
+          "c4"
+        ],
         "due_count": 2,
-        "deferred_same_kp": ["c3"],
+        "deferred_same_kp": [
+          "c3"
+        ],
         "by_kind": {
           "card": 1,
           "recall_card": 1
@@ -385,7 +460,9 @@
               {
                 "id": "x",
                 "kind": "card",
-                "kps": ["kx"],
+                "kps": [
+                  "kx"
+                ],
                 "freq": 1,
                 "recall": 0.8,
                 "due_day": "2026-10-15"
@@ -393,7 +470,9 @@
               {
                 "id": "y",
                 "kind": "card",
-                "kps": ["ky"],
+                "kps": [
+                  "ky"
+                ],
                 "freq": 4,
                 "recall": 0.9,
                 "due_day": "2026-10-21"
@@ -408,7 +487,9 @@
               {
                 "id": "x",
                 "kind": "card",
-                "kps": ["kx"],
+                "kps": [
+                  "kx"
+                ],
                 "freq": 1,
                 "recall": 0.55,
                 "due_day": "2026-10-15"
@@ -416,7 +497,9 @@
               {
                 "id": "z",
                 "kind": "card",
-                "kps": ["kz"],
+                "kps": [
+                  "kz"
+                ],
                 "freq": 4,
                 "recall": 0.9,
                 "due_day": "2026-11-02"
@@ -428,12 +511,20 @@
       "expect": {
         "variants": [
           {
-            "batch": ["y"],
-            "carried_over": ["x"]
+            "batch": [
+              "y"
+            ],
+            "carried_over": [
+              "x"
+            ]
           },
           {
-            "batch": ["x"],
-            "carried_over": ["z"]
+            "batch": [
+              "x"
+            ],
+            "carried_over": [
+              "z"
+            ]
           }
         ]
       }
@@ -452,7 +543,9 @@
           {
             "id": "p1",
             "kind": "card",
-            "kps": ["kp1"],
+            "kps": [
+              "kp1"
+            ],
             "freq": 3,
             "recall": 0.8,
             "due_day": "2026-10-21",
@@ -461,7 +554,9 @@
           {
             "id": "p2",
             "kind": "card",
-            "kps": ["kp2"],
+            "kps": [
+              "kp2"
+            ],
             "freq": 3,
             "recall": 0.8,
             "due_day": "2026-10-21",
@@ -470,7 +565,9 @@
           {
             "id": "p3",
             "kind": "card",
-            "kps": ["kp3"],
+            "kps": [
+              "kp3"
+            ],
             "freq": 3,
             "recall": 0.8,
             "due_day": "2026-10-21",
@@ -479,7 +576,9 @@
           {
             "id": "p4",
             "kind": "card",
-            "kps": ["kp4"],
+            "kps": [
+              "kp4"
+            ],
             "freq": 3,
             "recall": 0.8,
             "due_day": "2026-10-21",
@@ -488,16 +587,22 @@
           {
             "id": "p5",
             "kind": "card",
-            "kps": ["kp5"],
+            "kps": [
+              "kp5"
+            ],
             "freq": 3,
             "recall": 0.8,
             "due_day": "2026-10-21"
           }
         ],
-        "mistakes": ["m1"]
+        "mistakes": [
+          "m1"
+        ]
       },
       "expect": {
-        "batch": ["p5"],
+        "batch": [
+          "p5"
+        ],
         "due_count": 1,
         "excluded": {
           "p1": "待确认",
@@ -505,7 +610,9 @@
           "p3": "今天埋藏",
           "p4": "我移出"
         },
-        "mistakes_after_session": ["m1"]
+        "mistakes_after_session": [
+          "m1"
+        ]
       }
     },
     {
@@ -810,7 +917,9 @@
           {
             "id": "n1",
             "kind": "card",
-            "kps": ["kn1"],
+            "kps": [
+              "kn1"
+            ],
             "freq": 2,
             "recall": 0.8,
             "due_day": "2026-10-28"
@@ -818,7 +927,9 @@
           {
             "id": "n2",
             "kind": "card",
-            "kps": ["kn2"],
+            "kps": [
+              "kn2"
+            ],
             "freq": 3,
             "recall": 0.75,
             "due_day": "2026-10-27"
@@ -829,7 +940,9 @@
           {
             "id": "w1",
             "kind": "card",
-            "kps": ["kw1"],
+            "kps": [
+              "kw1"
+            ],
             "freq": 4,
             "recall": 0.97,
             "due_day": "2026-11-20",
@@ -838,7 +951,9 @@
           {
             "id": "w2",
             "kind": "recall_card",
-            "kps": ["kw2"],
+            "kps": [
+              "kw2"
+            ],
             "freq": 3,
             "recall": 0.95,
             "due_day": "2026-11-15",
@@ -847,7 +962,9 @@
           {
             "id": "w3",
             "kind": "card",
-            "kps": ["kw3"],
+            "kps": [
+              "kw3"
+            ],
             "freq": 2,
             "recall": 0.9,
             "due_day": "2026-11-30",
@@ -856,7 +973,9 @@
           {
             "id": "w4",
             "kind": "card",
-            "kps": ["kw4"],
+            "kps": [
+              "kw4"
+            ],
             "freq": 4,
             "recall": 0.93,
             "due_day": "2026-11-05",
@@ -865,7 +984,9 @@
           {
             "id": "w5",
             "kind": "card",
-            "kps": ["kw5"],
+            "kps": [
+              "kw5"
+            ],
             "freq": 4,
             "recall": 0.99,
             "due_day": "2026-11-25",
@@ -878,8 +999,16 @@
         }
       },
       "expect": {
-        "batch": ["n2", "n1", "w1", "w2"],
-        "warmup": ["w1", "w2"],
+        "batch": [
+          "n2",
+          "n1",
+          "w1",
+          "w2"
+        ],
+        "warmup": [
+          "w1",
+          "w2"
+        ],
         "due_count": 4,
         "overloaded": false,
         "new_cards": 5
@@ -987,11 +1116,16 @@
       "expect": {
         "variants": [
           {
-            "take": ["a", "b"],
+            "take": [
+              "a",
+              "b"
+            ],
             "total_seconds": 440
           },
           {
-            "take": ["s1"],
+            "take": [
+              "s1"
+            ],
             "total_seconds": 720
           }
         ]
@@ -1007,19 +1141,39 @@
         "variants": [
           {
             "review_day": "2026-10-21",
-            "points": ["完全正确", "基本正确", "完全正确", "基本正确"]
+            "points": [
+              "完全正确",
+              "基本正确",
+              "完全正确",
+              "基本正确"
+            ]
           },
           {
             "review_day": "2026-10-21",
-            "points": ["完全正确", "部分正确", "完全正确", "完全正确"]
+            "points": [
+              "完全正确",
+              "部分正确",
+              "完全正确",
+              "完全正确"
+            ]
           },
           {
             "review_day": "2026-10-21",
-            "points": ["完全正确", "完全正确", "完全正确", "漏掉"]
+            "points": [
+              "完全正确",
+              "完全正确",
+              "完全正确",
+              "漏掉"
+            ]
           },
           {
             "review_day": "2026-10-21",
-            "points": ["部分正确", "完全正确", "漏掉", "完全正确"]
+            "points": [
+              "部分正确",
+              "完全正确",
+              "漏掉",
+              "完全正确"
+            ]
           },
           {
             "review_day": "2026-10-21",
@@ -1063,11 +1217,26 @@
       "input": {
         "start_day": "2026-10-21",
         "cap": 80,
-        "scheduled": [100, 60, 70, 90]
+        "scheduled": [
+          100,
+          60,
+          70,
+          90
+        ]
       },
       "expect": {
-        "shown": [80, 80, 70, 80],
-        "overloaded": [true, false, false, true]
+        "shown": [
+          80,
+          80,
+          70,
+          80
+        ],
+        "overloaded": [
+          true,
+          false,
+          false,
+          true
+        ]
       }
     },
     {
@@ -1097,7 +1266,10 @@
         ]
       },
       "expect": {
-        "replay_order": ["rv-a1", "rv-b1"],
+        "replay_order": [
+          "rv-a1",
+          "rv-b1"
+        ],
         "records_kept": 2,
         "learning_day": {
           "rv-a1": "2026-10-21",
@@ -1148,14 +1320,18 @@
           {
             "id": "c9",
             "kind": "card",
-            "kps": ["k2"]
+            "kps": [
+              "k2"
+            ]
           }
         ],
         "candidates": [
           {
             "id": "c4",
             "kind": "recall_card",
-            "kps": ["k5"],
+            "kps": [
+              "k5"
+            ],
             "freq": 1,
             "recall": 0.4,
             "due_day": "2026-10-21"
@@ -1163,7 +1339,9 @@
         ]
       },
       "expect": {
-        "batch": ["c4"],
+        "batch": [
+          "c4"
+        ],
         "due_count": 2,
         "by_kind": {
           "card": 1,
@@ -1188,7 +1366,9 @@
               {
                 "id": "x",
                 "kind": "card",
-                "kps": ["kx"],
+                "kps": [
+                  "kx"
+                ],
                 "freq": 1,
                 "recall": 0.01,
                 "due_day": "2026-10-15"
@@ -1196,7 +1376,9 @@
               {
                 "id": "y",
                 "kind": "card",
-                "kps": ["ky"],
+                "kps": [
+                  "ky"
+                ],
                 "freq": 4,
                 "recall": 0.7,
                 "due_day": "2026-10-21"
@@ -1211,7 +1393,9 @@
               {
                 "id": "x",
                 "kind": "card",
-                "kps": ["kx"],
+                "kps": [
+                  "kx"
+                ],
                 "freq": 1,
                 "recall": 0,
                 "due_day": "2026-10-15"
@@ -1219,7 +1403,9 @@
               {
                 "id": "z",
                 "kind": "card",
-                "kps": ["kz"],
+                "kps": [
+                  "kz"
+                ],
                 "freq": 4,
                 "recall": 0.7,
                 "due_day": "2026-11-02"
@@ -1231,12 +1417,20 @@
       "expect": {
         "variants": [
           {
-            "batch": ["y"],
-            "carried_over": ["x"]
+            "batch": [
+              "y"
+            ],
+            "carried_over": [
+              "x"
+            ]
           },
           {
-            "batch": ["z"],
-            "carried_over": ["x"]
+            "batch": [
+              "z"
+            ],
+            "carried_over": [
+              "x"
+            ]
           }
         ]
       }
@@ -1255,7 +1449,9 @@
           {
             "id": "d1",
             "kind": "card",
-            "kps": ["k1"],
+            "kps": [
+              "k1"
+            ],
             "freq": 4,
             "recall": 0.9,
             "due_day": "2026-10-21"
@@ -1268,28 +1464,36 @@
             {
               "id": "n1",
               "kind": "card",
-              "kps": ["k1"],
+              "kps": [
+                "k1"
+              ],
               "freq": 4,
               "accepted_at": "2026-10-20T12:00:00+08:00"
             },
             {
               "id": "n2",
               "kind": "card",
-              "kps": ["k2"],
+              "kps": [
+                "k2"
+              ],
               "freq": 3,
               "accepted_at": "2026-10-20T12:00:00+08:00"
             },
             {
               "id": "n3",
               "kind": "card",
-              "kps": ["k2"],
+              "kps": [
+                "k2"
+              ],
               "freq": 2,
               "accepted_at": "2026-10-20T12:00:00+08:00"
             },
             {
               "id": "n4",
               "kind": "card",
-              "kps": ["k3"],
+              "kps": [
+                "k3"
+              ],
               "freq": 1,
               "accepted_at": "2026-10-20T12:00:00+08:00"
             }
@@ -1297,10 +1501,15 @@
         }
       },
       "expect": {
-        "batch": ["d1"],
+        "batch": [
+          "d1"
+        ],
         "due_count": 1,
         "new_cards": 2,
-        "new_card_ids": ["n2", "n4"],
+        "new_card_ids": [
+          "n2",
+          "n4"
+        ],
         "overloaded": false
       }
     },
@@ -1322,7 +1531,9 @@
             {
               "id": "n0",
               "kind": "card",
-              "kps": ["k1"],
+              "kps": [
+                "k1"
+              ],
               "freq": 4,
               "accepted_at": "2026-10-20T12:00:00+08:00"
             }
@@ -1331,14 +1542,18 @@
             {
               "id": "n1",
               "kind": "card",
-              "kps": ["k1"],
+              "kps": [
+                "k1"
+              ],
               "freq": 4,
               "accepted_at": "2026-10-20T12:00:00+08:00"
             },
             {
               "id": "n2",
               "kind": "card",
-              "kps": ["k2"],
+              "kps": [
+                "k2"
+              ],
               "freq": 3,
               "accepted_at": "2026-10-20T12:00:00+08:00"
             }
@@ -1349,7 +1564,9 @@
         "batch": [],
         "due_count": 0,
         "new_cards": 1,
-        "new_card_ids": ["n2"],
+        "new_card_ids": [
+          "n2"
+        ],
         "overloaded": false
       }
     }
