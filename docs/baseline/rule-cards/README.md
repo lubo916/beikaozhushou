@@ -45,15 +45,17 @@ R2 …
 
 ## 清单
 
-| 卡 | 文件 | 起草任务 | 使用任务 |
-|---|---|---|---|
-| 证据与掌握档 | evidence-mastery.md | R01 | B04 |
-| 记忆调度与复习队列 | review-scheduling.md | R02 | B06 |
-| 错题回炉与毕业 | mistake-graduation.md | R03 | B05 |
-| 计划与今日清单 | plan-today.md | R04 | B07 |
-| 摸底与起点报告 | diagnosis-start.md | R05 | B08 |
-| 三个数与统计口径 | metrics-prediction.md | R06 | B11 |
-| 模考 | mock-exam.md | R07 | B10 |
-| 账号生命周期 | account-lifecycle.md | R08 | B13、L02 |
-| AI 导师边界 | tutor-boundary.md | R09 | B15、L04 |
-| 会员与额度 | billing-quota.md | R10 | B14、L03 |
+参数直接引用 contracts/params.yaml 里已有的名字，默认值用表里现有的值（开工决定第 7 条）；需要新参数，在卡的参数表里写建议名与默认值，并写进交接单，由整合任务登记。V3 的算法说明与例子表可以直接沿用：
+
+| 卡 | 文件 | 起草任务 | 使用任务 | 可沿用的 V3 资料与参数 |
+|---|---|---|---|---|
+| 证据与掌握档 | evidence-mastery.md | R01 | B04 | docs/models/learner-model.md、tests/models/learner-model/cases.yaml；learner.evidence.*、learner.mastery.*、learner.verify.*、learner.self_check.items |
+| 记忆调度与复习队列 | review-scheduling.md | R02 | B06 | docs/models/srs.md、tests/models/srs/cases.yaml；learner.memory.*、plan.review.*、practice.recall.relearn_delay_minutes |
+| 错题回炉与毕业 | mistake-graduation.md | R03 | B05 | practice.mistake.*；勘误表第 1、2 条 |
+| 计划与今日清单 | plan-today.md | R04 | B07 | docs/models/planner.md、tests/models/planner/cases.yaml；plan.consolidate.*、plan.carryover.*、plan.proposal.*、plan.disconnect.*、plan.short_mode.*、plan.sprint.*、plan.calibrate.*、plan.week.* |
+| 摸底与起点报告 | diagnosis-start.md | R05 | B08 | learner.prior.min_population |
+| 三个数与统计口径 | metrics-prediction.md | R06 | B11 | docs/models/prediction.md、tests/models/prediction/cases.yaml；learner.forecast.*、plan.report.*；contracts/metrics.yaml |
+| 模考 | mock-exam.md | R07 | B10 | — |
+| 账号生命周期 | account-lifecycle.md | R08 | B13、L02 | account.deregister.cooling_days |
+| AI 导师边界 | tutor-boundary.md | R09 | B15、L04 | contracts/ai/actors.yaml、contracts/ai/scenarios.yaml |
+| 会员与额度 | billing-quota.md | R10 | B14、L03 | billing.quota.remind_at |
