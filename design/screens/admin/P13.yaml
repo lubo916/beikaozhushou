@@ -85,5 +85,3 @@ items:
     name: 核销规则与防刷
     text: 各类码共用的核销条件、适用人群（如首次付费专享）与防刷限制
     page_priority: P1
-slice: design/screens/slices/P13.html
-shots: design/screens/shots/P13/

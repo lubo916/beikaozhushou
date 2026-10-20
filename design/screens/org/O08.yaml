@@ -58,5 +58,3 @@ items:
     name: 流失风险预测
     text: 只用机构任务数据与已授权数据估计，仅供老师排优先级，不对学员展示
     page_priority: P2
-slice: design/screens/slices/O08.html
-shots: design/screens/shots/O08/

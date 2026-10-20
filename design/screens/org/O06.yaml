@@ -50,5 +50,3 @@ items:
     name: 计划进度对照
     text: 班级实际进度与计划的偏差，并给调整建议
     page_priority: P1
-slice: design/screens/slices/O06.html
-shots: design/screens/shots/O06/

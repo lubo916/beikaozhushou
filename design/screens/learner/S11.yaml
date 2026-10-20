@@ -111,5 +111,3 @@ items:
     name: 资料与题库整理
     text: 资料和题库可重命名、复制，或移动到其他科目或目标；移动时知识点、笔记、标注与学习记录随之迁移
     page_priority: P1
-slice: design/screens/slices/S11.html
-shots: design/screens/shots/S11/

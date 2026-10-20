@@ -75,5 +75,3 @@ items:
     name: 分享成绩
     text: 只含用户选择展示的信息
     page_priority: P2
-slice: design/screens/slices/S23.html
-shots: design/screens/shots/S23/

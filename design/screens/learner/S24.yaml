@@ -113,5 +113,3 @@ items:
     name: 对标上岸者
     text: 只用单独同意用户的匿名统计，样本不足不显示，默认不使用你的数据
     page_priority: P2
-slice: design/screens/slices/S24.html
-shots: design/screens/shots/S24/

@@ -53,5 +53,3 @@ items:
     name: 认证考试
     text: 上岗或合规认证：通过线与补考规则
     page_priority: P1
-slice: design/screens/slices/O07.html
-shots: design/screens/shots/O07/

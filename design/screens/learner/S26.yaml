@@ -57,5 +57,3 @@ items:
     name: 路径规划
     text: 多科或多证的先后搭配
     page_priority: P2
-slice: design/screens/slices/S26.html
-shots: design/screens/shots/S26/

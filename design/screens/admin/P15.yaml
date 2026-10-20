@@ -46,5 +46,3 @@ items:
     name: 活动配置
     text: 配置与上下线
     page_priority: P2
-slice: design/screens/slices/P15.html
-shots: design/screens/shots/P15/

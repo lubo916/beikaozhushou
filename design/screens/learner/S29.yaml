@@ -55,5 +55,3 @@ items:
     name: 没找到的反馈
     text: 记录搜了什么、期望找到什么
     page_priority: P2
-slice: design/screens/slices/S29.html
-shots: design/screens/shots/S29/

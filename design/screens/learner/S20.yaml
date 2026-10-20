@@ -90,5 +90,3 @@ items:
     name: 人工复评
     text: 对批改有异议可申请人工复核（有人工服务时）
     page_priority: P2
-slice: design/screens/slices/S20.html
-shots: design/screens/shots/S20/

@@ -87,5 +87,3 @@ items:
     name: 联考
     text: 统一时间开考（有组织方时）
     page_priority: P2
-slice: design/screens/slices/S22.html
-shots: design/screens/shots/S22/

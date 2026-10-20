@@ -142,5 +142,3 @@ items:
     name: 异地登录确认
     text: 提醒中可选「是我本人」（记为常用地点）或「不是我」（立即改密，并让全部设备下线）
     page_priority: P1
-slice: design/screens/slices/S32.html
-shots: design/screens/shots/S32/

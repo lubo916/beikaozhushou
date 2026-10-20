@@ -71,5 +71,3 @@ items:
     name: 真人模拟
     text: 预约真人考官，作为增值服务
     page_priority: P2
-slice: design/screens/slices/S21.html
-shots: design/screens/shots/S21/

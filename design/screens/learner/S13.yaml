@@ -92,5 +92,3 @@ items:
     name: 直播课堂
     text: 随堂答题、字幕、回放切片（机构场景）
     page_priority: P2
-slice: design/screens/slices/S13.html
-shots: design/screens/shots/S13/

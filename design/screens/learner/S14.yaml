@@ -79,5 +79,3 @@ items:
     name: 搬运提醒
     text: 大段照抄时提示改用自己的话
     page_priority: P1
-slice: design/screens/slices/S14.html
-shots: design/screens/shots/S14/

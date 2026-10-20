@@ -121,5 +121,3 @@ items:
     name: 备用验证
     text: 短信不可用时，已绑定邮箱的用户改收邮箱验证码；都不可用时转人工核验身份
     page_priority: P2
-slice: design/screens/slices/S01.html
-shots: design/screens/shots/S01/

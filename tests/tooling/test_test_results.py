@@ -1,8 +1,8 @@
-"""测试结果接线（计划 A7）：Vitest、Playwright 与工具测试的结果合并为 .test-results/results.json，spec_tool 能据此推导 AC 状态。"""
+"""Vitest、Playwright 与工具测试的结果合并为 .test-results/results.json。"""
 import json
 import unittest
 
-from _support import ROOT, load_engineering, spec_tool, temp_repo, write
+from _support import ROOT, load_engineering, temp_repo, write
 
 results = load_engineering("test_results")
 
@@ -42,17 +42,19 @@ class TestResultsTest(unittest.TestCase):
         self.assertEqual({(r["title"], r["status"]) for r in recs},
                          {("反例被拦下 [PLAT-02-AC7]", "passed"), ("test_sample.S.test_b", "failed")})
 
-    def test_merge_and_spec_tool(self):
-        """合并写出 results.json，spec_tool 按标题中的 AC 标签推导状态"""
+    def test_merge_writes_results(self):
+        """合并保留各来源的用例状态，并把完整结果写入 results.json"""
         root = temp_repo(self)
         write(root, ".test-results/tooling.json", json.dumps({"tests": [{"title": "工具 [PLAT-02-AC7]", "status": "passed"}]}))
         write(root, ".test-results/playwright.json", json.dumps({"suites": [{"title": "x.spec.ts", "file": "x.spec.ts", "specs": [
             {"title": "冒烟 [METR-01-AC10]", "tests": [{"projectName": "chromium", "status": "unexpected"}]}]}]}))
         merged = results.merge(root)
         self.assertEqual(len(merged["tests"]), 2)
-        res = spec_tool.Repo(root).test_results
-        self.assertEqual(res.get("PLAT-02-AC7"), "passed")
-        self.assertEqual(res.get("METR-01-AC10"), "failed")
+        states = {label: [r["status"] for r in merged["tests"] if label in r["title"]]
+                  for label in ("PLAT-02-AC7", "METR-01-AC10")}
+        self.assertEqual(states, {"PLAT-02-AC7": ["passed"], "METR-01-AC10": ["failed"]})
+        saved = json.loads((root / ".test-results/results.json").read_text(encoding="utf-8"))
+        self.assertEqual(saved, merged)
 
 
 if __name__ == "__main__":

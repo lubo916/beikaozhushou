@@ -93,5 +93,3 @@ items:
     name: 攻坚包
     text: 诊断卡点、讲解、示范、渐退练习、检验，前后测证明有效；时长有上限
     page_priority: P1
-slice: design/screens/slices/S10.html
-shots: design/screens/shots/S10/

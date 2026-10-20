@@ -118,5 +118,3 @@ items:
     name: 对话历史
     text: 导师对话按知识点或题目归档，可回看、接着问；清空的对话不再出现
     page_priority: P1
-slice: design/screens/slices/S28.html
-shots: design/screens/shots/S28/

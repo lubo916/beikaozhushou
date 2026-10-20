@@ -139,5 +139,3 @@ items:
     name: 周复盘入口
     text: 每周固定时间在清单末尾出现一项简短的周复盘，指向复盘与报告
     page_priority: P1
-slice: design/screens/slices/S06.html
-shots: design/screens/shots/S06/

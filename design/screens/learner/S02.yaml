@@ -108,5 +108,3 @@ items:
     name: 我该考什么
     text: 未定目标者可比较不同考试的难度、周期、条件与知识重叠
     page_priority: P2
-slice: design/screens/slices/S02.html
-shots: design/screens/shots/S02/

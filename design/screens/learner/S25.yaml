@@ -71,5 +71,3 @@ items:
     name: 日历同步
     text: 同步到系统日历
     page_priority: P2
-slice: design/screens/slices/S25.html
-shots: design/screens/shots/S25/

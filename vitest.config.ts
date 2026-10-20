@@ -1,5 +1,5 @@
 // Vitest 4（0.1b 计划 A5）：projects 覆盖 apps、packages 与 tests。纯逻辑用 node 环境；数据库测试（*.db.test.ts）串行；
-// 组件测试用浏览器模式（Playwright 驱动），不引入 jsdom。结果写 .test-results/vitest.json，由 verify 合并进 results.json。
+// 组件测试用浏览器模式（Playwright 驱动），不引入 jsdom。结果写 .test-results/vitest.json，可用 python3 scripts/engineering/test_results.py merge 合并进 results.json。
 import react from "@vitejs/plugin-react";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";

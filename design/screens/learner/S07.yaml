@@ -105,5 +105,3 @@ items:
     name: 班级计划融合
     text: 机构进度与个人计划合并而不是覆盖，共用一份时间预算
     page_priority: P1
-slice: design/screens/slices/S07.html
-shots: design/screens/shots/S07/

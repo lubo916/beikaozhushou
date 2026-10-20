@@ -142,5 +142,3 @@ items:
     name: 练习多端互斥
     text: 同一场练习不能在两台设备同时作答；模考的多端互斥见 S22-09
     page_priority: P1
-slice: design/screens/slices/S18.html
-shots: design/screens/shots/S18/

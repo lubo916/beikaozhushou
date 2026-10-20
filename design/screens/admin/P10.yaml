@@ -37,5 +37,3 @@ items:
     name: 备案台账
     text: 算法与模型备案
     page_priority: P1
-slice: design/screens/slices/P10.html
-shots: design/screens/shots/P10/

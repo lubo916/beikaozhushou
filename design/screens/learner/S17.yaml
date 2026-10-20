@@ -123,5 +123,3 @@ items:
     name: 试卷完整性提示
     text: 试卷中有题目被删除或下架时，在试卷与作答页提示得分可能不准，并可重新组卷
     page_priority: P2
-slice: design/screens/slices/S17.html
-shots: design/screens/shots/S17/

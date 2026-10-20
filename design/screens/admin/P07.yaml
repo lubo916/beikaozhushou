@@ -41,5 +41,3 @@ items:
     name: 来源与授权登记
     text: 生产前登记来源与授权
     page_priority: P1
-slice: design/screens/slices/P07.html
-shots: design/screens/shots/P07/

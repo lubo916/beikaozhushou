@@ -54,5 +54,3 @@ items:
     name: 讲义优先与考试关闭
     text: 与讲义冲突时以讲义为准并提示老师；班级考试期间关闭
     page_priority: P1
-slice: design/screens/slices/O10.html
-shots: design/screens/shots/O10/

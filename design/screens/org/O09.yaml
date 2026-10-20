@@ -61,5 +61,3 @@ items:
     name: 匿名与按题批改
     text: 减少印象分
     page_priority: P1
-slice: design/screens/slices/O09.html
-shots: design/screens/shots/O09/

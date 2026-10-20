@@ -46,5 +46,3 @@ items:
     name: 满意度回访
     text: 结课问卷与回访记录
     page_priority: P2
-slice: design/screens/slices/O12.html
-shots: design/screens/shots/O12/

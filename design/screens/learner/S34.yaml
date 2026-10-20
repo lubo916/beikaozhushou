@@ -45,5 +45,3 @@ items:
     name: 下一站推荐
     text: 考完后适合的下一个目标与可迁移比例
     page_priority: P2
-slice: design/screens/slices/S34.html
-shots: design/screens/shots/S34/

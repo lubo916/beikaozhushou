@@ -57,5 +57,3 @@ items:
     name: 线索沟通要点
     text: 基于诊断报告生成与线索沟通的要点
     page_priority: P1
-slice: design/screens/slices/O02.html
-shots: design/screens/shots/O02/

@@ -53,5 +53,3 @@ items:
     name: 进度证明
     text: 须学员本人确认才能导出
     page_priority: P1
-slice: design/screens/slices/O04.html
-shots: design/screens/shots/O04/

@@ -61,5 +61,3 @@ items:
     name: 跨考试映射
     text: 等价或相近知识点的映射
     page_priority: P2
-slice: design/screens/slices/P04.html
-shots: design/screens/shots/P04/

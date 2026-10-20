@@ -42,5 +42,3 @@ items:
     name: 处置记录与申诉
     text: 依据、操作人、结果
     page_priority: P0
-slice: design/screens/slices/P17.html
-shots: design/screens/shots/P17/

@@ -53,5 +53,3 @@ items:
     name: 高风险领域加严
     text: 法律、医药、财税等使用更严阈值
     page_priority: P1
-slice: design/screens/slices/P12.html
-shots: design/screens/shots/P12/

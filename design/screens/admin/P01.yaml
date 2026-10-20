@@ -56,5 +56,3 @@ items:
     name: 移动端处理
     text: 告警、双人复核审批、危机处置三类操作可在手机上处理
     page_priority: P1
-slice: design/screens/slices/P01.html
-shots: design/screens/shots/P01/

@@ -58,5 +58,3 @@ items:
     name: 学员邀请
     text: 邀请码与链接；加入时明示机构可见的数据范围
     page_priority: P0
-slice: design/screens/slices/O03.html
-shots: design/screens/shots/O03/

@@ -41,5 +41,3 @@ items:
     name: 渠道配置
     text: 小程序、网页、应用、企业微信
     page_priority: P2
-slice: design/screens/slices/O14.html
-shots: design/screens/shots/O14/

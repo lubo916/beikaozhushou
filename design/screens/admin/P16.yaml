@@ -49,5 +49,3 @@ items:
     name: 账号共享核查工单
     text: 同一账号反复超出设备上限时，自动生成核查工单
     page_priority: P2
-slice: design/screens/slices/P16.html
-shots: design/screens/shots/P16/

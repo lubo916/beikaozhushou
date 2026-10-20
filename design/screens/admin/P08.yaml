@@ -45,5 +45,3 @@ items:
     name: 难度标定回流
     text: 用真实作答修正难度
     page_priority: P1
-slice: design/screens/slices/P08.html
-shots: design/screens/shots/P08/

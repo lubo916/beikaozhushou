@@ -98,7 +98,7 @@ module.exports = {
     {
       name: "not-to-unresolvable",
       severity: "error",
-      comment: "依赖无法解析：先运行 pnpm install、python3 scripts/spec_tool.py gen 与 pnpm db:generate",
+      comment: "依赖无法解析：先运行 pnpm install、pnpm contract:gen 与 pnpm db:generate",
       from: {},
       to: { couldNotResolve: true },
     },

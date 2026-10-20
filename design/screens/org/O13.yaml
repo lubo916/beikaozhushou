@@ -49,5 +49,3 @@ items:
     name: 报表导出
     text: 含个人信息的导出须审批留痕
     page_priority: P2
-slice: design/screens/slices/O13.html
-shots: design/screens/shots/O13/

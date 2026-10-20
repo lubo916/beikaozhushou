@@ -77,5 +77,3 @@ items:
     name: 临考增频
     text: 冲刺期复习提醒可增加频次，仍受每日上限约束
     page_priority: P2
-slice: design/screens/slices/S27.html
-shots: design/screens/shots/S27/

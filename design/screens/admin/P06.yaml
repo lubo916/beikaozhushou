@@ -41,5 +41,3 @@ items:
     name: 计划调整建议
     text: 为受影响用户生成提议，确认后生效
     page_priority: P1
-slice: design/screens/slices/P06.html
-shots: design/screens/shots/P06/

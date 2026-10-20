@@ -75,5 +75,3 @@ items:
     name: 手机时间模板
     text: 手机上用“工作日 / 周末”两行模板代替 7 列格子，点开某天再细调
     page_priority: P1
-slice: design/screens/slices/S03.html
-shots: design/screens/shots/S03/

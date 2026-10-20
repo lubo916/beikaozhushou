@@ -40,5 +40,3 @@ items:
     name: 用户提示词审核
     text: 优质提示词可被采纳为预置
     page_priority: P2
-slice: design/screens/slices/P11.html
-shots: design/screens/shots/P11/

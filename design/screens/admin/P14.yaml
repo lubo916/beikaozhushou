@@ -41,5 +41,3 @@ items:
     name: 内容抽检
     text: 抽检机构内容与招生素材
     page_priority: P1
-slice: design/screens/slices/P14.html
-shots: design/screens/shots/P14/

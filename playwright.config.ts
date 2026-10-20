@@ -1,5 +1,5 @@
 // Playwright（0.1b 计划 A6）：testDir 为 tests/e2e；webServer 同时起 api 与学员端；三个浏览器项目。
-// 结果写 .test-results/playwright.json，由 verify 合并进 results.json。截图基线只在固定版本的 Linux 镜像中生成与比对（tests/e2e/Dockerfile）。
+// 结果写 .test-results/playwright.json，可用 python3 scripts/engineering/test_results.py merge 合并进 results.json。截图基线只在固定版本的 Linux 镜像中生成与比对（tests/e2e/Dockerfile）。
 import { defineConfig, devices } from "@playwright/test";
 
 const API_PORT = process.env["E2E_API_PORT"] || "3100";

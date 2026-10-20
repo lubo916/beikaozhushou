@@ -68,5 +68,3 @@ items:
     name: 分心拦截
     text: 学习期间屏蔽非必要通知
     page_priority: P2
-slice: design/screens/slices/S30.html
-shots: design/screens/shots/S30/

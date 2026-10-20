@@ -120,5 +120,3 @@ items:
     name: 支付渠道
     text: 按端提供支付方式；苹果应用内购买不支持优惠码；续费与退款回到原购买渠道办理
     page_priority: P0
-slice: design/screens/slices/S31.html
-shots: design/screens/shots/S31/

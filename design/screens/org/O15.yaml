@@ -80,5 +80,3 @@ items:
     name: 安全基线只紧不松
     text: 机构可在平台基线上收紧员工账号安全策略（失败锁定、二次验证、单会话、改密周期），不能放宽
     page_priority: P1
-slice: design/screens/slices/O15.html
-shots: design/screens/shots/O15/

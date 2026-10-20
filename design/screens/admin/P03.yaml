@@ -45,5 +45,3 @@ items:
     name: 扩展数据维护
     text: 岗位库、院校库、资格规则库，决定扩展包能否挂载
     page_priority: P1
-slice: design/screens/slices/P03.html
-shots: design/screens/shots/P03/

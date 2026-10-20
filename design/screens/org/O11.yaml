@@ -98,5 +98,3 @@ items:
     name: 听课评课
     text: 抽看回放并按量表打分，反馈给讲师
     page_priority: P2
-slice: design/screens/slices/O11.html
-shots: design/screens/shots/O11/

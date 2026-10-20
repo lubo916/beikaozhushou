@@ -65,5 +65,3 @@ items:
     name: 满意度评价
     text: 工单处理完成后可评价满意度
     page_priority: P1
-slice: design/screens/slices/S35.html
-shots: design/screens/shots/S35/

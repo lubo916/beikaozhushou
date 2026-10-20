@@ -89,5 +89,3 @@ items:
     name: 导出与分享
     text: 导出为文档；分享图只含用户选择展示的信息
     page_priority: P2
-slice: design/screens/slices/S05.html
-shots: design/screens/shots/S05/

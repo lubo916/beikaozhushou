@@ -91,5 +91,3 @@ items:
     name: 做题辅助开关
     text: 把握度标注与读后即测可分别关闭，默认开启；关闭前说明对证据等级的影响
     page_priority: P0
-slice: design/screens/slices/S33.html
-shots: design/screens/shots/S33/

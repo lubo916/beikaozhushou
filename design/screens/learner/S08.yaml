@@ -85,5 +85,3 @@ items:
     name: 导出与分享
     text: 导出文档；可分享给监督伙伴，范围自定
     page_priority: P2
-slice: design/screens/slices/S08.html
-shots: design/screens/shots/S08/

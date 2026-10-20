@@ -103,5 +103,3 @@ items:
     name: 错题周报
     text: 本周新增、毕业、顽固错题
     page_priority: P2
-slice: design/screens/slices/S19.html
-shots: design/screens/shots/S19/

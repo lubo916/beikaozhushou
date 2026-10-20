@@ -57,5 +57,3 @@ items:
     name: 按组织类型切换指标
     text: 培训机构、学校、企业内训共用页面，默认指标与用词随组织类型切换
     page_priority: P1
-slice: design/screens/slices/O01.html
-shots: design/screens/shots/O01/

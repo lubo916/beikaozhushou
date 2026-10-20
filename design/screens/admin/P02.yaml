@@ -32,5 +32,3 @@ items:
     name: 同步与字典查看
     text: 看板同步状态、数据字典
     page_priority: P1
-slice: design/screens/slices/P02.html
-shots: design/screens/shots/P02/

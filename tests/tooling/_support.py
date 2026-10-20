@@ -1,17 +1,12 @@
-"""tests/tooling 的公共辅助：定位仓库根、导入 spec_tool 与 scripts/engineering 下的脚本、构造临时仓库。"""
+"""tests/tooling 的公共辅助：定位仓库根、导入 scripts/engineering 下的脚本、构造临时仓库。"""
 from __future__ import annotations
 
 import importlib.util
 import shutil
-import sys
 import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT / "scripts") not in sys.path:
-    sys.path.insert(0, str(ROOT / "scripts"))
-
-import spec_tool  # noqa: E402
 
 
 def load_engineering(name: str):

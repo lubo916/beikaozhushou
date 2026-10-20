@@ -24,9 +24,7 @@
     "db:seed": "node --env-file-if-exists=.env packages/db/src/seed-cli.ts",
     "dev:api": "pnpm --filter @exam-prep/api dev",
     "dev:worker": "pnpm --filter @exam-prep/worker dev",
-    "dev:learner": "pnpm --filter @exam-prep/learner dev",
-    "spec:check": "python3 scripts/spec_tool.py check",
-    "spec:gen": "python3 scripts/spec_tool.py gen"
+    "dev:learner": "pnpm --filter @exam-prep/learner dev"
   },
   "dependencies": {
     "prisma": "7.0.0"
