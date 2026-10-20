@@ -27,7 +27,7 @@ contracts/openapi/
 - 合并脚本（tools/merge-openapi.mjs，F04 建）把所有文件合成一份再交给 Orval；路径或名字重复直接报错。
 - 页面私有的数据形状用页 ID 作前缀命名（如 `S06TodayView`），公共形状引用 schemas/。需要新的公共形状，在交接单里提出。
 - 生成物不进 git：`pnpm gen` 生成类型、Zod 校验、TanStack Query 钩子、MSW 处理器。
-- 现状：仓库里还是 V3 的单文件 contracts/openapi.yaml（前缀 `/api`，没有 v1）和它的生成脚本 scripts/engineering/contract-gen.mjs，生成物 packages/contract/src/generated/ 也还在 git 里。F04 把它拆进上面的结构、改用 `/api/v1`、把生成物移出 git；拆完之前以单文件为准。
+- 现状：仓库里还是 V3 的单文件 contracts/openapi.yaml（前缀 `/api`，没有 v1）和它的生成脚本 scripts/engineering/contract-gen.mjs，生成物 packages/contract/src/generated/ 也还在 git 里。F02 建立 `pnpm gen` 入口并接管契约生成、把契约生成物移出 git；F04 把它拆进上面的结构、改用 `/api/v1`、接通 Orval；拆完之前以单文件为准。
 
 ## 3 页面怎么拿数据
 
