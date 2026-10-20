@@ -6,8 +6,8 @@
     "kind 表示测哪段规则：strength＝单条证据定级（R1–R5）；mastery＝一个知识点的档位派生（R6–R17、R21）；target＝目标档（R18）；map_stats＝地图上的数（R19、R20）。",
     "expect 里列出的字段都要相等，没列的不检查；score 允许 0.001 的误差。",
     "参数取 params 的值，与 contracts/params.yaml 现值相同；只有 credibility_caps 的四级按规则卡写成 none（不记），见规则卡出入表第 1 条。proposed_params 是建议新增、待整合任务登记的参数。",
-    "带 decision 的例子取决于待拍板问题，现按 temp_decisions 的临时默认写；拍板后改卡、改这里、改测试，同一次提交。",
-    "mastery 的 evidence 按写入账本的先后排列。没写的字段取默认：type＝single、kps＝1、source＝practice、confidence＝sure、at_h＝0（作答时间，单位小时）。revoked＝已撤回；inherited＝拆分时按映射继承来的；batch＝同一次自评检验的题。",
+    "带 decision 的例子取决于拍板问题：decided 里是已拍板的，temp_decisions 里是还没拍板、按推荐临时写的；改了哪条，就改卡、改这里、改测试，同一次提交。",
+    "mastery 的 evidence 按写入账本的先后排列。没写的字段取默认：type＝single、kps＝1、source＝practice、confidence＝sure、at_h＝0（作答时间，单位小时）。reason＝这条证据的原因代码，判断“把握度关闭时只因关闭才记成中”要用；revoked＝已撤回；inherited＝拆分时按映射继承来的；batch＝同一次自评检验的题。",
     "取值代码：strength 用 strong、medium、weak、negative、pending、none（none＝不记）；confidence 用 sure、vague、guess、off、none；credibility 用 reviewed、own、generated_confirmed、generated_instant；题型与知识类型用 docs/product/glossary.yaml 的代码。"
   ],
   "params": {
@@ -46,16 +46,19 @@
     },
     "learner.mastery.apply_question_types": ["material", "calculation", "short_answer", "essay", "oral", "practical"],
     "learner.mastery.transfer_min_kps": 2,
-    "learner.mastery.weak_gap_levels": 2
+    "learner.mastery.weak_gap_levels": 2,
+    "learner.mastery.drop_buffer": 1.0
+  },
+  "decided": {
+    "R01-Q4": "B",
+    "R01-Q7": "B"
   },
   "temp_decisions": {
     "R01-Q1": "C",
     "R01-Q2": "B",
     "R01-Q3": "B",
-    "R01-Q4": "A",
     "R01-Q5": "A",
-    "R01-Q6": "A",
-    "R01-Q7": "A"
+    "R01-Q6": "A"
   },
   "cases": [
     {
@@ -202,7 +205,7 @@
       "id": "E8",
       "kind": "strength",
       "title": "正常：把握度已关闭",
-      "rule": "R2",
+      "rule": "R2、R3",
       "input": {
         "source": "practice",
         "credibility": "reviewed",
@@ -415,18 +418,18 @@
     {
       "id": "E18",
       "kind": "mastery",
-      "title": "边界：只有中证据",
+      "title": "边界：只有“模糊”的中证据",
       "rule": "R10",
       "input": {
         "evidence": [
-          { "q": "a", "strength": "medium", "confidence": "vague" },
-          { "q": "b", "strength": "medium", "confidence": "vague" },
-          { "q": "c", "strength": "medium", "confidence": "vague" },
-          { "q": "d", "strength": "medium", "confidence": "vague" },
-          { "q": "e", "strength": "medium", "confidence": "vague" },
-          { "q": "f", "strength": "medium", "confidence": "vague" },
-          { "q": "g", "strength": "medium", "confidence": "vague" },
-          { "q": "h", "strength": "medium", "confidence": "vague" }
+          { "q": "a", "strength": "medium", "confidence": "vague", "reason": "vague" },
+          { "q": "b", "strength": "medium", "confidence": "vague", "reason": "vague" },
+          { "q": "c", "strength": "medium", "confidence": "vague", "reason": "vague" },
+          { "q": "d", "strength": "medium", "confidence": "vague", "reason": "vague" },
+          { "q": "e", "strength": "medium", "confidence": "vague", "reason": "vague" },
+          { "q": "f", "strength": "medium", "confidence": "vague", "reason": "vague" },
+          { "q": "g", "strength": "medium", "confidence": "vague", "reason": "vague" },
+          { "q": "h", "strength": "medium", "confidence": "vague", "reason": "vague" }
         ]
       },
       "expect": {
@@ -439,23 +442,23 @@
     {
       "id": "E19",
       "kind": "mastery",
-      "title": "边界：把握度已关闭",
+      "title": "正常：把握度关闭也能到 3 档",
       "rule": "R10",
       "decision": "R01-Q7",
       "input": {
         "evidence": [
-          { "q": "a", "strength": "medium", "confidence": "off" },
-          { "q": "b", "strength": "medium", "confidence": "off" },
-          { "q": "c", "strength": "medium", "confidence": "off" },
-          { "q": "d", "strength": "medium", "confidence": "off" },
-          { "q": "e", "strength": "medium", "confidence": "off" },
-          { "q": "f", "strength": "medium", "confidence": "off" },
-          { "q": "g", "strength": "medium", "confidence": "off" },
-          { "q": "h", "strength": "medium", "confidence": "off" }
+          { "q": "a", "strength": "medium", "confidence": "off", "reason": "confidence_off" },
+          { "q": "b", "strength": "medium", "confidence": "off", "reason": "confidence_off" },
+          { "q": "c", "strength": "medium", "confidence": "off", "reason": "confidence_off" },
+          { "q": "d", "strength": "medium", "confidence": "off", "reason": "confidence_off" },
+          { "q": "e", "strength": "medium", "confidence": "off", "reason": "confidence_off" },
+          { "q": "f", "strength": "medium", "confidence": "off", "reason": "confidence_off" },
+          { "q": "g", "strength": "medium", "confidence": "off", "reason": "confidence_off" },
+          { "q": "h", "strength": "medium", "confidence": "off", "reason": "confidence_off" }
         ]
       },
       "expect": {
-        "level": 2,
+        "level": 3,
         "score": 4.8,
         "sufficient": true,
         "pending": false
@@ -543,7 +546,7 @@
     {
       "id": "E23",
       "kind": "mastery",
-      "title": "正常：做错降档",
+      "title": "边界：错一次没跌够，不降档",
       "rule": "R8、R14",
       "decision": "R01-Q4",
       "input": {
@@ -557,7 +560,7 @@
         ]
       },
       "expect": {
-        "level": 2,
+        "level": 3,
         "score": 4.0,
         "sufficient": true,
         "pending": false
@@ -706,8 +709,8 @@
         "evidence": [
           { "q": "a", "strength": "strong" },
           { "q": "b", "strength": "strong" },
-          { "q": "c", "strength": "strong", "source": "self_check", "batch": "s1" },
-          { "q": "d", "strength": "negative", "source": "self_check", "batch": "s1" }
+          { "q": "c", "strength": "negative", "source": "self_check", "batch": "s1" },
+          { "q": "d", "strength": "strong", "source": "self_check", "batch": "s1" }
         ]
       },
       "expect": {
@@ -983,6 +986,56 @@
           "k6": "dashed",
           "k8": "dashed"
         }
+      }
+    },
+    {
+      "id": "E40",
+      "kind": "mastery",
+      "title": "正常：连错两次跌够了，降一档",
+      "rule": "R14",
+      "decision": "R01-Q4",
+      "input": {
+        "evidence": [
+          { "q": "a", "strength": "strong" },
+          { "q": "b", "strength": "strong" },
+          { "q": "c", "strength": "strong" },
+          { "q": "d", "strength": "strong" },
+          { "q": "e", "strength": "strong" },
+          { "q": "f", "strength": "negative" },
+          { "q": "g", "strength": "negative" }
+        ]
+      },
+      "expect": {
+        "level": 2,
+        "score": 3.0,
+        "sufficient": true,
+        "pending": false
+      }
+    },
+    {
+      "id": "E41",
+      "kind": "mastery",
+      "title": "边界：降档后再做对，过门槛就升回",
+      "rule": "R14",
+      "decision": "R01-Q4",
+      "input": {
+        "evidence": [
+          { "q": "a", "strength": "strong" },
+          { "q": "b", "strength": "strong" },
+          { "q": "c", "strength": "strong" },
+          { "q": "d", "strength": "strong" },
+          { "q": "e", "strength": "strong" },
+          { "q": "f", "strength": "negative" },
+          { "q": "g", "strength": "negative" },
+          { "q": "h", "strength": "strong" },
+          { "q": "i", "strength": "strong" }
+        ]
+      },
+      "expect": {
+        "level": 3,
+        "score": 5.0,
+        "sufficient": true,
+        "pending": false
       }
     }
   ]
