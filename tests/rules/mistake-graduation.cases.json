@@ -1,6 +1,6 @@
 {
   "card": "docs/baseline/rule-cards/mistake-graduation.md",
-  "about": "R03 错题回炉与毕业的例子表，与 docs/baseline/rule-cards/mistake-graduation.md 的例子表逐行对应，B05 拿来做测试。用法：先把 defaults 合并进每个例子（input.before 缺的字段取 defaults.before，input.event 缺的字段取 defaults.event，参数取 defaults.params，个别例子可在 input.params 里覆盖）；before 为 null 表示这道题还不在错题本里。last_day、last_fail_day、due、local_day 是学员时区的日期；at 是 UTC 时间，按 defaults.learner 的时区和日界线换算成哪一天。expect 只检查写出来的字段；labels 按事件发生那天算，集合相等（不计顺序）。代码标识：状态 new 新增、retrying 回炉中、awaiting_check 待验收、graduated 已毕业；标签 needs_correction 待订正、due_retry 到期回炉、stubborn 顽固（待登记进术语表）；outcome 为 pass 算数、not_counted 不算数也不算失败、fail 失败、practice 没到期只当练习；check 为下次验收或回炉出的题：original 原题、variant 变式题；new_mistake 表示另收了一条新错题。",
+  "about": "R03 错题回炉与毕业的例子表，与 docs/baseline/rule-cards/mistake-graduation.md 的例子表逐行对应，B05 拿来做测试。用法：先把 defaults 合并进每个例子（input.before 缺的字段取 defaults.before，input.event 缺的字段取 defaults.event，参数取 defaults.params，个别例子可在 input.params 里覆盖）；before 为 null 表示这道题还不在错题本里。last_day、last_fail_day、due、local_day 是学员时区的日期；at 是 UTC 时间，按 defaults.learner 的时区和日界线换算成哪一天。expect 只检查写出来的字段；labels 按事件发生那天算，集合相等（不计顺序）。代码标识：状态 new 新增、retrying 回炉中、awaiting_check 待验收、graduated 已毕业；标签 needs_correction 待订正、due_retry 到期回炉、stubborn 顽固（待登记进术语表）；outcome 为 pass 算数、not_counted 不算数也不算失败、fail 失败、practice 没到期只当练习；check 为下次验收或回炉出的题：original 原题、variant 变式题；new_mistake 表示另收了一条新错题；collected 表示这一步新收了一条；removed 表示已移出；in_queue 表示在到期队列里（没毕业、没移出、没撤回），in_today 表示今天到期（含逾期）、进今日清单。改答案的例子（event.kind 为 answer_key_revised，即 E32、E34–E36）按 R18 从头重放：input.history 是这道题按时间排的全部记录（其中的作答也先合并 defaults.event），作答里的 result 是当时的判定，原样保留，result_now 是按新答案重判的结果（不写表示没变）；实现要用有效对错（有 result_now 就用它）从头走一遍 R1–R17，不能改写 result，也不能在 input.before 上打补丁。input.before 是改答案前看到的样子（用 result 重放得到），只供对照，测试可以顺带检查；null 表示原来不在错题本里。这类例子的 expect 按改答案那天（event.at）算；collected_day 是重放后的收录那天；withdrawn 为 true 表示撤回：不显示、不进到期队列、不计入页头统计、不算毕业，作答和这条错题的历史都保留。",
   "defaults": {
     "params": {
       "practice.mistake.review_intervals": [3, 7, 14],
@@ -824,8 +824,17 @@
     {
       "id": "E32",
       "rule": "R18",
-      "title": "异常：题目改了答案，收录那次作答其实是对的，错题撤回",
+      "title": "异常：题目改了答案，只有一次误收，没有别的收录原因，撤回",
       "input": {
+        "history": [
+          {
+            "kind": "answer",
+            "scene": "practice",
+            "at": "2026-10-21T02:00:00Z",
+            "result": "wrong",
+            "result_now": "correct"
+          }
+        ],
         "before": {
           "status": "new",
           "corrected": false,
@@ -834,13 +843,13 @@
         },
         "event": {
           "kind": "answer_key_revised",
-          "at": "2026-10-22T02:00:00Z",
-          "collected_answer_now": "correct"
+          "at": "2026-10-22T02:00:00Z"
         }
       },
       "expect": {
         "withdrawn": true,
-        "in_queue": false
+        "in_queue": false,
+        "in_today": false
       }
     },
     {
@@ -862,6 +871,133 @@
       "expect": {
         "status": "retrying",
         "labels": ["due_retry"],
+        "in_today": true
+      }
+    },
+    {
+      "id": "E34",
+      "rule": "R18,R1,R8",
+      "title": "异常：首次收录是误收，但 24 日回炉那次其实错了：不撤回，按 24 日重新算",
+      "input": {
+        "history": [
+          {
+            "kind": "answer",
+            "scene": "practice",
+            "at": "2026-10-21T02:00:00Z",
+            "result": "wrong",
+            "result_now": "correct"
+          },
+          {
+            "kind": "answer",
+            "scene": "retry",
+            "at": "2026-10-24T02:00:00Z",
+            "result": "correct",
+            "result_now": "wrong"
+          }
+        ],
+        "before": {
+          "status": "retrying",
+          "corrected": false,
+          "streak": 1,
+          "last_day": "2026-10-24",
+          "due": "2026-10-31"
+        },
+        "event": {
+          "kind": "answer_key_revised",
+          "at": "2026-10-26T02:00:00Z"
+        }
+      },
+      "expect": {
+        "withdrawn": false,
+        "collected_day": "2026-10-24",
+        "status": "new",
+        "streak": 0,
+        "fail_count": 0,
+        "due": "2026-10-27",
+        "labels": ["needs_correction"],
+        "in_queue": true,
+        "in_today": false
+      }
+    },
+    {
+      "id": "E35",
+      "rule": "R18,R1,R8",
+      "title": "异常：原先判对、不在错题本里，改答案后变错：补收为新增",
+      "input": {
+        "history": [
+          {
+            "kind": "answer",
+            "scene": "practice",
+            "at": "2026-10-21T02:00:00Z",
+            "result": "correct",
+            "result_now": "wrong"
+          }
+        ],
+        "before": null,
+        "event": {
+          "kind": "answer_key_revised",
+          "at": "2026-10-26T02:00:00Z"
+        }
+      },
+      "expect": {
+        "collected": true,
+        "collected_day": "2026-10-21",
+        "status": "new",
+        "streak": 0,
+        "fail_count": 0,
+        "due": "2026-10-24",
+        "labels": ["needs_correction", "due_retry"],
+        "in_queue": true,
+        "in_today": true
+      }
+    },
+    {
+      "id": "E36",
+      "rule": "R18,R17",
+      "title": "边界：先手动移出、后来才有真错：移出不起作用，按真错收为新增并显示",
+      "input": {
+        "history": [
+          {
+            "kind": "answer",
+            "scene": "practice",
+            "at": "2026-10-21T02:00:00Z",
+            "result": "wrong",
+            "result_now": "correct"
+          },
+          {
+            "kind": "manual_remove",
+            "at": "2026-10-22T02:00:00Z"
+          },
+          {
+            "kind": "answer",
+            "scene": "practice",
+            "at": "2026-10-23T02:00:00Z",
+            "result": "correct",
+            "result_now": "wrong"
+          }
+        ],
+        "before": {
+          "status": "new",
+          "corrected": false,
+          "removed": true,
+          "last_day": "2026-10-21",
+          "due": "2026-10-24"
+        },
+        "event": {
+          "kind": "answer_key_revised",
+          "at": "2026-10-26T02:00:00Z"
+        }
+      },
+      "expect": {
+        "withdrawn": false,
+        "collected_day": "2026-10-23",
+        "status": "new",
+        "removed": false,
+        "streak": 0,
+        "fail_count": 0,
+        "due": "2026-10-26",
+        "labels": ["needs_correction", "due_retry"],
+        "in_queue": true,
         "in_today": true
       }
     }
