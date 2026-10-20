@@ -1,0 +1,1052 @@
+{
+  "card": "docs/baseline/rule-cards/mistake-graduation.md",
+  "about": "R03 错题回炉与毕业的例子表，与 docs/baseline/rule-cards/mistake-graduation.md 的例子表逐行对应，B05 拿来做测试。用法：先把 defaults 合并进每个例子（input.before 缺的字段取 defaults.before，input.event 缺的字段取 defaults.event，参数取 defaults.params，个别例子可在 input.params 里覆盖）；before 为 null 表示这道题还不在错题本里。last_day、last_fail_day、due、local_day 是学员时区的日期；at 是 UTC 时间，按 defaults.learner 的时区和日界线换算成哪一天。expect 只检查写出来的字段；labels 按事件发生那天算，集合相等（不计顺序）。代码标识：状态 new 新增、retrying 回炉中、awaiting_check 待验收、graduated 已毕业；标签 needs_correction 待订正、due_retry 到期回炉、stubborn 顽固（待登记进术语表）；outcome 为 pass 算数、not_counted 不算数也不算失败、fail 失败、practice 没到期只当练习；check 为下次验收或回炉出的题：original 原题、variant 变式题；new_mistake 表示另收了一条新错题；collected 表示这一步新收了一条；removed 表示已移出；in_queue 表示在到期队列里（没毕业、没移出、没撤回），in_today 表示今天到期（含逾期）、进今日清单。改答案的例子（event.kind 为 answer_key_revised，即 E32、E34–E36）按 R18 从头重放：input.history 是这道题按时间排的全部记录（其中的作答也先合并 defaults.event），作答里的 result 是当时的判定，原样保留，result_now 是按新答案重判的结果（不写表示没变）；实现要用有效对错（有 result_now 就用它）从头走一遍 R1–R17，不能改写 result，也不能在 input.before 上打补丁。input.before 是改答案前看到的样子（用 result 重放得到），只供对照，测试可以顺带检查；null 表示原来不在错题本里。这类例子的 expect 按改答案那天（event.at）算；collected_day 是重放后的收录那天；withdrawn 为 true 表示撤回：不显示、不进到期队列、不计入页头统计、不算毕业，作答和这条错题的历史都保留。统计的例子（E37）没有 event：input.records 是各条错题，changes 写这条错题哪天变成什么状态；expect.stats 是各天结束时的页头统计：graduated 已毕业、graduated_this_week 本周（周一至周日）毕业、retrying 回炉中，都按题数（R20；待拍板 R03-Q6，先按 A）。",
+  "defaults": {
+    "params": {
+      "practice.mistake.review_intervals": [3, 7, 14],
+      "practice.mistake.graduate_correct_count": 2,
+      "practice.mistake.no_variant_extra_count": 1,
+      "practice.mistake.stubborn_fail_count": 3,
+      "learner.mastery.cross_check_items": 2
+    },
+    "learner": {
+      "timezone": "Asia/Shanghai",
+      "day_start": "04:00"
+    },
+    "before": {
+      "streak": 0,
+      "fail_count": 0,
+      "last_fail_day": null,
+      "corrected": true,
+      "check": "original",
+      "extra_passes": 0,
+      "question_credibility": "reviewed",
+      "removed": false
+    },
+    "event": {
+      "question": "original",
+      "confidence": "sure",
+      "fast": false,
+      "hint": false,
+      "credibility": "reviewed",
+      "variant_sources": {
+        "pool": true,
+        "personal": false,
+        "instant": "ok"
+      }
+    }
+  },
+  "cases": [
+    {
+      "id": "E1",
+      "rule": "R1,R6,R8",
+      "title": "正常：练习答错，收为新增",
+      "input": {
+        "before": null,
+        "event": {
+          "kind": "answer",
+          "scene": "practice",
+          "at": "2026-10-21T02:00:00Z",
+          "result": "wrong"
+        }
+      },
+      "expect": {
+        "collected": true,
+        "status": "new",
+        "streak": 0,
+        "fail_count": 0,
+        "due": "2026-10-24",
+        "labels": ["needs_correction"],
+        "in_queue": true
+      }
+    },
+    {
+      "id": "E2",
+      "rule": "R8",
+      "title": "边界：北京时间凌晨 3:30 答错，算前一天",
+      "input": {
+        "before": null,
+        "event": {
+          "kind": "answer",
+          "scene": "practice",
+          "at": "2026-10-21T19:30:00Z",
+          "result": "wrong"
+        }
+      },
+      "expect": {
+        "collected": true,
+        "local_day": "2026-10-21",
+        "due": "2026-10-24"
+      }
+    },
+    {
+      "id": "E3",
+      "rule": "R1",
+      "title": "正常：多选少选（部分对）也收",
+      "input": {
+        "before": null,
+        "event": {
+          "kind": "answer",
+          "scene": "practice",
+          "at": "2026-10-21T02:00:00Z",
+          "result": "partial"
+        }
+      },
+      "expect": {
+        "collected": true,
+        "status": "new",
+        "due": "2026-10-24"
+      }
+    },
+    {
+      "id": "E4",
+      "rule": "R2",
+      "title": "异常：摸底诊断答错不收",
+      "input": {
+        "before": null,
+        "event": {
+          "kind": "answer",
+          "scene": "diagnosis",
+          "at": "2026-10-21T02:00:00Z",
+          "result": "wrong"
+        }
+      },
+      "expect": {
+        "collected": false
+      }
+    },
+    {
+      "id": "E5",
+      "rule": "R2",
+      "title": "边界：模考里没作答的空题不自动收（R03-Q4）",
+      "input": {
+        "before": null,
+        "event": {
+          "kind": "answer",
+          "scene": "mock",
+          "at": "2026-10-21T02:00:00Z",
+          "result": "blank"
+        }
+      },
+      "expect": {
+        "collected": false
+      }
+    },
+    {
+      "id": "E6",
+      "rule": "R2",
+      "title": "异常：导师出的题答错，揭晓后标“有问题”，不收",
+      "input": {
+        "before": null,
+        "event": {
+          "kind": "answer",
+          "scene": "practice",
+          "at": "2026-10-21T02:00:00Z",
+          "result": "wrong",
+          "credibility": "generated_instant",
+          "generated_check": "problem"
+        }
+      },
+      "expect": {
+        "collected": false
+      }
+    },
+    {
+      "id": "E7",
+      "rule": "R3",
+      "title": "正常：做对的题手动标“易错”加入",
+      "input": {
+        "before": null,
+        "event": {
+          "kind": "manual_add",
+          "at": "2026-10-21T02:00:00Z"
+        }
+      },
+      "expect": {
+        "collected": true,
+        "status": "new",
+        "source": "manual",
+        "due": "2026-10-24",
+        "labels": ["needs_correction"]
+      }
+    },
+    {
+      "id": "E8",
+      "rule": "R7",
+      "title": "正常：新增的错题保存了订正，变回炉中",
+      "input": {
+        "before": {
+          "status": "new",
+          "corrected": false,
+          "last_day": "2026-10-21",
+          "due": "2026-10-24"
+        },
+        "event": {
+          "kind": "correction",
+          "at": "2026-10-22T02:00:00Z"
+        }
+      },
+      "expect": {
+        "status": "retrying",
+        "due": "2026-10-24",
+        "labels": []
+      }
+    },
+    {
+      "id": "E9",
+      "rule": "R7,R8,R9",
+      "title": "正常：第一次回炉答对、确定",
+      "input": {
+        "before": {
+          "status": "new",
+          "corrected": false,
+          "last_day": "2026-10-21",
+          "due": "2026-10-24"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "retry",
+          "at": "2026-10-24T02:00:00Z",
+          "result": "correct"
+        }
+      },
+      "expect": {
+        "outcome": "pass",
+        "status": "retrying",
+        "streak": 1,
+        "fail_count": 0,
+        "due": "2026-10-31",
+        "labels": []
+      }
+    },
+    {
+      "id": "E10",
+      "rule": "R8",
+      "title": "边界：逾期 4 天才做，答对照样算",
+      "input": {
+        "before": {
+          "status": "retrying",
+          "last_day": "2026-10-21",
+          "due": "2026-10-24"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "retry",
+          "at": "2026-10-28T02:00:00Z",
+          "result": "correct"
+        }
+      },
+      "expect": {
+        "outcome": "pass",
+        "streak": 1,
+        "fail_count": 0,
+        "due": "2026-11-04"
+      }
+    },
+    {
+      "id": "E11",
+      "rule": "R9",
+      "title": "正常：回炉答错，清零回第 1 档",
+      "input": {
+        "before": {
+          "status": "retrying",
+          "streak": 1,
+          "last_day": "2026-10-24",
+          "due": "2026-10-31"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "retry",
+          "at": "2026-10-31T02:00:00Z",
+          "result": "wrong"
+        }
+      },
+      "expect": {
+        "outcome": "fail",
+        "status": "retrying",
+        "streak": 0,
+        "fail_count": 1,
+        "due": "2026-11-03"
+      }
+    },
+    {
+      "id": "E12",
+      "rule": "R9",
+      "title": "边界：答对但选“模糊”，不算数也不算失败（R03-Q2）",
+      "input": {
+        "before": {
+          "status": "retrying",
+          "streak": 1,
+          "last_day": "2026-10-24",
+          "due": "2026-10-31"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "retry",
+          "at": "2026-10-31T02:00:00Z",
+          "result": "correct",
+          "confidence": "vague"
+        }
+      },
+      "expect": {
+        "outcome": "not_counted",
+        "streak": 1,
+        "fail_count": 0,
+        "due": "2026-11-07"
+      }
+    },
+    {
+      "id": "E13",
+      "rule": "R7,R9",
+      "title": "边界：第一次回炉蒙对，不算数",
+      "input": {
+        "before": {
+          "status": "new",
+          "corrected": false,
+          "last_day": "2026-10-21",
+          "due": "2026-10-24"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "retry",
+          "at": "2026-10-24T02:00:00Z",
+          "result": "correct",
+          "confidence": "guess"
+        }
+      },
+      "expect": {
+        "outcome": "not_counted",
+        "status": "retrying",
+        "streak": 0,
+        "fail_count": 0,
+        "due": "2026-10-27",
+        "labels": []
+      }
+    },
+    {
+      "id": "E14",
+      "rule": "R9",
+      "title": "边界：答对但秒答，不算数",
+      "input": {
+        "before": {
+          "status": "retrying",
+          "streak": 1,
+          "last_day": "2026-10-24",
+          "due": "2026-10-31"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "retry",
+          "at": "2026-10-31T02:00:00Z",
+          "result": "correct",
+          "fast": true
+        }
+      },
+      "expect": {
+        "outcome": "not_counted",
+        "streak": 1,
+        "due": "2026-11-07"
+      }
+    },
+    {
+      "id": "E15",
+      "rule": "R9",
+      "title": "边界：用过提示后答对，不算数",
+      "input": {
+        "before": {
+          "status": "retrying",
+          "streak": 1,
+          "last_day": "2026-10-24",
+          "due": "2026-10-31"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "retry",
+          "at": "2026-10-31T02:00:00Z",
+          "result": "correct",
+          "hint": true
+        }
+      },
+      "expect": {
+        "outcome": "not_counted",
+        "streak": 1,
+        "due": "2026-11-07"
+      }
+    },
+    {
+      "id": "E16",
+      "rule": "R9",
+      "title": "边界：把握度关闭时答对，算数",
+      "input": {
+        "before": {
+          "status": "retrying",
+          "last_day": "2026-10-21",
+          "due": "2026-10-24"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "retry",
+          "at": "2026-10-24T02:00:00Z",
+          "result": "correct",
+          "confidence": "off"
+        }
+      },
+      "expect": {
+        "outcome": "pass",
+        "streak": 1,
+        "due": "2026-10-31"
+      }
+    },
+    {
+      "id": "E17",
+      "rule": "R10",
+      "title": "边界：没到期在错题本重做答对，只当练习",
+      "input": {
+        "before": {
+          "status": "retrying",
+          "streak": 1,
+          "last_day": "2026-10-24",
+          "due": "2026-10-31"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "retry",
+          "at": "2026-10-27T02:00:00Z",
+          "result": "correct"
+        }
+      },
+      "expect": {
+        "outcome": "practice",
+        "streak": 1,
+        "fail_count": 0,
+        "due": "2026-10-31"
+      }
+    },
+    {
+      "id": "E18",
+      "rule": "R4,R10",
+      "title": "异常：没到期在练习里碰到同一道题答错",
+      "input": {
+        "before": {
+          "status": "retrying",
+          "streak": 1,
+          "last_day": "2026-10-24",
+          "due": "2026-10-31"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "practice",
+          "at": "2026-10-27T02:00:00Z",
+          "result": "wrong"
+        }
+      },
+      "expect": {
+        "outcome": "fail",
+        "new_mistake": false,
+        "streak": 0,
+        "fail_count": 1,
+        "due": "2026-10-30"
+      }
+    },
+    {
+      "id": "E19",
+      "rule": "R11",
+      "title": "边界：同一天第二次做错，只记 1 次失败",
+      "input": {
+        "before": {
+          "status": "retrying",
+          "fail_count": 1,
+          "last_day": "2026-10-31",
+          "last_fail_day": "2026-10-31",
+          "due": "2026-11-03"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "retry",
+          "at": "2026-10-31T09:00:00Z",
+          "result": "wrong"
+        }
+      },
+      "expect": {
+        "outcome": "fail",
+        "streak": 0,
+        "fail_count": 1,
+        "due": "2026-11-03"
+      }
+    },
+    {
+      "id": "E20",
+      "rule": "R6,R9",
+      "title": "正常：回炉失败第 3 次，打“顽固”",
+      "input": {
+        "before": {
+          "status": "retrying",
+          "fail_count": 2,
+          "last_day": "2026-11-03",
+          "last_fail_day": "2026-11-03",
+          "due": "2026-11-06"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "retry",
+          "at": "2026-11-06T02:00:00Z",
+          "result": "wrong"
+        }
+      },
+      "expect": {
+        "outcome": "fail",
+        "fail_count": 3,
+        "due": "2026-11-09",
+        "labels": ["stubborn"]
+      }
+    },
+    {
+      "id": "E21",
+      "rule": "R12,R13",
+      "title": "正常：连续做对第 2 次、有变式，当天进验收（R03-Q1）",
+      "input": {
+        "before": {
+          "status": "retrying",
+          "streak": 1,
+          "last_day": "2026-10-24",
+          "due": "2026-10-31"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "retry",
+          "at": "2026-10-31T02:00:00Z",
+          "result": "correct"
+        }
+      },
+      "expect": {
+        "outcome": "pass",
+        "status": "awaiting_check",
+        "streak": 2,
+        "check": "variant",
+        "due": "2026-10-31",
+        "labels": ["due_retry"]
+      }
+    },
+    {
+      "id": "E22",
+      "rule": "R14",
+      "title": "正常：审定变式题答对、确定，毕业",
+      "input": {
+        "before": {
+          "status": "awaiting_check",
+          "streak": 2,
+          "last_day": "2026-10-31",
+          "due": "2026-10-31",
+          "check": "variant"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "acceptance",
+          "at": "2026-10-31T03:00:00Z",
+          "question": "variant",
+          "result": "correct"
+        }
+      },
+      "expect": {
+        "outcome": "pass",
+        "status": "graduated",
+        "in_queue": false,
+        "labels": []
+      }
+    },
+    {
+      "id": "E23",
+      "rule": "R14",
+      "title": "异常：变式题答错，留在待验收、3 天后换新变式（R03-Q3）",
+      "input": {
+        "before": {
+          "status": "awaiting_check",
+          "streak": 2,
+          "last_day": "2026-10-31",
+          "due": "2026-10-31",
+          "check": "variant"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "acceptance",
+          "at": "2026-10-31T03:00:00Z",
+          "question": "variant",
+          "result": "wrong"
+        }
+      },
+      "expect": {
+        "outcome": "fail",
+        "status": "awaiting_check",
+        "streak": 2,
+        "fail_count": 1,
+        "check": "variant",
+        "due": "2026-11-03",
+        "new_mistake": true
+      }
+    },
+    {
+      "id": "E24",
+      "rule": "R14",
+      "title": "异常：AI 即时生成的变式答完标“有问题”，当场换一道",
+      "input": {
+        "before": {
+          "status": "awaiting_check",
+          "streak": 2,
+          "last_day": "2026-10-31",
+          "due": "2026-10-31",
+          "check": "variant"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "acceptance",
+          "at": "2026-10-31T03:00:00Z",
+          "question": "variant",
+          "result": "correct",
+          "credibility": "generated_instant",
+          "generated_check": "problem"
+        }
+      },
+      "expect": {
+        "outcome": "not_counted",
+        "status": "awaiting_check",
+        "fail_count": 0,
+        "check": "variant",
+        "due": "2026-10-31",
+        "new_mistake": false,
+        "labels": ["due_retry"]
+      }
+    },
+    {
+      "id": "E25",
+      "rule": "R14",
+      "title": "异常：待验收期间练习里原题又答错，退回回炉中",
+      "input": {
+        "before": {
+          "status": "awaiting_check",
+          "streak": 2,
+          "last_day": "2026-10-31",
+          "due": "2026-10-31",
+          "check": "variant"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "practice",
+          "at": "2026-11-01T02:00:00Z",
+          "result": "wrong"
+        }
+      },
+      "expect": {
+        "outcome": "fail",
+        "status": "retrying",
+        "streak": 0,
+        "fail_count": 1,
+        "due": "2026-11-04"
+      }
+    },
+    {
+      "id": "E26",
+      "rule": "R13,R15",
+      "title": "边界：没有可用变式（题库没有、点数不够），改用原题、隔末档验收（R03-Q5）",
+      "input": {
+        "before": {
+          "status": "retrying",
+          "streak": 1,
+          "last_day": "2026-10-24",
+          "due": "2026-10-31"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "retry",
+          "at": "2026-10-31T02:00:00Z",
+          "result": "correct",
+          "variant_sources": {
+            "pool": false,
+            "personal": false,
+            "instant": "no_quota"
+          }
+        }
+      },
+      "expect": {
+        "outcome": "pass",
+        "status": "awaiting_check",
+        "streak": 2,
+        "check": "original",
+        "due": "2026-11-14"
+      }
+    },
+    {
+      "id": "E27",
+      "rule": "R15",
+      "title": "正常：原题验收答对，毕业",
+      "input": {
+        "before": {
+          "status": "awaiting_check",
+          "streak": 2,
+          "last_day": "2026-10-31",
+          "due": "2026-11-14",
+          "check": "original"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "acceptance",
+          "at": "2026-11-14T02:00:00Z",
+          "result": "correct",
+          "variant_sources": {
+            "pool": false,
+            "personal": false,
+            "instant": "no_quota"
+          }
+        }
+      },
+      "expect": {
+        "outcome": "pass",
+        "status": "graduated",
+        "in_queue": false
+      }
+    },
+    {
+      "id": "E28",
+      "rule": "R14",
+      "title": "正常：原题和变式都是生成题，两道不同的题都做对，够异题印证",
+      "input": {
+        "before": {
+          "status": "awaiting_check",
+          "streak": 2,
+          "last_day": "2026-10-31",
+          "due": "2026-10-31",
+          "check": "variant",
+          "question_credibility": "generated_confirmed"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "acceptance",
+          "at": "2026-10-31T03:00:00Z",
+          "question": "variant",
+          "result": "correct",
+          "credibility": "generated_instant",
+          "generated_check": "ok"
+        }
+      },
+      "expect": {
+        "outcome": "pass",
+        "status": "graduated",
+        "distinct_correct": 2
+      }
+    },
+    {
+      "id": "E29",
+      "rule": "R15",
+      "title": "异常：原题是生成题、一直没有变式，只凭一道生成题不毕业",
+      "input": {
+        "before": {
+          "status": "awaiting_check",
+          "streak": 2,
+          "last_day": "2026-10-31",
+          "due": "2026-11-14",
+          "check": "original",
+          "question_credibility": "generated_confirmed"
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "acceptance",
+          "at": "2026-11-14T02:00:00Z",
+          "result": "correct",
+          "credibility": "generated_confirmed",
+          "variant_sources": {
+            "pool": false,
+            "personal": false,
+            "instant": "ai_down"
+          }
+        }
+      },
+      "expect": {
+        "outcome": "pass",
+        "status": "awaiting_check",
+        "check": "original",
+        "due": "2026-11-28",
+        "blocked_by": "cross_check"
+      }
+    },
+    {
+      "id": "E30",
+      "rule": "R16",
+      "title": "正常：毕业后模考里同一道题又答错，重开回炉",
+      "input": {
+        "before": {
+          "status": "graduated",
+          "streak": 2,
+          "fail_count": 1,
+          "last_day": "2026-10-31",
+          "due": null
+        },
+        "event": {
+          "kind": "answer",
+          "scene": "mock",
+          "at": "2026-12-10T02:00:00Z",
+          "result": "wrong"
+        }
+      },
+      "expect": {
+        "outcome": "fail",
+        "status": "retrying",
+        "streak": 0,
+        "fail_count": 2,
+        "due": "2026-12-13",
+        "in_queue": true,
+        "new_mistake": false
+      }
+    },
+    {
+      "id": "E31",
+      "rule": "R17",
+      "title": "正常：手动移出，状态和进度保留",
+      "input": {
+        "before": {
+          "status": "retrying",
+          "streak": 1,
+          "last_day": "2026-10-24",
+          "due": "2026-10-31"
+        },
+        "event": {
+          "kind": "manual_remove",
+          "at": "2026-10-25T02:00:00Z"
+        }
+      },
+      "expect": {
+        "removed": true,
+        "status": "retrying",
+        "streak": 1,
+        "due": "2026-10-31",
+        "in_queue": false,
+        "labels": []
+      }
+    },
+    {
+      "id": "E32",
+      "rule": "R18",
+      "title": "异常：题目改了答案，只有一次误收，没有别的收录原因，撤回",
+      "input": {
+        "history": [
+          {
+            "kind": "answer",
+            "scene": "practice",
+            "at": "2026-10-21T02:00:00Z",
+            "result": "wrong",
+            "result_now": "correct"
+          }
+        ],
+        "before": {
+          "status": "new",
+          "corrected": false,
+          "last_day": "2026-10-21",
+          "due": "2026-10-24"
+        },
+        "event": {
+          "kind": "answer_key_revised",
+          "at": "2026-10-22T02:00:00Z"
+        }
+      },
+      "expect": {
+        "withdrawn": true,
+        "in_queue": false,
+        "in_today": false
+      }
+    },
+    {
+      "id": "E33",
+      "rule": "R6,R19",
+      "title": "正常：到期那天打开，带“到期回炉”、进今日清单",
+      "input": {
+        "before": {
+          "status": "retrying",
+          "streak": 1,
+          "last_day": "2026-10-24",
+          "due": "2026-10-31"
+        },
+        "event": {
+          "kind": "open",
+          "at": "2026-10-31T01:00:00Z"
+        }
+      },
+      "expect": {
+        "status": "retrying",
+        "labels": ["due_retry"],
+        "in_today": true
+      }
+    },
+    {
+      "id": "E34",
+      "rule": "R18,R1,R8",
+      "title": "异常：首次收录是误收，但 24 日回炉那次其实错了：不撤回，按 24 日重新算",
+      "input": {
+        "history": [
+          {
+            "kind": "answer",
+            "scene": "practice",
+            "at": "2026-10-21T02:00:00Z",
+            "result": "wrong",
+            "result_now": "correct"
+          },
+          {
+            "kind": "answer",
+            "scene": "retry",
+            "at": "2026-10-24T02:00:00Z",
+            "result": "correct",
+            "result_now": "wrong"
+          }
+        ],
+        "before": {
+          "status": "retrying",
+          "corrected": false,
+          "streak": 1,
+          "last_day": "2026-10-24",
+          "due": "2026-10-31"
+        },
+        "event": {
+          "kind": "answer_key_revised",
+          "at": "2026-10-26T02:00:00Z"
+        }
+      },
+      "expect": {
+        "withdrawn": false,
+        "collected_day": "2026-10-24",
+        "status": "new",
+        "streak": 0,
+        "fail_count": 0,
+        "due": "2026-10-27",
+        "labels": ["needs_correction"],
+        "in_queue": true,
+        "in_today": false
+      }
+    },
+    {
+      "id": "E35",
+      "rule": "R18,R1,R8",
+      "title": "异常：原先判对、不在错题本里，改答案后变错：补收为新增",
+      "input": {
+        "history": [
+          {
+            "kind": "answer",
+            "scene": "practice",
+            "at": "2026-10-21T02:00:00Z",
+            "result": "correct",
+            "result_now": "wrong"
+          }
+        ],
+        "before": null,
+        "event": {
+          "kind": "answer_key_revised",
+          "at": "2026-10-26T02:00:00Z"
+        }
+      },
+      "expect": {
+        "collected": true,
+        "collected_day": "2026-10-21",
+        "status": "new",
+        "streak": 0,
+        "fail_count": 0,
+        "due": "2026-10-24",
+        "labels": ["needs_correction", "due_retry"],
+        "in_queue": true,
+        "in_today": true
+      }
+    },
+    {
+      "id": "E36",
+      "rule": "R18,R17",
+      "title": "边界：先手动移出、后来才有真错：移出不起作用，按真错收为新增并显示",
+      "input": {
+        "history": [
+          {
+            "kind": "answer",
+            "scene": "practice",
+            "at": "2026-10-21T02:00:00Z",
+            "result": "wrong",
+            "result_now": "correct"
+          },
+          {
+            "kind": "manual_remove",
+            "at": "2026-10-22T02:00:00Z"
+          },
+          {
+            "kind": "answer",
+            "scene": "practice",
+            "at": "2026-10-23T02:00:00Z",
+            "result": "correct",
+            "result_now": "wrong"
+          }
+        ],
+        "before": {
+          "status": "new",
+          "corrected": false,
+          "removed": true,
+          "last_day": "2026-10-21",
+          "due": "2026-10-24"
+        },
+        "event": {
+          "kind": "answer_key_revised",
+          "at": "2026-10-26T02:00:00Z"
+        }
+      },
+      "expect": {
+        "withdrawn": false,
+        "collected_day": "2026-10-23",
+        "status": "new",
+        "removed": false,
+        "streak": 0,
+        "fail_count": 0,
+        "due": "2026-10-26",
+        "labels": ["needs_correction", "due_retry"],
+        "in_queue": true,
+        "in_today": true
+      }
+    },
+    {
+      "id": "E37",
+      "rule": "R20",
+      "title": "边界：同一道题毕业、复发、再毕业，“已毕业”最多算 1 道（待拍板 R03-Q6，先按 A）",
+      "input": {
+        "records": [
+          {
+            "changes": [
+              {
+                "day": "2026-10-31",
+                "status": "graduated"
+              },
+              {
+                "day": "2026-12-10",
+                "status": "retrying"
+              },
+              {
+                "day": "2026-12-20",
+                "status": "graduated"
+              }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "stats": [
+          {
+            "day": "2026-11-01",
+            "graduated": 1,
+            "graduated_this_week": 1,
+            "retrying": 0
+          },
+          {
+            "day": "2026-12-15",
+            "graduated": 0,
+            "graduated_this_week": 0,
+            "retrying": 1
+          },
+          {
+            "day": "2026-12-20",
+            "graduated": 1,
+            "graduated_this_week": 1,
+            "retrying": 0
+          }
+        ]
+      }
+    }
+  ]
+}
