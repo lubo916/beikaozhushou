@@ -1,12 +1,20 @@
 /// <reference lib="dom" />
 
 import { spawnSync } from "node:child_process";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 import { ALL_PAGES, pageLabel, urlOf, type PageEntry } from "./support/catalog.ts";
-import { expectLoaded, expectOpened, firstLine, installActivityMarker, settle } from "./support/checks.ts";
-import { PAGE_GALLERY_TAG, ROOT } from "./support/env.ts";
+import {
+  expectLoaded,
+  expectOpened,
+  firstLine,
+  installActivityMarker,
+  navigationProblem,
+  settle,
+  waitForAppReady,
+} from "./support/checks.ts";
+import { APP_NAMES, PAGE_GALLERY_TAG, ROOT, type AppKey } from "./support/env.ts";
 
 const WIDTHS = [375, 834, 1280] as const;
 const STATES = [
@@ -131,8 +139,11 @@ const GALLERY_VIEWPORTS = [
 /** 截图时页面里的“现在”：固定下来，倒计时这类随日期变的内容才不会每天都算“有变化”。 */
 const GALLERY_NOW = new Date("2026-10-21T09:00:00+08:00");
 const GALLERY_EXAM = "kj";
-/** 同时开几个标签页截图。 */
-const GALLERY_TABS = 4;
+/**
+ * 同时开几个标签页截图。页面画廊与原有的组件陈列页测试一起在 pnpm gallery 里跑：四个标签页连续打开 70 页会占满开发服务器与机器，
+ * 第 1 轮本地完整验证里同时跑的原有组件测试因此 2 项失败、5 项重试才过（单独跑原有测试全过）。只开一个，和别的测试一样一次打开一页。
+ */
+const GALLERY_TABS = 1;
 /** 正文区的内容比窗口高时，把窗口拉高到放得下全部内容再截，最多拉到这么高。 */
 const GALLERY_MAX_HEIGHT = 8000;
 /** 同一秒里开了好几次画廊时，目录名后面加 -2、-3……最多试这么多次。 */
@@ -149,6 +160,26 @@ interface GalleryShot {
 interface GalleryJob {
   readonly entry: PageEntry;
   readonly shots: GalleryShot[];
+}
+
+/** tools/gallery.mjs 写出的 changes.json 里逐张列出的问题：这一次没截到（failed），或没法和上一次比对（error）。 */
+interface GalleryProblem {
+  readonly app: AppKey;
+  readonly id: string;
+  readonly name: string;
+  readonly width: number;
+  readonly status: "failed" | "error";
+  readonly error: string;
+}
+
+interface GalleryChanges {
+  readonly problems: readonly GalleryProblem[];
+}
+
+const PROBLEM_NAMES: Readonly<Record<GalleryProblem["status"], string>> = { failed: "没能截图", error: "没法和上一次比对" };
+
+function describeGalleryProblem(problem: GalleryProblem): string {
+  return `${APP_NAMES[problem.app]} ${problem.id} ${problem.name}（${problem.width}）${PROBLEM_NAMES[problem.status]}：${problem.error}`;
 }
 
 function galleryRunName(date: Date): string {
@@ -186,7 +217,11 @@ async function fitToContent(page: Page, viewport: Viewport): Promise<void> {
 
 async function captureShot(page: Page, entry: PageEntry, viewport: Viewport, file: string): Promise<void> {
   await page.setViewportSize(viewport);
-  await page.goto(urlOf(entry, entry.app === "learner" ? { exam: GALLERY_EXAM } : {}));
+  const url = urlOf(entry, entry.app === "learner" ? { exam: GALLERY_EXAM } : {});
+  // 与冒烟同样的打开判定与就绪等待：回应要成功（缓存仍然有效的 304 也算），再等外壳正文区出现（有上限）
+  const problem = navigationProblem(await page.goto(url), url);
+  if (problem !== null) throw new Error(problem);
+  await waitForAppReady(page);
   await expectOpened(page, entry, entry.views[0]);
   await expectLoaded(page, entry);
   await page.evaluate(async () => {
@@ -244,6 +279,11 @@ test.describe("页面画廊：全部页面默认视图两档截图，与上一�
     const args = [join(ROOT, "tools", "gallery.mjs"), "--root", GALLERY_ROOT, "--run", run];
     const compare = spawnSync(process.execPath, args, { cwd: ROOT, encoding: "utf8" });
     await testInfo.attach("页面画廊比对结果", { body: `${compare.stdout}${compare.stderr}`, contentType: "text/plain" });
+    // 按每张截图核对比对结果：哪一档没截到、哪一档没法和上一次比，都要报出来；画面变化只写进清单供人复核，不算失败
+    const written = await readFile(join(GALLERY_ROOT, run, "changes.json"), "utf8").catch(() => null);
+    expect(written, `tools/gallery.mjs 没写出这一次的 changes.json：${compare.stderr}`).not.toBeNull();
+    const { problems } = JSON.parse(written ?? "{}") as GalleryChanges;
+    expect(problems.map(describeGalleryProblem), "这些截图没能截到或没法和上一次比对（见 .bk/gallery/index.html）").toEqual([]);
     expect(compare.status, `tools/gallery.mjs 比对没完成：${compare.stderr}`).toBe(0);
 
     const failed: string[] = [];

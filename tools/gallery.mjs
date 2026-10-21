@@ -1,10 +1,12 @@
 // 页面画廊比对（F06）：把 .bk/gallery/<时间>/ 这一次的截图与上一次逐点比对；画面变化超过阈值的页面写进 .bk/gallery/changes.json，
 // 并生成 .bk/gallery/index.html（上一次、这一次、差异三栏并排）。截图由 tests/e2e/gallery.spec.ts 拍（pnpm gallery），拍完自动调用本工具。
-// 只用 Node 自带模块（PNG 的解码与编码用 zlib），不新增依赖。
+// 结果按每张截图汇总：没截到、旧图或新图读不了（没法比对）逐张写进 changes.json 的 problems，并让命令失败；画面变化只写进清单供人复核。
+// 只用 Node 自带模块（PNG 的解码与编码用 zlib），不新增依赖。回归测试在 tests/tooling/gallery.test.ts（pnpm test 会跑）。
 // 用法：node tools/gallery.mjs [--run <时间目录名>] [--threshold 0.001] [--keep 20] [--root .bk/gallery]
 //   --run        要比对的这一次，默认最新一次；和它比的“上一次”是名字排在它前面的最近一次
 //   --threshold  变化的像素占整张图的比例超过多少算“有变化”，默认 0.001（千分之一）；也可用环境变量 BK_GALLERY_THRESHOLD
 //   --keep       只保留最近几次截图，更早的整次目录删掉；默认 20，0 表示全部保留
+// 退出码：0 每张截图都截到并比对完（有画面变化也是 0）；2 有截图没截到或没法比对（changes.json 与 index.html 照常写出）；1 参数不对或比对没法进行
 import { Buffer } from "node:buffer";
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -224,22 +226,44 @@ function compareShot({ root, run, previous, shot, before, tolerance, threshold, 
   return entry;
 }
 
-const PAGE_ORDER = ["changed", "error", "failed", "new", "same"];
+/** 截图结果里算“出了问题”的：这一次没截到（failed）、图读不了或没法比对（error）。画面有变化（changed）不算问题，只供人复核。 */
+const PROBLEM_STATUSES = new Set(["failed", "error"]);
+/** 一页的总体状态取它各张截图里最要紧的一种，index.html 按它分组：出了问题的排最前，其次有变化、新增、没变。 */
+const PAGE_ORDER = ["failed", "error", "changed", "new", "same"];
+/** 有截图没截到或没法比对时命令行的退出码（参数不对、比对没法进行是 1）。 */
+const EXIT_PROBLEMS = 2;
 
 function pageStatus(shots) {
   return PAGE_ORDER.find((status) => shots.some((shot) => shot.status === status)) ?? "same";
 }
 
-/** 比对 run 与它前面最近的一次，写出 changes.json（画廊根目录一份、这一次目录里一份）与 index.html；返回 changes 的内容。 */
+/** 清单里登记了这一档宽度、这一页却没有这一档的截图记录：也算没截到。 */
+function missingShot(width) {
+  return { width, status: "failed", ratio: null, before: null, after: null, diff: null, error: "这一档没有截图记录" };
+}
+
+/** problems 里的一条：哪一页、哪一档、什么问题。 */
+function problemOf(page, shot) {
+  const error = shot.error ?? STATUS_NAMES[shot.status];
+  return { app: page.app, id: page.id, name: page.name, width: shot.width, status: shot.status, error };
+}
+
+/**
+ * 比对 run 与它前面最近的一次，写出 changes.json（画廊根目录一份、这一次目录里一份）与 index.html；返回 changes 的内容。
+ * 结果按每张截图汇总：changed 是有一档画面变了的页面（供人复核），failed 是有一档没截到或没法比对的页面，problems 逐张列出这些问题；
+ * 同一页一档有变化、另一档出了问题时两份清单里都有它，问题不会被“有变化”盖住。
+ */
 export function compareRuns({ root, run, threshold = DEFAULTS.threshold, tolerance = DEFAULTS.tolerance, keep = DEFAULTS.keep }) {
   const runs = listRuns(root);
   const current = run ?? runs.at(-1);
   if (current === undefined) throw new Error(`${root} 里还没有截图：先运行 pnpm gallery`);
   if (!runs.includes(current)) throw new Error(`${join(root, current)} 不是拍完的一次截图（缺 ${MANIFEST}）`);
   const manifest = readJson(join(root, current, MANIFEST));
+  const widths = manifest.widths ?? [];
   const previous = runs.filter((name) => name < current).at(-1) ?? null;
+  const previousPages = previous === null ? [] : readJson(join(root, previous, MANIFEST)).pages;
   const earlier = new Map();
-  for (const page of previous === null ? [] : readJson(join(root, previous, MANIFEST)).pages) {
+  for (const page of previousPages) {
     for (const shot of page.shots) earlier.set(shotKey(page, shot.width), shot);
   }
   const pages = manifest.pages.map((page) => {
@@ -247,29 +271,29 @@ export function compareRuns({ root, run, threshold = DEFAULTS.threshold, toleran
       const before = earlier.get(shotKey(page, shot.width));
       return compareShot({ root, run: current, previous, shot, before, tolerance, threshold, page });
     });
+    for (const width of widths) {
+      if (!page.shots.some((shot) => shot.width === width)) shots.push(missingShot(width));
+    }
     return { app: page.app, id: page.id, name: page.name, path: page.path, status: pageStatus(shots), shots };
   });
-  const seen = new Set(manifest.pages.map((page) => `${page.app}/${page.id}`));
-  const removed = [];
-  if (previous !== null) {
-    for (const page of readJson(join(root, previous, MANIFEST)).pages) {
-      if (!seen.has(`${page.app}/${page.id}`)) removed.push(pageTitle(page));
-    }
-  }
-  const titles = (status) => pages.filter((page) => page.status === status).map(pageTitle);
+  const pageKey = (page) => `${page.app}/${page.id}`;
+  const seen = new Set(manifest.pages.map(pageKey));
+  const known = new Set(previousPages.map(pageKey));
+  const having = (matches) => pages.filter((page) => page.shots.some(matches)).map(pageTitle);
   const changes = {
-    version: 1,
+    version: 2,
     generated: new Date().toISOString(),
     run: current,
     previous,
     browser: manifest.browser ?? null,
     threshold,
     tolerance,
-    widths: manifest.widths ?? [],
-    changed: titles("changed"),
-    added: previous === null ? [] : titles("new"),
-    removed,
-    failed: [...titles("failed"), ...titles("error")],
+    widths,
+    changed: having((shot) => shot.status === "changed"),
+    added: previous === null ? [] : pages.filter((page) => !known.has(pageKey(page))).map(pageTitle),
+    removed: previousPages.filter((page) => !seen.has(pageKey(page))).map(pageTitle),
+    failed: having((shot) => PROBLEM_STATUSES.has(shot.status)),
+    problems: pages.flatMap((page) => page.shots.filter((shot) => PROBLEM_STATUSES.has(shot.status)).map((shot) => problemOf(page, shot))),
     pages,
   };
   const json = `${JSON.stringify(changes, null, 2)}\n`;
@@ -322,6 +346,16 @@ function renderPage(page) {
   return `<section class="page p-${page.status}" id="${escapeHtml(`${page.app}-${page.id}`)}"><h2>${escapeHtml(pageTitle(page))} <small>${escapeHtml(where)}</small></h2>${shots}</section>`;
 }
 
+/** 最上面的问题清单：哪一页哪一档没截到或没法比对（点页名跳到那一页）。 */
+function renderProblems(problems) {
+  if (problems.length === 0) return "";
+  const items = problems.map((item) => {
+    const anchor = escapeHtml(`${item.app}-${item.id}`);
+    return `<li><a href="#${anchor}">${escapeHtml(`${item.id} ${item.name}`)}</a> ${item.width} 宽 · ${STATUS_NAMES[item.status]}：${escapeHtml(item.error)}</li>`;
+  });
+  return `<div class="problems"><p>有 ${problems.length} 张截图没能截到或没法和上一次比对，这一次的检查因此不通过：</p><ul>${items.join("")}</ul></div>`;
+}
+
 function renderIndex(changes) {
   const groups = PAGE_ORDER.map((status) => ({ status, pages: changes.pages.filter((page) => page.status === status) }));
   const counts = groups.map(({ status, pages }) => `${STATUS_NAMES[status]} ${pages.length} 页`).join(" · ");
@@ -357,6 +391,7 @@ figure img { display: block; max-width: 100%; height: auto; border: 1px solid Gr
 figure.empty div { padding: 24px; text-align: center; color: GrayText; border: 1px dashed GrayText; }
 figcaption { font-size: 12px; color: GrayText; }
 .problem { color: #b23e2e; font-size: 13px; white-space: pre-wrap; }
+.problems { color: #b23e2e; }
 details { margin: 24px 0; }
 summary { cursor: pointer; font-weight: bold; font-size: 18px; }
 </style>
@@ -367,6 +402,7 @@ summary { cursor: pointer; font-weight: bold; font-size: 18px; }
 <p>这一次：${escapeHtml(changes.run)}${changes.browser === null ? "" : `（${escapeHtml(changes.browser)}）`}；上一次：${escapeHtml(previous)}</p>
 <p>${escapeHtml(counts)}。变化的像素超过整张图的 ${percent(changes.threshold)} 算“有变化”；红色标出的是变了的地方。</p>
 ${removed}
+${renderProblems(changes.problems)}
 </div>
 ${body}
 </body>
@@ -407,7 +443,10 @@ function summary(changes, root) {
   ];
   if (changes.added.length > 0) lines.push(`新增 ${changes.added.length} 页：${changes.added.join("、")}`);
   if (changes.removed.length > 0) lines.push(`上一次有、这一次没有 ${changes.removed.length} 页：${changes.removed.join("、")}`);
-  if (changes.failed.length > 0) lines.push(`没能截图或没法比对 ${changes.failed.length} 页：${changes.failed.join("、")}`);
+  if (changes.problems.length > 0) {
+    const list = changes.problems.map((item) => `${item.id} ${item.name} ${item.width} 宽（${STATUS_NAMES[item.status]}：${item.error}）`);
+    lines.push(`没能截图或没法比对 ${changes.problems.length} 张：${list.join("、")}`);
+  }
   if (changes.pruned.length > 0) lines.push(`按保留次数删掉了更早的 ${changes.pruned.length} 次截图：${changes.pruned.join("、")}`);
   lines.push(`前后对照：${join(root, INDEX)}`);
   return `${lines.join("\n")}\n`;
@@ -418,6 +457,11 @@ function main() {
     const options = parseArgs(process.argv.slice(2), process.env);
     const changes = compareRuns(options);
     process.stdout.write(summary(changes, options.root));
+    if (changes.problems.length > 0) {
+      const message = `页面画廊比对不通过：${changes.problems.length} 张截图没能截到或没法和上一次比对（逐张见上面与 changes.json 的 problems）\n`;
+      process.stderr.write(message);
+      process.exitCode = EXIT_PROBLEMS;
+    }
   } catch (error) {
     process.stderr.write(`页面画廊比对没完成：${error instanceof Error ? error.message : String(error)}\n`);
     process.exitCode = 1;
