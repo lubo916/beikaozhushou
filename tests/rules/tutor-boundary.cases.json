@@ -1,0 +1,1022 @@
+{
+  "card": "docs/baseline/rule-cards/tutor-boundary.md",
+  "status": "草稿",
+  "rule_version": "R09-r1",
+  "notes": [
+    "kind 表示测哪段规则：turn＝一次提问的判定（R1–R22、R24、R26、R30–R33）；write＝导师工具的一次写操作（R23–R26）；label＝一段内容在显示、复制、存下、导出时的标识（R27–R29）；queue＝不可用期间存下的提问在恢复时怎么办（R31）；hotline＝危机规程里显示哪些热线（R20）。",
+    "input 与 defaults 里同 kind 的默认值深合并（对象逐层合并，数组和 null 整体替换）；expect 里列出的字段都要相等，没列的不检查。",
+    "action 取值：answer 正常回答、hint_only 只给提示、guide_only 只引导不给答案、limited_answer 限定回答、refuse 拒答（固定说法）、blocked 拦截、crisis_protocol 危机规程、unavailable 暂不可用、no_entry 不出现入口、preview 先给执行卡或消耗提示（确认后才执行）、quota_paused 额度不够暂停这一项。",
+    "labels 与 tags：ai_generated＝“AI 生成”，pending_confirm＝“待你确认”，after_recovery＝“恢复后补答”。charge＝这一步扣不扣点（扣多少归 R10）；cost、remaining、total 是 AI 点数。",
+    "classify 来自分类执行者：risk 取 none、distress、crisis；safety 取 ok、unsafe；available＝分类服务是否可用；keyword_hit＝平台关键词表是否命中。check 来自网关核对，source 为 null 表示没找到出处。learner.kaoqing_maturity 用术语表 data_maturity 的代码；forecast_state 用页面状态代码。",
+    "context 里的 confidence 是学员作答时选的把握度；answer_confidence 是导师回答的把握度（高、中、低），两者不同，见规则卡出入表第 7 条。",
+    "hotline 的 local、national 是每条热线距上次核验的天数（null＝没核验过），按列表顺序编号为 local#1、national#1 等。",
+    "params 与 contracts/params.yaml 现值相同；proposed_params 是建议新增、待整合任务登记的参数。decided 是用户已拍板的问题；temp_decisions 是还没拍板、先按临时默认写的问题。"
+  ],
+  "params": {
+    "billing.quota.remind_at": [0.5, 0.2],
+    "learner.self_check.items": 2
+  },
+  "proposed_params": {
+    "tutor.crisis.duty_response_minutes": 15,
+    "tutor.crisis.context_messages": 3,
+    "tutor.crisis.pause_nudges_hours": 24,
+    "tutor.crisis.hotline_verify_days": 90,
+    "tutor.outage.queue_hours": 24
+  },
+  "decided": {
+    "R09-Q1": "A",
+    "R09-Q2": "A",
+    "R09-Q3": "A",
+    "R09-Q4": "A",
+    "R09-Q5": "A"
+  },
+  "temp_decisions": {
+    "R09-Q6": "A"
+  },
+  "defaults": {
+    "turn": {
+      "end": "learner",
+      "page": "S28",
+      "page_mode": "standard",
+      "assessment": false,
+      "online": true,
+      "context": ["page", "knowledge_point", "recent_mistake"],
+      "removed": [],
+      "quiz": null,
+      "assignment_open": false,
+      "classify": {
+        "available": true,
+        "keyword_hit": false,
+        "risk": "none",
+        "safety": "ok",
+        "intent": "explain"
+      },
+      "check": {
+        "source": "textbook",
+        "conflict": false,
+        "forbidden": false,
+        "bank_explanation": false
+      },
+      "learner": {
+        "forecast_state": "normal",
+        "kaoqing_maturity": "usable"
+      },
+      "service": {
+        "up": true,
+        "eta_minutes": null
+      },
+      "quota": {
+        "cost": 0,
+        "remaining": 40,
+        "total": 40
+      },
+      "duty_online": true
+    },
+    "write": {
+      "actor": "tutor",
+      "target": "practice.cards",
+      "mode": "propose",
+      "confirmed": false,
+      "cost": 0
+    },
+    "label": {
+      "origin": "model",
+      "channel": "display",
+      "edited": false,
+      "question_phase": null
+    },
+    "queue": {
+      "queued_hours": 2,
+      "cost": 0,
+      "tool": false,
+      "in_assessment": false
+    },
+    "hotline": {
+      "local": [],
+      "national": []
+    }
+  },
+  "cases": [
+    {
+      "id": "E1",
+      "kind": "turn",
+      "title": "正常：普通提问，找到出处",
+      "rule": "R5、R6",
+      "input": {
+        "page": "S28"
+      },
+      "expect": {
+        "action": "answer",
+        "reason": "normal",
+        "labels": ["ai_generated"],
+        "must_include": ["source", "answer_confidence"],
+        "charge": false
+      }
+    },
+    {
+      "id": "E2",
+      "kind": "turn",
+      "title": "边界：没找到出处",
+      "rule": "R6",
+      "input": {
+        "check": {
+          "source": null
+        }
+      },
+      "expect": {
+        "action": "answer",
+        "reason": "no_source",
+        "labels": ["ai_generated"],
+        "must_include": ["no_source_notice", "answer_confidence"],
+        "answer_confidence": "low"
+      }
+    },
+    {
+      "id": "E3",
+      "kind": "turn",
+      "title": "正常：做题页揭晓后答错",
+      "rule": "R5",
+      "input": {
+        "page": "S18",
+        "page_mode": "immersive",
+        "quiz": {
+          "phase": "revealed",
+          "correct": false
+        },
+        "context": ["question", "chosen_option", "confidence", "draft"]
+      },
+      "expect": {
+        "action": "answer",
+        "auto_mode": "correct_mistake",
+        "context_sent": ["question", "chosen_option", "confidence", "draft"],
+        "labels": ["ai_generated"]
+      }
+    },
+    {
+      "id": "E4",
+      "kind": "turn",
+      "title": "边界：揭晓前问导师",
+      "rule": "R7",
+      "input": {
+        "page": "S18",
+        "page_mode": "immersive",
+        "quiz": {
+          "phase": "answering"
+        }
+      },
+      "expect": {
+        "action": "hint_only",
+        "reason": "before_reveal",
+        "hint_recorded": true,
+        "labels": ["ai_generated"]
+      }
+    },
+    {
+      "id": "E5",
+      "kind": "turn",
+      "title": "正常：阅读器里点掉一个上下文",
+      "rule": "R3、R5",
+      "input": {
+        "page": "S12",
+        "page_mode": "immersive",
+        "context": ["paragraph", "knowledge_point", "mastery"],
+        "removed": ["mastery"]
+      },
+      "expect": {
+        "action": "answer",
+        "auto_mode": "explain",
+        "context_sent": ["paragraph", "knowledge_point"]
+      }
+    },
+    {
+      "id": "E6",
+      "kind": "turn",
+      "title": "异常：讲解与标准答案冲突",
+      "rule": "R8",
+      "input": {
+        "page": "S18",
+        "page_mode": "immersive",
+        "quiz": {
+          "phase": "revealed",
+          "correct": false
+        },
+        "check": {
+          "conflict": true,
+          "bank_explanation": true
+        }
+      },
+      "expect": {
+        "action": "blocked",
+        "reason": "answer_conflict",
+        "show": "bank_explanation",
+        "review_logged": true,
+        "offer": ["report_issue"],
+        "charge": false,
+        "labels": []
+      }
+    },
+    {
+      "id": "E7",
+      "kind": "turn",
+      "title": "异常：回答含宣传禁用语",
+      "rule": "R8",
+      "input": {
+        "check": {
+          "forbidden": true
+        }
+      },
+      "expect": {
+        "action": "blocked",
+        "reason": "forbidden_words",
+        "review_logged": true,
+        "charge": false
+      }
+    },
+    {
+      "id": "E8",
+      "kind": "turn",
+      "title": "正常：问考题预测，考情可参考",
+      "rule": "R10",
+      "input": {
+        "classify": {
+          "intent": "exam_prediction"
+        },
+        "learner": {
+          "kaoqing_maturity": "usable"
+        }
+      },
+      "expect": {
+        "action": "refuse",
+        "reason": "exam_prediction",
+        "template": "refuse.exam_prediction",
+        "labels": [],
+        "charge": false,
+        "offer": ["kaoqing_level", "weak_point_review"]
+      }
+    },
+    {
+      "id": "E9",
+      "kind": "turn",
+      "title": "边界：考情冷启动",
+      "rule": "R10",
+      "input": {
+        "classify": {
+          "intent": "exam_prediction"
+        },
+        "learner": {
+          "kaoqing_maturity": "cold"
+        }
+      },
+      "expect": {
+        "action": "refuse",
+        "offer": ["weak_point_review"]
+      }
+    },
+    {
+      "id": "E10",
+      "kind": "turn",
+      "title": "边界：考情成熟中",
+      "rule": "R10",
+      "input": {
+        "classify": {
+          "intent": "exam_prediction"
+        },
+        "learner": {
+          "kaoqing_maturity": "maturing"
+        }
+      },
+      "expect": {
+        "action": "refuse",
+        "offer": ["kaoqing_raw_counts", "weak_point_review"]
+      }
+    },
+    {
+      "id": "E11",
+      "kind": "turn",
+      "title": "正常：问“我能过吗”",
+      "rule": "R4、R11",
+      "input": {
+        "classify": {
+          "intent": "promise_result"
+        }
+      },
+      "expect": {
+        "action": "limited_answer",
+        "reason": "promise_request",
+        "numbers_from": ["forecast_gap"],
+        "must_include": ["no_promise"],
+        "labels": ["ai_generated"]
+      }
+    },
+    {
+      "id": "E12",
+      "kind": "turn",
+      "title": "边界：预测数据不足",
+      "rule": "R4、R11",
+      "input": {
+        "classify": {
+          "intent": "promise_result"
+        },
+        "learner": {
+          "forecast_state": "insufficient_data"
+        }
+      },
+      "expect": {
+        "action": "limited_answer",
+        "numbers_from": [],
+        "must_include": ["no_promise", "forecast_state_notice"]
+      }
+    },
+    {
+      "id": "E13",
+      "kind": "turn",
+      "title": "正常：问报考资格",
+      "rule": "R12",
+      "input": {
+        "classify": {
+          "intent": "qualification"
+        }
+      },
+      "expect": {
+        "action": "limited_answer",
+        "reason": "qualification",
+        "must_include": ["official_source", "local_notice_caveat"],
+        "verdict_allowed": false,
+        "labels": ["ai_generated"]
+      }
+    },
+    {
+      "id": "E14",
+      "kind": "turn",
+      "title": "边界：机构布置、还没交的作业题",
+      "rule": "R13",
+      "input": {
+        "assignment_open": true
+      },
+      "expect": {
+        "action": "guide_only",
+        "reason": "open_assignment",
+        "labels": ["ai_generated"]
+      }
+    },
+    {
+      "id": "E15",
+      "kind": "turn",
+      "title": "异常：内容安全不过",
+      "rule": "R14",
+      "input": {
+        "classify": {
+          "safety": "unsafe"
+        }
+      },
+      "expect": {
+        "action": "refuse",
+        "reason": "unsafe_content",
+        "template": "refuse.unsafe",
+        "flag_logged": true,
+        "charge": false,
+        "labels": []
+      }
+    },
+    {
+      "id": "E16",
+      "kind": "turn",
+      "title": "正常：要导师把知识点标成已掌握",
+      "rule": "R24",
+      "input": {
+        "classify": {
+          "intent": "change_mastery"
+        }
+      },
+      "expect": {
+        "action": "limited_answer",
+        "reason": "mastery_not_writable",
+        "writes": [],
+        "offer": ["self_check"],
+        "self_check_items": 2
+      }
+    },
+    {
+      "id": "E17",
+      "kind": "turn",
+      "title": "正常：模考作答中",
+      "rule": "R1",
+      "input": {
+        "page": "S22",
+        "page_mode": "immersive",
+        "assessment": true
+      },
+      "expect": {
+        "action": "no_entry",
+        "reason": "assessment",
+        "entry_visible": false
+      }
+    },
+    {
+      "id": "E18",
+      "kind": "turn",
+      "title": "正常：机构端",
+      "rule": "R1",
+      "input": {
+        "end": "org",
+        "page": "O01"
+      },
+      "expect": {
+        "action": "no_entry",
+        "reason": "not_learner_end",
+        "entry_visible": false
+      }
+    },
+    {
+      "id": "E19",
+      "kind": "turn",
+      "title": "边界：引导页",
+      "rule": "R1",
+      "input": {
+        "page": "S03",
+        "page_mode": "guided"
+      },
+      "expect": {
+        "action": "no_entry",
+        "reason": "page_mode",
+        "entry_visible": false
+      }
+    },
+    {
+      "id": "E20",
+      "kind": "turn",
+      "title": "正常：风险信号，值守在线",
+      "rule": "R15、R17、R18、R19、R21、R22",
+      "input": {
+        "classify": {
+          "risk": "crisis"
+        }
+      },
+      "expect": {
+        "action": "crisis_protocol",
+        "reason": "crisis_signal",
+        "template": "crisis.protocol",
+        "labels": [],
+        "charge": false,
+        "buttons": ["live_chat", "hotline", "trusted_person", "back_to_chat"],
+        "eta_minutes": 15,
+        "duty_notice": "online",
+        "duty_ticket": {
+          "created": true,
+          "to": "platform_duty",
+          "share": "trigger_and_before",
+          "before_messages": 3
+        },
+        "pause_nudges_hours": 24,
+        "store": "crisis_separate",
+        "org_visible": false,
+        "memory_write": false
+      }
+    },
+    {
+      "id": "E21",
+      "kind": "turn",
+      "title": "边界：值守不在线",
+      "rule": "R19",
+      "input": {
+        "classify": {
+          "risk": "crisis"
+        },
+        "duty_online": false
+      },
+      "expect": {
+        "action": "crisis_protocol",
+        "eta_minutes": null,
+        "duty_notice": "offline_call_hotline_first",
+        "duty_ticket": {
+          "created": true,
+          "to": "platform_duty",
+          "share": "trigger_and_before",
+          "before_messages": 3
+        }
+      }
+    },
+    {
+      "id": "E22",
+      "kind": "turn",
+      "title": "异常：分类服务不可用，关键词命中",
+      "rule": "R15",
+      "input": {
+        "classify": {
+          "available": false,
+          "keyword_hit": true
+        }
+      },
+      "expect": {
+        "action": "crisis_protocol",
+        "reason": "keyword_fallback"
+      }
+    },
+    {
+      "id": "E23",
+      "kind": "turn",
+      "title": "异常：分类服务不可用，关键词没命中",
+      "rule": "R15、R30",
+      "input": {
+        "classify": {
+          "available": false,
+          "keyword_hit": false
+        }
+      },
+      "expect": {
+        "action": "unavailable",
+        "reason": "classifier_down",
+        "queued": true,
+        "show_eta": false
+      }
+    },
+    {
+      "id": "E24",
+      "kind": "turn",
+      "title": "异常：导师不可用、额度用完时出现风险信号",
+      "rule": "R2、R15",
+      "input": {
+        "classify": {
+          "risk": "crisis"
+        },
+        "service": {
+          "up": false
+        },
+        "quota": {
+          "remaining": 0
+        }
+      },
+      "expect": {
+        "action": "crisis_protocol",
+        "reason": "crisis_signal",
+        "charge": false
+      }
+    },
+    {
+      "id": "E25",
+      "kind": "turn",
+      "title": "正常：情绪低落",
+      "rule": "R16",
+      "input": {
+        "classify": {
+          "risk": "distress"
+        }
+      },
+      "expect": {
+        "action": "answer",
+        "reason": "distress",
+        "pause_nudges": "this_conversation",
+        "offer": ["lighten_today_proposal"],
+        "duty_ticket": {
+          "created": false
+        },
+        "labels": ["ai_generated"]
+      }
+    },
+    {
+      "id": "E26",
+      "kind": "turn",
+      "title": "正常：导师不可用，有预计时间",
+      "rule": "R30",
+      "input": {
+        "service": {
+          "up": false,
+          "eta_minutes": 20
+        }
+      },
+      "expect": {
+        "action": "unavailable",
+        "reason": "service_down",
+        "paused": ["explain", "generate_questions", "grading", "make_cards"],
+        "available": ["today", "review", "quiz_with_bank_explanation"],
+        "show_eta": true,
+        "eta_minutes": 20,
+        "queued": true,
+        "labels": []
+      }
+    },
+    {
+      "id": "E27",
+      "kind": "turn",
+      "title": "边界：导师不可用，没有预计时间",
+      "rule": "R30",
+      "input": {
+        "service": {
+          "up": false,
+          "eta_minutes": null
+        }
+      },
+      "expect": {
+        "action": "unavailable",
+        "show_eta": false,
+        "eta_minutes": null
+      }
+    },
+    {
+      "id": "E28",
+      "kind": "turn",
+      "title": "正常：离线",
+      "rule": "R33",
+      "input": {
+        "online": false
+      },
+      "expect": {
+        "action": "unavailable",
+        "reason": "offline",
+        "history_viewable": true,
+        "queued": false
+      }
+    },
+    {
+      "id": "E29",
+      "kind": "turn",
+      "title": "正常：组题，要扣点，额度充足",
+      "rule": "R23、R26",
+      "input": {
+        "classify": {
+          "intent": "make_questions"
+        },
+        "quota": {
+          "cost": 2,
+          "remaining": 30,
+          "total": 40
+        }
+      },
+      "expect": {
+        "action": "preview",
+        "reason": "confirm_first",
+        "writes": [
+          {
+            "target": "practice.questions",
+            "mode": "propose",
+            "lands": "practice_pending_set"
+          }
+        ],
+        "needs_cost_confirm": true,
+        "remind_tier": null,
+        "charge": false
+      }
+    },
+    {
+      "id": "E30",
+      "kind": "turn",
+      "title": "边界：额度剩不到两成",
+      "rule": "R26、R32",
+      "input": {
+        "classify": {
+          "intent": "make_questions"
+        },
+        "quota": {
+          "cost": 2,
+          "remaining": 6,
+          "total": 40
+        }
+      },
+      "expect": {
+        "action": "preview",
+        "needs_cost_confirm": true,
+        "remind_tier": 0.2
+      }
+    },
+    {
+      "id": "E31",
+      "kind": "turn",
+      "title": "边界：额度用完，普通问答照常",
+      "rule": "R32",
+      "input": {
+        "quota": {
+          "cost": 0,
+          "remaining": 0,
+          "total": 40
+        }
+      },
+      "expect": {
+        "action": "answer",
+        "reason": "normal",
+        "charge": false
+      }
+    },
+    {
+      "id": "E32",
+      "kind": "turn",
+      "title": "异常：额度不够还要组题",
+      "rule": "R32",
+      "input": {
+        "classify": {
+          "intent": "make_questions"
+        },
+        "quota": {
+          "cost": 2,
+          "remaining": 1,
+          "total": 40
+        }
+      },
+      "expect": {
+        "action": "quota_paused",
+        "reason": "quota_exhausted",
+        "must_include": ["which_item", "when_restore", "upgrade_amount", "free_alternative"],
+        "charge": false
+      }
+    },
+    {
+      "id": "E33",
+      "kind": "turn",
+      "title": "正常：把今天改轻一点",
+      "rule": "R23",
+      "input": {
+        "classify": {
+          "intent": "plan_change"
+        }
+      },
+      "expect": {
+        "action": "preview",
+        "writes": [
+          {
+            "target": "plan.items",
+            "mode": "propose",
+            "lands": "proposal"
+          }
+        ],
+        "needs_cost_confirm": false,
+        "charge": false
+      }
+    },
+    {
+      "id": "E34",
+      "kind": "write",
+      "title": "正常：制卡，学员还没确认",
+      "rule": "R23",
+      "input": {
+        "target": "practice.cards"
+      },
+      "expect": {
+        "allowed": true,
+        "lands": "pending_area",
+        "takes_effect": false,
+        "charge": false
+      }
+    },
+    {
+      "id": "E35",
+      "kind": "write",
+      "title": "正常：组题，学员确认",
+      "rule": "R23、R26",
+      "input": {
+        "target": "practice.questions",
+        "confirmed": true,
+        "cost": 2
+      },
+      "expect": {
+        "allowed": true,
+        "lands": "practice_pending_set",
+        "takes_effect": true,
+        "charge": true,
+        "evidence": "blind_then_confirm"
+      }
+    },
+    {
+      "id": "E36",
+      "kind": "write",
+      "title": "正常：计划提议",
+      "rule": "R23",
+      "input": {
+        "target": "plan.items"
+      },
+      "expect": {
+        "allowed": true,
+        "lands": "proposal",
+        "takes_effect": false,
+        "proposal_fields": ["what", "why", "cost", "if_not"],
+        "source": "tutor"
+      }
+    },
+    {
+      "id": "E37",
+      "kind": "write",
+      "title": "异常：导师直接改计划",
+      "rule": "R25",
+      "input": {
+        "target": "plan.items",
+        "mode": "direct"
+      },
+      "expect": {
+        "allowed": false,
+        "reason": "actor_scope",
+        "logged": true,
+        "data_changed": false
+      }
+    },
+    {
+      "id": "E38",
+      "kind": "write",
+      "title": "异常：导师碰掌握档",
+      "rule": "R24、R25",
+      "input": {
+        "target": "learner.mastery"
+      },
+      "expect": {
+        "allowed": false,
+        "reason": "actor_scope",
+        "logged": true,
+        "data_changed": false
+      }
+    },
+    {
+      "id": "E39",
+      "kind": "label",
+      "title": "正常：显示导师回答",
+      "rule": "R27",
+      "input": {},
+      "expect": {
+        "explicit": true
+      }
+    },
+    {
+      "id": "E40",
+      "kind": "label",
+      "title": "正常：复制导师回答",
+      "rule": "R28",
+      "input": {
+        "channel": "copy"
+      },
+      "expect": {
+        "explicit": true
+      }
+    },
+    {
+      "id": "E41",
+      "kind": "label",
+      "title": "正常：导出含 AI 内容的笔记",
+      "rule": "R28",
+      "input": {
+        "channel": "export"
+      },
+      "expect": {
+        "explicit": true,
+        "implicit_metadata": true
+      }
+    },
+    {
+      "id": "E42",
+      "kind": "label",
+      "title": "边界：学员改过的 AI 内容",
+      "rule": "R28",
+      "input": {
+        "channel": "save",
+        "edited": true
+      },
+      "expect": {
+        "explicit": true
+      }
+    },
+    {
+      "id": "E43",
+      "kind": "label",
+      "title": "边界：危机规程等固定文案",
+      "rule": "R29",
+      "input": {
+        "origin": "fixed_copy"
+      },
+      "expect": {
+        "explicit": false
+      }
+    },
+    {
+      "id": "E44",
+      "kind": "label",
+      "title": "边界：题库自带的解析",
+      "rule": "R29",
+      "input": {
+        "origin": "bank_explanation",
+        "channel": "copy"
+      },
+      "expect": {
+        "explicit": false
+      }
+    },
+    {
+      "id": "E45",
+      "kind": "label",
+      "title": "正常：导师出的题，揭晓前",
+      "rule": "R27",
+      "input": {
+        "question_phase": "before_reveal"
+      },
+      "expect": {
+        "explicit": true,
+        "tags": ["ai_generated", "pending_confirm"]
+      }
+    },
+    {
+      "id": "E46",
+      "kind": "queue",
+      "title": "正常：恢复后补答",
+      "rule": "R31",
+      "input": {
+        "queued_hours": 2
+      },
+      "expect": {
+        "auto_answer": true,
+        "tags": ["after_recovery"],
+        "labels": ["ai_generated"]
+      }
+    },
+    {
+      "id": "E47",
+      "kind": "queue",
+      "title": "边界：正好 24 小时",
+      "rule": "R31",
+      "input": {
+        "queued_hours": 24
+      },
+      "expect": {
+        "auto_answer": true
+      }
+    },
+    {
+      "id": "E48",
+      "kind": "queue",
+      "title": "边界：超过保留时长",
+      "rule": "R31",
+      "input": {
+        "queued_hours": 25
+      },
+      "expect": {
+        "auto_answer": false,
+        "notify_reask": true
+      }
+    },
+    {
+      "id": "E49",
+      "kind": "queue",
+      "title": "正常：存下的是组题请求",
+      "rule": "R31",
+      "input": {
+        "tool": true,
+        "cost": 2
+      },
+      "expect": {
+        "auto_answer": false,
+        "needs_reconfirm": true,
+        "charge": false
+      }
+    },
+    {
+      "id": "E50",
+      "kind": "queue",
+      "title": "边界：恢复时正在模考",
+      "rule": "R31",
+      "input": {
+        "in_assessment": true
+      },
+      "expect": {
+        "auto_answer": false,
+        "defer": "until_assessment_end"
+      }
+    },
+    {
+      "id": "E51",
+      "kind": "hotline",
+      "title": "正常：按核验日期筛本地区热线",
+      "rule": "R20",
+      "input": {
+        "local": [30, 90, 120]
+      },
+      "expect": {
+        "shown": ["local#1", "local#2"],
+        "button_visible": true,
+        "alert_ops": false
+      }
+    },
+    {
+      "id": "E52",
+      "kind": "hotline",
+      "title": "边界：本地区都过期，用全国的",
+      "rule": "R20",
+      "input": {
+        "local": [120],
+        "national": [10]
+      },
+      "expect": {
+        "shown": ["national#1"],
+        "button_visible": true,
+        "alert_ops": true
+      }
+    },
+    {
+      "id": "E53",
+      "kind": "hotline",
+      "title": "异常：一条有效的都没有",
+      "rule": "R20",
+      "input": {
+        "local": [],
+        "national": [200]
+      },
+      "expect": {
+        "shown": [],
+        "button_visible": false,
+        "alert_ops": true
+      }
+    }
+  ]
+}
