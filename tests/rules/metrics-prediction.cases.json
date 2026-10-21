@@ -1,0 +1,1856 @@
+{
+  "card": "docs/baseline/rule-cards/metrics-prediction.md",
+  "status": "草稿",
+  "rule_version": "R06-r2",
+  "decided": {
+    "R06-Q1": "A",
+    "R06-Q2": "A",
+    "R06-Q3": "A",
+    "R06-Q4": "A",
+    "R06-Q5": "A",
+    "R06-Q6": "B"
+  },
+  "pending": {
+    "R06-Q7": "A",
+    "R06-Q8": "A"
+  },
+  "conventions": [
+    "每条例子是 input → expect；expect 只列要核对的字段，没列的不核对。带 variants 的例子，input.variants[i] 对应 expect.variants[i]，各自独立。",
+    "fn 是建议的纯函数（名字可改）：forecast_subject、week_change、pick_headline、effective_time 放 learner 领域 core；completion、health、report_gate 放 plan 领域 core；accuracy 放 practice 领域 core。预测记录与指标快照由 metrics 领域保存。",
+    "分数的算法：先算加权平均得分率，再乘满分；最可能值四舍五入（.5 进位），保守值向下取整，乐观值向上取整；取整前先容 1e-9 误差。recent_per_day、needed_per_day、health 是四舍五入到两位小数后的值；完成度 percent 向下取整，正确率 percent 四舍五入；estimated_share 允许 1e-4 误差。",
+    "知识点没写的字段取默认：scope＝follow_default（跟随默认），evidence＝sufficient（证据充分，按 R01）。scope 另有 added（我加入）、removed（我移出）；type＝accumulation 是积累拓展型，target 为 null。scope 与类型的代码以 docs/product/glossary.yaml 为准，不一致时改这里。",
+    "intel：mature 表示考情数据成熟度到了“可参考”或“成熟”，immature 表示冷启动或成熟中。peer 是同类考生数据：population 人数、rate 该知识点的平均得分率。self_level（自评档）、target_before（改之前的目标档）、note 只作说明，规则不用。",
+    "时间带时区（ISO 8601）。“哪一天”按学员时区和日界线（默认北京时间凌晨 4 点）算，用 packages/shared/src/today；today、*_day、target_date 是学习日 YYYY-MM-DD。周是周一到周日。weekly_budget_minutes 从周一排到周日。",
+    "health：窗口是今天之前的 7 天（不含今天）；level_start 是窗口开始时的档，level_now 是今天开始时的档；kps 里的 target 是现在的目标档，scope 是现在的范围。",
+    "effective_time：activities 是学习活动，active 是页面在前台且有操作（或正在播放）的时间段；同一 id 的活动才合成片段。evidence 里 counted＝false 表示不算证据（秒评、手动勾选“看过”、没确认的即时题），revoked＝true 表示已撤回，strength 只作说明。kind 代码是建议：practice 做题、review 复习卡片、recite 背诵、reading 阅读、video 视听、post_test 读后即测（视听为片内检测）、mock_exam 模考、subjective 主观题、oral 口头训练、tutor 问导师；study_room 自习室专注等其他 kind 不算在场。days 里的数都是分钟；pending_check 为 null 表示没有待检测。",
+    "accuracy：attempts 按时间排；q 是题目编号（改版也算同一题，变式题是另一题）；credibility 只写非默认值，generated_instant 是没确认的即时题（四级）；revoked＝true 是题目报错改正后撤回的作答；subjective＝true 是主观题。",
+    "params 是 contracts/params.yaml 的现值；params_proposed 是本卡建议新增、待整合任务登记的参数。decision 标出对应的拍板问题：decided 是你已定的，pending 是待拍板、先按临时默认写的。"
+  ],
+  "params": {
+    "learner.forecast.coverage_target": 0.8,
+    "learner.prior.min_population": 200,
+    "learner.evidence.min_for_sufficient": 2,
+    "plan.report.min_days": 3,
+    "plan.report.min_effective_minutes": 120
+  },
+  "params_proposed": {
+    "learner.forecast.level_rates": [0.2, 0.35, 0.5, 0.7, 0.85, 0.95],
+    "learner.forecast.band_halfwidth": {
+      "measured": 0.04,
+      "projected": 0.06,
+      "peer": 0.1,
+      "prior": 0.15
+    },
+    "learner.forecast.confidence_width_ratio": [0.06, 0.12],
+    "plan.health.window_days": 7,
+    "plan.health.min_days": 3,
+    "plan.health.verdict_levels": [0.8, 1.0],
+    "learner.effective.idle_gap_minutes": 5,
+    "learner.effective.makeup_days": 7,
+    "practice.accuracy.min_attempts": 10
+  },
+  "cases": [
+    {
+      "id": "E1",
+      "title": "正常：复现原型的 57–65、差 9 分、按计划到目标日 63–72",
+      "kind": "正常",
+      "rule": "R6、R7、R8、R9、R10、R11",
+      "fn": "forecast_subject",
+      "input": {
+        "full_score": 100,
+        "target_score": 70,
+        "map_health": "pass",
+        "intel": "mature",
+        "kps": [
+          {
+            "id": "k1",
+            "score_weight": 17,
+            "level": 4,
+            "target": 4
+          },
+          {
+            "id": "k2",
+            "score_weight": 35,
+            "level": 3,
+            "target": 3
+          },
+          {
+            "id": "k3",
+            "score_weight": 35,
+            "level": 2,
+            "target": 2
+          },
+          {
+            "id": "k4",
+            "score_weight": 13,
+            "level": 1,
+            "target": 4
+          }
+        ]
+      },
+      "expect": {
+        "status": "normal",
+        "today": {
+          "low": 57,
+          "ml": 61,
+          "high": 65
+        },
+        "by_target_date": {
+          "low": 63,
+          "ml": 68,
+          "high": 72
+        },
+        "gap": 9,
+        "reached": false,
+        "confidence": "medium",
+        "weight_basis": "score",
+        "labeled": false,
+        "estimated_share": 0,
+        "peer_kps": []
+      }
+    },
+    {
+      "id": "E2",
+      "title": "证据不足又没有足够的同类考生：区间变宽并给出原因（只做快速定位时就是这样）",
+      "kind": "边界",
+      "rule": "R7、R11",
+      "fn": "forecast_subject",
+      "input": {
+        "full_score": 100,
+        "target_score": 70,
+        "map_health": "pass",
+        "intel": "mature",
+        "kps": [
+          {
+            "id": "k1",
+            "score_weight": 17,
+            "level": 4,
+            "target": 4
+          },
+          {
+            "id": "k2",
+            "score_weight": 35,
+            "level": 3,
+            "target": 3,
+            "evidence": "insufficient"
+          },
+          {
+            "id": "k3",
+            "score_weight": 35,
+            "level": 2,
+            "target": 2,
+            "evidence": "insufficient"
+          },
+          {
+            "id": "k4",
+            "score_weight": 13,
+            "level": 1,
+            "target": 4
+          }
+        ]
+      },
+      "expect": {
+        "status": "normal",
+        "today": {
+          "low": 49,
+          "ml": 61,
+          "high": 73
+        },
+        "by_target_date": {
+          "low": 55,
+          "ml": 68,
+          "high": 80
+        },
+        "gap": 9,
+        "reached": false,
+        "confidence": "low",
+        "weight_basis": "score",
+        "labeled": false,
+        "estimated_share": 0.7,
+        "peer_kps": []
+      }
+    },
+    {
+      "id": "E3",
+      "title": "证据不足、同类考生够人数：改用同类考生的平均得分率",
+      "kind": "边界",
+      "rule": "R7、R11",
+      "fn": "forecast_subject",
+      "input": {
+        "full_score": 100,
+        "target_score": 70,
+        "map_health": "pass",
+        "intel": "mature",
+        "kps": [
+          {
+            "id": "k1",
+            "score_weight": 17,
+            "level": 4,
+            "target": 4
+          },
+          {
+            "id": "k2",
+            "score_weight": 35,
+            "level": 3,
+            "target": 3,
+            "evidence": "insufficient",
+            "peer": {
+              "population": 350,
+              "rate": 0.62
+            }
+          },
+          {
+            "id": "k3",
+            "score_weight": 35,
+            "level": 2,
+            "target": 2,
+            "evidence": "insufficient",
+            "peer": {
+              "population": 120,
+              "rate": 0.55
+            }
+          },
+          {
+            "id": "k4",
+            "score_weight": 13,
+            "level": 1,
+            "target": 4
+          }
+        ]
+      },
+      "expect": {
+        "status": "normal",
+        "today": {
+          "low": 48,
+          "ml": 58,
+          "high": 69
+        },
+        "by_target_date": {
+          "low": 54,
+          "ml": 65,
+          "high": 75
+        },
+        "gap": 12,
+        "reached": false,
+        "confidence": "low",
+        "weight_basis": "score",
+        "labeled": false,
+        "estimated_share": 0.7,
+        "peer_kps": ["k2"]
+      }
+    },
+    {
+      "id": "E4",
+      "title": "地图体检不通过：预测锁定",
+      "kind": "异常",
+      "rule": "R12",
+      "fn": "forecast_subject",
+      "input": {
+        "full_score": 100,
+        "target_score": 70,
+        "map_health": "blocked",
+        "intel": "mature",
+        "kps": [
+          {
+            "id": "k1",
+            "score_weight": 17,
+            "level": 4,
+            "target": 4
+          },
+          {
+            "id": "k2",
+            "score_weight": 35,
+            "level": 3,
+            "target": 3
+          },
+          {
+            "id": "k3",
+            "score_weight": 35,
+            "level": 2,
+            "target": 2
+          },
+          {
+            "id": "k4",
+            "score_weight": 13,
+            "level": 1,
+            "target": 4
+          }
+        ]
+      },
+      "expect": {
+        "status": "locked",
+        "today": null,
+        "by_target_date": null,
+        "gap": null,
+        "reason": "map_health_blocked"
+      }
+    },
+    {
+      "id": "E5",
+      "title": "考情冷启动：按重要度估算并标注",
+      "kind": "边界",
+      "rule": "R6",
+      "fn": "forecast_subject",
+      "input": {
+        "full_score": 100,
+        "target_score": 70,
+        "map_health": "pass",
+        "intel": "immature",
+        "kps": [
+          {
+            "id": "k1",
+            "score_weight": 10,
+            "importance": 4,
+            "level": 3,
+            "target": 3
+          },
+          {
+            "id": "k2",
+            "score_weight": 60,
+            "importance": 2,
+            "level": 1,
+            "target": 3
+          },
+          {
+            "id": "k3",
+            "score_weight": 30,
+            "importance": 2,
+            "level": 2,
+            "target": 3
+          }
+        ]
+      },
+      "expect": {
+        "status": "normal",
+        "today": {
+          "low": 52,
+          "ml": 56,
+          "high": 61
+        },
+        "by_target_date": {
+          "low": 65,
+          "ml": 70,
+          "high": 75
+        },
+        "gap": 14,
+        "reached": false,
+        "confidence": "medium",
+        "weight_basis": "importance",
+        "labeled": true,
+        "estimated_share": 0,
+        "peer_kps": []
+      }
+    },
+    {
+      "id": "E6",
+      "title": "移出范围的照样进预测、积累拓展型不算、.5 进位",
+      "kind": "边界",
+      "rule": "R6、R8、R10",
+      "fn": "forecast_subject",
+      "input": {
+        "full_score": 100,
+        "target_score": 70,
+        "map_health": "pass",
+        "intel": "mature",
+        "kps": [
+          {
+            "id": "k1",
+            "score_weight": 40,
+            "level": 3,
+            "target": 3
+          },
+          {
+            "id": "k2",
+            "score_weight": 30,
+            "level": 1,
+            "target": 3,
+            "scope": "removed"
+          },
+          {
+            "id": "k3",
+            "score_weight": 30,
+            "level": 2,
+            "target": 3
+          },
+          {
+            "id": "k4",
+            "type": "accumulation",
+            "score_weight": 10,
+            "level": 4,
+            "target": null
+          }
+        ]
+      },
+      "expect": {
+        "status": "normal",
+        "today": {
+          "low": 49,
+          "ml": 54,
+          "high": 58
+        },
+        "by_target_date": {
+          "low": 54,
+          "ml": 60,
+          "high": 65
+        },
+        "gap": 16,
+        "reached": false,
+        "confidence": "medium",
+        "weight_basis": "score",
+        "labeled": false,
+        "estimated_share": 0,
+        "peer_kps": []
+      }
+    },
+    {
+      "id": "E7",
+      "title": "满分 710、上沿夹到 1、已过目标线",
+      "kind": "边界",
+      "rule": "R7、R8、R9、R11",
+      "fn": "forecast_subject",
+      "decision": "R06-Q4",
+      "input": {
+        "full_score": 710,
+        "target_score": 520,
+        "map_health": "pass",
+        "intel": "mature",
+        "kps": [
+          {
+            "id": "k1",
+            "score_weight": 50,
+            "level": 5,
+            "target": 4
+          },
+          {
+            "id": "k2",
+            "score_weight": 50,
+            "level": 5,
+            "target": 4,
+            "evidence": "insufficient"
+          }
+        ]
+      },
+      "expect": {
+        "status": "normal",
+        "today": {
+          "low": 607,
+          "ml": 675,
+          "high": 707
+        },
+        "by_target_date": {
+          "low": 607,
+          "ml": 675,
+          "high": 707
+        },
+        "gap": -155,
+        "reached": true,
+        "confidence": "low",
+        "weight_basis": "score",
+        "labeled": false,
+        "estimated_share": 0.5,
+        "peer_kps": []
+      }
+    },
+    {
+      "id": "E8",
+      "title": "较上周：和上周最后一条比，周一凌晨 4 点前那条仍算上周（复现原型 +2）",
+      "kind": "正常",
+      "rule": "R2、R13",
+      "fn": "week_change",
+      "decision": "R06-Q8",
+      "input": {
+        "today": "2026-10-21",
+        "now_ml": 61,
+        "records": [
+          {
+            "at": "2026-10-17T21:00:00+08:00",
+            "ml": 58
+          },
+          {
+            "at": "2026-10-18T22:00:00+08:00",
+            "ml": 58
+          },
+          {
+            "at": "2026-10-19T03:30:00+08:00",
+            "ml": 59
+          },
+          {
+            "at": "2026-10-19T21:00:00+08:00",
+            "ml": 60
+          },
+          {
+            "at": "2026-10-20T21:00:00+08:00",
+            "ml": 61
+          }
+        ]
+      },
+      "expect": {
+        "change": 2
+      }
+    },
+    {
+      "id": "E9",
+      "title": "较上周不显示：本周才有记录；上周最后一条是锁定的",
+      "kind": "异常",
+      "rule": "R13",
+      "fn": "week_change",
+      "decision": "R06-Q8",
+      "input": {
+        "variants": [
+          {
+            "today": "2026-10-21",
+            "now_ml": 61,
+            "records": [
+              {
+                "at": "2026-10-19T21:00:00+08:00",
+                "ml": 60
+              },
+              {
+                "at": "2026-10-20T21:00:00+08:00",
+                "ml": 61
+              }
+            ]
+          },
+          {
+            "today": "2026-10-21",
+            "now_ml": 61,
+            "records": [
+              {
+                "at": "2026-10-17T21:00:00+08:00",
+                "ml": 58
+              },
+              {
+                "at": "2026-10-18T21:00:00+08:00",
+                "status": "locked"
+              },
+              {
+                "at": "2026-10-20T21:00:00+08:00",
+                "ml": 61
+              }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "change": null,
+            "reason": "no_last_week"
+          },
+          {
+            "change": null,
+            "reason": "last_week_locked"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E10",
+      "title": "两科都要过：卡片显示差距大的那科（复现原型 S24 各科进度）",
+      "kind": "正常",
+      "rule": "R4",
+      "fn": "pick_headline",
+      "decision": "R06-Q1",
+      "input": {
+        "subjects": [
+          {
+            "name": "初级会计实务",
+            "order": 1,
+            "forecast_status": "normal",
+            "gap": 9,
+            "completion": 0.4615
+          },
+          {
+            "name": "经济法基础",
+            "order": 2,
+            "forecast_status": "normal",
+            "gap": 3,
+            "completion": 0.5333
+          }
+        ]
+      },
+      "expect": {
+        "subject": "初级会计实务",
+        "show_subject_name": true
+      }
+    },
+    {
+      "id": "E11",
+      "title": "差距一样取完成度低的；预测都锁定取完成度最低的",
+      "kind": "边界",
+      "rule": "R4",
+      "fn": "pick_headline",
+      "decision": "R06-Q1",
+      "input": {
+        "variants": [
+          {
+            "subjects": [
+              {
+                "name": "科目一",
+                "order": 1,
+                "forecast_status": "normal",
+                "gap": 5,
+                "completion": 0.6
+              },
+              {
+                "name": "科目二",
+                "order": 2,
+                "forecast_status": "normal",
+                "gap": 5,
+                "completion": 0.4
+              }
+            ]
+          },
+          {
+            "subjects": [
+              {
+                "name": "科目一",
+                "order": 1,
+                "forecast_status": "locked",
+                "gap": null,
+                "completion": 0.3
+              },
+              {
+                "name": "科目二",
+                "order": 2,
+                "forecast_status": "locked",
+                "gap": null,
+                "completion": 0.5
+              }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "subject": "科目二",
+            "show_subject_name": true
+          },
+          {
+            "subject": "科目一",
+            "show_subject_name": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "E12",
+      "title": "只有一科：不写科目名",
+      "kind": "边界",
+      "rule": "R4",
+      "fn": "pick_headline",
+      "input": {
+        "subjects": [
+          {
+            "name": "大学英语六级",
+            "order": 1,
+            "forecast_status": "normal",
+            "gap": -155,
+            "completion": 0.8
+          }
+        ]
+      },
+      "expect": {
+        "subject": "大学英语六级",
+        "show_subject_name": false
+      }
+    },
+    {
+      "id": "E13",
+      "title": "完成度：复现原型 46%",
+      "kind": "正常",
+      "rule": "R3、R15、R16、R17",
+      "fn": "completion",
+      "decision": "R06-Q2",
+      "input": {
+        "intel": "mature",
+        "kps": [
+          {
+            "id": "k1",
+            "score_weight": 40,
+            "level": 3,
+            "target": 3,
+            "self_level": 5
+          },
+          {
+            "id": "k2",
+            "score_weight": 20,
+            "level": 2,
+            "target": 3
+          },
+          {
+            "id": "k3",
+            "score_weight": 20,
+            "level": 1,
+            "target": 4
+          },
+          {
+            "id": "k4",
+            "score_weight": 20,
+            "level": 0,
+            "target": 3,
+            "scope": "added"
+          },
+          {
+            "id": "k5",
+            "score_weight": 30,
+            "level": 3,
+            "target": 3,
+            "scope": "removed"
+          },
+          {
+            "id": "k6",
+            "type": "accumulation",
+            "score_weight": 10,
+            "level": 4,
+            "target": null
+          }
+        ]
+      },
+      "expect": {
+        "status": "normal",
+        "done": 6,
+        "total": 13,
+        "percent": 46,
+        "score_percent": 58
+      }
+    },
+    {
+      "id": "E14",
+      "title": "超过目标档不多算；没全部到目标不显示 100%",
+      "kind": "边界",
+      "rule": "R15、R17",
+      "fn": "completion",
+      "input": {
+        "intel": "mature",
+        "kps": [
+          {
+            "id": "k1",
+            "score_weight": 10,
+            "level": 5,
+            "target": 4
+          },
+          {
+            "id": "k2",
+            "score_weight": 10,
+            "level": 4,
+            "target": 4
+          },
+          {
+            "id": "k3",
+            "score_weight": 10,
+            "level": 4,
+            "target": 4
+          },
+          {
+            "id": "k4",
+            "score_weight": 10,
+            "level": 4,
+            "target": 4
+          },
+          {
+            "id": "k5",
+            "score_weight": 10,
+            "level": 4,
+            "target": 4
+          },
+          {
+            "id": "k6",
+            "score_weight": 10,
+            "level": 3,
+            "target": 4
+          }
+        ]
+      },
+      "expect": {
+        "status": "normal",
+        "done": 23,
+        "total": 24,
+        "percent": 95,
+        "score_percent": 95
+      }
+    },
+    {
+      "id": "E15",
+      "title": "范围里没有可算的知识点：不出",
+      "kind": "异常",
+      "rule": "R3、R17",
+      "fn": "completion",
+      "input": {
+        "intel": "mature",
+        "kps": [
+          {
+            "id": "k1",
+            "score_weight": 10,
+            "level": 1,
+            "target": 3,
+            "scope": "removed"
+          },
+          {
+            "id": "k2",
+            "type": "accumulation",
+            "score_weight": 10,
+            "level": 2,
+            "target": null
+          }
+        ]
+      },
+      "expect": {
+        "status": "empty"
+      }
+    },
+    {
+      "id": "E16",
+      "title": "健康度正常",
+      "kind": "正常",
+      "rule": "R18、R19、R20、R21",
+      "fn": "health",
+      "input": {
+        "today": "2026-10-21",
+        "first_learning_day": "2026-09-01",
+        "target_date": "2026-10-31",
+        "weekly_budget_minutes": [60, 60, 60, 60, 60, 60, 60],
+        "unavailable_days": [],
+        "kps": [
+          {
+            "id": "k1",
+            "target": 4,
+            "level_start": 1,
+            "level_now": 4
+          },
+          {
+            "id": "k2",
+            "target": 4,
+            "level_start": 0,
+            "level_now": 3
+          },
+          {
+            "id": "k3",
+            "target": 5,
+            "level_start": 0,
+            "level_now": 3
+          },
+          {
+            "id": "k4",
+            "target": 4,
+            "level_start": 1,
+            "level_now": 4
+          },
+          {
+            "id": "k5",
+            "target": 4,
+            "level_start": 0,
+            "level_now": 0
+          },
+          {
+            "id": "k6",
+            "target": 4,
+            "level_start": 0,
+            "level_now": 0
+          },
+          {
+            "id": "k7",
+            "target": 3,
+            "level_start": 0,
+            "level_now": 0
+          }
+        ]
+      },
+      "expect": {
+        "status": "normal",
+        "progress": 12,
+        "learnable_days": 7,
+        "remaining_work": 14,
+        "remaining_days": 10,
+        "recent_per_day": 1.71,
+        "needed_per_day": 1.4,
+        "health": 1.22,
+        "verdict": "ok"
+      }
+    },
+    {
+      "id": "E17",
+      "title": "有不可学日、周日没时间；健康度正好 0.8",
+      "kind": "边界",
+      "rule": "R19、R20、R21",
+      "fn": "health",
+      "decision": "R06-Q3",
+      "input": {
+        "today": "2026-10-21",
+        "first_learning_day": "2026-09-01",
+        "target_date": "2026-11-04",
+        "weekly_budget_minutes": [60, 60, 60, 60, 60, 60, 0],
+        "unavailable_days": ["2026-10-16", "2026-10-17", "2026-10-28"],
+        "kps": [
+          {
+            "id": "k1",
+            "target": 4,
+            "level_start": 0,
+            "level_now": 4
+          },
+          {
+            "id": "k2",
+            "target": 4,
+            "level_start": 1,
+            "level_now": 3
+          },
+          {
+            "id": "k3",
+            "target": 3,
+            "level_start": 0,
+            "level_now": 2
+          },
+          {
+            "id": "k4",
+            "target": 4,
+            "level_start": 0,
+            "level_now": 0
+          },
+          {
+            "id": "k5",
+            "target": 4,
+            "level_start": 0,
+            "level_now": 0
+          },
+          {
+            "id": "k6",
+            "target": 4,
+            "level_start": 0,
+            "level_now": 0
+          },
+          {
+            "id": "k7",
+            "target": 4,
+            "level_start": 0,
+            "level_now": 0
+          },
+          {
+            "id": "k8",
+            "target": 4,
+            "level_start": 0,
+            "level_now": 0
+          }
+        ]
+      },
+      "expect": {
+        "status": "normal",
+        "progress": 8,
+        "learnable_days": 5,
+        "remaining_work": 22,
+        "remaining_days": 11,
+        "recent_per_day": 1.6,
+        "needed_per_day": 2,
+        "health": 0.8,
+        "verdict": "tight"
+      }
+    },
+    {
+      "id": "E18",
+      "title": "开始学习不满 7 天：数据不足",
+      "kind": "异常",
+      "rule": "R22",
+      "fn": "health",
+      "input": {
+        "today": "2026-10-21",
+        "first_learning_day": "2026-10-17",
+        "target_date": "2026-12-31",
+        "weekly_budget_minutes": [60, 60, 60, 60, 60, 60, 60],
+        "unavailable_days": [],
+        "kps": [
+          {
+            "id": "k1",
+            "target": 3,
+            "level_start": 0,
+            "level_now": 2
+          },
+          {
+            "id": "k2",
+            "target": 3,
+            "level_start": 0,
+            "level_now": 1
+          },
+          {
+            "id": "k3",
+            "target": 4,
+            "level_start": 0,
+            "level_now": 0
+          }
+        ]
+      },
+      "expect": {
+        "status": "insufficient_data",
+        "reason": "window_not_full",
+        "progress": 3,
+        "learnable_days": 4
+      }
+    },
+    {
+      "id": "E19",
+      "title": "7 天里可学的天数太少：数据不足",
+      "kind": "异常",
+      "rule": "R22",
+      "fn": "health",
+      "input": {
+        "today": "2026-10-21",
+        "first_learning_day": "2026-09-01",
+        "target_date": "2026-12-31",
+        "weekly_budget_minutes": [60, 60, 60, 60, 60, 60, 60],
+        "unavailable_days": ["2026-10-14", "2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18"],
+        "kps": [
+          {
+            "id": "k1",
+            "target": 3,
+            "level_start": 1,
+            "level_now": 2
+          },
+          {
+            "id": "k2",
+            "target": 4,
+            "level_start": 0,
+            "level_now": 0
+          }
+        ]
+      },
+      "expect": {
+        "status": "insufficient_data",
+        "reason": "too_few_learnable_days",
+        "progress": 1,
+        "learnable_days": 2
+      }
+    },
+    {
+      "id": "E20",
+      "title": "掉档：净推进为负按 0 算",
+      "kind": "异常",
+      "rule": "R18、R19、R21",
+      "fn": "health",
+      "input": {
+        "today": "2026-10-21",
+        "first_learning_day": "2026-09-01",
+        "target_date": "2026-10-31",
+        "weekly_budget_minutes": [60, 60, 60, 60, 60, 60, 60],
+        "unavailable_days": [],
+        "kps": [
+          {
+            "id": "k1",
+            "target": 3,
+            "level_start": 3,
+            "level_now": 1
+          },
+          {
+            "id": "k2",
+            "target": 3,
+            "level_start": 1,
+            "level_now": 1
+          },
+          {
+            "id": "k3",
+            "target": 4,
+            "level_start": 0,
+            "level_now": 0
+          }
+        ]
+      },
+      "expect": {
+        "status": "normal",
+        "progress": -2,
+        "learnable_days": 7,
+        "remaining_work": 8,
+        "remaining_days": 10,
+        "recent_per_day": 0,
+        "needed_per_day": 0.8,
+        "health": 0,
+        "verdict": "short",
+        "reason": "levels_dropped"
+      }
+    },
+    {
+      "id": "E21",
+      "title": "加入或移出范围、改目标档都不算推进",
+      "kind": "边界",
+      "rule": "R18",
+      "fn": "health",
+      "input": {
+        "today": "2026-10-21",
+        "first_learning_day": "2026-09-01",
+        "target_date": "2026-10-31",
+        "weekly_budget_minutes": [60, 60, 60, 60, 60, 60, 60],
+        "unavailable_days": [],
+        "kps": [
+          {
+            "id": "k1",
+            "target": 3,
+            "level_start": 3,
+            "level_now": 3,
+            "scope": "added"
+          },
+          {
+            "id": "k2",
+            "target": 2,
+            "level_start": 3,
+            "level_now": 3,
+            "target_before": 4
+          },
+          {
+            "id": "k3",
+            "target": 3,
+            "level_start": 1,
+            "level_now": 2
+          },
+          {
+            "id": "k4",
+            "target": 3,
+            "level_start": 0,
+            "level_now": 3,
+            "scope": "removed"
+          },
+          {
+            "id": "k5",
+            "target": 4,
+            "level_start": 0,
+            "level_now": 0
+          }
+        ]
+      },
+      "expect": {
+        "status": "normal",
+        "progress": 1,
+        "learnable_days": 7,
+        "remaining_work": 5,
+        "remaining_days": 10,
+        "recent_per_day": 0.14,
+        "needed_per_day": 0.5,
+        "health": 0.29,
+        "verdict": "short"
+      }
+    },
+    {
+      "id": "E22",
+      "title": "范围内都已到目标档：不出比值",
+      "kind": "边界",
+      "rule": "R22",
+      "fn": "health",
+      "input": {
+        "today": "2026-10-21",
+        "first_learning_day": "2026-09-01",
+        "target_date": "2026-10-31",
+        "weekly_budget_minutes": [60, 60, 60, 60, 60, 60, 60],
+        "unavailable_days": [],
+        "kps": [
+          {
+            "id": "k1",
+            "target": 3,
+            "level_start": 3,
+            "level_now": 3
+          },
+          {
+            "id": "k2",
+            "target": 4,
+            "level_start": 2,
+            "level_now": 4
+          }
+        ]
+      },
+      "expect": {
+        "status": "done"
+      }
+    },
+    {
+      "id": "E23",
+      "title": "目标日已过：不出",
+      "kind": "异常",
+      "rule": "R22",
+      "fn": "health",
+      "input": {
+        "today": "2026-10-21",
+        "first_learning_day": "2026-09-01",
+        "target_date": "2026-10-20",
+        "weekly_budget_minutes": [60, 60, 60, 60, 60, 60, 60],
+        "unavailable_days": [],
+        "kps": [
+          {
+            "id": "k1",
+            "target": 3,
+            "level_start": 1,
+            "level_now": 2
+          }
+        ]
+      },
+      "expect": {
+        "status": "not_applicable",
+        "reason": "target_date_passed"
+      }
+    },
+    {
+      "id": "E24",
+      "title": "一天的在场、有效与待检测",
+      "kind": "正常",
+      "rule": "R23、R24、R25、R27",
+      "fn": "effective_time",
+      "input": {
+        "now": "2026-10-21T22:00:00+08:00",
+        "post_test_items": {
+          "3.2": 3
+        },
+        "activities": [
+          {
+            "id": "a1",
+            "kind": "practice",
+            "active": [
+              {
+                "from": "2026-10-21T20:00:00+08:00",
+                "to": "2026-10-21T20:30:00+08:00"
+              }
+            ],
+            "evidence": [
+              {
+                "at": "2026-10-21T20:05:00+08:00"
+              },
+              {
+                "at": "2026-10-21T20:28:00+08:00"
+              }
+            ]
+          },
+          {
+            "id": "a2",
+            "kind": "reading",
+            "section": "3.2",
+            "active": [
+              {
+                "from": "2026-10-21T20:35:00+08:00",
+                "to": "2026-10-21T21:00:00+08:00"
+              }
+            ],
+            "evidence": []
+          },
+          {
+            "id": "a3",
+            "kind": "review",
+            "active": [
+              {
+                "from": "2026-10-21T21:05:00+08:00",
+                "to": "2026-10-21T21:20:00+08:00"
+              }
+            ],
+            "evidence": [
+              {
+                "at": "2026-10-21T21:10:00+08:00"
+              }
+            ]
+          },
+          {
+            "id": "a4",
+            "kind": "tutor",
+            "active": [
+              {
+                "from": "2026-10-21T21:25:00+08:00",
+                "to": "2026-10-21T21:35:00+08:00"
+              }
+            ],
+            "evidence": []
+          },
+          {
+            "id": "a5",
+            "kind": "study_room",
+            "active": [
+              {
+                "from": "2026-10-21T19:00:00+08:00",
+                "to": "2026-10-21T20:00:00+08:00"
+              }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "days": {
+          "2026-10-21": {
+            "presence": 80,
+            "effective": 45,
+            "pending_check": 25
+          }
+        },
+        "effective_days": ["2026-10-21"],
+        "pending_check": {
+          "sections": ["3.2"],
+          "minutes": 25,
+          "items": 3
+        }
+      }
+    },
+    {
+      "id": "E25",
+      "title": "停顿不超过 5 分钟算同一段，超过就断开",
+      "kind": "边界",
+      "rule": "R23、R24",
+      "fn": "effective_time",
+      "input": {
+        "now": "2026-10-21T22:00:00+08:00",
+        "activities": [
+          {
+            "id": "a1",
+            "kind": "practice",
+            "active": [
+              {
+                "from": "2026-10-21T20:00:00+08:00",
+                "to": "2026-10-21T20:10:00+08:00"
+              },
+              {
+                "from": "2026-10-21T20:13:00+08:00",
+                "to": "2026-10-21T20:20:00+08:00"
+              },
+              {
+                "from": "2026-10-21T20:32:00+08:00",
+                "to": "2026-10-21T20:40:00+08:00"
+              }
+            ],
+            "evidence": [
+              {
+                "at": "2026-10-21T20:05:00+08:00"
+              }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "days": {
+          "2026-10-21": {
+            "presence": 28,
+            "effective": 20,
+            "pending_check": 0
+          }
+        },
+        "effective_days": ["2026-10-21"],
+        "pending_check": null
+      }
+    },
+    {
+      "id": "E26",
+      "title": "补做检测：7 天内转为有效、算在原来那天；超过 7 天不转",
+      "kind": "边界",
+      "rule": "R25、R27",
+      "fn": "effective_time",
+      "decision": "R06-Q6",
+      "input": {
+        "now": "2026-10-21T22:00:00+08:00",
+        "post_test_items": {
+          "4.1": 3,
+          "4.2": 3
+        },
+        "activities": [
+          {
+            "id": "r41",
+            "kind": "reading",
+            "section": "4.1",
+            "active": [
+              {
+                "from": "2026-10-14T20:00:00+08:00",
+                "to": "2026-10-14T20:40:00+08:00"
+              }
+            ],
+            "evidence": []
+          },
+          {
+            "id": "r42",
+            "kind": "reading",
+            "section": "4.2",
+            "active": [
+              {
+                "from": "2026-10-13T20:00:00+08:00",
+                "to": "2026-10-13T20:30:00+08:00"
+              }
+            ],
+            "evidence": []
+          },
+          {
+            "id": "t41",
+            "kind": "post_test",
+            "section": "4.1",
+            "active": [
+              {
+                "from": "2026-10-21T20:00:00+08:00",
+                "to": "2026-10-21T20:05:00+08:00"
+              }
+            ],
+            "evidence": [
+              {
+                "at": "2026-10-21T20:04:00+08:00"
+              }
+            ]
+          },
+          {
+            "id": "t42",
+            "kind": "post_test",
+            "section": "4.2",
+            "active": [
+              {
+                "from": "2026-10-21T20:10:00+08:00",
+                "to": "2026-10-21T20:15:00+08:00"
+              }
+            ],
+            "evidence": [
+              {
+                "at": "2026-10-21T20:14:00+08:00"
+              }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "days": {
+          "2026-10-13": {
+            "presence": 30,
+            "effective": 0,
+            "pending_check": 0
+          },
+          "2026-10-14": {
+            "presence": 40,
+            "effective": 40,
+            "pending_check": 0
+          },
+          "2026-10-21": {
+            "presence": 10,
+            "effective": 10,
+            "pending_check": 0
+          }
+        },
+        "effective_days": ["2026-10-14", "2026-10-21"],
+        "pending_check": null
+      }
+    },
+    {
+      "id": "E27",
+      "title": "读后即测没通过：读的时间也算有效",
+      "kind": "边界",
+      "rule": "R26",
+      "fn": "effective_time",
+      "decision": "R06-Q7",
+      "input": {
+        "now": "2026-10-21T22:00:00+08:00",
+        "post_test_items": {
+          "5.1": 3
+        },
+        "activities": [
+          {
+            "id": "r51",
+            "kind": "reading",
+            "section": "5.1",
+            "active": [
+              {
+                "from": "2026-10-21T21:00:00+08:00",
+                "to": "2026-10-21T21:20:00+08:00"
+              }
+            ],
+            "evidence": []
+          },
+          {
+            "id": "t51",
+            "kind": "post_test",
+            "section": "5.1",
+            "active": [
+              {
+                "from": "2026-10-21T21:20:00+08:00",
+                "to": "2026-10-21T21:25:00+08:00"
+              }
+            ],
+            "evidence": [
+              {
+                "at": "2026-10-21T21:24:00+08:00",
+                "strength": "negative"
+              }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "days": {
+          "2026-10-21": {
+            "presence": 25,
+            "effective": 25,
+            "pending_check": 0
+          }
+        },
+        "effective_days": ["2026-10-21"],
+        "pending_check": null
+      }
+    },
+    {
+      "id": "E28",
+      "title": "跨过凌晨 4 点日界线：切到两天",
+      "kind": "边界",
+      "rule": "R27",
+      "fn": "effective_time",
+      "input": {
+        "now": "2026-10-21T22:00:00+08:00",
+        "activities": [
+          {
+            "id": "a1",
+            "kind": "practice",
+            "active": [
+              {
+                "from": "2026-10-21T03:50:00+08:00",
+                "to": "2026-10-21T04:10:00+08:00"
+              }
+            ],
+            "evidence": [
+              {
+                "at": "2026-10-21T04:05:00+08:00"
+              }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "days": {
+          "2026-10-20": {
+            "presence": 10,
+            "effective": 10,
+            "pending_check": 0
+          },
+          "2026-10-21": {
+            "presence": 10,
+            "effective": 10,
+            "pending_check": 0
+          }
+        },
+        "effective_days": ["2026-10-20", "2026-10-21"],
+        "pending_check": null
+      }
+    },
+    {
+      "id": "E29",
+      "title": "撤回的证据、秒评不算；答错的负证据算",
+      "kind": "异常",
+      "rule": "R24",
+      "fn": "effective_time",
+      "input": {
+        "now": "2026-10-21T22:00:00+08:00",
+        "activities": [
+          {
+            "id": "p5",
+            "kind": "practice",
+            "active": [
+              {
+                "from": "2026-10-21T20:00:00+08:00",
+                "to": "2026-10-21T20:10:00+08:00"
+              }
+            ],
+            "evidence": [
+              {
+                "at": "2026-10-21T20:05:00+08:00",
+                "revoked": true
+              }
+            ]
+          },
+          {
+            "id": "r5",
+            "kind": "review",
+            "active": [
+              {
+                "from": "2026-10-21T20:20:00+08:00",
+                "to": "2026-10-21T20:25:00+08:00"
+              }
+            ],
+            "evidence": [
+              {
+                "at": "2026-10-21T20:22:00+08:00",
+                "counted": false,
+                "note": "秒评"
+              }
+            ]
+          },
+          {
+            "id": "p6",
+            "kind": "practice",
+            "active": [
+              {
+                "from": "2026-10-21T20:30:00+08:00",
+                "to": "2026-10-21T20:40:00+08:00"
+              }
+            ],
+            "evidence": [
+              {
+                "at": "2026-10-21T20:35:00+08:00",
+                "strength": "negative"
+              }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "days": {
+          "2026-10-21": {
+            "presence": 25,
+            "effective": 10,
+            "pending_check": 0
+          }
+        },
+        "effective_days": ["2026-10-21"],
+        "pending_check": null
+      }
+    },
+    {
+      "id": "E30",
+      "title": "两台设备同时开着：重叠的时间只算一次",
+      "kind": "边界",
+      "rule": "R23、R24",
+      "fn": "effective_time",
+      "input": {
+        "now": "2026-10-21T22:00:00+08:00",
+        "post_test_items": {
+          "6.1": 2
+        },
+        "activities": [
+          {
+            "id": "a1",
+            "kind": "practice",
+            "device": "phone",
+            "active": [
+              {
+                "from": "2026-10-21T21:00:00+08:00",
+                "to": "2026-10-21T21:30:00+08:00"
+              }
+            ],
+            "evidence": [
+              {
+                "at": "2026-10-21T21:10:00+08:00"
+              }
+            ]
+          },
+          {
+            "id": "a2",
+            "kind": "reading",
+            "section": "6.1",
+            "device": "tablet",
+            "active": [
+              {
+                "from": "2026-10-21T21:20:00+08:00",
+                "to": "2026-10-21T21:40:00+08:00"
+              }
+            ],
+            "evidence": []
+          }
+        ]
+      },
+      "expect": {
+        "days": {
+          "2026-10-21": {
+            "presence": 40,
+            "effective": 30,
+            "pending_check": 10
+          }
+        },
+        "effective_days": ["2026-10-21"],
+        "pending_check": {
+          "sections": ["6.1"],
+          "minutes": 10,
+          "items": 2
+        }
+      }
+    },
+    {
+      "id": "E31",
+      "title": "正确率只算每道题的第一次作答",
+      "kind": "正常",
+      "rule": "R28",
+      "fn": "accuracy",
+      "decision": "R06-Q5",
+      "input": {
+        "attempts": [
+          {
+            "q": "q1",
+            "at": "2026-10-21T20:00:00+08:00",
+            "correct": true
+          },
+          {
+            "q": "q2",
+            "at": "2026-10-21T20:01:00+08:00",
+            "correct": false
+          },
+          {
+            "q": "q3",
+            "at": "2026-10-21T20:02:00+08:00",
+            "correct": true
+          },
+          {
+            "q": "q4",
+            "at": "2026-10-21T20:03:00+08:00",
+            "correct": true
+          },
+          {
+            "q": "q5",
+            "at": "2026-10-21T20:04:00+08:00",
+            "correct": false
+          },
+          {
+            "q": "q6",
+            "at": "2026-10-21T20:05:00+08:00",
+            "correct": true
+          },
+          {
+            "q": "q7",
+            "at": "2026-10-21T20:06:00+08:00",
+            "correct": true
+          },
+          {
+            "q": "q8",
+            "at": "2026-10-21T20:07:00+08:00",
+            "correct": false
+          },
+          {
+            "q": "q9",
+            "at": "2026-10-21T20:08:00+08:00",
+            "correct": true
+          },
+          {
+            "q": "v3",
+            "at": "2026-10-21T20:09:00+08:00",
+            "correct": true,
+            "note": "q3 的变式题"
+          },
+          {
+            "q": "q2",
+            "at": "2026-10-21T20:10:00+08:00",
+            "correct": true,
+            "note": "重做"
+          },
+          {
+            "q": "q5",
+            "at": "2026-10-21T20:11:00+08:00",
+            "correct": true,
+            "note": "重做"
+          }
+        ]
+      },
+      "expect": {
+        "status": "normal",
+        "first_attempts": 10,
+        "correct": 7,
+        "percent": 70
+      }
+    },
+    {
+      "id": "E32",
+      "title": "不进正确率的作答；首次作答不够 10 题",
+      "kind": "异常",
+      "rule": "R29、R30",
+      "fn": "accuracy",
+      "input": {
+        "attempts": [
+          {
+            "q": "q1",
+            "at": "2026-10-21T20:00:00+08:00",
+            "correct": true
+          },
+          {
+            "q": "q2",
+            "at": "2026-10-21T20:01:00+08:00",
+            "correct": true
+          },
+          {
+            "q": "q3",
+            "at": "2026-10-21T20:02:00+08:00",
+            "correct": true
+          },
+          {
+            "q": "q4",
+            "at": "2026-10-21T20:03:00+08:00",
+            "correct": true
+          },
+          {
+            "q": "q5",
+            "at": "2026-10-21T20:04:00+08:00",
+            "correct": true
+          },
+          {
+            "q": "q6",
+            "at": "2026-10-21T20:05:00+08:00",
+            "correct": false
+          },
+          {
+            "q": "q7",
+            "at": "2026-10-21T20:06:00+08:00",
+            "correct": false
+          },
+          {
+            "q": "q8",
+            "at": "2026-10-21T20:07:00+08:00",
+            "correct": false
+          },
+          {
+            "q": "g1",
+            "at": "2026-10-21T20:08:00+08:00",
+            "correct": true,
+            "credibility": "generated_instant"
+          },
+          {
+            "q": "q9",
+            "at": "2026-10-21T20:09:00+08:00",
+            "correct": false,
+            "revoked": true
+          },
+          {
+            "q": "s1",
+            "at": "2026-10-21T20:10:00+08:00",
+            "correct": true,
+            "subjective": true
+          },
+          {
+            "q": "q9",
+            "at": "2026-10-21T20:11:00+08:00",
+            "correct": true,
+            "note": "题目改正后再做"
+          }
+        ]
+      },
+      "expect": {
+        "status": "insufficient_data",
+        "first_attempts": 8,
+        "correct": 5
+      }
+    },
+    {
+      "id": "E33",
+      "title": "周报给不给结论",
+      "kind": "边界",
+      "rule": "R31",
+      "fn": "report_gate",
+      "input": {
+        "variants": [
+          {
+            "effective_days": 3,
+            "effective_minutes": 150
+          },
+          {
+            "effective_days": 2,
+            "effective_minutes": 300
+          },
+          {
+            "effective_days": 4,
+            "effective_minutes": 100
+          },
+          {
+            "effective_days": 3,
+            "effective_minutes": 120
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "report": "full"
+          },
+          {
+            "report": "none"
+          },
+          {
+            "report": "data_only"
+          },
+          {
+            "report": "full"
+          }
+        ]
+      }
+    }
+  ]
+}
