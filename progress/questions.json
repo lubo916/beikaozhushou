@@ -800,7 +800,7 @@
       "status": "answered",
       "asked": "v0014",
       "answer": "A",
-      "answered": "v0014"
+      "answered": "v0019"
     },
     {
       "id": "R04-Q2",
@@ -815,7 +815,7 @@
       "status": "answered",
       "asked": "v0014",
       "answer": "A",
-      "answered": "v0014"
+      "answered": "v0019"
     },
     {
       "id": "R04-Q3",
@@ -830,7 +830,7 @@
       "status": "answered",
       "asked": "v0014",
       "answer": "A",
-      "answered": "v0014"
+      "answered": "v0019"
     },
     {
       "id": "R04-Q4",
@@ -845,7 +845,7 @@
       "status": "answered",
       "asked": "v0014",
       "answer": "A",
-      "answered": "v0014"
+      "answered": "v0019"
     },
     {
       "id": "R04-Q5",
@@ -861,7 +861,7 @@
       "status": "answered",
       "asked": "v0014",
       "answer": "A",
-      "answered": "v0014"
+      "answered": "v0019"
     },
     {
       "id": "R04-Q6",
@@ -876,7 +876,7 @@
       "status": "answered",
       "asked": "v0014",
       "answer": "A",
-      "answered": "v0014"
+      "answered": "v0019"
     },
     {
       "id": "R04-Q7",
@@ -891,7 +891,7 @@
       "status": "answered",
       "asked": "v0014",
       "answer": "A",
-      "answered": "v0014"
+      "answered": "v0019"
     },
     {
       "id": "R04-Q8",
@@ -906,7 +906,7 @@
       "status": "answered",
       "asked": "v0014",
       "answer": "A",
-      "answered": "v0014"
+      "answered": "v0019"
     },
     {
       "id": "R04-Q9",
@@ -922,7 +922,7 @@
       "status": "answered",
       "asked": "v0014",
       "answer": "A",
-      "answered": "v0014"
+      "answered": "v0019"
     },
     {
       "id": "R04-Q10",
@@ -938,7 +938,7 @@
       "status": "answered",
       "asked": "v0014",
       "answer": "A",
-      "answered": "v0014"
+      "answered": "v0019"
     },
     {
       "id": "R06-Q1",
@@ -1200,6 +1200,37 @@
       "asked": "v0018",
       "answer": "A",
       "answered": "v0018"
+    },
+    {
+      "id": "R04-Q11",
+      "task": "R04",
+      "q": "中断回来的启动任务里，第一项复习就超过留给它的时间（比如一段背诵要 7 分钟或 12 分钟）怎么办？",
+      "options": [
+        "A 照已定稿的 R02 只给这一项，不带那道上次做对过的错题（错题照常进当天清单），复习改用整段时长重取；第一项比整段还长时只给它，页面写实际时长（如约 12 分钟）",
+        "B 照 R02 只给这一项，仍带那道错题（启动任务更长，如约 16 分钟）",
+        "C 启动任务严格不超过设定时长，这一项不给（要改已定稿的 R02）"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0019",
+      "answer": "A",
+      "answered": "v0019"
+    },
+    {
+      "id": "R04-Q12",
+      "task": "R04",
+      "q": "回来那天的可用时间比启动任务那一项还短（比如机构几乎占满了）怎么办？",
+      "options": [
+        "A 不出启动任务，改给一项“可选”的到期复习最小版（不占当天时间、不进完成率），其余照常排；可用时间为 0 的日子本来就是这样",
+        "B 照样把这一项当启动任务，这一天个人合计可以超出可用时间（要改 R04-Q7）"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0019",
+      "answer": "A",
+      "answered": "v0019"
     }
   ]
 }
