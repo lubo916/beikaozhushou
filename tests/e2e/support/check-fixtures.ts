@@ -41,7 +41,7 @@ const SERVICE_WORKER = `self.addEventListener("install", function () { self.skip
 self.addEventListener("activate", function (event) { event.waitUntil(self.clients.claim()); });
 self.addEventListener("fetch", function (event) {
   var url = new URL(event.request.url);
-  if (url.pathname.indexOf("/api/") !== 0) return;
+  if (url.pathname.indexOf("/api/") !== 0 && url.pathname !== "/fixture/failure") return;
   var fail = url.searchParams.get("fail");
   if (fail === "network") { event.respondWith(Response.error()); return; }
   var forbidden = fail === "403";
@@ -62,7 +62,8 @@ const API_FAILURE_SCRIPT = `(async function () {
   if (!navigator.serviceWorker.controller) {
     await new Promise(function (resolve) { navigator.serviceWorker.addEventListener("controllerchange", resolve, { once: true }); });
   }
-  var api = new URL("/api/v1/today?fail=" + query.get("fail"), location.href).href;
+  var path = query.get("path") === "asset" ? "/fixture/failure" : "/api/v1/today";
+  var api = new URL(path + "?fail=" + query.get("fail"), location.href).href;
   var results = [];
   for (var attempt = 0; attempt < 2; attempt += 1) {
     try { results.push(String((await fetch(api)).status)); } catch (error) { results.push("network"); }
@@ -72,6 +73,15 @@ const API_FAILURE_SCRIPT = `(async function () {
     console.error("Application parser crashed for " + api);
     console.error("Application parser crashed");
     setTimeout(function () { throw new Error("Application parser crashed for " + api); }, 0);
+  }
+  if (query.get("log") === "native-text") {
+    console.error("Failed to load resource: Response served by service worker is an error");
+    setTimeout(function () { throw new Error("Response served by service worker is an error"); }, 0);
+  }
+  if (query.get("log") === "firefox-text") {
+    var firefox = '[JavaScript Error: "Failed to load ‘' + api + '’. A ServiceWorker passed an Error Response to FetchEvent.respondWith(). This typically means the ServiceWorker performed an invalid fetch() call." {file: "' + new URL("/sw.js", location.href).href + '" line: 7}]';
+    console.error(firefox);
+    setTimeout(function () { throw new Error(firefox); }, 0);
   }
   outcome.textContent = "接口请求结果：" + results.join(",");
   outcome.setAttribute("data-outcome", results.join(","));

@@ -207,11 +207,12 @@ function compareShot({ root, run, previous, shot, before, tolerance, threshold, 
   const entry = { width: shot.width, status: "new", ratio: null, before: null, after: null, diff: null, error: null };
   if (shot.file === undefined) return { ...entry, status: "failed", error: shot.error ?? "没有截图" };
   entry.after = `${run}/${shot.file}`;
-  if (before === undefined || before.file === undefined || previous === null) return entry;
-  entry.before = `${previous}/${before.file}`;
   try {
-    const older = decodePng(readFileSync(join(root, entry.before)));
+    // 第一次或新增页面也先确认当前图片确实可读，不能只凭清单中的文件名判为新增。
     const newer = decodePng(readFileSync(join(root, entry.after)));
+    if (before === undefined || before.file === undefined || previous === null) return entry;
+    entry.before = `${previous}/${before.file}`;
+    const older = decodePng(readFileSync(join(root, entry.before)));
     const result = compareImages(older, newer, tolerance);
     entry.ratio = result.ratio;
     entry.status = result.ratio > threshold ? "changed" : "same";

@@ -44,9 +44,10 @@ const EXPECTED_API_FAILURE: Readonly<Partial<Record<StateCode, ApiOutcome>>> = {
 const HTTP_FAILURE = /^Failed to load resource: the server responded with a status of (\d{3})(?: \([^)]*\))?$/;
 /** Chromium、WebKit 记“请求断网”的固定写法（Service Worker 回错误响应也是它），出处同上（Chromium 实测为 net::ERR_FAILED，WebKit 冒号后写原因）。 */
 const NETWORK_FAILURE = /^Failed to load resource: (?!the server responded with a status of )\S/;
-/** Firefox 记“Service Worker 回了错误响应”的固定写法（Gecko 的 dom.properties），地址在正文的固定位置，出处是 Service Worker 脚本。 */
+/** Firefox 原生离线消息的完整包装（本地 trace 实测）；脚本地址和行号还须与 console.location 对上。 */
 const FIREFOX_INTERCEPTION_FAILURE =
-  /^Failed to load ‘([^’]+)’\. A ServiceWorker (?:passed an error Response to FetchEvent\.respondWith\(\)|intercepted the request and encountered an unexpected error)/i;
+  /^\[JavaScript Error: "Failed to load ‘([^’]+)’\. A ServiceWorker passed an Error Response to FetchEvent\.respondWith\(\)\. This typically means the ServiceWorker performed an invalid fetch\(\) call\." \{file: "([^"]+)" line: (\d+)\}\]$/;
+const FIREFOX_OFFLINE_FAILURE = "<unknown error>";
 
 /** “页面安静”：这么久没有新加载完成的资源。 */
 const QUIET_MS = 500;
@@ -60,17 +61,26 @@ const READY_TIMEOUT_MS = 20_000;
 const BODY_TIMEOUT_MS = 5_000;
 /** 304 Not Modified：浏览器带着缓存来问，服务器说缓存仍然有效，页面用缓存里的那一份（WebKit 再次打开同一地址时就报这个）。 */
 const NOT_MODIFIED = 304;
+/** WebKit 对 Service Worker 的 Response.error() 发出的原生网络错误（本地 trace 实测）。 */
+const WEBKIT_OFFLINE_ERROR = "Response served by service worker is an error";
+const WEBKIT_OFFLINE_CONSOLE = `Failed to load resource: ${WEBKIT_OFFLINE_ERROR}`;
 const HTTP_ERROR = 400;
 
 interface BrowserProblem {
   readonly kind: "pageerror" | "console";
   readonly text: string;
   readonly url: string;
+  /** 仅 WebKit 原生消息具有这些空元数据；普通应用 Error 和 console.error 不符合。 */
+  readonly nativeWebKitOffline: boolean;
+  /** Firefox 原生消息明确包含的接口地址；固定包装、脚本来源和行号必须吻合。 */
+  readonly nativeFirefoxOfflineUrl: string | null;
 }
 
 interface ApiFailure {
   readonly url: string;
   readonly outcome: ApiOutcome;
+  /** requestfailed 的真实原因；取消请求不算 Service Worker 故意返回的网络错误。 */
+  readonly failureText?: string;
 }
 
 /** 这次打开以来 Playwright 看到的接口请求，以及其中失败的（回 4xx、5xx，或断网）。 */
@@ -101,12 +111,10 @@ function outcomeName(outcome: ApiOutcome): string {
 
 /**
  * 认出浏览器自己记的一条资源加载失败：哪个地址、什么结果；认不出来为 null。应用自己 console.error 的认不出来——
- * Chromium、WebKit 的写法要求出处就是失败的那个地址（应用打的日志出处是脚本），Firefox 的写法要求正文是 Gecko 的固定句子。
+ * Chromium、WebKit 的写法要求出处就是失败的那个地址（应用打的日志出处是脚本），Firefox 带包装的原生离线消息在 problems 中按真实请求逐条判断。
  */
 function reportedFailure(problem: BrowserProblem): ApiFailure | null {
   if (problem.kind !== "console") return null;
-  const firefox = FIREFOX_INTERCEPTION_FAILURE.exec(problem.text)?.[1];
-  if (firefox !== undefined) return { url: firefox, outcome: "network" };
   if (problem.url === "") return null;
   const status = HTTP_FAILURE.exec(problem.text)?.[1];
   if (status !== undefined) return { url: problem.url, outcome: Number(status) };
@@ -116,7 +124,7 @@ function reportedFailure(problem: BrowserProblem): ApiFailure | null {
 /**
  * 一条报错在该状态下是不是预期内的接口失败。三样都对上才放过：是浏览器自己记的资源加载失败、失败的是接口请求；
  * 失败的结果正是这一态假数据层该给的（出错 500、受限 403、离线断网）；Playwright 也看到这个请求真的这样失败了
- * （浏览器没把这个请求报给 Playwright 时，只能凭前两样）。未捕获的异常、应用自己 console.error 的报错（哪怕正文里有接口地址）从不放过。
+ * （浏览器没把这个请求报给 Playwright 时，只能凭前两样）。这里不放过未捕获的异常和应用自己的 console.error；WebKit 的原生离线双消息另由 problems 按严格证据与额度判断。
  * 返回 null 表示放过；否则返回写进失败说明的补充（没有补充时为空串）。
  */
 function unexpectedNote(problem: BrowserProblem, state: StateCode, traffic: ApiTraffic): string | null {
@@ -207,7 +215,7 @@ export async function waitForAppReady(page: Page, timeout = READY_TIMEOUT_MS): P
 }
 
 export interface PageWatch {
-  /** 先回空白页（上一页的请求与计时器随之停止）、清空记录，再打开地址：回应要成功（2xx，或缓存仍然有效的 304），再等页面就绪（waitForAppReady）。 */
+  /** 直接打开目标地址，避免经过空白页使 MSW 的最后一个同源客户端离开并注销；清空本次记录后核对回应，再等页面就绪。 */
   open(url: string): Promise<void>;
   /** 这次打开以来的浏览器报错（未捕获的异常、控制台 error），去掉该状态下预期内的接口失败（见 unexpectedNote）。 */
   problems(state: StateCode): string[];
@@ -215,11 +223,40 @@ export interface PageWatch {
 
 /** 开始盯住一个标签页：浏览器报错、接口请求及其失败；同时装上 settle 用的资源记录。 */
 export async function watchPage(page: Page): Promise<PageWatch> {
+  const browser = page.context().browser()?.browserType().name();
+  const webkit = browser === "webkit";
   const seen: BrowserProblem[] = [];
   const traffic: ApiTraffic = { requested: new Set<string>(), failed: [] };
-  page.on("pageerror", (error) => seen.push({ kind: "pageerror", text: error.message, url: "" }));
+  page.on("pageerror", (error) =>
+    seen.push({
+      kind: "pageerror",
+      text: error.message,
+      url: "",
+      nativeWebKitOffline: webkit && error.message === WEBKIT_OFFLINE_ERROR && error.name === "" && error.stack === "",
+      nativeFirefoxOfflineUrl: null,
+    }),
+  );
   page.on("console", (message) => {
-    if (message.type() === "error") seen.push({ kind: "console", text: message.text(), url: message.location().url });
+    if (message.type() !== "error") return;
+    const location = message.location();
+    const firefox = browser === "firefox" ? FIREFOX_INTERCEPTION_FAILURE.exec(message.text()) : null;
+    const firefoxUrl =
+      firefox !== null && message.args().length === 1 && firefox[2] === location.url && Number(firefox[3]) === location.lineNumber
+        ? apiUrl(firefox[1] ?? "")
+        : null;
+    seen.push({
+      kind: "console",
+      text: message.text(),
+      url: location.url,
+      nativeFirefoxOfflineUrl: firefoxUrl,
+      nativeWebKitOffline:
+        webkit &&
+        message.text() === WEBKIT_OFFLINE_CONSOLE &&
+        message.args().length === 0 &&
+        location.url === "" &&
+        location.lineNumber === 0 &&
+        location.columnNumber === 0,
+    });
   });
   page.on("request", (request) => {
     const url = apiUrl(request.url());
@@ -231,12 +268,11 @@ export async function watchPage(page: Page): Promise<PageWatch> {
   });
   page.on("requestfailed", (request) => {
     const url = apiUrl(request.url());
-    if (url !== null) traffic.failed.push({ url, outcome: "network" });
+    if (url !== null) traffic.failed.push({ url, outcome: "network", failureText: request.failure()?.errorText ?? "" });
   });
   await installActivityMarker(page);
   return {
     async open(url) {
-      await page.goto("about:blank");
       seen.length = 0;
       traffic.requested.clear();
       traffic.failed.length = 0;
@@ -245,7 +281,33 @@ export async function watchPage(page: Page): Promise<PageWatch> {
       await waitForAppReady(page);
     },
     problems(state) {
+      // WebKit 会为同一次 Response.error() 同时发原生 pageerror 和无来源 console。
+      // 每个真实失败的 /api/ 请求最多各放过一条；必须是离线态、原文和原生元数据都匹配。
+      // 额度每次查询重新计算，problems() 可重复调用，不消耗之后断言的证据。
+      const count =
+        state === "offline"
+          ? traffic.failed.filter((failure) => failure.outcome === "network" && failure.failureText === WEBKIT_OFFLINE_ERROR).length
+          : 0;
+      const remaining = { pageerror: count, console: count };
+      // Firefox 的原生消息里有接口地址，按地址逐条抵扣真实网络失败，不能借其他接口的失败来放过它。
+      const firefoxRemaining = new Map<string, number>();
+      if (state === "offline") {
+        for (const failure of traffic.failed) {
+          if (failure.outcome === "network" && failure.failureText === FIREFOX_OFFLINE_FAILURE) {
+            firefoxRemaining.set(failure.url, (firefoxRemaining.get(failure.url) ?? 0) + 1);
+          }
+        }
+      }
       return seen.flatMap((item) => {
+        if (item.nativeWebKitOffline && remaining[item.kind] > 0) {
+          remaining[item.kind] -= 1;
+          return [];
+        }
+        const firefoxUrl = item.nativeFirefoxOfflineUrl;
+        if (firefoxUrl !== null && (firefoxRemaining.get(firefoxUrl) ?? 0) > 0) {
+          firefoxRemaining.set(firefoxUrl, (firefoxRemaining.get(firefoxUrl) ?? 0) - 1);
+          return [];
+        }
         const note = unexpectedNote(item, state, traffic);
         return note === null ? [] : [`${describeProblem(item)}${note}`];
       });

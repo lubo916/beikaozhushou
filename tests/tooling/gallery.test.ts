@@ -47,8 +47,11 @@ interface Changes {
   readonly pages: readonly { readonly status: string; readonly shots: readonly ShotResult[] }[];
 }
 
-/** 一次截图里 S10 的一张：有图，或没截到（写明原因）。 */
-type Shot = { readonly width: number; readonly bytes: Buffer } | { readonly width: number; readonly error: string };
+/** 一次截图里的一张：有图、没截到（写明原因），或清单登记了文件但文件丢失。 */
+type Shot =
+  | { readonly width: number; readonly bytes: Buffer }
+  | { readonly width: number; readonly error: string }
+  | { readonly width: number; readonly missing: true };
 
 function pngChunk(type: string, body: Buffer): Buffer {
   const head = Buffer.alloc(8);
@@ -88,16 +91,16 @@ function galleryRoot(): string {
   return root;
 }
 
-/** 写一次截图：S10 一页，各档的图或没截到的原因，加上 manifest.json（结构与 tests/e2e/gallery.spec.ts 写的一致）。 */
-function writeRun(root: string, run: string, shots: readonly Shot[]): void {
+/** 写一次截图：一页，各档的图或没截到的原因，加上 manifest.json（结构与 tests/e2e/gallery.spec.ts 写的一致）。 */
+function writeRun(root: string, run: string, shots: readonly Shot[], pageId = "S10"): void {
   mkdirSync(join(root, run, "learner"), { recursive: true });
   const entries = shots.map((shot) => {
     if ("error" in shot) return { width: shot.width, error: shot.error };
-    const file = `learner/S10-${shot.width}.png`;
-    writeFileSync(join(root, run, file), shot.bytes);
+    const file = `learner/${pageId}-${shot.width}.png`;
+    if ("bytes" in shot) writeFileSync(join(root, run, file), shot.bytes);
     return { width: shot.width, file };
   });
-  const page = { app: "learner", id: "S10", name: "知识点主页", path: "/kp/demo", shots: entries };
+  const page = { app: "learner", id: pageId, name: "知识点主页", path: "/kp/demo", shots: entries };
   const manifest = { version: 1, run, browser: "chromium 141", widths: WIDTHS, pages: [page] };
   writeFileSync(join(root, run, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
 }
@@ -132,6 +135,59 @@ describe("页面画廊比对 tools/gallery.mjs（命令行）", () => {
     expect(shotStatuses(changes)).toEqual(["375:new", "1280:new"]);
     expect([changes.changed, changes.added, changes.failed, problemsOf(changes)]).toEqual([[], [], [], []]);
     expect(existsSync(join(root, "index.html"))).toBe(true);
+  });
+
+  it.each(["首次运行", "新增页面"] as const)("%s：当前 375 截图损坏，不能算新增成功", (scenario) => {
+    const root = galleryRoot();
+    if (scenario === "新增页面") {
+      writeRun(
+        root,
+        FIRST,
+        [
+          { width: 375, bytes: png(BLUE) },
+          { width: 1280, bytes: png(BLUE) },
+        ],
+        "S09",
+      );
+    }
+    writeRun(root, SECOND, [
+      { width: 375, bytes: BROKEN },
+      { width: 1280, bytes: png(BLUE) },
+    ]);
+    const { status, stderr, changes } = compare(root, SECOND);
+    expect(status).toBe(EXIT_PROBLEMS);
+    expect(stderr).toContain("页面画廊比对不通过");
+    expect(shotStatuses(changes)).toEqual(["375:error", "1280:new"]);
+    expect(changes.failed).toEqual([PAGE]);
+    expect(problemsOf(changes)).toEqual(["375:error"]);
+    expect(changes.problems[0]?.error).toBe("不是 PNG 文件");
+    expect(existsSync(join(root, "index.html")), "出了问题仍要写出对照页").toBe(true);
+  });
+
+  it.each(["首次运行", "新增页面"] as const)("%s：清单登记的当前 375 截图文件丢失，不能算新增成功", (scenario) => {
+    const root = galleryRoot();
+    if (scenario === "新增页面") {
+      writeRun(
+        root,
+        FIRST,
+        [
+          { width: 375, bytes: png(BLUE) },
+          { width: 1280, bytes: png(BLUE) },
+        ],
+        "S09",
+      );
+    }
+    writeRun(root, SECOND, [
+      { width: 375, missing: true },
+      { width: 1280, bytes: png(BLUE) },
+    ]);
+    const { status, changes } = compare(root, SECOND);
+    expect(status).toBe(EXIT_PROBLEMS);
+    expect(shotStatuses(changes)).toEqual(["375:error", "1280:new"]);
+    expect(changes.failed).toEqual([PAGE]);
+    expect(problemsOf(changes)).toEqual(["375:error"]);
+    expect(changes.problems[0]?.error).toContain("ENOENT");
+    expect(changes.problems[0]?.error).toContain("S10-375.png");
   });
 
   it("两次一模一样：两档都没变，命令成功", () => {

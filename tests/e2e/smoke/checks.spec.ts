@@ -1,7 +1,8 @@
 /// <reference lib="dom" />
 // 冒烟检查本身的回归测试（F06 第 2 轮，按第 1 轮收包复核找到的反例补）：随冒烟入口（pnpm e2e:smoke、bk verify）在 Chromium、WebKit、Firefox 里都跑。
 // 页面来自本机小网站 tests/e2e/support/check-fixtures.ts，照学员端外壳的结构写；被测的检查与冒烟、黄金路径、页面画廊用的是同一份 support/checks.ts。
-import { expect, test } from "@playwright/test";
+import { EventEmitter } from "node:events";
+import { expect, test, type Page } from "@playwright/test";
 import { pageById } from "../support/catalog.ts";
 import { WHOLE_PAGE_STATES, closedPort, startCheckFixtures, type CheckFixtures } from "../support/check-fixtures.ts";
 import {
@@ -35,6 +36,57 @@ const API_FAILURES: readonly ApiFailure[] = [
   { state: "offline", fail: "network", label: "接口断网" },
 ];
 
+/** WebKit trace 里实测的原文；这里刻意不用被测代码的常量，防止实现和反例一起改错。 */
+const NATIVE_NETWORK_ERROR = "Response served by service worker is an error";
+const NATIVE_NETWORK_CONSOLE = "Failed to load resource: Response served by service worker is an error";
+
+/** 重放真实 trace 的原生事件，补足浏览器场景不易稳定制造的“没有请求证据”和“重复消息超过请求数”。 */
+async function nativeFailureProbe(browserName: string) {
+  const events = new EventEmitter();
+  Object.assign(events, {
+    context: () => ({ browser: () => ({ browserType: () => ({ name: () => browserName }) }) }),
+    addInitScript: async () => {},
+  });
+  const watch = await watchPage(events as unknown as Page);
+  return {
+    watch,
+    fail(url = "http://127.0.0.1/api/v1/today", errorText = NATIVE_NETWORK_ERROR) {
+      events.emit("requestfailed", { url: () => url, failure: () => ({ errorText }) });
+    },
+    native() {
+      const error = new Error(NATIVE_NETWORK_ERROR);
+      error.name = "";
+      error.stack = "";
+      events.emit("pageerror", error);
+      events.emit("console", {
+        type: () => "error",
+        text: () => NATIVE_NETWORK_CONSOLE,
+        args: () => [],
+        location: () => ({ url: "", lineNumber: 0, columnNumber: 0 }),
+      });
+    },
+    firefox(url = "http://127.0.0.1/api/v1/today", locationUrl = "http://127.0.0.1/sw.js", lineNumber = 7) {
+      const text = `[JavaScript Error: "Failed to load ‘${url}’. A ServiceWorker passed an Error Response to FetchEvent.respondWith(). This typically means the ServiceWorker performed an invalid fetch() call." {file: "http://127.0.0.1/sw.js" line: 7}]`;
+      events.emit("console", {
+        type: () => "error",
+        text: () => text,
+        args: () => [text],
+        location: () => ({ url: locationUrl, lineNumber, columnNumber: 35 }),
+      });
+    },
+    app() {
+      // 应用 Error 保留名字与调用栈；即便 console 的来源恰巧为空，它仍有字符串实参。
+      events.emit("pageerror", new Error(NATIVE_NETWORK_ERROR));
+      events.emit("console", {
+        type: () => "error",
+        text: () => NATIVE_NETWORK_CONSOLE,
+        args: () => [NATIVE_NETWORK_CONSOLE],
+        location: () => ({ url: "", lineNumber: 0, columnNumber: 0 }),
+      });
+    },
+  };
+}
+
 let site: CheckFixtures;
 let unreachable = 0;
 
@@ -66,6 +118,8 @@ test.describe("自测：打开页面（复核问题 1：合法的缓存响应被
     const watch = await watchPage(page);
     for (const visit of [1, 2, 3]) {
       await test.step(`第 ${visit} 次打开`, async () => {
+        // WebKit 直接重载同一地址会绕过条件缓存；先到另一同源页面再返回，明确验证真实的 304 往返。
+        if (visit > 1) await watch.open(site.url("/status/200"));
         await watch.open(site.url("/cached/today"));
         await expectOpened(page, TODAY, TODAY_VIEW);
         await expectLoaded(page, TODAY);
@@ -85,7 +139,9 @@ test.describe("自测：打开页面（复核问题 1：合法的缓存响应被
 
 test.describe("自测：浏览器报错的放行（复核问题 2：带接口网址的应用报错被漏掉）", () => {
   for (const failure of API_FAILURES) {
-    test(`${STATE_NAMES[failure.state]}态：假数据层故意让${failure.label}，浏览器记下的报错在这一态放过，换到别的状态照样算报错`, async ({ page }) => {
+    test(`${STATE_NAMES[failure.state]}态：假数据层故意让${failure.label}，浏览器记下的报错在这一态放过，换到别的状态照样算报错`, async ({
+      page,
+    }) => {
       const watch = await watchPage(page);
       await watch.open(site.url(`/api-failure?fail=${failure.fail}`));
       const outcome = `${failure.fail},${failure.fail}`;
@@ -103,7 +159,9 @@ test.describe("自测：浏览器报错的放行（复核问题 2：带接口网
   }
 
   for (const failure of API_FAILURES) {
-    test(`${STATE_NAMES[failure.state]}态：应用自己的报错一律不放过（正文带接口网址、带这次真失败的接口网址、不带网址、未捕获的异常）`, async ({ page }) => {
+    test(`${STATE_NAMES[failure.state]}态：应用自己的报错一律不放过（正文带接口网址、带这次真失败的接口网址、不带网址、未捕获的异常）`, async ({
+      page,
+    }) => {
       const watch = await watchPage(page);
       await watch.open(site.url(`/api-failure?fail=${failure.fail}&log=app`));
       await expect(page.locator("#outcome")).toHaveAttribute("data-outcome", `${failure.fail},${failure.fail}`);
@@ -112,11 +170,128 @@ test.describe("自测：浏览器报错的放行（复核问题 2：带接口网
       const message = "应用自己的四条报错都要报出来";
       await expect.poll(() => watch.problems(failure.state).filter(fromApp).length, { message }).toBe(4);
       const reported = watch.problems(failure.state);
-      expect(reported.filter((text) => text.includes("http://127.0.0.1:5173/api/quiz/demo")), "复核里的反例原文").toHaveLength(1);
-      expect(reported.filter((text) => text.startsWith("未捕获的异常")), "未捕获的异常").toHaveLength(1);
-      expect(reported.filter((text) => !fromApp(text)), "假数据层故意给的接口失败照常放过").toEqual([]);
+      expect(
+        reported.filter((text) => text.includes("http://127.0.0.1:5173/api/quiz/demo")),
+        "复核里的反例原文",
+      ).toHaveLength(1);
+      expect(
+        reported.filter((text) => text.startsWith("未捕获的异常")),
+        "未捕获的异常",
+      ).toHaveLength(1);
+      expect(
+        reported.filter((text) => !fromApp(text)),
+        "假数据层故意给的接口失败照常放过",
+      ).toEqual([]);
     });
   }
+
+  test("离线态：与 WebKit 原生报错同文案的应用 Error 和 console 仍必须报错", async ({ page }) => {
+    const watch = await watchPage(page);
+    await watch.open(site.url("/api-failure?fail=network&log=native-text"));
+    await expect(page.locator("#outcome")).toHaveAttribute("data-outcome", "network,network");
+    await settle(page);
+    await expect.poll(() => watch.problems("offline").filter((text) => text.startsWith("未捕获的异常")).length).toBe(1);
+    expect(watch.problems("offline")).toEqual([
+      expect.stringContaining(`控制台报错：${NATIVE_NETWORK_CONSOLE}`),
+      `未捕获的异常：${NATIVE_NETWORK_ERROR}`,
+    ]);
+  });
+
+  test("离线态：非接口资源被 Service Worker 断网，不能当作预期的接口失败放过", async ({ page, browserName }) => {
+    const watch = await watchPage(page);
+    await watch.open(site.url("/api-failure?fail=network&path=asset"));
+    await expect(page.locator("#outcome")).toHaveAttribute("data-outcome", "network,network");
+    await settle(page);
+    const all = watch.problems("normal");
+    if (browserName === "webkit") expect(all).toHaveLength(4);
+    const withoutNote = (texts: readonly string[]): string[] => texts.map((text) => text.replace(/（浏览器记[^）]*）$/, ""));
+    expect(withoutNote(watch.problems("offline"))).toEqual(all);
+  });
+
+  test("WebKit 原生离线错误必须有同文案的接口失败证据，每个失败请求只豁免各一条原生消息", async ({ browserName }) => {
+    const missing = await nativeFailureProbe(browserName);
+    missing.native();
+    expect(missing.watch.problems("offline"), "没有请求证据不能豁免").toHaveLength(2);
+
+    const cancelled = await nativeFailureProbe(browserName);
+    cancelled.fail("http://127.0.0.1/api/v1/today", "Load request cancelled");
+    cancelled.native();
+    expect(cancelled.watch.problems("offline"), "取消请求不是强制离线的证据").toHaveLength(2);
+
+    const asset = await nativeFailureProbe(browserName);
+    asset.fail("http://127.0.0.1/fixture/failure");
+    asset.native();
+    expect(asset.watch.problems("offline"), "非接口失败不能豁免").toHaveLength(2);
+
+    const exact = await nativeFailureProbe(browserName);
+    exact.fail();
+    exact.native();
+    for (const state of ["normal", "error", "restricted"] as const) {
+      expect(exact.watch.problems(state), "非离线态不能豁免").toHaveLength(2);
+    }
+    expect(exact.watch.problems("offline"), "仅 WebKit 精确原生消息可以豁免").toHaveLength(browserName === "webkit" ? 0 : 2);
+    expect(exact.watch.problems("offline"), "重复读取不能消耗证据").toHaveLength(browserName === "webkit" ? 0 : 2);
+    exact.native();
+    expect(exact.watch.problems("offline"), "超出请求数的消息仍算报错").toHaveLength(browserName === "webkit" ? 2 : 4);
+    exact.fail();
+    expect(exact.watch.problems("offline"), "两个实际失败请求各有一份额度").toHaveLength(browserName === "webkit" ? 0 : 4);
+    exact.app();
+    expect(exact.watch.problems("offline"), "应用报错即便同文案也不占用原生消息额度").toHaveLength(browserName === "webkit" ? 2 : 6);
+  });
+
+  test("离线态：完整复制 Firefox 原生文案的应用 console 与 Error 仍必须报错", async ({ page }) => {
+    const watch = await watchPage(page);
+    await watch.open(site.url("/api-failure?fail=network&log=firefox-text"));
+    await expect(page.locator("#outcome")).toHaveAttribute("data-outcome", "network,network");
+    await settle(page);
+    await expect.poll(() => watch.problems("offline").filter((text) => text.startsWith("未捕获的异常")).length).toBe(1);
+    const reported = watch.problems("offline");
+    expect(reported).toHaveLength(2);
+    expect(reported[0]).toContain('控制台报错：[JavaScript Error: "Failed to load ‘');
+    expect(reported[0]).toContain(`（${site.url("/api-failure?fail=network&log=firefox-text")}）`);
+    expect(reported[1]).toContain('未捕获的异常：[JavaScript Error: "Failed to load ‘');
+  });
+
+  test("Firefox 原生离线消息必须匹配脚本来源、行号与这个接口的真实失败，不能重复借用额度", async ({ browserName }) => {
+    const api = "http://127.0.0.1/api/v1/today";
+    const missing = await nativeFailureProbe(browserName);
+    missing.firefox();
+    expect(missing.watch.problems("offline"), "没有请求证据不能豁免").toHaveLength(1);
+
+    const different = await nativeFailureProbe(browserName);
+    different.fail("http://127.0.0.1/api/v1/other", "<unknown error>");
+    different.firefox();
+    expect(different.watch.problems("offline"), "其他接口的失败不能作为证据").toHaveLength(1);
+
+    const cancelled = await nativeFailureProbe(browserName);
+    cancelled.fail(api, "Load request cancelled");
+    cancelled.firefox();
+    expect(cancelled.watch.problems("offline"), "取消请求不能作为证据").toHaveLength(1);
+
+    const asset = await nativeFailureProbe(browserName);
+    asset.fail("http://127.0.0.1/fixture/failure", "<unknown error>");
+    asset.firefox("http://127.0.0.1/fixture/failure");
+    expect(asset.watch.problems("offline"), "非接口失败不能豁免").toHaveLength(1);
+
+    const metadata = await nativeFailureProbe(browserName);
+    metadata.fail(api, "<unknown error>");
+    metadata.firefox(api, "http://127.0.0.1/page.js");
+    metadata.firefox(api, "http://127.0.0.1/sw.js", 99);
+    expect(metadata.watch.problems("offline"), "脚本来源或行号不符时不能按原生消息处理").toHaveLength(2);
+
+    const exact = await nativeFailureProbe(browserName);
+    exact.fail(api, "<unknown error>");
+    exact.firefox();
+    for (const state of ["normal", "error", "restricted"] as const) {
+      expect(exact.watch.problems(state), "非离线态不能豁免").toHaveLength(1);
+    }
+    expect(exact.watch.problems("offline"), "仅 Firefox 精确原生消息可以豁免").toHaveLength(browserName === "firefox" ? 0 : 1);
+    expect(exact.watch.problems("offline"), "重复读取不能消耗证据").toHaveLength(browserName === "firefox" ? 0 : 1);
+    exact.firefox();
+    expect(exact.watch.problems("offline"), "超出请求数的消息仍算报错").toHaveLength(browserName === "firefox" ? 1 : 2);
+    exact.fail(api, "<unknown error>");
+    expect(exact.watch.problems("offline"), "两个真实失败请求各有一份额度").toHaveLength(browserName === "firefox" ? 0 : 2);
+  });
 });
 
 test.describe("自测：正常态的正文（复核问题 3：顶栏正确、正文整页出错仍能通过）", () => {
@@ -161,7 +336,10 @@ test.describe("自测：等页面就绪（Firefox 冒烟里外壳超过 5 秒才
 
   test("外壳一直不出现：在给定的上限内报错，并写明地址、等待期间的导航与页面状态", async ({ page }) => {
     await page.goto(site.url("/no-shell?reloads=2"));
-    const error = await waitForAppReady(page, 3_000).then(() => null, (reason: unknown) => String(reason));
+    const error = await waitForAppReady(page, 3_000).then(
+      () => null,
+      (reason: unknown) => String(reason),
+    );
     expect(error, "外壳没出现时应报错").toContain("外壳的正文区 main#main 在 3 秒内没出现");
     expect(error).toMatch(/地址 \S*no-shell/);
     expect(error).toMatch(/等待期间主框架导航 \d+ 次/);
