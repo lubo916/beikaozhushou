@@ -1453,8 +1453,10 @@
       ],
       "recommend": "A",
       "temp": "A",
-      "status": "open",
-      "asked": "v0021"
+      "status": "answered",
+      "asked": "v0021",
+      "answer": "A",
+      "answered": "v0021"
     }
   ]
 }
