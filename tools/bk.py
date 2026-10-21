@@ -5,6 +5,7 @@
 本地（Codex 桌面端）常用
   python3 tools/bk.py doctor              环境检查
   python3 tools/bk.py status              现在到哪了、下一步做什么、等你拍板的问题
+  python3 tools/bk.py prereq B08          查看规则衔接前置及复核凭据
   python3 tools/bk.py pack T032           出任务包（交给网页版 Claude）
   python3 tools/bk.py in --latest         收结果包：合并、完整验证、记进度、出新版本包
   python3 tools/bk.py run                 启动本地预览
@@ -21,6 +22,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import fnmatch
+import hashlib
 import json
 import os
 import re
@@ -374,6 +376,186 @@ def get_task(root: Path, cfg: dict, task_id: str, title: str = "") -> dict:
         return adhoc_task(task_id, title)
     die(f"任务清单 progress/tasks.json 里没有 {task_id}。临时修复请用：bk start fix --title \"一句话\"")
     raise SystemExit
+
+
+# B08 的跨卡衔接不能被旧任务 done 或旧规则定稿替代。
+PREREQUISITES = {
+    "B08": {
+        "R01-diagnosis-evidence": {"rule": "evidence-mastery", "label": "R01 诊断错答不记负证据的衔接"},
+        "R06-option-forecast": {"rule": "metrics-prediction", "label": "R06 各档方案到目标日预测的衔接"},
+    },
+}
+PREREQUISITE_FILE = "tools/bk.prerequisites.json"
+
+
+def _sha256(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def _prerequisite_bytes(root: Path, rel: str, ref: str | None = None) -> bytes:
+    if ref is None:
+        return (root / rel).read_bytes()
+    result = subprocess.run(["git", "show", f"{ref}:{rel}"], cwd=root, capture_output=True)
+    if result.returncode:
+        raise BkError(f"已提交主干缺少前置依据：{rel}")
+    return result.stdout
+
+
+def prerequisite_baseline(root: Path, rule: str, ref: str | None = None) -> dict:
+    """忽略定稿标签的业务摘要；单改状态或确认日期不能算完成衔接。"""
+    card = _prerequisite_bytes(root, f"docs/baseline/rule-cards/{rule}.md", ref).decode("utf-8")
+    cases = json.loads(_prerequisite_bytes(root, f"tests/rules/{rule}.cases.json", ref))
+    body = "\n".join(line for line in card.splitlines() if not line.startswith("- 状态："))
+    payload = {"cases": cases["cases"], "params": cases.get("params", {})}
+    return {"card": _sha256(body.encode("utf-8")),
+            "cases": _sha256(json.dumps(payload, ensure_ascii=False, sort_keys=True,
+                                       separators=(",", ":")).encode("utf-8"))}
+
+
+def _prerequisite_state(root: Path, task_id: str, ref: str | None = None) -> tuple[dict, dict]:
+    data = json.loads(_prerequisite_bytes(root, PREREQUISITE_FILE, ref))
+    if type(data.get("schema")) is not int or data["schema"] != 1:
+        raise BkError("前置记录 schema 必须为 1")
+    entries = data["tasks"][task_id]
+    if not isinstance(entries, dict) or set(entries) != set(PREREQUISITES[task_id]):
+        raise BkError(f"{task_id} 必须保留全部指定前置项，不能删除或改名")
+    for entry in entries.values():
+        if not isinstance(entry, dict) or "receipt" not in entry:
+            raise BkError("前置项缺少 baseline 或 receipt")
+        baseline = entry["baseline"]
+        if not isinstance(baseline, dict) or set(baseline) != {"card", "cases"} or any(
+                not isinstance(v, str) or not re.fullmatch(r"[0-9a-f]{64}", v) for v in baseline.values()):
+            raise BkError("前置项的原始业务摘要无效")
+    return data, entries
+
+
+def _prerequisite_evidence(root: Path, rel: str, prefix: str, ref: str | None = None) -> Path:
+    if not isinstance(rel, str) or not rel.startswith(prefix) or not rel.endswith(".md"):
+        raise BkError(f"复核依据必须位于 {prefix} 且为 Markdown")
+    path = (root / rel).resolve()
+    if (not path.is_relative_to(root.resolve()) or not path.is_relative_to((root / prefix).resolve())
+            or (ref is None and not path.is_file())):
+        raise BkError(f"复核依据不存在或越出指定目录：{rel}")
+    return path
+
+
+def _prerequisite_problem(root: Path, definition: dict, entry: dict, ref: str | None = None) -> str | None:
+    receipt = entry["receipt"]
+    if receipt is None:
+        return "尚未登记已完成的衔接复核及对应例子"
+    if not isinstance(receipt, dict):
+        return "复核凭据格式无效"
+    rule = definition["rule"]
+    card_path = root / "docs/baseline/rule-cards" / f"{rule}.md"
+    cases_path = root / "tests/rules" / f"{rule}.cases.json"
+    card = _prerequisite_bytes(root, card_path.relative_to(root).as_posix(), ref)
+    cases_raw = _prerequisite_bytes(root, cases_path.relative_to(root).as_posix(), ref)
+    cases = json.loads(cases_raw)
+    if not re.search(r"^- 状态：已定稿", card.decode("utf-8"), re.M) or cases.get("status") != "已定稿":
+        return "规则卡和例子都须完成本次整合并定稿"
+    current = prerequisite_baseline(root, rule, ref)
+    if any(current[key] == entry["baseline"][key] for key in ("card", "cases")):
+        return "仍是衔接前的规则或例子；旧定稿、只改状态均不能放行"
+    if receipt.get("card") != _sha256(card) or receipt.get("cases") != _sha256(cases_raw):
+        return "规则卡或例子已变化，须重新复核登记"
+    ids = receipt.get("case_ids")
+    known = {c["id"] for c in cases["cases"]}
+    if not isinstance(ids, list) or not ids or any(not isinstance(x, str) or x not in known for x in ids):
+        return "须列出实际覆盖本次衔接的例子编号"
+    if len(set(ids)) != len(ids) or not isinstance(receipt.get("accepted_at"), str) or not receipt["accepted_at"]:
+        return "复核时间或例子编号无效"
+    for key, prefix in (("decision", "docs/decisions/"), ("review", "progress/reports/")):
+        evidence = receipt[key]
+        path = _prerequisite_evidence(root, evidence["path"], prefix, ref)
+        if evidence.get("sha256") != _sha256(_prerequisite_bytes(root, path.relative_to(root).as_posix(), ref)):
+            return f"{key} 依据已变化，须重新复核登记"
+    return None
+
+
+def prerequisite_issues(root: Path, task_id: str, ref: str | None = None) -> list[str]:
+    if task_id not in PREREQUISITES:
+        return []
+    try:
+        _, entries = _prerequisite_state(root, task_id, ref)
+        issues = []
+        for key, definition in PREREQUISITES[task_id].items():
+            problem = _prerequisite_problem(root, definition, entries[key], ref)
+            if problem:
+                issues.append(f"{key}（{definition['label']}）：{problem}")
+        return issues
+    except (OSError, ValueError, TypeError, KeyError, AttributeError, BkError) as e:
+        return [f"前置记录缺失、损坏或凭据无效：{e}"]
+
+
+def prerequisite_launch_issues(root: Path, task_id: str) -> list[str]:
+    issues = prerequisite_issues(root, task_id)
+    if issues or task_id not in PREREQUISITES:
+        return issues
+    # V4 出包主干固定为 main；候选不能换一个 ref 给自己放行。
+    issues = prerequisite_issues(root, task_id, ref="main")
+    if issues:
+        return ["已提交 main：" + issue for issue in issues]
+    try:
+        _, entries = _prerequisite_state(root, task_id, ref="main")
+        protected = {PREREQUISITE_FILE, "tools/bk.py"}
+        for key, definition in PREREQUISITES[task_id].items():
+            rule = definition["rule"]
+            protected.update((f"docs/baseline/rule-cards/{rule}.md", f"tests/rules/{rule}.cases.json"))
+            protected.update(entries[key]["receipt"][name]["path"] for name in ("decision", "review"))
+        changed = [rel for rel in sorted(protected)
+                   if _prerequisite_bytes(root, rel) != _prerequisite_bytes(root, rel, "main")]
+        return ["当前分支或入包候选改动了前置依据，须由原规则任务重新复核：" + rel for rel in changed]
+    except (OSError, ValueError, TypeError, KeyError, AttributeError, BkError) as e:
+        return [f"主干前置核对失败：{e}"]
+
+
+def require_prerequisites(root: Path, task_id: str, *, authoritative: bool = False) -> None:
+    issues = prerequisite_launch_issues(root, task_id) if authoritative else prerequisite_issues(root, task_id)
+    if issues:
+        die(f"{task_id} 前置检测未通过（--force 不能跳过）：\n  " + "\n  ".join(issues) +
+            f"\n先完成对应规则、例子、确认与复核，再运行 bk prereq {task_id} 查看和登记。")
+
+
+def cmd_prereq(args) -> None:
+    root = find_root()
+    definitions = PREREQUISITES.get(args.task, {})
+    if not args.accept:
+        require_prerequisites(root, args.task, authoritative=True)
+        say(f"✓ {args.task} 的额外规则衔接前置已满足。" if definitions else f"{args.task} 没有额外规则衔接前置。")
+        return
+    if args.accept not in definitions:
+        die("前置项编号不存在。")
+    if env_kind() != "local":
+        die("衔接复核只在本地登记；网页端不能自行放行。")
+    cfg = load_config(root)
+    if current_branch(root) != cfg["main_branch"] or not worktree_clean(root):
+        die("先完成并提交规则、例子、确认决定与复核报告，再在干净主干登记。")
+    data, entries = _prerequisite_state(root, args.task)
+    definition = definitions[args.accept]
+    decision = _prerequisite_evidence(root, args.decision, "docs/decisions/")
+    review = _prerequisite_evidence(root, args.review, "progress/reports/")
+    rule = definition["rule"]
+    card = root / "docs/baseline/rule-cards" / f"{rule}.md"
+    cases = root / "tests/rules" / f"{rule}.cases.json"
+    for path in (card, cases, decision, review):
+        if sh(["git", "ls-files", "--error-unmatch", "--", path.relative_to(root).as_posix()],
+              cwd=root, check=False).returncode:
+            die("复核依据必须已提交到当前主干。")
+    candidate = {"card": _sha256(card.read_bytes()), "cases": _sha256(cases.read_bytes()),
+                 "decision": {"path": decision.relative_to(root).as_posix(), "sha256": _sha256(decision.read_bytes())},
+                 "review": {"path": review.relative_to(root).as_posix(), "sha256": _sha256(review.read_bytes())},
+                 "case_ids": args.case, "accepted_at": now()}
+    entry = entries[args.accept]
+    problem = _prerequisite_problem(root, definition, dict(entry, receipt=candidate))
+    if problem:
+        die(f"不能登记 {args.accept}：{problem}")
+    entry["receipt"] = candidate
+    save_json(root / PREREQUISITE_FILE, data)
+    git(root, "add", PREREQUISITE_FILE)
+    git(root, "commit", "-q", "-m", f"登记 {args.task} 前置复核：{args.accept}")
+    say(f"✓ 已登记 {args.accept}，凭据绑定本次规则、例子、决定和复核报告；这些文件变化后须重审。")
+    remaining = prerequisite_issues(root, args.task)
+    say(f"{args.task} 仍有 {len(remaining)} 项前置未通过。" if remaining else f"✓ {args.task} 额外前置全部满足。")
 
 
 def new_adhoc_id(root: Path) -> str:
@@ -1032,6 +1214,7 @@ def resume_from_outputs(task_id: str) -> Path | None:
 
 def cmd_start(args) -> None:
     task_id = args.task
+    require_prerequisites(find_root(), task_id, authoritative=True)
     if args.resume and env_kind() == "web":
         here = find_root()
         sess = load_json(here / ".bk" / "session.json", None)
@@ -1050,6 +1233,7 @@ def cmd_start(args) -> None:
             shutil.rmtree(tmp, ignore_errors=True)
     root = find_root()
     cfg = load_config(root)
+    require_prerequisites(root, task_id, authoritative=True)  # web 恢复后的内容也须重查
     ensure_local_exclude(root)
     meta = load_json(root / ".bk" / "package.json", {}) or {}
     sess = load_json(session_path(root), None)
@@ -1200,6 +1384,7 @@ def cmd_done(args) -> None:
     if not sess:
         die("没有进行中的任务。先运行 bk start <任务编号>。")
     task = get_task(root, cfg, sess["task"], sess.get("title", ""))
+    require_prerequisites(root, task["id"], authoritative=True)
     ex = expand_task(task, cfg)
     if current_branch(root) != sess["branch"]:
         die(f"当前不在任务分支 {sess['branch']} 上（现在是 {current_branch(root)}）。")
@@ -1309,6 +1494,7 @@ def cmd_done(args) -> None:
 
 def integrate(root: Path, cfg: dict, ref: str, report_rel: str, zip_name: str | None, task: dict,
               sess: dict, zpath: Path | None = None, resume: bool = False) -> bool:
+    require_prerequisites(root, task["id"], authoritative=True)
     main = cfg["main_branch"]
     if not resume:
         git(root, "checkout", "--quiet", main)
@@ -1385,6 +1571,7 @@ def integrate(root: Path, cfg: dict, ref: str, report_rel: str, zip_name: str | 
 
 def complete_merge(root: Path, cfg: dict, ref: str, report_rel: str, summary: dict, task: dict, sess: dict,
                    zip_name: str | None, zpath: Path | None) -> None:
+    require_prerequisites(root, task["id"], authoritative=True)  # 最终合并前再查，防凭据过期
     main = cfg["main_branch"]
     git(root, "checkout", "--quiet", main)
     git(root, "merge", "--quiet", "--ff-only", "bk/integrate")
@@ -1649,6 +1836,7 @@ def apply_branch(root: Path, cfg: dict, branch: str) -> bool:
     if not m:
         die("分支名应当是 task/<任务>-r<轮次>，例如 task/U06-r1")
     task_id, rnd = m.group(1), int(m.group(2))
+    require_prerequisites(root, task_id, authoritative=True)
     ref = f"refs/bk/in/{task_id}-r{rnd}"
     sh(["git", "fetch", "--quiet", "--no-tags", "origin", f"+refs/heads/{branch}:{ref}"], cwd=root)
     report_rel = f"progress/reports/{task_id}-r{rnd}.md"
@@ -1681,6 +1869,7 @@ def apply_zip(root: Path, cfg: dict, z: Path) -> bool:
     if not (repo / ".git").exists() or not meta:
         die("这不是 bk 生成的结果包（缺 repo/.git 或 .bk/package.json）。")
     task = get_task(root, cfg, meta["task"], meta.get("title", ""))
+    require_prerequisites(root, task["id"], authoritative=True)
     sess = {"task": meta["task"], "round": meta["round"], "base": meta["base"], "version": meta["version"],
             "branch": meta["branch"], "title": meta.get("title", "")}
     if git(root, "cat-file", "-t", meta["base"], check=False) != "commit":
@@ -1719,6 +1908,8 @@ def apply_zip(root: Path, cfg: dict, z: Path) -> bool:
 def cmd_pack(args) -> None:
     root = find_root()
     cfg = load_config(root)
+    if args.task:
+        require_prerequisites(root, args.task, authoritative=True)
     main = cfg["main_branch"]
     if git(root, "rev-parse", "--verify", "-q", main, check=False) == "":
         die(f"仓库里没有 {main} 分支。")
@@ -1737,6 +1928,7 @@ def cmd_pack(args) -> None:
         if not title:
             die("临时修复要写一句话描述：bk pack fix --title \"今日页按钮颜色不对\"")
     task = get_task(root, cfg, task_id, title)
+    require_prerequisites(root, task_id, authoritative=True)
     if task.get("kind") == "fix" and task_id.startswith("X"):
         tdoc = tasks_doc(root)
         if task_id not in task_map(tdoc):
@@ -1797,7 +1989,7 @@ def ready_tasks(root: Path) -> list[dict]:
     for t in tdoc.get("tasks", []):
         if t.get("status", "todo") != "todo" or t["id"] in inflight or t.get("optional"):
             continue
-        if all(tm.get(d, {}).get("status") == "done" for d in t.get("deps", [])):
+        if all(tm.get(d, {}).get("status") == "done" for d in t.get("deps", [])) and not prerequisite_launch_issues(root, t["id"]):
             res.append(t)
     return res
 
@@ -1955,6 +2147,13 @@ def cmd_status(args) -> None:
     tm = task_map(tdoc)
     if inflight:
         say("进行中：" + "；".join(f"{k} {tm.get(k, {}).get('title', '')}（{TASK_STATUS_CN.get(i['status'], i['status'])}，{i['time']}）" for k, i in inflight.items()))
+    for task_id in PREREQUISITES:
+        if task_id in tm:
+            issues = prerequisite_launch_issues(root, task_id)
+            if issues:
+                say(f"{task_id} 额外开工前置未通过：")
+                for issue in issues:
+                    say("  " + issue)
     nxt = ready_tasks(root)
     if nxt:
         say("可以开始（依赖都已完成）：")
@@ -2706,6 +2905,13 @@ def main() -> None:
     s = sub.add_parser("task", help="只打印任务简报")
     s.add_argument("task")
     s.set_defaults(fn=cmd_task)
+    s = sub.add_parser("prereq", help="查看或登记任务的规则衔接前置复核")
+    s.add_argument("task")
+    s.add_argument("--accept", default="", help="完成衔接并复核后登记指定前置项")
+    s.add_argument("--decision", default="", help="已提交的整合确认决定卡")
+    s.add_argument("--review", default="", help="已提交的衔接复核报告")
+    s.add_argument("--case", action="append", default=[], help="覆盖本次衔接的例子编号，可重复指定")
+    s.set_defaults(fn=cmd_prereq)
     s = sub.add_parser("verify", help="跑检查：quick / web / full")
     s.add_argument("--level", choices=["quick", "web", "full"])
     s.set_defaults(fn=cmd_verify)

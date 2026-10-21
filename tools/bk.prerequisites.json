@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "tasks": {
+    "B08": {
+      "R01-diagnosis-evidence": {
+        "baseline": {
+          "card": "1bbd02300933469404a23abc08f980ad8afa67e863c2ecad2dab350b013c4e48",
+          "cases": "e362a4041cc7b779f3cf12fb5a1b8159f4b48648981a6bed3ad653d7f0f631f0"
+        },
+        "receipt": null
+      },
+      "R06-option-forecast": {
+        "baseline": {
+          "card": "cd8242a9fcd2407c9b4b0cecc4609ef02621cb3c33525084d0613b278c1def52",
+          "cases": "dbe7bda99ff81c3e78734bd7c25a6668e5fe847789319a743d753e4306cbce13"
+        },
+        "receipt": null
+      }
+    }
+  }
+}
