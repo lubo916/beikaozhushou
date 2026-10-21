@@ -30,16 +30,10 @@
     "account.day.time_zone": "Asia/Shanghai",
     "account.day.start_hour": 4,
     "compliance.revoke.purge_days": 30,
-    "engagement.quiet_hours": [
-      "22:00",
-      "08:00"
-    ]
+    "engagement.quiet_hours": ["22:00", "08:00"]
   },
   "params_proposed": {
-    "account.minor.quiet_window": [
-      "22:00",
-      "06:00"
-    ],
+    "account.minor.quiet_window": ["22:00", "06:00"],
     "account.age.min_service_age": 14,
     "account.age.adult_age": 18,
     "account.guest.retention_days": 30,
@@ -276,10 +270,7 @@
               "payment": false,
               "video_analysis": false
             },
-            "quiet_floor": [
-              "22:00",
-              "06:00"
-            ]
+            "quiet_floor": ["22:00", "06:00"]
           },
           {
             "service": true,
@@ -289,10 +280,7 @@
               "payment": false,
               "video_analysis": false
             },
-            "quiet_floor": [
-              "22:00",
-              "06:00"
-            ],
+            "quiet_floor": ["22:00", "06:00"],
             "requires_age_confirmation": true
           },
           {
@@ -348,38 +336,23 @@
         "variants": [
           {
             "minor_mode": true,
-            "learner_quiet_hours": [
-              "22:00",
-              "08:00"
-            ]
+            "learner_quiet_hours": ["22:00", "08:00"]
           },
           {
             "minor_mode": true,
-            "learner_quiet_hours": [
-              "23:00",
-              "07:00"
-            ]
+            "learner_quiet_hours": ["23:00", "07:00"]
           },
           {
             "minor_mode": false,
-            "learner_quiet_hours": [
-              "23:00",
-              "07:00"
-            ]
+            "learner_quiet_hours": ["23:00", "07:00"]
           },
           {
             "minor_mode": true,
-            "learner_quiet_hours": [
-              "21:00",
-              "05:00"
-            ]
+            "learner_quiet_hours": ["21:00", "05:00"]
           },
           {
             "minor_mode": true,
-            "learner_quiet_hours": [
-              "22:00",
-              "08:00"
-            ],
+            "learner_quiet_hours": ["22:00", "08:00"],
             "push": {
               "kind": "security",
               "at": "2026-10-21T23:30:00+08:00"
@@ -387,10 +360,7 @@
           },
           {
             "minor_mode": false,
-            "learner_quiet_hours": [
-              "22:00",
-              "08:00"
-            ],
+            "learner_quiet_hours": ["22:00", "08:00"],
             "push": {
               "kind": "security",
               "at": "2026-10-21T23:30:00+08:00"
@@ -401,28 +371,16 @@
       "expect": {
         "variants": [
           {
-            "quiet": [
-              "22:00",
-              "08:00"
-            ]
+            "quiet": ["22:00", "08:00"]
           },
           {
-            "quiet": [
-              "22:00",
-              "07:00"
-            ]
+            "quiet": ["22:00", "07:00"]
           },
           {
-            "quiet": [
-              "23:00",
-              "07:00"
-            ]
+            "quiet": ["23:00", "07:00"]
           },
           {
-            "quiet": [
-              "21:00",
-              "06:00"
-            ]
+            "quiet": ["21:00", "06:00"]
           },
           {
             "deliver_at": "2026-10-22T06:00:00+08:00",
@@ -604,10 +562,7 @@
         "account_id": "g1",
         "kind": "registered",
         "copied_records": 0,
-        "consent_records": [
-          "user_agreement",
-          "privacy_policy"
-        ]
+        "consent_records": ["user_agreement", "privacy_policy"]
       }
     },
     {
@@ -662,13 +617,7 @@
           "answers": 40,
           "evidence": 52
         },
-        "recompute": [
-          "mastery",
-          "memory",
-          "forecast",
-          "completion",
-          "health"
-        ],
+        "recompute": ["mastery", "memory", "forecast", "completion", "health"],
         "summary": {
           "goals_added": 1,
           "answers_appended": 40
@@ -721,10 +670,7 @@
             "plan": "plan-u"
           }
         ],
-        "dropped": [
-          "guest_goal:junior-accounting",
-          "plan:plan-g"
-        ],
+        "dropped": ["guest_goal:junior-accounting", "plan:plan-g"],
         "appended": {
           "answers": 25
         }
@@ -803,9 +749,7 @@
             {
               "id": "m-g",
               "question": "q9",
-              "answers": [
-                "a2"
-              ]
+              "answers": ["a2"]
             }
           ]
         },
@@ -832,9 +776,7 @@
             {
               "id": "m-a",
               "question": "q9",
-              "answers": [
-                "a1"
-              ]
+              "answers": ["a1"]
             }
           ]
         }
@@ -842,23 +784,13 @@
       "expect": {
         "recall_cards": {
           "kept": "c-a",
-          "appended_reviews": [
-            "r3"
-          ],
-          "replay_order": [
-            "r1",
-            "r3",
-            "r2"
-          ],
-          "not_added": [
-            "c-g"
-          ]
+          "appended_reviews": ["r3"],
+          "replay_order": ["r1", "r3", "r2"],
+          "not_added": ["c-g"]
         },
         "mistakes": {
           "kept": "m-a",
-          "appended_answers": [
-            "a2"
-          ],
+          "appended_answers": ["a2"],
           "status": "recompute_by_R03"
         }
       }
@@ -1135,10 +1067,7 @@
           "age_band": "unconfirmed",
           "minor_mode": true
         },
-        "consent_records": [
-          "user_agreement",
-          "privacy_policy"
-        ],
+        "consent_records": ["user_agreement", "privacy_policy"],
         "next": "age_confirm"
       }
     },
@@ -1208,13 +1137,8 @@
           },
           {
             "outcome": "need_reconsent",
-            "docs": [
-              "privacy_policy"
-            ],
-            "allowed_meanwhile": [
-              "export",
-              "deregister"
-            ]
+            "docs": ["privacy_policy"],
+            "allowed_meanwhile": ["export", "deregister"]
           }
         ]
       }
@@ -1229,11 +1153,7 @@
         "account": {
           "status": "active"
         },
-        "online": [
-          "d1",
-          "d2",
-          "d3"
-        ],
+        "online": ["d1", "d2", "d3"],
         "new_device": "d4",
         "variants": [
           {
@@ -1252,11 +1172,7 @@
       "expect": {
         "variants": [
           {
-            "listed": [
-              "d1",
-              "d2",
-              "d3"
-            ],
+            "listed": ["d1", "d2", "d3"],
             "outcome": "ok",
             "revoked": [
               {
@@ -1266,11 +1182,7 @@
             ]
           },
           {
-            "listed": [
-              "d1",
-              "d2",
-              "d3"
-            ],
+            "listed": ["d1", "d2", "d3"],
             "outcome": "cancelled",
             "session_created": false
           },
@@ -1518,10 +1430,7 @@
           {
             "outcome": "restricted",
             "until": "2026-10-12T09:30:00+08:00",
-            "actions": [
-              "appeal",
-              "export"
-            ],
+            "actions": ["appeal", "export"],
             "learning": false
           },
           {
@@ -1538,11 +1447,7 @@
       "rule": "R24、R25、R26",
       "fn": "revoke",
       "input": {
-        "online": [
-          "d1",
-          "d2",
-          "d3"
-        ],
+        "online": ["d1", "d2", "d3"],
         "variants": [
           {
             "action": "password_change",
@@ -1569,39 +1474,23 @@
       "expect": {
         "variants": [
           {
-            "revoked": [
-              "d2",
-              "d3"
-            ],
+            "revoked": ["d2", "d3"],
             "reason": "credential_changed"
           },
           {
-            "revoked": [
-              "d1",
-              "d3"
-            ],
+            "revoked": ["d1", "d3"],
             "reason": "credential_changed"
           },
           {
-            "revoked": [
-              "d1",
-              "d2",
-              "d3"
-            ],
+            "revoked": ["d1", "d2", "d3"],
             "reason": "credential_changed"
           },
           {
-            "revoked": [
-              "d1",
-              "d2",
-              "d3"
-            ],
+            "revoked": ["d1", "d2", "d3"],
             "reason": "platform_forced"
           },
           {
-            "revoked": [
-              "d3"
-            ],
+            "revoked": ["d3"],
             "reason": "other_device"
           }
         ]
@@ -1653,39 +1542,27 @@
         "phone": null,
         "variants": [
           {
-            "credentials": [
-              "wechat"
-            ],
+            "credentials": ["wechat"],
             "action": "study"
           },
           {
-            "credentials": [
-              "wechat"
-            ],
+            "credentials": ["wechat"],
             "action": "pay"
           },
           {
-            "credentials": [
-              "wechat"
-            ],
+            "credentials": ["wechat"],
             "action": "manage_devices"
           },
           {
-            "credentials": [
-              "wechat"
-            ],
+            "credentials": ["wechat"],
             "action": "deregister"
           },
           {
-            "credentials": [
-              "apple"
-            ],
+            "credentials": ["apple"],
             "action": "deregister"
           },
           {
-            "credentials": [
-              "apple"
-            ],
+            "credentials": ["apple"],
             "action": "pay"
           }
         ]
@@ -1754,11 +1631,7 @@
         "outcome": "cooling_off",
         "days_left": 9,
         "auto_cancel": false,
-        "actions": [
-          "cancel",
-          "continue",
-          "export"
-        ]
+        "actions": ["cancel", "continue", "export"]
       }
     },
     {
@@ -1954,10 +1827,7 @@
         },
         "phone_released": true,
         "purge_copies_within_days": 30,
-        "legal_review": [
-          "crisis_records",
-          "orders_invoices"
-        ]
+        "legal_review": ["crisis_records", "orders_invoices"]
       }
     },
     {
@@ -1968,9 +1838,7 @@
       "fn": "deletion_scope",
       "input": {
         "account": "u1",
-        "merged_guests": [
-          "g1"
-        ],
+        "merged_guests": ["g1"],
         "imports_by_others": [
           {
             "user": "u9",
@@ -1980,13 +1848,8 @@
         ]
       },
       "expect": {
-        "delete": [
-          "u1",
-          "g1_originals"
-        ],
-        "keep": [
-          "u9:cards-1"
-        ]
+        "delete": ["u1", "g1_originals"],
+        "keep": ["u9:cards-1"]
       }
     }
   ]
