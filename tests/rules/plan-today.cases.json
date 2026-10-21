@@ -1,0 +1,1719 @@
+{
+  "card": "docs/baseline/rule-cards/plan-today.md",
+  "status": "草稿",
+  "updated": "2026-10-21",
+  "decisions": ["docs/decisions/D-2026-10-21-R04-r1.md", "docs/decisions/D-2026-10-21-R04-r2.md"],
+  "conventions": {
+    "op": "这个例子测哪一步：generate_today 生成当天清单；plan_week 排本周；daytime 白天的变化；nightly_carryover 夜间顺延；undo 撤销顺延；late_evidence 证据晚到；fill 装法（短时重组、三档）；after_all_done 全部完成；judge_items 完成判定；completion_rates 完成率；interruption_tier 中断分档；proposal_check 提议触发；proposal_lifecycle 提议状态；apply_change 谁能直接改",
+    "day": "学习日 YYYY-MM-DD，按学员时区与日界线（默认 Asia/Shanghai、凌晨 4 点），统一用 packages/shared/src/today 的“今天”函数；weekday：1＝周一 … 7＝周日",
+    "minutes": "分钟，可以有小数；“放得下”用 ≤ 比；比例先保留 6 位小数再比较，避免浮点误差；gaps、rate 只为显示保留 3 位",
+    "row": "到期队列的一行：同一来源合成一行 {source, count, unit_minutes}，用时＝count × unit_minutes；截短＝减少 count，至少留 1 条",
+    "item": "推进或收尾的一项 {id, source, minutes 或 count＋unit_minutes, value（提分性价比）, importance, deadline, locked, kind（org 机构／custom 自定）}；带 count 的可以截短",
+    "free": "某天还放得下多少＝available（当天预算 − 机构占用，小于 0 按 0）− planned_personal（那天已排的个人占用：预计巩固段＋收尾段＋锁定任务＋已排的推进任务，含之前顺延来的和这一晚已经放进去的）；顺延（R20）要求放进去后 ≤ available，排本周（R11）要求 ≤ available × (1 − plan.week.buffer_ratio)；写成 planned {consolidate, closing, locked, advance} 时，planned_personal 是四项之和",
+    "steps": "R1 的步骤：1 巩固段装到保底额，2 口述回顾，3 周复盘（周日），4 锁定的推进任务，5 巩固段第一轮余下的额度，6 其余推进任务，7 补巩固；left_after＝这一步之后还剩多少分钟；没列出的步骤什么也没放",
+    "status": "清单项状态：todo 未开始、in_progress 进行中、seen 看过、done 完成、self_reported 自报做完、skipped_today 今天不做",
+    "optional": "optional: true 的项不占 available、不进完成率，页面写明“可选”：不可学日与机构占满时的最小版（R27、R28）、全部完成后的加练（R19）",
+    "linked": "机构或自定任务关联了什么：questions、cards、reading、recitation；空数组＝系统里没有作答或阅读记录（R15 的表）；只在完成判定和完成率的例子里写",
+    "null": "比值的分母为 0 时 rate（gap、round_coverage）写 null 并给 reason：no_counted_items、declared_zero、scope_empty；任何地方都不出现 NaN、Infinity（R18 的表）",
+    "fill_order": "装法（R24）看项的顺序：巩固段 → 口述回顾 → 推进段 → 周复盘；结果显示时仍按清单顺序",
+    "codes": "source、segment、mix_mode（roi／review_first／new_first）、tier（full／lite／minimal）、提议状态（pending／confirmed／declined／undone）用术语表与 packages/shared/src/vocab/supplement.ts 的代码；weekly_review、todo、in_progress、seen、done、self_reported、skipped_today、optional、linked、off_day、start_task、sprint_mode 与各个提议 kind、reason 是临时代码，待术语表登记"
+  },
+  "params": {
+    "plan.consolidate.min_ratio": 0.3,
+    "plan.consolidate.sprint_ratio": 0.5,
+    "plan.mix.roi_consolidate_cap": 0.5,
+    "plan.week.buffer_ratio": 0.15,
+    "plan.carryover.search_days": 3,
+    "plan.proposal.undo_days": 7,
+    "plan.disconnect.tiers_days": [3, 14],
+    "plan.disconnect.start_task_minutes": 10,
+    "plan.disconnect.recovery_days": 14,
+    "plan.short_mode.minutes": 15,
+    "plan.degrade.lite_ratio": 0.5,
+    "plan.degrade.minimal_minutes": 20,
+    "plan.off_day.review_minutes": 10,
+    "plan.closing.recap_minutes": 3,
+    "plan.closing.weekly_review_minutes": 10,
+    "plan.practice.accuracy_band": [0.6, 0.8],
+    "plan.sprint.days_before": 10,
+    "plan.calibrate.weeks": 2,
+    "plan.calibrate.gap_ratio": 0.2
+  },
+  "params_pending_registration": [
+    "plan.mix.roi_consolidate_cap",
+    "plan.degrade.lite_ratio",
+    "plan.degrade.minimal_minutes",
+    "plan.off_day.review_minutes",
+    "plan.closing.recap_minutes",
+    "plan.closing.weekly_review_minutes",
+    "plan.disconnect.recovery_days",
+    "plan.practice.accuracy_band"
+  ],
+  "cases": [
+    {
+      "id": "E1",
+      "rule": "R1 R2 R3 R4 R6 R8 R12 R13 R14",
+      "op": "generate_today",
+      "title": "普通的一天（周日，按性价比）：和原型今日页的“10 件事、约 2 小时 25 分”同构",
+      "input": {
+        "day": "2026-10-11",
+        "weekday": 7,
+        "mix_mode": "roi",
+        "sprint_mode": false,
+        "budget_minutes": 145,
+        "reservations": [{ "id": "O1", "source": "org_or_custom", "kind": "org", "minutes": 25, "deadline": "2026-10-13" }],
+        "due_queue": [
+          { "source": "due_review", "count": 24, "unit_minutes": 1 },
+          { "source": "mistake_retry", "count": 4, "unit_minutes": 4 },
+          { "source": "verify_recheck", "count": 2, "unit_minutes": 2 }
+        ],
+        "scheduled": [
+          { "id": "N1", "source": "new_learning", "minutes": 20, "value": 0.15, "importance": 3 },
+          { "id": "T1", "source": "to_target", "minutes": 12, "value": 0.25, "importance": 3 },
+          { "id": "P1", "source": "practice", "minutes": 16, "value": 0.12, "importance": 3 },
+          { "id": "C1", "source": "org_or_custom", "kind": "custom", "minutes": 15 }
+        ]
+      },
+      "expect": {
+        "available_minutes": 120,
+        "consolidate_floor_minutes": 36,
+        "consolidate_cap_minutes": 60,
+        "consolidate": [
+          { "source": "due_review", "count": 24, "minutes": 24 },
+          { "source": "mistake_retry", "count": 4, "minutes": 16 },
+          { "source": "verify_recheck", "count": 2, "minutes": 4 }
+        ],
+        "advance": ["T1", "N1", "P1", "O1", "C1"],
+        "closing": ["bedtime_review", "weekly_review"],
+        "minutes": { "consolidate": 44, "advance_personal": 63, "org_reserved": 25, "closing": 13, "total": 145 },
+        "item_count": 10,
+        "carried_out": [],
+        "left_in_due_queue": [],
+        "continue_target": "due_review"
+      }
+    },
+    {
+      "id": "E2",
+      "rule": "R4 R5 R24",
+      "op": "generate_today",
+      "title": "到期多，按性价比：巩固段先装到一半，推进段装完空出来的再补",
+      "input": {
+        "day": "2026-10-13",
+        "weekday": 2,
+        "mix_mode": "roi",
+        "sprint_mode": false,
+        "budget_minutes": 100,
+        "reservations": [],
+        "due_queue": [
+          { "source": "due_review", "count": 40, "unit_minutes": 1 },
+          { "source": "mistake_retry", "count": 3, "unit_minutes": 4 },
+          { "source": "verify_recheck", "count": 2, "unit_minutes": 2 }
+        ],
+        "scheduled": [
+          { "id": "N1", "source": "new_learning", "minutes": 30, "value": 0.2, "importance": 3 },
+          { "id": "P1", "source": "practice", "minutes": 20, "value": 0.12, "importance": 3 },
+          { "id": "T1", "source": "to_target", "minutes": 15, "value": 0.3, "importance": 3 }
+        ]
+      },
+      "expect": {
+        "available_minutes": 100,
+        "consolidate_cap_minutes": 50,
+        "first_pass_consolidate": [
+          { "source": "due_review", "count": 40 },
+          { "source": "mistake_retry", "count": 2 },
+          { "source": "verify_recheck", "count": 1 }
+        ],
+        "advance": ["T1", "N1"],
+        "carried_out": ["P1"],
+        "backfill": [{ "source": "verify_recheck", "count": 1 }],
+        "consolidate": [
+          { "source": "due_review", "count": 40, "minutes": 40 },
+          { "source": "mistake_retry", "count": 2, "minutes": 8 },
+          { "source": "verify_recheck", "count": 2, "minutes": 4 }
+        ],
+        "left_in_due_queue": [{ "source": "mistake_retry", "count": 1 }],
+        "closing": ["bedtime_review"],
+        "minutes": { "consolidate": 52, "advance_personal": 45, "closing": 3, "total": 100 },
+        "show_backlog_count": false
+      }
+    },
+    {
+      "id": "E3",
+      "rule": "R4 R5",
+      "op": "generate_today",
+      "title": "同 E2，复习优先：到期的全排，推进段放不下的跳过、接着看下一项",
+      "input": {
+        "day": "2026-10-13",
+        "weekday": 2,
+        "mix_mode": "review_first",
+        "sprint_mode": false,
+        "budget_minutes": 100,
+        "reservations": [],
+        "due_queue": [
+          { "source": "due_review", "count": 40, "unit_minutes": 1 },
+          { "source": "mistake_retry", "count": 3, "unit_minutes": 4 },
+          { "source": "verify_recheck", "count": 2, "unit_minutes": 2 }
+        ],
+        "scheduled": [
+          { "id": "N1", "source": "new_learning", "minutes": 30, "value": 0.2, "importance": 3 },
+          { "id": "P1", "source": "practice", "minutes": 20, "value": 0.12, "importance": 3 },
+          { "id": "T1", "source": "to_target", "minutes": 15, "value": 0.3, "importance": 3 }
+        ]
+      },
+      "expect": {
+        "available_minutes": 100,
+        "consolidate": [
+          { "source": "due_review", "count": 40, "minutes": 40 },
+          { "source": "mistake_retry", "count": 3, "minutes": 12 },
+          { "source": "verify_recheck", "count": 2, "minutes": 4 }
+        ],
+        "advance": ["T1", "P1"],
+        "carried_out": ["N1"],
+        "left_in_due_queue": [],
+        "closing": ["bedtime_review"],
+        "minutes": { "consolidate": 56, "advance_personal": 35, "closing": 3, "total": 94 }
+      }
+    },
+    {
+      "id": "E4",
+      "rule": "R3 R4",
+      "op": "generate_today",
+      "title": "同 E2，新学优先：巩固段先只到保底，推进段装完空出来的再补",
+      "input": {
+        "day": "2026-10-13",
+        "weekday": 2,
+        "mix_mode": "new_first",
+        "sprint_mode": false,
+        "budget_minutes": 100,
+        "reservations": [],
+        "due_queue": [
+          { "source": "due_review", "count": 40, "unit_minutes": 1 },
+          { "source": "mistake_retry", "count": 3, "unit_minutes": 4 },
+          { "source": "verify_recheck", "count": 2, "unit_minutes": 2 }
+        ],
+        "scheduled": [
+          { "id": "N1", "source": "new_learning", "minutes": 30, "value": 0.2, "importance": 3 },
+          { "id": "P1", "source": "practice", "minutes": 20, "value": 0.12, "importance": 3 },
+          { "id": "T1", "source": "to_target", "minutes": 15, "value": 0.3, "importance": 3 }
+        ]
+      },
+      "expect": {
+        "available_minutes": 100,
+        "consolidate_cap_minutes": 30,
+        "first_pass_consolidate": [{ "source": "due_review", "count": 30 }],
+        "advance": ["T1", "N1", "P1"],
+        "carried_out": [],
+        "backfill": [{ "source": "due_review", "count": 2 }],
+        "consolidate": [{ "source": "due_review", "count": 32, "minutes": 32 }],
+        "left_in_due_queue": [
+          { "source": "due_review", "count": 8 },
+          { "source": "mistake_retry", "count": 3 },
+          { "source": "verify_recheck", "count": 2 }
+        ],
+        "closing": ["bedtime_review"],
+        "minutes": { "consolidate": 32, "advance_personal": 65, "closing": 3, "total": 100 }
+      }
+    },
+    {
+      "id": "E5",
+      "rule": "R3",
+      "op": "generate_today",
+      "title": "同 E2，新学优先＋已确认冲刺模式：保底升到 50%，结果与 E2 相同",
+      "input": {
+        "day": "2026-10-13",
+        "weekday": 2,
+        "mix_mode": "new_first",
+        "sprint_mode": true,
+        "budget_minutes": 100,
+        "reservations": [],
+        "due_queue": [
+          { "source": "due_review", "count": 40, "unit_minutes": 1 },
+          { "source": "mistake_retry", "count": 3, "unit_minutes": 4 },
+          { "source": "verify_recheck", "count": 2, "unit_minutes": 2 }
+        ],
+        "scheduled": [
+          { "id": "N1", "source": "new_learning", "minutes": 30, "value": 0.2, "importance": 3 },
+          { "id": "P1", "source": "practice", "minutes": 20, "value": 0.12, "importance": 3 },
+          { "id": "T1", "source": "to_target", "minutes": 15, "value": 0.3, "importance": 3 }
+        ]
+      },
+      "expect": {
+        "consolidate_floor_minutes": 50,
+        "consolidate_cap_minutes": 50,
+        "consolidate": [
+          { "source": "due_review", "count": 40, "minutes": 40 },
+          { "source": "mistake_retry", "count": 2, "minutes": 8 },
+          { "source": "verify_recheck", "count": 2, "minutes": 4 }
+        ],
+        "advance": ["T1", "N1"],
+        "carried_out": ["P1"],
+        "left_in_due_queue": [{ "source": "mistake_retry", "count": 1 }],
+        "minutes": { "consolidate": 52, "advance_personal": 45, "closing": 3, "total": 100 }
+      }
+    },
+    {
+      "id": "E6",
+      "rule": "R3",
+      "op": "generate_today",
+      "title": "第一天，没有到期项：巩固段为空，不为它留时间",
+      "input": {
+        "day": "2026-08-17",
+        "weekday": 1,
+        "mix_mode": "roi",
+        "sprint_mode": false,
+        "budget_minutes": 90,
+        "reservations": [],
+        "due_queue": [],
+        "scheduled": [
+          { "id": "T1", "source": "to_target", "minutes": 15, "value": 0.3, "importance": 3 },
+          { "id": "N1", "source": "new_learning", "minutes": 30, "value": 0.2, "importance": 3 },
+          { "id": "P1", "source": "practice", "minutes": 20, "value": 0.12, "importance": 3 }
+        ]
+      },
+      "expect": {
+        "consolidate": [],
+        "consolidate_reserved_minutes": 0,
+        "advance": ["T1", "N1", "P1"],
+        "closing": ["bedtime_review"],
+        "minutes": { "consolidate": 0, "advance_personal": 65, "closing": 3, "total": 68 },
+        "unused_minutes": 22
+      }
+    },
+    {
+      "id": "E7",
+      "rule": "R7 R13",
+      "op": "generate_today",
+      "title": "推进段排序：截止日、性价比、重要度、编号；星标不提前；“我移出”的不进；练习按正确率区间挑",
+      "input": {
+        "day": "2026-10-13",
+        "weekday": 2,
+        "mix_mode": "roi",
+        "sprint_mode": false,
+        "budget_minutes": 300,
+        "reservations": [
+          { "id": "O1", "source": "org_or_custom", "kind": "org", "minutes": 25, "deadline": "2026-10-13" },
+          { "id": "O2", "source": "org_or_custom", "kind": "org", "minutes": 20, "deadline": "2026-10-18" }
+        ],
+        "due_queue": [],
+        "scheduled": [
+          { "id": "C1", "source": "org_or_custom", "kind": "custom", "minutes": 10, "deadline": "2026-10-14" },
+          { "id": "N1", "source": "new_learning", "minutes": 30, "value": 0.2, "importance": 3 },
+          { "id": "N2", "source": "new_learning", "minutes": 30, "value": 0.2, "importance": 3, "starred": true },
+          { "id": "T1", "source": "to_target", "minutes": 15, "value": 0.3, "importance": 2 },
+          { "id": "T2", "source": "to_target", "minutes": 10, "value": 0.2, "importance": 4 },
+          { "id": "P1", "source": "practice", "minutes": 20, "value": 0.12, "importance": 3, "locked": true },
+          { "id": "S1", "source": "new_learning", "minutes": 20, "value": 0.5, "importance": 4, "scope_state": "removed" }
+        ],
+        "practice_candidates": [
+          { "kp": "kp-01", "accuracy": 0.55 },
+          { "kp": "kp-02", "accuracy": 0.6 },
+          { "kp": "kp-03", "accuracy": 0.7 },
+          { "kp": "kp-04", "accuracy": 0.8 },
+          { "kp": "kp-05", "accuracy": 0.85 }
+        ]
+      },
+      "expect": {
+        "advance": ["O1", "C1", "T1", "T2", "N1", "N2", "P1", "O2"],
+        "excluded": [{ "id": "S1", "why": "学习范围：我移出" }],
+        "practice_picked": ["kp-02", "kp-03", "kp-04"]
+      }
+    },
+    {
+      "id": "E8",
+      "rule": "R5",
+      "op": "generate_today",
+      "title": "生成时放不下：锁定的先占位，不会被拿掉",
+      "input": {
+        "day": "2026-10-14",
+        "weekday": 3,
+        "mix_mode": "roi",
+        "sprint_mode": false,
+        "budget_minutes": 60,
+        "reservations": [],
+        "due_queue": [{ "source": "due_review", "count": 20, "unit_minutes": 1 }],
+        "scheduled": [
+          { "id": "T1", "source": "to_target", "minutes": 15, "value": 0.3, "importance": 3 },
+          { "id": "N1", "source": "new_learning", "minutes": 30, "value": 0.2, "importance": 3 },
+          { "id": "P1", "source": "practice", "minutes": 20, "value": 0.12, "importance": 3, "locked": true }
+        ]
+      },
+      "expect": {
+        "consolidate": [{ "source": "due_review", "count": 20, "minutes": 20 }],
+        "advance": ["T1", "P1"],
+        "carried_out": ["N1"],
+        "carry_search_from": "2026-10-15",
+        "closing": ["bedtime_review"],
+        "minutes": { "consolidate": 20, "advance_personal": 35, "closing": 3, "total": 58 }
+      }
+    },
+    {
+      "id": "E9",
+      "rule": "R27",
+      "op": "generate_today",
+      "title": "不可学日：只留一项可选的到期复习最小版（不占预算、不进完成率），其余当场顺延",
+      "input": {
+        "day": "2026-10-11",
+        "weekday": 7,
+        "off_day": true,
+        "mix_mode": "roi",
+        "sprint_mode": false,
+        "budget_minutes": 145,
+        "reservations": [],
+        "due_queue": [
+          { "source": "due_review", "count": 20, "unit_minutes": 1 },
+          { "source": "mistake_retry", "count": 2, "unit_minutes": 4 }
+        ],
+        "scheduled": [
+          { "id": "N1", "source": "new_learning", "minutes": 30, "value": 0.2, "importance": 3 },
+          { "id": "P1", "source": "practice", "minutes": 20, "value": 0.12, "importance": 3 }
+        ]
+      },
+      "expect": {
+        "consolidate": [{ "source": "due_review", "count": 10, "minutes": 10, "optional": true }],
+        "budget_used_minutes": 0,
+        "in_completion_rate": false,
+        "notice": "今天不可学，其余已顺延，不影响进度数字",
+        "advance": [],
+        "closing": [],
+        "carried_out": ["N1", "P1"],
+        "carry_search_from": "2026-10-12",
+        "left_in_due_queue": [
+          { "source": "due_review", "count": 10 },
+          { "source": "mistake_retry", "count": 2 }
+        ],
+        "health_excluded": true,
+        "counts_as_interruption_day": false,
+        "forbidden_words": ["落后"],
+        "switch_back": { "action": "今天其实能学", "effect": "撤销这批顺延，按普通日重新生成" }
+      }
+    },
+    {
+      "id": "E10",
+      "rule": "R1 R28",
+      "op": "generate_today",
+      "title": "机构占用超过当天预算：个人一项不占预算，最小版复习是可选项；告知并出“占用超出”提议，确认前预算不变",
+      "input": {
+        "day": "2026-10-15",
+        "weekday": 4,
+        "mix_mode": "roi",
+        "sprint_mode": false,
+        "budget_minutes": 30,
+        "reservations": [{ "id": "O1", "source": "org_or_custom", "kind": "org", "minutes": 40, "deadline": "2026-10-15" }],
+        "due_queue": [{ "source": "due_review", "count": 15, "unit_minutes": 1 }],
+        "scheduled": [{ "id": "N1", "source": "new_learning", "minutes": 20, "value": 0.2, "importance": 3 }]
+      },
+      "expect": {
+        "available_minutes_raw": -10,
+        "available_minutes": 0,
+        "consolidate": [{ "source": "due_review", "count": 10, "minutes": 10, "optional": true }],
+        "in_completion_rate": false,
+        "notice": "机构作业和课表占满了今天的时间",
+        "advance": ["O1"],
+        "closing": [],
+        "carried_out": ["N1"],
+        "left_in_due_queue": [{ "source": "due_review", "count": 5 }],
+        "proposal": {
+          "kind": "budget_conflict",
+          "status": "pending",
+          "change": { "day": "2026-10-15", "budget_from": 30, "budget_to": 50 }
+        },
+        "budget_until_confirmed": 30
+      }
+    },
+    {
+      "id": "E11",
+      "rule": "R1 R5",
+      "op": "daytime",
+      "title": "白天：新到期的项不加进今天；机构加任务时个人任务避让",
+      "input": {
+        "day": "2026-10-13",
+        "weekday": 2,
+        "mix_mode": "roi",
+        "budget_minutes": 100,
+        "reservations": [],
+        "list_at_day_start": {
+          "consolidate": [{ "source": "due_review", "count": 20, "unit_minutes": 1 }],
+          "advance": [
+            { "id": "T1", "source": "to_target", "minutes": 15, "value": 0.3, "importance": 3 },
+            { "id": "N1", "source": "new_learning", "minutes": 30, "value": 0.2, "importance": 3 },
+            { "id": "P1", "source": "practice", "minutes": 20, "value": 0.12, "importance": 3 }
+          ],
+          "closing": [{ "id": "B1", "source": "bedtime_review", "minutes": 3 }]
+        },
+        "events": [
+          { "at": "10:00", "type": "new_due_item", "item": { "source": "mistake_retry", "count": 1, "unit_minutes": 4 } },
+          {
+            "at": "14:00",
+            "type": "org_task_added",
+            "done_so_far": ["due_review", "T1"],
+            "item": { "id": "O1", "source": "org_or_custom", "kind": "org", "minutes": 30, "deadline": "2026-10-16" }
+          }
+        ]
+      },
+      "expect": {
+        "after_events": [
+          { "at": "10:00", "list_changed": false, "new_item_shows_from_day": "2026-10-14" },
+          {
+            "at": "14:00",
+            "available_minutes": 70,
+            "used_minutes": 35,
+            "remaining_minutes": 35,
+            "advance": ["T1", "N1", "O1"],
+            "moved_out": ["P1"],
+            "carry_search_from": "2026-10-14",
+            "replan_log": [{ "kind": "org_avoidance", "id": "P1", "undo_until_day": "2026-10-19" }]
+          }
+        ]
+      }
+    },
+    {
+      "id": "E12",
+      "rule": "R20 R21",
+      "op": "nightly_carryover",
+      "title": "普通顺延：周六凌晨把周五没做完的放进最早放得下的一天",
+      "input": {
+        "run_at_day": "2026-10-10",
+        "yesterday": "2026-10-09",
+        "leftovers": [{ "id": "N1", "source": "new_learning", "minutes": 20, "value": 0.15, "status": "in_progress" }],
+        "days": [
+          { "day": "2026-10-10", "available": 120, "planned_personal": 110 },
+          { "day": "2026-10-11", "available": 120, "planned_personal": 95 },
+          { "day": "2026-10-12", "available": 60, "planned_personal": 51 }
+        ]
+      },
+      "expect": {
+        "moves": [{ "id": "N1", "from": "2026-10-09", "to": "2026-10-11", "minutes": 20 }],
+        "replan_log": [{ "kind": "auto_carryover", "id": "N1", "from": "2026-10-09", "to": "2026-10-11", "reason": "没做完" }],
+        "notify_on_day": "2026-10-10",
+        "undo_until_day": "2026-10-16",
+        "proposals": []
+      }
+    },
+    {
+      "id": "E13",
+      "rule": "R20",
+      "op": "nightly_carryover",
+      "title": "计数任务做了一部分：只挪没做的部分",
+      "input": {
+        "run_at_day": "2026-10-10",
+        "yesterday": "2026-10-09",
+        "leftovers": [
+          { "id": "P1", "source": "practice", "count": 8, "unit_minutes": 2, "done_count": 3, "value": 0.12, "status": "in_progress" }
+        ],
+        "days": [
+          { "day": "2026-10-10", "available": 60, "planned_personal": 48 },
+          { "day": "2026-10-11", "available": 60, "planned_personal": 60 },
+          { "day": "2026-10-12", "available": 60, "planned_personal": 20 }
+        ]
+      },
+      "expect": {
+        "moves": [{ "id": "P1", "from": "2026-10-09", "to": "2026-10-10", "count": 5, "minutes": 10 }],
+        "proposals": []
+      }
+    },
+    {
+      "id": "E14",
+      "rule": "R17 R20",
+      "op": "nightly_carryover",
+      "title": "哪些不顺延：到期项留在队列，口述回顾与周复盘不顺延，“看过”照样顺延，“今天不想学”的回到计划里",
+      "input": {
+        "run_at_day": "2026-10-12",
+        "yesterday": "2026-10-11",
+        "leftovers": [
+          { "source": "due_review", "count": 26, "done_count": 20, "unit_minutes": 1 },
+          { "source": "mistake_retry", "count": 2, "done_count": 0, "unit_minutes": 4 },
+          { "id": "B1", "source": "bedtime_review", "minutes": 3, "status": "todo" },
+          { "id": "W1", "source": "weekly_review", "minutes": 10, "status": "todo" },
+          { "id": "N2", "source": "new_learning", "minutes": 15, "value": 0.18, "status": "seen" },
+          { "id": "N3", "source": "new_learning", "minutes": 20, "value": 0.2, "status": "skipped_today", "reason": "课上已经学过" }
+        ],
+        "days": [
+          { "day": "2026-10-12", "available": 60, "planned_personal": 40 },
+          { "day": "2026-10-13", "available": 60, "planned_personal": 60 },
+          { "day": "2026-10-14", "available": 60, "planned_personal": 60 }
+        ]
+      },
+      "expect": {
+        "moves": [{ "id": "N2", "from": "2026-10-11", "to": "2026-10-12", "minutes": 15 }],
+        "stays_in_due_queue": [
+          { "source": "due_review", "count": 6 },
+          { "source": "mistake_retry", "count": 2 }
+        ],
+        "dropped": ["B1", "W1"],
+        "back_to_pool": ["N3"],
+        "proposals": []
+      }
+    },
+    {
+      "id": "E15",
+      "rule": "R20",
+      "op": "nightly_carryover",
+      "title": "找空位时只数能学的日子，跳过不可学日",
+      "input": {
+        "run_at_day": "2026-10-10",
+        "yesterday": "2026-10-09",
+        "leftovers": [{ "id": "N1", "source": "new_learning", "minutes": 20, "value": 0.15, "status": "todo" }],
+        "days": [
+          { "day": "2026-10-10", "off_day": true },
+          { "day": "2026-10-11", "available": 60, "planned_personal": 55 },
+          { "day": "2026-10-12", "available": 60, "planned_personal": 30 },
+          { "day": "2026-10-13", "available": 60, "planned_personal": 20 }
+        ]
+      },
+      "expect": {
+        "window_days": ["2026-10-11", "2026-10-12", "2026-10-13"],
+        "moves": [{ "id": "N1", "from": "2026-10-09", "to": "2026-10-12", "minutes": 20 }],
+        "proposals": []
+      }
+    },
+    {
+      "id": "E16",
+      "rule": "R20",
+      "op": "nightly_carryover",
+      "title": "机构任务只在截止日（含）前找空位；截止已过的不再排",
+      "input": {
+        "run_at_day": "2026-10-10",
+        "yesterday": "2026-10-09",
+        "leftovers": [
+          { "id": "O1", "source": "org_or_custom", "kind": "org", "minutes": 25, "deadline": "2026-10-11" },
+          { "id": "O2", "source": "org_or_custom", "kind": "org", "minutes": 20, "deadline": "2026-10-09" }
+        ],
+        "days": [
+          { "day": "2026-10-10", "available": 60, "planned_personal": 50 },
+          { "day": "2026-10-11", "available": 60, "planned_personal": 30 },
+          { "day": "2026-10-12", "available": 90, "planned_personal": 30 }
+        ]
+      },
+      "expect": {
+        "moves": [{ "id": "O1", "from": "2026-10-09", "to": "2026-10-11", "minutes": 25 }],
+        "not_moved": [{ "id": "O2", "why": "截止已过，交给机构端" }],
+        "proposals": []
+      }
+    },
+    {
+      "id": "E17",
+      "rule": "R22",
+      "op": "nightly_carryover",
+      "title": "放不下的与锁定没做完的：同一晚合成一条提议，确认前不排",
+      "input": {
+        "run_at_day": "2026-10-10",
+        "yesterday": "2026-10-09",
+        "target_day": "2027-05-16",
+        "leftovers": [
+          { "id": "N3", "source": "new_learning", "minutes": 40, "value": 0.2, "status": "todo" },
+          { "id": "P3", "source": "practice", "minutes": 35, "value": 0.1, "status": "todo" },
+          { "id": "L1", "source": "practice", "minutes": 20, "value": 0.12, "locked": true, "status": "todo" }
+        ],
+        "days": [
+          { "day": "2026-10-10", "available": 60, "planned_personal": 50 },
+          { "day": "2026-10-11", "available": 60, "planned_personal": 35 },
+          { "day": "2026-10-12", "available": 60, "planned_personal": 30 }
+        ],
+        "later_days": [
+          { "day": "2026-10-13", "available": 60, "planned_personal": 15 },
+          { "day": "2026-10-14", "available": 90, "planned_personal": 40 }
+        ]
+      },
+      "expect": {
+        "moves": [],
+        "proposals": [
+          {
+            "kind": "cannot_place",
+            "status": "pending",
+            "changes": [
+              { "id": "N3", "to": "2026-10-13" },
+              { "id": "L1", "to": "2026-10-11" },
+              { "id": "P3", "to": "2026-10-14" }
+            ]
+          }
+        ],
+        "unscheduled_until_answered": ["N3", "L1", "P3"],
+        "on_decline": "这几项回到计划里待排（锁定的也一样）"
+      }
+    },
+    {
+      "id": "E18",
+      "rule": "R21",
+      "op": "undo",
+      "title": "撤销自动顺延：撤销期内可以，过了不行",
+      "input": {
+        "replan_record": { "kind": "auto_carryover", "id": "N1", "from": "2026-10-09", "to": "2026-10-11", "made_on_day": "2026-10-10" },
+        "checks": [{ "at_day": "2026-10-10" }, { "at_day": "2026-10-17" }]
+      },
+      "expect": {
+        "undo_until_day": "2026-10-16",
+        "checks": [
+          { "at_day": "2026-10-10", "allowed": true, "effect": "N1 从 2026-10-11 拿掉，回到计划里待排", "replan_log_append": "undo" },
+          { "at_day": "2026-10-17", "allowed": false }
+        ]
+      }
+    },
+    {
+      "id": "E19",
+      "rule": "R16 R23",
+      "op": "late_evidence",
+      "title": "离线晚到：凌晨 3:30 做完的算前一天，已经顺延的自动取消",
+      "input": {
+        "time_zone": "Asia/Shanghai",
+        "day_start_hour": 4,
+        "item": { "id": "N1", "source": "new_learning", "scheduled_day": "2026-10-11" },
+        "carryover_done": { "made_on_day": "2026-10-12", "to": "2026-10-13" },
+        "evidence": {
+          "type": "post_read_check",
+          "passed": true,
+          "occurred_at": "2026-10-11T19:30:00Z",
+          "synced_at": "2026-10-12T01:00:00Z"
+        }
+      },
+      "expect": {
+        "evidence_learning_day": "2026-10-11",
+        "item_status": "done",
+        "completed_on_day": "2026-10-11",
+        "carryover": "cancelled",
+        "replan_log_append": { "kind": "correction", "reason": "离线完成晚到" },
+        "recount_completion_for_day": "2026-10-11"
+      }
+    },
+    {
+      "id": "E20",
+      "rule": "R24 R25",
+      "op": "fill",
+      "title": "我只有 15 分钟：按装法装，能截的截，截不了的跳过；今天截止的机构任务保留但不算分钟",
+      "input": {
+        "mode": "short",
+        "cap_minutes": 15,
+        "day": "2026-10-11",
+        "remaining": [
+          { "id": "M", "segment": "consolidate", "source": "mistake_retry", "count": 4, "unit_minutes": 4 },
+          { "id": "V", "segment": "consolidate", "source": "verify_recheck", "count": 2, "unit_minutes": 2 },
+          { "id": "O2", "segment": "advance", "source": "org_or_custom", "kind": "org", "minutes": 30, "deadline": "2026-10-11" },
+          { "id": "T1", "segment": "advance", "source": "to_target", "count": 3, "unit_minutes": 4 },
+          { "id": "N1", "segment": "advance", "source": "new_learning", "minutes": 20 },
+          { "id": "P1", "segment": "advance", "source": "practice", "count": 8, "unit_minutes": 2 },
+          { "id": "B1", "segment": "closing", "source": "bedtime_review", "minutes": 3 },
+          { "id": "W1", "segment": "closing", "source": "weekly_review", "minutes": 10 }
+        ]
+      },
+      "expect": {
+        "kept": [
+          { "id": "M", "count": 3, "minutes": 12 },
+          { "id": "V", "count": 1, "minutes": 2 }
+        ],
+        "kept_outside_cap": ["O2"],
+        "minutes": 14,
+        "set_aside": [
+          { "id": "M", "count": 1 },
+          { "id": "V", "count": 1 },
+          { "id": "T1" },
+          { "id": "N1" },
+          { "id": "P1" },
+          { "id": "B1" },
+          { "id": "W1" }
+        ],
+        "new_items_added": 0,
+        "can_switch_back": true
+      }
+    },
+    {
+      "id": "E21",
+      "rule": "R24 R26",
+      "op": "fill",
+      "title": "三档降级：原型那组剩下的 105 分钟（原型写的 55、20 分钟是示例数字，勘误第 4 条）",
+      "input": {
+        "mode": "tiers",
+        "day": "2026-10-11",
+        "remaining": [
+          { "id": "V", "segment": "consolidate", "source": "verify_recheck", "count": 2, "unit_minutes": 2 },
+          { "id": "T1", "segment": "advance", "source": "to_target", "count": 3, "unit_minutes": 4 },
+          { "id": "N1", "segment": "advance", "source": "new_learning", "minutes": 20 },
+          { "id": "P1", "segment": "advance", "source": "practice", "count": 8, "unit_minutes": 2 },
+          { "id": "O1", "segment": "advance", "source": "org_or_custom", "kind": "org", "minutes": 25, "deadline": "2026-10-13" },
+          { "id": "C1", "segment": "advance", "source": "org_or_custom", "kind": "custom", "minutes": 15 },
+          { "id": "B1", "segment": "closing", "source": "bedtime_review", "minutes": 3 },
+          { "id": "W1", "segment": "closing", "source": "weekly_review", "minutes": 10 }
+        ]
+      },
+      "expect": {
+        "remaining_minutes": 105,
+        "tiers": {
+          "full": { "minutes": 105 },
+          "lite": {
+            "cap_minutes": 52.5,
+            "minutes": 51,
+            "items": [{ "id": "V", "count": 2 }, { "id": "T1", "count": 3 }, { "id": "N1" }, { "id": "P1", "count": 6 }, { "id": "B1" }]
+          },
+          "minimal": { "cap_minutes": 20, "minutes": 19, "items": [{ "id": "V", "count": 2 }, { "id": "T1", "count": 3 }, { "id": "B1" }] }
+        }
+      }
+    },
+    {
+      "id": "E22",
+      "rule": "R19",
+      "op": "after_all_done",
+      "title": "全部完成：不再加任务，换档栏隐藏，给明天第一项预览和可选加练",
+      "input": {
+        "list_status": "all_done",
+        "item_count": 10,
+        "tomorrow_first": { "source": "due_review" }
+      },
+      "expect": {
+        "add_items": false,
+        "tier_bar": "hidden",
+        "show": ["tomorrow_first_preview", "optional_extra_practice"],
+        "extra_practice_produces_evidence": true,
+        "extra_practice_in_completion": false
+      }
+    },
+    {
+      "id": "E23",
+      "rule": "R15 R16",
+      "op": "judge_items",
+      "title": "完成看证据：做错也算完成，手动勾选只算看过，读后即测没过不算",
+      "input": {
+        "items": [
+          {
+            "id": "P1",
+            "source": "practice",
+            "count": 3,
+            "evidence": [
+              { "answered": true, "revealed": true, "correct": true },
+              { "answered": true, "revealed": true, "correct": false },
+              { "answered": true, "revealed": true, "correct": true }
+            ]
+          },
+          {
+            "id": "P2",
+            "source": "practice",
+            "count": 3,
+            "manual_check": true,
+            "evidence": [
+              { "answered": true, "revealed": true, "correct": true },
+              { "answered": true, "revealed": true, "correct": true }
+            ]
+          },
+          { "id": "R1", "source": "new_learning", "post_read_check": { "taken": true, "passed": false } },
+          { "id": "R2", "source": "new_learning", "post_read_check": { "taken": true, "passed": true } },
+          { "id": "D1", "source": "due_review", "count": 10, "recall_ratings": 10, "ratings_forgot": 2 },
+          { "id": "D2", "source": "due_review", "count": 10, "recall_ratings": 6 },
+          { "id": "B1", "source": "bedtime_review", "recap_finished": true },
+          { "id": "W1", "source": "weekly_review", "manual_check": true }
+        ]
+      },
+      "expect": {
+        "status": {
+          "P1": "done",
+          "P2": "seen",
+          "R1": "in_progress",
+          "R2": "done",
+          "D1": "done",
+          "D2": "in_progress",
+          "B1": "done",
+          "W1": "seen"
+        },
+        "progress": { "P2": "2/3", "D2": "6/10" }
+      }
+    },
+    {
+      "id": "E24",
+      "rule": "R18",
+      "op": "completion_rates",
+      "title": "完成率：分母不含“今天不想学这个”的、换档放到一边的",
+      "input": {
+        "day": "2026-10-11",
+        "items": [
+          { "id": "D", "segment": "consolidate", "status": "done" },
+          { "id": "M", "segment": "consolidate", "status": "done" },
+          { "id": "V", "segment": "consolidate", "status": "seen" },
+          { "id": "T1", "segment": "advance", "status": "done" },
+          { "id": "N1", "segment": "advance", "status": "done" },
+          { "id": "P1", "segment": "advance", "status": "done" },
+          { "id": "O1", "segment": "advance", "kind": "org", "linked": ["questions"], "status": "done" },
+          { "id": "C1", "segment": "advance", "status": "skipped_today", "reason": "已经在课上做过" },
+          { "id": "B1", "segment": "closing", "status": "done" },
+          { "id": "W1", "segment": "closing", "status": "todo" }
+        ],
+        "set_aside": ["P2", "N2"]
+      },
+      "expect": {
+        "today_list": { "done": 7, "total": 9, "rate": 0.778 },
+        "consolidate": { "done": 2, "total": 3, "rate": 0.667 },
+        "not_counted": ["C1", "P2", "N2"]
+      }
+    },
+    {
+      "id": "E25",
+      "rule": "R29",
+      "op": "interruption_tier",
+      "title": "中断天数怎么数、分档边界；不可学日不算也不打断",
+      "input": {
+        "checks": [
+          { "last_effective_day": "2026-10-05", "today": "2026-10-08", "off_days": [] },
+          { "last_effective_day": "2026-10-05", "today": "2026-10-09", "off_days": [] },
+          { "last_effective_day": "2026-10-01", "today": "2026-10-15", "off_days": [] },
+          { "last_effective_day": "2026-10-01", "today": "2026-10-16", "off_days": [] },
+          { "last_effective_day": "2026-10-05", "today": "2026-10-09", "off_days": ["2026-10-07"] }
+        ]
+      },
+      "expect": {
+        "tier_codes": "0＝照常，1＝第一档，2＝第二档",
+        "checks": [
+          { "gap_days": 2, "tier": 0 },
+          { "gap_days": 3, "tier": 1 },
+          { "gap_days": 13, "tier": 1 },
+          { "gap_days": 14, "tier": 2 },
+          { "gap_days": 2, "tier": 0 }
+        ]
+      }
+    },
+    {
+      "id": "E26",
+      "rule": "R29",
+      "op": "generate_today",
+      "title": "中断 5 天回来：10 分钟启动任务（含一道上次做对过的错题），做完才显示其余，出重组提议",
+      "input": {
+        "day": "2026-10-11",
+        "weekday": 7,
+        "mix_mode": "roi",
+        "sprint_mode": false,
+        "budget_minutes": 145,
+        "reservations": [],
+        "interruption": { "last_effective_day": "2026-10-05", "off_days": [] },
+        "due_queue": [
+          { "source": "due_review", "count": 40, "unit_minutes": 0.75 },
+          {
+            "source": "mistake_retry",
+            "items": [
+              { "id": "M1", "minutes": 4, "last_retry_correct": true },
+              { "id": "M2", "minutes": 4, "last_retry_correct": false }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "gap_days": 5,
+        "tier": 1,
+        "start_task": {
+          "minutes": 10,
+          "items": [
+            { "source": "due_review", "count": 8, "minutes": 6 },
+            { "source": "mistake_retry", "id": "M1", "minutes": 4 }
+          ]
+        },
+        "rest_of_list_visible": "做完启动任务之后",
+        "show_backlog_count": false,
+        "proposal": {
+          "kind": "reconnect_reorganize",
+          "status": "pending",
+          "recovery_days": 14,
+          "change": "中断期间没做的推进任务排进接下来 14 天；排不下的部分才建议推后当前轮次结束日"
+        }
+      }
+    },
+    {
+      "id": "E27",
+      "rule": "R29",
+      "op": "generate_today",
+      "title": "中断 16 天回来：启动任务同第一档，提议改为重排剩下的轮次，不要求复测",
+      "input": {
+        "day": "2026-10-21",
+        "weekday": 3,
+        "mix_mode": "roi",
+        "sprint_mode": false,
+        "budget_minutes": 145,
+        "reservations": [],
+        "interruption": { "last_effective_day": "2026-10-04", "off_days": [] },
+        "due_queue": [
+          { "source": "due_review", "count": 40, "unit_minutes": 0.75 },
+          {
+            "source": "mistake_retry",
+            "items": [
+              { "id": "M1", "minutes": 4, "last_retry_correct": true },
+              { "id": "M2", "minutes": 4, "last_retry_correct": false }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "gap_days": 16,
+        "tier": 2,
+        "start_task": {
+          "minutes": 10,
+          "items": [
+            { "source": "due_review", "count": 8, "minutes": 6 },
+            { "source": "mistake_retry", "id": "M1", "minutes": 4 }
+          ]
+        },
+        "show_backlog_count": false,
+        "proposal": { "kind": "replan_remaining_rounds", "status": "pending", "requires_retest": false }
+      }
+    },
+    {
+      "id": "E28",
+      "rule": "R22 R29",
+      "op": "nightly_carryover",
+      "title": "中断达到第一档后的夜里：照常顺延，但放不下的不单独出提议，等回来并进重组提议",
+      "input": {
+        "run_at_day": "2026-10-09",
+        "yesterday": "2026-10-08",
+        "interruption": { "last_effective_day": "2026-10-05", "off_days": [] },
+        "leftovers": [
+          { "id": "N3", "source": "new_learning", "minutes": 40, "value": 0.2, "status": "todo" },
+          { "id": "N4", "source": "new_learning", "minutes": 20, "value": 0.15, "status": "todo" }
+        ],
+        "days": [
+          { "day": "2026-10-09", "available": 60, "planned_personal": 50 },
+          { "day": "2026-10-10", "available": 60, "planned_personal": 35 },
+          { "day": "2026-10-11", "available": 60, "planned_personal": 30 }
+        ]
+      },
+      "expect": {
+        "no_study_days_so_far": 3,
+        "moves": [{ "id": "N4", "from": "2026-10-08", "to": "2026-10-10", "minutes": 20 }],
+        "proposals": [],
+        "held_for_reconnect": ["N3"]
+      }
+    },
+    {
+      "id": "E29",
+      "rule": "R33",
+      "op": "proposal_check",
+      "title": "按实测重排：连续两周每周相差达到 20% 才出；声明扣掉不可学日；学得多也算",
+      "input": {
+        "kind": "calibrate",
+        "checks": [
+          {
+            "weeks": [
+              { "declared": 540, "actual": 432 },
+              { "declared": 540, "actual": 420 }
+            ]
+          },
+          {
+            "weeks": [
+              { "declared": 540, "actual": 432 },
+              { "declared": 540, "actual": 450 }
+            ]
+          },
+          {
+            "weeks": [
+              { "declared": 540, "off_day_minutes": 60, "actual": 400 },
+              { "declared": 540, "actual": 420 }
+            ]
+          },
+          {
+            "weeks": [
+              { "declared": 300, "actual": 360 },
+              { "declared": 300, "actual": 380 }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "checks": [
+          { "gaps": [0.2, 0.222], "propose": true },
+          { "gaps": [0.2, 0.167], "propose": false },
+          { "gaps": [0.167, 0.222], "propose": false },
+          { "gaps": [0.2, 0.267], "propose": true }
+        ]
+      }
+    },
+    {
+      "id": "E30",
+      "rule": "R32 R33",
+      "op": "proposal_check",
+      "title": "冲刺模式提议：剩 10 天出；已进入或选过“不改”的不再出",
+      "input": {
+        "kind": "sprint",
+        "target_day": "2027-05-16",
+        "checks": [
+          { "today": "2027-05-06", "sprint_mode": false },
+          { "today": "2027-05-05", "sprint_mode": false },
+          { "today": "2027-05-08", "sprint_mode": true },
+          { "today": "2027-05-07", "sprint_mode": false, "declined_on_day": "2027-05-06" }
+        ]
+      },
+      "expect": {
+        "checks": [
+          { "days_to_target": 10, "propose": true },
+          { "days_to_target": 11, "propose": false },
+          { "days_to_target": 8, "propose": false },
+          { "days_to_target": 9, "propose": false }
+        ],
+        "after_confirm": "巩固段保底改用 plan.consolidate.sprint_ratio（见 E5）"
+      }
+    },
+    {
+      "id": "E31",
+      "rule": "R32",
+      "op": "proposal_lifecycle",
+      "title": "提议状态：新的顶替旧的、确认、撤销期、不改；没有提议自动生效",
+      "input": {
+        "events": [
+          { "day": "2026-10-11", "do": "create", "id": "P1", "kind": "calibrate" },
+          { "day": "2026-10-18", "do": "create", "id": "P2", "kind": "calibrate" },
+          { "day": "2026-10-18", "do": "confirm", "id": "P2" },
+          { "day": "2026-10-24", "do": "undo", "id": "P2" },
+          { "day": "2026-10-11", "do": "create", "id": "P3", "kind": "switch_round" },
+          { "day": "2026-10-12", "do": "decline", "id": "P3" },
+          { "day": "2026-10-18", "do": "create", "id": "P4", "kind": "compress_scope" },
+          { "day": "2026-10-18", "do": "confirm", "id": "P4" },
+          { "day": "2026-10-25", "do": "undo", "id": "P4" }
+        ]
+      },
+      "expect": {
+        "after_each": [
+          { "P1": "pending" },
+          { "P1": "undone", "P2": "pending" },
+          { "P2": "confirmed", "undo_until_day": "2026-10-24" },
+          { "P2": "undone", "allowed": true },
+          { "P3": "pending" },
+          { "P3": "declined", "applied": false },
+          { "P4": "pending" },
+          { "P4": "confirmed", "undo_until_day": "2026-10-24" },
+          { "P4": "confirmed", "allowed": false, "why": "已过撤销期" }
+        ],
+        "replan_log_kinds": ["proposal_superseded", "proposal_confirmed", "proposal_undone", "proposal_declined", "proposal_confirmed"],
+        "auto_applied": []
+      }
+    },
+    {
+      "id": "E32",
+      "rule": "R33",
+      "op": "proposal_check",
+      "title": "压缩范围：装不下时提议移出性价比最低、刚好补上缺口的一批知识点",
+      "input": {
+        "kind": "compress_scope",
+        "checks": [
+          {
+            "remaining_advance_minutes": 1500,
+            "capacity_until_target_minutes": 1200,
+            "kp_candidates": [
+              { "kp": "K1", "value": 0.3, "minutes": 300 },
+              { "kp": "K6", "value": 0.1, "minutes": 200 },
+              { "kp": "K7", "value": 0.08, "minutes": 90 },
+              { "kp": "K8", "value": 0.06, "minutes": 100 },
+              { "kp": "K9", "value": 0.05, "minutes": 120 }
+            ]
+          },
+          { "remaining_advance_minutes": 1100, "capacity_until_target_minutes": 1200 }
+        ]
+      },
+      "expect": {
+        "checks": [
+          {
+            "shortfall_minutes": 300,
+            "propose": true,
+            "remove": ["K9", "K8", "K7"],
+            "freed_minutes": 310,
+            "cost": { "score": "来自 R06 的预测", "levels": "来自 R06 的预测" }
+          },
+          { "propose": false }
+        ]
+      }
+    },
+    {
+      "id": "E33",
+      "rule": "R33",
+      "op": "proposal_check",
+      "title": "切换轮次：结束日当天出提议，掌握档不清零；本轮覆盖进度",
+      "input": {
+        "kind": "switch_round",
+        "round": { "name": "第 1 轮 打基础", "start": "2026-08-17", "end": "2026-12-20", "next": "第 2 轮 攻重点" },
+        "kp_in_scope": 200,
+        "kp_with_new_evidence_this_round": 128,
+        "checks": [{ "today": "2026-12-19" }, { "today": "2026-12-20" }]
+      },
+      "expect": {
+        "checks": [{ "propose": false }, { "propose": true, "change": "切到第 2 轮 攻重点" }],
+        "mastery_reset": false,
+        "round_coverage": 0.64
+      }
+    },
+    {
+      "id": "E34",
+      "rule": "R30",
+      "op": "apply_change",
+      "title": "谁能直接改计划：只有计划引擎的夜间顺延；导师、复盘和改轮次都只能出提议",
+      "input": {
+        "checks": [
+          { "source": "tutor", "change": { "type": "round_end", "round": 2, "shift_days": 7 } },
+          { "source": "plan_engine", "change": { "type": "auto_carryover", "id": "N1", "to": "2026-10-11" } },
+          { "source": "plan_engine", "change": { "type": "round_end", "round": 1, "shift_days": 3 } },
+          { "source": "review", "change": { "type": "scope_remove", "kp": ["K9"] } }
+        ]
+      },
+      "expect": {
+        "checks": [
+          { "applied": false, "proposal": { "status": "pending", "source": "tutor" } },
+          { "applied": true, "proposal": null, "replan_log": "auto_carryover", "undo_days": 7 },
+          { "applied": false, "proposal": { "status": "pending", "source": "plan_engine" } },
+          { "applied": false, "proposal": { "status": "pending", "source": "review" } }
+        ]
+      }
+    },
+    {
+      "id": "E35",
+      "rule": "R1 R2 R3",
+      "op": "generate_today",
+      "title": "低预算的周日（冲刺期）：保底先占，周复盘放不下就这周不排；合计不超过可用时间（复核的反例：原来会排成 23 > 20）",
+      "input": {
+        "day": "2026-10-18",
+        "weekday": 7,
+        "mix_mode": "roi",
+        "sprint_mode": true,
+        "budget_minutes": 20,
+        "reservations": [],
+        "due_queue": [
+          { "source": "due_review", "count": 12, "unit_minutes": 1 },
+          { "source": "mistake_retry", "count": 2, "unit_minutes": 4 }
+        ],
+        "scheduled": [{ "id": "N1", "source": "new_learning", "minutes": 15, "value": 0.2, "importance": 3 }]
+      },
+      "expect": {
+        "available_minutes": 20,
+        "consolidate_floor_minutes": 10,
+        "consolidate_cap_minutes": 10,
+        "steps": [
+          { "step": 1, "took": [{ "source": "due_review", "count": 10 }], "left_after": 10 },
+          { "step": 2, "took": ["bedtime_review"], "left_after": 7 },
+          { "step": 3, "took": [], "not_placed": ["weekly_review"], "left_after": 7 },
+          { "step": 6, "took": [], "carried_out": ["N1"], "left_after": 7 },
+          {
+            "step": 7,
+            "took": [
+              { "source": "due_review", "count": 2 },
+              { "source": "mistake_retry", "count": 1 }
+            ],
+            "left_after": 1
+          }
+        ],
+        "consolidate": [
+          { "source": "due_review", "count": 12, "minutes": 12 },
+          { "source": "mistake_retry", "count": 1, "minutes": 4 }
+        ],
+        "advance": [],
+        "closing": ["bedtime_review"],
+        "not_scheduled": [{ "id": "weekly_review", "why": "剩下的时间放不下：这周不排，不顺延，不出提议" }],
+        "carried_out": ["N1"],
+        "carry_search_from": "2026-10-19",
+        "left_in_due_queue": [{ "source": "mistake_retry", "count": 1 }],
+        "minutes": { "consolidate": 16, "advance_personal": 0, "closing": 3, "total": 19 },
+        "unused_minutes": 1
+      }
+    },
+    {
+      "id": "E36",
+      "rule": "R1 R3 R4",
+      "op": "generate_today",
+      "title": "额度不能整分：保底 7.5、上限 12.5 都不取整；装不下一整条的零头留给后面的步骤",
+      "input": {
+        "day": "2026-10-14",
+        "weekday": 3,
+        "mix_mode": "roi",
+        "sprint_mode": false,
+        "budget_minutes": 45,
+        "reservations": [{ "id": "O1", "source": "org_or_custom", "kind": "org", "minutes": 20, "deadline": "2026-10-16" }],
+        "due_queue": [
+          { "source": "due_review", "count": 5, "unit_minutes": 1 },
+          { "source": "mistake_retry", "count": 3, "unit_minutes": 4 }
+        ],
+        "scheduled": [
+          { "id": "N1", "source": "new_learning", "minutes": 12, "value": 0.2, "importance": 3 },
+          { "id": "P1", "source": "practice", "minutes": 8, "value": 0.1, "importance": 3 }
+        ]
+      },
+      "expect": {
+        "available_minutes": 25,
+        "consolidate_floor_minutes": 7.5,
+        "consolidate_cap_minutes": 12.5,
+        "steps": [
+          {
+            "step": 1,
+            "took": [{ "source": "due_review", "count": 5 }],
+            "skipped": [{ "source": "mistake_retry", "why": "一道 4 分钟，放不进保底额剩下的 2.5" }],
+            "left_after": 20
+          },
+          { "step": 2, "took": ["bedtime_review"], "left_after": 17 },
+          { "step": 5, "took": [{ "source": "mistake_retry", "count": 1 }], "left_after": 13 },
+          { "step": 6, "took": ["N1"], "carried_out": ["P1"], "left_after": 1 }
+        ],
+        "consolidate": [
+          { "source": "due_review", "count": 5, "minutes": 5 },
+          { "source": "mistake_retry", "count": 1, "minutes": 4 }
+        ],
+        "advance": ["N1", "O1"],
+        "closing": ["bedtime_review"],
+        "carried_out": ["P1"],
+        "carry_search_from": "2026-10-15",
+        "left_in_due_queue": [{ "source": "mistake_retry", "count": 2 }],
+        "minutes": { "consolidate": 9, "advance_personal": 12, "org_reserved": 20, "closing": 3, "total": 44 },
+        "unused_minutes": 1
+      }
+    },
+    {
+      "id": "E37",
+      "rule": "R1 R4 R5",
+      "op": "generate_today",
+      "title": "到期超量（复习优先）：到期的装到剩下的时间用完为止，合计仍不超过可用时间",
+      "input": {
+        "day": "2026-10-15",
+        "weekday": 4,
+        "mix_mode": "review_first",
+        "sprint_mode": false,
+        "budget_minutes": 60,
+        "reservations": [],
+        "due_queue": [
+          { "source": "due_review", "count": 50, "unit_minutes": 1 },
+          { "source": "mistake_retry", "count": 10, "unit_minutes": 4 }
+        ],
+        "scheduled": [
+          { "id": "L1", "source": "practice", "minutes": 15, "value": 0.12, "importance": 3, "locked": true },
+          { "id": "T1", "source": "to_target", "minutes": 10, "value": 0.3, "importance": 3 },
+          { "id": "N1", "source": "new_learning", "minutes": 20, "value": 0.2, "importance": 3 }
+        ]
+      },
+      "expect": {
+        "available_minutes": 60,
+        "consolidate_floor_minutes": 18,
+        "steps": [
+          { "step": 1, "took": [{ "source": "due_review", "count": 18 }], "left_after": 42 },
+          { "step": 2, "took": ["bedtime_review"], "left_after": 39 },
+          { "step": 4, "took": ["L1"], "left_after": 24 },
+          { "step": 5, "took": [{ "source": "due_review", "count": 24 }], "left_after": 0 },
+          { "step": 6, "took": [], "carried_out": ["T1", "N1"], "left_after": 0 }
+        ],
+        "consolidate": [{ "source": "due_review", "count": 42, "minutes": 42 }],
+        "advance": ["L1"],
+        "closing": ["bedtime_review"],
+        "carried_out": ["T1", "N1"],
+        "carry_search_from": "2026-10-16",
+        "left_in_due_queue": [
+          { "source": "due_review", "count": 8 },
+          { "source": "mistake_retry", "count": 10 }
+        ],
+        "minutes": { "consolidate": 42, "advance_personal": 15, "closing": 3, "total": 60 },
+        "show_backlog_count": false
+      }
+    },
+    {
+      "id": "E38",
+      "rule": "R1 R5 R22",
+      "op": "generate_today",
+      "title": "锁定的放不下：不自动搬，当场合进“排不下”提议，确认前不排；没锁定的照常顺延",
+      "input": {
+        "day": "2026-10-14",
+        "weekday": 3,
+        "mix_mode": "roi",
+        "sprint_mode": false,
+        "budget_minutes": 60,
+        "reservations": [],
+        "target_day": "2027-05-16",
+        "due_queue": [{ "source": "due_review", "count": 20, "unit_minutes": 1 }],
+        "scheduled": [
+          { "id": "L1", "source": "practice", "minutes": 30, "value": 0.12, "importance": 3, "locked": true },
+          { "id": "L2", "source": "new_learning", "minutes": 25, "value": 0.2, "importance": 3, "locked": true },
+          { "id": "T1", "source": "to_target", "minutes": 15, "value": 0.3, "importance": 3 }
+        ],
+        "next_days": [
+          { "day": "2026-10-15", "available": 60, "planned_personal": 40 },
+          { "day": "2026-10-16", "available": 60, "planned_personal": 25 },
+          { "day": "2026-10-17", "available": 60, "planned_personal": 20 }
+        ]
+      },
+      "expect": {
+        "available_minutes": 60,
+        "consolidate_floor_minutes": 18,
+        "consolidate_cap_minutes": 30,
+        "steps": [
+          { "step": 1, "took": [{ "source": "due_review", "count": 18 }], "left_after": 42 },
+          { "step": 2, "took": ["bedtime_review"], "left_after": 39 },
+          { "step": 4, "took": ["L2"], "not_placed": ["L1"], "left_after": 14 },
+          { "step": 5, "took": [{ "source": "due_review", "count": 2 }], "left_after": 12 },
+          { "step": 6, "took": [], "carried_out": ["T1"], "left_after": 12 }
+        ],
+        "consolidate": [{ "source": "due_review", "count": 20, "minutes": 20 }],
+        "advance": ["L2"],
+        "closing": ["bedtime_review"],
+        "carried_out": ["T1"],
+        "carry_moves": [{ "id": "T1", "to": "2026-10-15", "minutes": 15 }],
+        "proposal": { "kind": "cannot_place", "status": "pending", "changes": [{ "id": "L1", "to": "2026-10-16" }] },
+        "unscheduled_until_answered": ["L1"],
+        "on_decline": "回到计划里待排（锁定的也一样）",
+        "minutes": { "consolidate": 20, "advance_personal": 25, "closing": 3, "total": 48 },
+        "unused_minutes": 12
+      }
+    },
+    {
+      "id": "E39",
+      "rule": "R1 R11",
+      "op": "plan_week",
+      "title": "排本周：一整周装箱，每天只排到 A × (1 − 缓冲)，缓冲只扣一次；额度可以有小数",
+      "input": {
+        "run_at_day": "2026-10-19",
+        "mix_mode": "roi",
+        "sprint_mode": false,
+        "days": [
+          { "day": "2026-10-19", "weekday": 1, "budget": 60, "org": 0, "due_expected_minutes": 20 },
+          { "day": "2026-10-20", "weekday": 2, "budget": 60, "org": 30, "due_expected_minutes": 10 },
+          { "day": "2026-10-21", "weekday": 3, "off_day": true },
+          { "day": "2026-10-22", "weekday": 4, "budget": 45, "org": 0, "due_expected_minutes": 30 },
+          {
+            "day": "2026-10-23",
+            "weekday": 5,
+            "budget": 60,
+            "org": 0,
+            "due_expected_minutes": 15,
+            "locked": [{ "id": "L1", "source": "practice", "minutes": 20 }]
+          },
+          { "day": "2026-10-24", "weekday": 6, "budget": 120, "org": 0, "due_expected_minutes": 40 },
+          { "day": "2026-10-25", "weekday": 7, "budget": 90, "org": 0, "due_expected_minutes": 30 }
+        ],
+        "tasks": [
+          { "id": "T1", "source": "to_target", "minutes": 25, "value": 0.3, "importance": 3 },
+          { "id": "N1", "source": "new_learning", "minutes": 30, "value": 0.25, "importance": 3 },
+          { "id": "N2", "source": "new_learning", "minutes": 20, "value": 0.22, "importance": 3 },
+          { "id": "P1", "source": "practice", "minutes": 12, "value": 0.2, "importance": 3 },
+          { "id": "N3", "source": "new_learning", "minutes": 40, "value": 0.18, "importance": 3 },
+          { "id": "P2", "source": "practice", "minutes": 15, "value": 0.15, "importance": 3 },
+          { "id": "N4", "source": "new_learning", "minutes": 60, "value": 0.12, "importance": 3 },
+          { "id": "P3", "source": "practice", "minutes": 10, "value": 0.1, "importance": 3 },
+          { "id": "P4", "source": "practice", "minutes": 13, "value": 0.09, "importance": 3 },
+          { "id": "N5", "source": "new_learning", "minutes": 35, "value": 0.08, "importance": 3 }
+        ]
+      },
+      "expect": {
+        "days": [
+          {
+            "day": "2026-10-19",
+            "available": 60,
+            "limit": 51,
+            "consolidate_expected": 20,
+            "closing": 3,
+            "locked": 0,
+            "placed": ["T1"],
+            "used": 48
+          },
+          {
+            "day": "2026-10-20",
+            "available": 30,
+            "limit": 25.5,
+            "consolidate_expected": 10,
+            "closing": 3,
+            "locked": 0,
+            "placed": ["P1"],
+            "used": 25
+          },
+          { "day": "2026-10-21", "off_day": true, "placed": [] },
+          {
+            "day": "2026-10-22",
+            "available": 45,
+            "limit": 38.25,
+            "consolidate_expected": 22.5,
+            "closing": 3,
+            "locked": 0,
+            "placed": ["P3"],
+            "used": 35.5
+          },
+          {
+            "day": "2026-10-23",
+            "available": 60,
+            "limit": 51,
+            "consolidate_expected": 15,
+            "closing": 3,
+            "locked": 20,
+            "placed": ["P4"],
+            "used": 51
+          },
+          {
+            "day": "2026-10-24",
+            "available": 120,
+            "limit": 102,
+            "consolidate_expected": 40,
+            "closing": 3,
+            "locked": 0,
+            "placed": ["N1", "N2"],
+            "used": 93
+          },
+          {
+            "day": "2026-10-25",
+            "available": 90,
+            "limit": 76.5,
+            "consolidate_expected": 30,
+            "closing": 13,
+            "locked": 0,
+            "placed": ["P2"],
+            "used": 58
+          }
+        ],
+        "unplaced": ["N3", "N4", "N5"],
+        "unplaced_goes": "留在计划里待排，下周一再排；整体装不下由压缩范围提议处理（R33）",
+        "buffer": "每天 available × plan.week.buffer_ratio，只在 limit 里扣这一次；顺延（R20）最多可以用到 available"
+      }
+    },
+    {
+      "id": "E40",
+      "rule": "R11 R20 R22",
+      "op": "nightly_carryover",
+      "title": "顺延和排本周用同一个容量：先扣预计巩固、收尾、锁定和已排推进（复核的反例 73 > 60）；缓冲恰好用完；同一天叠放两项",
+      "input": {
+        "run_at_day": "2026-10-20",
+        "yesterday": "2026-10-19",
+        "target_day": "2027-05-16",
+        "leftovers": [
+          { "id": "N1", "source": "new_learning", "minutes": 20, "value": 0.25, "status": "todo" },
+          { "id": "P1", "source": "practice", "minutes": 9, "value": 0.2, "status": "todo" },
+          { "id": "P2", "source": "practice", "minutes": 12, "value": 0.15, "status": "todo" },
+          { "id": "N2", "source": "new_learning", "minutes": 10, "value": 0.1, "status": "seen" }
+        ],
+        "days": [
+          { "day": "2026-10-20", "budget": 60, "org": 0, "planned": { "consolidate": 20, "closing": 3, "locked": 0, "advance": 30 } },
+          { "day": "2026-10-21", "budget": 60, "org": 0, "planned": { "consolidate": 15, "closing": 3, "locked": 20, "advance": 13 } },
+          {
+            "day": "2026-10-22",
+            "budget": 90,
+            "org": 30,
+            "planned": { "consolidate": 10, "closing": 3, "locked": 0, "advance": 12 },
+            "note": "advance 12 是 10 月 16 日顺延过来的一项"
+          }
+        ],
+        "later_days": [
+          { "day": "2026-10-23", "budget": 60, "org": 0, "planned": { "consolidate": 20, "closing": 3, "locked": 0, "advance": 22 } }
+        ]
+      },
+      "expect": {
+        "available": { "2026-10-20": 60, "2026-10-21": 60, "2026-10-22": 60 },
+        "planned_personal": { "2026-10-20": 53, "2026-10-21": 51, "2026-10-22": 25 },
+        "free_before": { "2026-10-20": 7, "2026-10-21": 9, "2026-10-22": 35 },
+        "key_checks": [
+          { "id": "N1", "day": "2026-10-20", "total_if_placed": 73, "fits": false },
+          { "id": "P1", "day": "2026-10-21", "total_if_placed": 60, "fits": true, "note": "正好用完缓冲" },
+          { "id": "P2", "day": "2026-10-22", "total_if_placed": 57, "fits": true, "note": "N1 已放进这天之后接着算" }
+        ],
+        "moves": [
+          { "id": "N1", "from": "2026-10-19", "to": "2026-10-22", "minutes": 20 },
+          { "id": "P1", "from": "2026-10-19", "to": "2026-10-21", "minutes": 9 },
+          { "id": "P2", "from": "2026-10-19", "to": "2026-10-22", "minutes": 12 }
+        ],
+        "free_after": { "2026-10-20": 7, "2026-10-21": 0, "2026-10-22": 3 },
+        "proposals": [{ "kind": "cannot_place", "status": "pending", "changes": [{ "id": "N2", "to": "2026-10-23" }] }],
+        "unscheduled_until_answered": ["N2"]
+      }
+    },
+    {
+      "id": "E41",
+      "rule": "R15 R20",
+      "op": "judge_items",
+      "title": "机构与自定任务的完成：挂了证据的看证据；没有作答或阅读记录的，机构任务看机构端记录，学员点“做完了”只记“自报做完”",
+      "input": {
+        "day": "2026-10-14",
+        "time_zone": "Asia/Shanghai",
+        "items": [
+          {
+            "id": "O1",
+            "source": "org_or_custom",
+            "kind": "org",
+            "linked": ["questions"],
+            "count": 5,
+            "evidence": [
+              { "answered": true, "revealed": true, "correct": true },
+              { "answered": true, "revealed": true, "correct": false },
+              { "answered": true, "revealed": true, "correct": true },
+              { "answered": true, "revealed": true, "correct": false },
+              { "answered": true, "revealed": true, "correct": true }
+            ]
+          },
+          {
+            "id": "O2",
+            "source": "org_or_custom",
+            "kind": "org",
+            "linked": [],
+            "format": "live_class",
+            "starts_at": "2026-10-14T11:00:00Z",
+            "org_record": { "type": "attendance", "occurred_at": "2026-10-14T11:00:00Z" }
+          },
+          {
+            "id": "O3",
+            "source": "org_or_custom",
+            "kind": "org",
+            "linked": [],
+            "format": "paper_homework",
+            "deadline": "2026-10-16",
+            "learner_marked_done": true
+          },
+          { "id": "O4", "source": "org_or_custom", "kind": "org", "linked": [], "format": "paper_homework", "deadline": "2026-10-16" },
+          {
+            "id": "C1",
+            "source": "org_or_custom",
+            "kind": "custom",
+            "linked": ["reading"],
+            "post_read_check": { "taken": true, "passed": true }
+          },
+          {
+            "id": "C2",
+            "source": "org_or_custom",
+            "kind": "custom",
+            "linked": [],
+            "note": "看外部网课第 3 讲",
+            "learner_marked_done": true
+          },
+          { "id": "C3", "source": "org_or_custom", "kind": "custom", "linked": [], "note": "整理纸质笔记" }
+        ],
+        "later": [{ "at": "2026-10-15T02:00:00Z", "id": "O3", "org_record": { "type": "graded", "occurred_at": "2026-10-14T12:30:00Z" } }]
+      },
+      "expect": {
+        "status": { "O1": "done", "O2": "done", "O3": "self_reported", "O4": "todo", "C1": "done", "C2": "self_reported", "C3": "todo" },
+        "confirmed_by": { "O1": "evidence", "O2": "org_record", "O3": "learner", "C1": "evidence", "C2": "learner" },
+        "in_completion_rate": ["O1", "C1"],
+        "not_in_completion_rate": ["O2", "O3", "O4", "C2", "C3"],
+        "writes_learning_evidence": { "O1": true, "O2": false, "O3": false, "C1": true, "C2": false },
+        "learning_day": { "O2": "2026-10-14" },
+        "tonight": {
+          "O2": "不顺延：直播课过了上课时间",
+          "O3": "不顺延：已自报做完",
+          "O4": "截止日 2026-10-16（含）前按 R20 顺延",
+          "C2": "不顺延：已自报做完",
+          "C3": "按 R20 顺延"
+        },
+        "after_later": {
+          "O3": { "status": "done", "confirmed_by": "org_record", "learning_day": "2026-10-14", "in_completion_rate": false }
+        }
+      }
+    },
+    {
+      "id": "E42",
+      "rule": "R18 R19 R27",
+      "op": "completion_rates",
+      "title": "分母为 0：比值写 null 并给原因，不输出 NaN，也不当作已完成；这些天不进平台汇总",
+      "input": {
+        "checks": [
+          {
+            "day": "2026-10-12",
+            "plan_exists": true,
+            "items": [
+              { "id": "D", "segment": "consolidate", "status": "skipped_today", "reason": "身体不舒服" },
+              { "id": "N1", "segment": "advance", "status": "skipped_today", "reason": "身体不舒服" }
+            ]
+          },
+          {
+            "day": "2026-10-13",
+            "plan_exists": true,
+            "items": [
+              { "id": "N1", "segment": "advance", "status": "done" },
+              { "id": "P1", "segment": "advance", "status": "seen" },
+              { "id": "B1", "segment": "closing", "status": "done" }
+            ]
+          },
+          { "day": "2026-10-14", "plan_exists": false, "items": [] },
+          {
+            "day": "2026-10-15",
+            "plan_exists": true,
+            "off_day": true,
+            "items": [{ "id": "D", "segment": "consolidate", "optional": true, "status": "done" }]
+          }
+        ]
+      },
+      "expect": {
+        "checks": [
+          {
+            "today_list": { "done": 0, "total": 0, "rate": null, "reason": "no_counted_items" },
+            "consolidate": { "done": 0, "total": 0, "rate": null, "reason": "no_counted_items" },
+            "all_done": false,
+            "page": "今天的项都先不做了；显示明天第一项的预览"
+          },
+          {
+            "today_list": { "done": 2, "total": 3, "rate": 0.667 },
+            "consolidate": { "done": 0, "total": 0, "rate": null, "reason": "no_counted_items" },
+            "all_done": false,
+            "page": "不显示巩固段"
+          },
+          {
+            "today_list": { "done": 0, "total": 0, "rate": null, "reason": "no_counted_items" },
+            "consolidate": { "done": 0, "total": 0, "rate": null, "reason": "no_counted_items" },
+            "all_done": false,
+            "page_state": "empty",
+            "page": "今天没有安排；按钮“生成计划”"
+          },
+          {
+            "today_list": { "done": 0, "total": 0, "rate": null, "reason": "no_counted_items" },
+            "consolidate": { "done": 0, "total": 0, "rate": null, "reason": "no_counted_items" },
+            "all_done": false,
+            "page": "今天不可学，其余已顺延，不影响进度数字"
+          }
+        ],
+        "aggregate": "rate 为 null 的日子不进平台汇总（P01）：不算 0，也不算 1",
+        "proposals": [],
+        "never_output": ["NaN", "Infinity"]
+      }
+    },
+    {
+      "id": "E43",
+      "rule": "R18 R33",
+      "op": "proposal_check",
+      "title": "按实测重排遇到整周不可学：这一周没有比值、不算数，连续的周数从它之后重新数",
+      "input": {
+        "kind": "calibrate",
+        "checks": [
+          {
+            "weeks": [
+              { "declared": 540, "actual": 400 },
+              { "declared": 540, "off_day_minutes": 540, "actual": 60 }
+            ]
+          },
+          {
+            "weeks": [
+              { "declared": 540, "actual": 400 },
+              { "declared": 540, "off_day_minutes": 540, "actual": 60 },
+              { "declared": 540, "actual": 400 }
+            ]
+          },
+          {
+            "weeks": [
+              { "declared": 540, "actual": 400 },
+              { "declared": 540, "off_day_minutes": 540, "actual": 60 },
+              { "declared": 540, "actual": 400 },
+              { "declared": 540, "actual": 410 }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "checks": [
+          { "gaps": [0.259, null], "reasons": [null, "declared_zero"], "propose": false },
+          { "gaps": [0.259, null, 0.259], "propose": false },
+          { "gaps": [0.259, null, 0.259, 0.241], "propose": true }
+        ],
+        "null_week_page": "只显示实测 60 分钟，标“数据不足”，不写相差多少"
+      }
+    },
+    {
+      "id": "E44",
+      "rule": "R18 R33",
+      "op": "proposal_check",
+      "title": "学习范围为空：覆盖进度没有数（null），不当作达成；不出压缩范围提议，到结束日照常提议切换轮次",
+      "input": {
+        "kind": "switch_round",
+        "round": {
+          "name": "第 1 轮 打基础",
+          "start": "2026-08-17",
+          "end": "2026-12-20",
+          "next": "第 2 轮 攻重点",
+          "switch_condition": { "round_coverage_at_least": 0.8 }
+        },
+        "kp_in_scope": 0,
+        "kp_with_new_evidence_this_round": 0,
+        "remaining_advance_minutes": 0,
+        "checks": [{ "today": "2026-11-10" }, { "today": "2026-12-20" }]
+      },
+      "expect": {
+        "round_coverage": null,
+        "reason": "scope_empty",
+        "page": "学习范围里还没有知识点（链到“学习范围”标签）",
+        "checks": [
+          { "propose": false, "why": "按覆盖进度写的切换条件算没满足" },
+          { "propose": true, "change": "切到第 2 轮 攻重点", "why": "到了结束日" }
+        ],
+        "compress_scope": { "propose": false },
+        "mastery_reset": false
+      }
+    }
+  ]
+}
