@@ -1,0 +1,2113 @@
+{
+  "card": "docs/baseline/rule-cards/billing-quota.md",
+  "status": "草稿",
+  "decided": {
+    "R10-Q1": "A",
+    "R10-Q2": "A",
+    "R10-Q3": "A",
+    "R10-Q4": "A",
+    "R10-Q5": "A",
+    "R10-Q6": "A",
+    "R10-Q7": "A",
+    "R10-Q8": "A",
+    "R10-Q9": "A",
+    "R10-Q10": "A"
+  },
+  "conventions": [
+    "每条例子是 input → expect；expect 只列要核对的字段，没列的不核对。对象里的对象、列表里的对象也一样只核对写出来的字段；列表按顺序逐项核对，长度要相等。",
+    "时间写成带时区的 ISO 8601（例子里都是北京时间 +08:00）；“哪一天”按 day 设置、用 packages/shared/src/today 的 today() 算（凌晨 4 点切日）。名字以 _day 结尾的字段是学习日 YYYY-MM-DD。",
+    "params 是 contracts/params.yaml 的现值；params_proposed 与 flags_proposed 是本卡建议新增、待整合任务登记的参数和功能开关，取值就是规则卡“参数”一节的默认值。个别例子在 input.params 里覆盖。",
+    "segments 是 tier_at 排出的档位时间线，同档相接的权益已合成一段，from 是这一段开始的时刻。ledger 是点数与用量流水（只追加）：change 负数是扣、正数是退；source 是 allowance（当期额度）或加量包的 id。为了好算，同一时刻的多次用量写成一条。当期额度的流水可带 period_start（记在哪一期名下，即那一期开始的时刻）；退回用 refund_of 指向原扣减的 id，并照抄它的 source 和 period_start。没写 period_start 的例子都在同一期里。",
+    "balance.allowance_left 是当期额度还剩多少（由 usage 算出）；packs 是加量包，按 bought_at 先后使用。charge 的 requests 按提交到数据库的先后排列，用来模拟同时提交；requests 里的 confirmed_cost 是学员确认时看到的点数。",
+    "settle 的 input 给 outcome（只收到一次结果通知）或 events（按到达先后排的多次通知，取值见 codes.ai_result）；current_period_start 是现在这一期开始的时刻。expect.outcomes 与 events 逐条对应；lapsed 是退回后跟着已结束的那一期作废的点数；result_shown 是这次的 AI 结果给不给学员看。",
+    "tutor_turns 的 steps 每一步是一个操作（op）和它的结果（answer）。merge_usage 的 requests 是同一个合并请求到达的次数（比如网络重试）；appended 是追加到账号下的流水副本，copy_of 指向游客原流水的 id。",
+    "代码标识的中文意思见 codes；其中 exam_pass、subscription、ai_points、high_cost_ai、core_loop 已在 docs/product/glossary.yaml 里，其余是建议，待整合任务登记。"
+  ],
+  "day": {
+    "time_zone": "Asia/Shanghai",
+    "day_start_hour": 4
+  },
+  "params": {
+    "billing.quota.remind_at": [0.5, 0.2]
+  },
+  "params_proposed": {
+    "billing.quota.tutor_turns_daily": {
+      "free": 10,
+      "member": 40,
+      "member_plus": 40
+    },
+    "billing.quota.ai_points_monthly": {
+      "free": 3,
+      "member": 40,
+      "member_plus": 40
+    },
+    "billing.quota.human_review_monthly": {
+      "free": 0,
+      "member": 0,
+      "member_plus": 4
+    },
+    "billing.quota.parsing_monthly": {
+      "free": 5,
+      "member": 30,
+      "member_plus": 30
+    },
+    "billing.quota.active_goals": {
+      "guest": 1,
+      "free": 1,
+      "member": 3,
+      "member_plus": 3
+    },
+    "billing.points.cost": {
+      "subjective_grading": 1,
+      "card_generation": 1,
+      "oral_check": 1,
+      "mistake_analysis": 3,
+      "instant_questions": 1
+    },
+    "billing.points.instant_max_items": 5
+  },
+  "flags_proposed": {
+    "billing.member_plus_on_sale": false
+  },
+  "codes": {
+    "membership_tier": {
+      "free": "免费",
+      "member": "会员",
+      "member_plus": "会员加人工服务"
+    },
+    "entitlement_source": {
+      "exam_pass": "考期通行证",
+      "subscription": "时长订阅",
+      "redeem_code": "兑换码",
+      "org": "机构开通",
+      "gift": "赠送"
+    },
+    "item": {
+      "tutor_turns": "导师次数",
+      "ai_points": "AI 点数",
+      "human_review": "人工精批",
+      "parsing": "资料解析",
+      "active_goals": "同时进行的目标数"
+    },
+    "op": {
+      "tutor_reply": "导师普通问答一轮（任何入口、讲法和模式；打字、拍照、语音提问都算；不计量）",
+      "reader_explain": "阅读器里讲解选中内容",
+      "photo_search": "拍照搜题",
+      "note_ai_organize": "笔记 AI 整理",
+      "coach_review": "复盘里的教练点评",
+      "subjective_grading": "主观题批改（导师批改）",
+      "card_generation": "制卡",
+      "oral_check": "口述检测",
+      "mistake_analysis": "AI 错题分析",
+      "instant_questions": "即时出题",
+      "material_parse": "资料解析",
+      "human_review": "人工精批",
+      "crisis": "危机处置（R09 的危机规程；不计量）"
+    },
+    "core_op": {
+      "today_list": "今日清单",
+      "plan": "计划",
+      "night_carryover": "夜间顺延",
+      "due_review": "到期复习",
+      "mistake_retry": "错题回炉",
+      "new_learning": "新学",
+      "reading_check": "读后检测",
+      "auto_recall_card": "知识点回忆卡（自动有）",
+      "practice_bank": "做审定题和自有题",
+      "mock_exam": "模考",
+      "cloze_dictation": "挖空与默写",
+      "self_grade": "对照得分点自评",
+      "skip_grade": "暂不评分",
+      "handwritten_note": "手写笔记",
+      "view_data": "查看自己的数据",
+      "export_data": "导出自己的数据"
+    },
+    "tutor_mode": {
+      "direct": "直接讲",
+      "guided": "引导提问",
+      "teach_back": "讲给我听",
+      "quiz_me": "出题考我",
+      "consult": "学习咨询"
+    },
+    "ai_result": {
+      "ok": "成功",
+      "failed": "失败",
+      "timeout": "超时",
+      "blocked": "被安全规则拦下",
+      "degraded_key_points": "降级为只给要点"
+    },
+    "charge_outcome": {
+      "charged": "扣成",
+      "insufficient": "不够：不扣、不执行",
+      "requote": "价格变了，重新告知",
+      "duplicate": "重复请求，返回第一次的结果"
+    },
+    "turn_outcome": {
+      "counted": "算 1 次",
+      "released": "没答出来，退回",
+      "refused": "今天用完了，不让问",
+      "not_metered": "不计次数，照常"
+    },
+    "reminder": {
+      "0.5": "剩一半",
+      "0.2": "剩 20%",
+      "exhausted": "本期额度用完了",
+      "exhausted_using_packs": "本期额度用完了，接下来用加量包"
+    },
+    "alternative": {
+      "self_grade": "对照得分点自评",
+      "skip_grade": "暂不评分",
+      "cloze_dictation": "挖空与默写",
+      "practice_bank": "做审定题和自有题",
+      "use_original_question": "错题验收改用原题",
+      "pick_cause_myself": "自己选错因",
+      "view_explanation": "看解析",
+      "make_card_myself": "自己做卡",
+      "view_source": "看教材出处",
+      "type_search": "打字搜索",
+      "ask_tutor": "把题拍给导师问（普通问答，不计次数）",
+      "organize_myself": "自己整理笔记",
+      "view_week_data": "看本周的数据部分"
+    },
+    "material_mode": {
+      "parse": "可解析",
+      "map_only": "只映射",
+      "link_only": "只外链"
+    },
+    "parse_state": {
+      "parsing": "解析中",
+      "queued": "排队中",
+      "no_quota": "不占额度"
+    },
+    "goal_access": {
+      "active": "照常",
+      "read_only": "只读"
+    },
+    "goal_way": {
+      "end_a_goal": "结束一个目标",
+      "upgrade": "升级"
+    },
+    "read_only_scope": {
+      "due_review": "到期复习",
+      "mistake_retry": "错题回炉",
+      "new_learning": "新学",
+      "edit_goal": "改目标设置",
+      "edit_plan": "改计划",
+      "add_material": "加资料",
+      "view": "查看",
+      "export": "导出"
+    },
+    "asked_by": {
+      "text": "打字",
+      "photo": "拍照",
+      "voice": "语音"
+    },
+    "context": {
+      "practice": "练习中心",
+      "mistake_check": "错题验收",
+      "tutor": "从导师里发起（含导师组题、“出题考我”）"
+    },
+    "settle_outcome": {
+      "kept": "第一个结果是给出了结果：扣的点算数",
+      "refunded": "第一个结果是没给出结果：全额退回",
+      "duplicate": "和第一个结果一样的通知又来一遍：什么都不改",
+      "late_ignored": "结算之后才到的不同结果：什么都不改，只记进 AI 调用记录"
+    },
+    "goal_trigger": {
+      "tier_change": "档位变化",
+      "guest_merge": "游客并入"
+    }
+  },
+  "functions": {
+    "tier_at": "现在是什么档（R1–R4）：排出每段权益的起止，给出当前档位、正在用的那段、待生效的、最终到期时刻",
+    "can_grant": "能不能开通这个档（R1）",
+    "gate": "放不放行、计不计量（R5、R6、R7）：核心闭环、导师普通问答和危机处置在任何额度下都放行、不计量；输出被拦下的和要计量的操作",
+    "meter_of": "一项操作算在哪个计量项、扣多少（R7、R8）：按实际用的能力算，不按入口和讲法；普通问答和危机处置为 null",
+    "period": "某一刻所在的学习日与每月周期（R9、R10）",
+    "usage": "某一刻各计量项的本期额度、已用、剩余和起止（R9–R11），以及加量包剩余",
+    "quote": "执行前告知（R7、R8、R13、R18）：要用几点、够不够、用后剩多少；不够时给说明",
+    "charge": "确认后扣点（R12、R14、R15）：按提交先后处理，输出每次的结果、新写的流水、扣后余额",
+    "settle": "AI 回来后结算（R16、R17、R23、R24）：按收到的第一个结果定，没给出说好的结果就按原路全额退回；之后的重复、迟到通知什么都不改；当期额度退回原来那一期，那一期已结束就跟着作废",
+    "tutor_turns": "导师次数先占后退（R7、R9、R16、R18）：只有计次数的那几样占次数；普通问答和危机处置不占、不拦",
+    "remind": "这次提醒哪一档（R20）",
+    "create_goal": "能不能再建一个目标（R21）",
+    "goal_access": "档位变低或游客并入后，哪些目标照常、哪些只读（R22、R25）",
+    "parse_queue": "资料解析：开始、排队、不占额度、失败退回、新周期自动开始（R16、R19）",
+    "merge_usage": "游客并入账号时的用量（R26）：游客流水复制追加到账号下，落在账号当期的算进已用，重复请求不重复追加"
+  },
+  "cases": [
+    {
+      "id": "E1",
+      "title": "订阅期内又兑换一个月，排在后面",
+      "kind": "正常",
+      "rule": "R2、R3",
+      "fn": "tier_at",
+      "input": {
+        "entitlements": [
+          {
+            "id": "sub1",
+            "tier": "member",
+            "source": "subscription",
+            "granted_at": "2026-09-29T14:00:00+08:00",
+            "months": 1
+          },
+          {
+            "id": "code1",
+            "tier": "member",
+            "source": "redeem_code",
+            "granted_at": "2026-10-20T09:00:00+08:00",
+            "months": 1
+          }
+        ],
+        "at": "2026-10-21T10:00:00+08:00"
+      },
+      "expect": {
+        "tier": "member",
+        "active": "sub1",
+        "schedule": [
+          {
+            "id": "sub1",
+            "start": "2026-09-29T14:00:00+08:00",
+            "end": "2026-10-29T14:00:00+08:00"
+          },
+          {
+            "id": "code1",
+            "start": "2026-10-29T14:00:00+08:00",
+            "end": "2026-11-29T14:00:00+08:00"
+          }
+        ],
+        "queued": ["code1"],
+        "final_expiry": "2026-11-29T14:00:00+08:00"
+      }
+    },
+    {
+      "id": "E2",
+      "title": "到期那一刻回到免费",
+      "kind": "边界",
+      "rule": "R2、R4",
+      "fn": "tier_at",
+      "input": {
+        "entitlements": [
+          {
+            "id": "sub1",
+            "tier": "member",
+            "source": "subscription",
+            "granted_at": "2026-09-29T14:00:00+08:00",
+            "months": 1
+          }
+        ],
+        "at": "2026-10-29T14:00:00+08:00"
+      },
+      "expect": {
+        "tier": "free",
+        "active": null,
+        "queued": [],
+        "final_expiry": "2026-10-29T14:00:00+08:00"
+      }
+    },
+    {
+      "id": "E3",
+      "title": "考期通行证期间兑换一个月，排在通行证之后",
+      "kind": "正常",
+      "rule": "R2、R3",
+      "fn": "tier_at",
+      "input": {
+        "entitlements": [
+          {
+            "id": "pass1",
+            "tier": "member",
+            "source": "exam_pass",
+            "granted_at": "2026-10-10T09:00:00+08:00",
+            "until": "2027-06-15T04:00:00+08:00"
+          },
+          {
+            "id": "code1",
+            "tier": "member",
+            "source": "redeem_code",
+            "granted_at": "2026-12-01T12:00:00+08:00",
+            "months": 1
+          }
+        ],
+        "at": "2026-12-01T12:00:00+08:00"
+      },
+      "expect": {
+        "tier": "member",
+        "active": "pass1",
+        "schedule": [
+          {
+            "id": "pass1",
+            "start": "2026-10-10T09:00:00+08:00",
+            "end": "2027-06-15T04:00:00+08:00"
+          },
+          {
+            "id": "code1",
+            "start": "2027-06-15T04:00:00+08:00",
+            "end": "2027-07-15T04:00:00+08:00"
+          }
+        ],
+        "queued": ["code1"],
+        "final_expiry": "2027-07-15T04:00:00+08:00"
+      }
+    },
+    {
+      "id": "E4",
+      "title": "人工服务没就绪时开通会员加人工服务",
+      "kind": "异常",
+      "rule": "R1",
+      "fn": "can_grant",
+      "input": {
+        "tier": "member_plus"
+      },
+      "expect": {
+        "allowed": false,
+        "reason": "not_on_sale"
+      }
+    },
+    {
+      "id": "E5",
+      "title": "免费、额度全用完、会员刚到期、AI 也不可用",
+      "kind": "边界",
+      "rule": "R5、R6",
+      "fn": "gate",
+      "input": {
+        "tier": "free",
+        "membership_expired": true,
+        "ai_available": false,
+        "left": {
+          "tutor_turns": 0,
+          "ai_points": 0,
+          "parsing": 0
+        },
+        "ops": [
+          "today_list",
+          "plan",
+          "night_carryover",
+          "due_review",
+          "mistake_retry",
+          "new_learning",
+          "reading_check",
+          "auto_recall_card",
+          "practice_bank",
+          "mock_exam",
+          "cloze_dictation",
+          "self_grade",
+          "skip_grade",
+          "handwritten_note",
+          "view_data",
+          "export_data"
+        ]
+      },
+      "expect": {
+        "blocked": [],
+        "metered": []
+      }
+    },
+    {
+      "id": "E6",
+      "title": "各操作算在哪一项、扣多少",
+      "kind": "正常",
+      "rule": "R7、R8",
+      "fn": "meter_of",
+      "input": {
+        "ops": [
+          {
+            "op": "tutor_reply",
+            "mode": "direct"
+          },
+          {
+            "op": "tutor_reply",
+            "mode": "quiz_me"
+          },
+          {
+            "op": "reader_explain"
+          },
+          {
+            "op": "photo_search"
+          },
+          {
+            "op": "note_ai_organize"
+          },
+          {
+            "op": "coach_review"
+          },
+          {
+            "op": "subjective_grading"
+          },
+          {
+            "op": "card_generation"
+          },
+          {
+            "op": "oral_check"
+          },
+          {
+            "op": "mistake_analysis"
+          },
+          {
+            "op": "instant_questions"
+          },
+          {
+            "op": "material_parse"
+          },
+          {
+            "op": "due_review"
+          },
+          {
+            "op": "tutor_reply",
+            "mode": "direct",
+            "asked_by": "photo"
+          },
+          {
+            "op": "note_ai_organize",
+            "context": "tutor"
+          },
+          {
+            "op": "instant_questions",
+            "context": "tutor"
+          },
+          {
+            "op": "crisis"
+          }
+        ]
+      },
+      "expect": {
+        "meters": [
+          null,
+          null,
+          null,
+          {
+            "item": "tutor_turns",
+            "cost": 1
+          },
+          {
+            "item": "tutor_turns",
+            "cost": 1
+          },
+          {
+            "item": "tutor_turns",
+            "cost": 1
+          },
+          {
+            "item": "ai_points",
+            "cost": 1
+          },
+          {
+            "item": "ai_points",
+            "cost": 1
+          },
+          {
+            "item": "ai_points",
+            "cost": 1
+          },
+          {
+            "item": "ai_points",
+            "cost": 3
+          },
+          {
+            "item": "ai_points",
+            "cost": 1
+          },
+          {
+            "item": "parsing",
+            "cost": 1
+          },
+          null,
+          null,
+          {
+            "item": "tutor_turns",
+            "cost": 1
+          },
+          {
+            "item": "ai_points",
+            "cost": 1
+          },
+          null
+        ]
+      }
+    },
+    {
+      "id": "E7",
+      "title": "免费档，11 月 1 日凌晨 3:30 还算 10 月",
+      "kind": "边界",
+      "rule": "R9、R10",
+      "fn": "period",
+      "input": {
+        "segment": {
+          "tier": "free",
+          "from": "2026-09-01T10:00:00+08:00"
+        },
+        "at": "2026-11-01T03:30:00+08:00"
+      },
+      "expect": {
+        "learning_day": "2026-10-31",
+        "day_end": "2026-11-01T04:00:00+08:00",
+        "month_start": "2026-10-01T04:00:00+08:00",
+        "month_end": "2026-11-01T04:00:00+08:00"
+      }
+    },
+    {
+      "id": "E8",
+      "title": "1 月 31 日开通，2 月取最后一天",
+      "kind": "边界",
+      "rule": "R10",
+      "fn": "period",
+      "input": {
+        "segment": {
+          "tier": "member",
+          "from": "2027-01-31T10:00:00+08:00"
+        },
+        "at": "2027-03-01T12:00:00+08:00"
+      },
+      "expect": {
+        "month_start": "2027-02-28T10:00:00+08:00",
+        "month_end": "2027-03-31T10:00:00+08:00"
+      }
+    },
+    {
+      "id": "E9",
+      "title": "当天开通会员：每月的项重给，导师次数当天照算",
+      "kind": "正常",
+      "rule": "R9、R10",
+      "fn": "usage",
+      "input": {
+        "segments": [
+          {
+            "tier": "free",
+            "from": "2026-09-01T10:00:00+08:00"
+          },
+          {
+            "tier": "member",
+            "from": "2026-10-20T15:00:00+08:00"
+          }
+        ],
+        "ledger": [
+          {
+            "at": "2026-10-10T20:00:00+08:00",
+            "item": "ai_points",
+            "change": -3,
+            "source": "allowance"
+          },
+          {
+            "at": "2026-10-20T09:00:00+08:00",
+            "item": "tutor_turns",
+            "change": -10,
+            "source": "allowance"
+          }
+        ],
+        "at": "2026-10-20T16:00:00+08:00",
+        "items": ["ai_points", "tutor_turns"]
+      },
+      "expect": {
+        "ai_points": {
+          "allowance": 40,
+          "used": 0,
+          "remaining": 40,
+          "period_start": "2026-10-20T15:00:00+08:00",
+          "period_end": "2026-11-20T15:00:00+08:00"
+        },
+        "tutor_turns": {
+          "allowance": 40,
+          "used": 10,
+          "remaining": 30,
+          "period_start": "2026-10-20T04:00:00+08:00",
+          "period_end": "2026-10-21T04:00:00+08:00"
+        }
+      }
+    },
+    {
+      "id": "E10",
+      "title": "会员到期回免费",
+      "kind": "边界",
+      "rule": "R4、R9、R10",
+      "fn": "usage",
+      "input": {
+        "segments": [
+          {
+            "tier": "member",
+            "from": "2026-10-20T15:00:00+08:00"
+          },
+          {
+            "tier": "free",
+            "from": "2026-11-20T15:00:00+08:00"
+          }
+        ],
+        "ledger": [
+          {
+            "at": "2026-11-10T20:00:00+08:00",
+            "item": "ai_points",
+            "change": -30,
+            "source": "allowance"
+          },
+          {
+            "at": "2026-11-20T09:00:00+08:00",
+            "item": "tutor_turns",
+            "change": -25,
+            "source": "allowance"
+          }
+        ],
+        "at": "2026-11-20T16:00:00+08:00",
+        "items": ["ai_points", "tutor_turns"]
+      },
+      "expect": {
+        "ai_points": {
+          "allowance": 3,
+          "used": 0,
+          "remaining": 3,
+          "period_start": "2026-11-20T15:00:00+08:00",
+          "period_end": "2026-12-01T04:00:00+08:00"
+        },
+        "tutor_turns": {
+          "allowance": 10,
+          "used": 25,
+          "remaining": 0,
+          "period_end": "2026-11-21T04:00:00+08:00"
+        }
+      }
+    },
+    {
+      "id": "E11",
+      "title": "订阅接兑换码不断档：周期接着数，不结转",
+      "kind": "正常",
+      "rule": "R10、R11",
+      "fn": "usage",
+      "input": {
+        "segments": [
+          {
+            "tier": "member",
+            "from": "2026-09-29T14:00:00+08:00"
+          }
+        ],
+        "ledger": [
+          {
+            "at": "2026-10-05T20:00:00+08:00",
+            "item": "ai_points",
+            "change": -10,
+            "source": "allowance"
+          }
+        ],
+        "packs": [
+          {
+            "id": "p1",
+            "item": "ai_points",
+            "bought_at": "2026-10-01T12:00:00+08:00",
+            "left": 5
+          }
+        ],
+        "at": "2026-10-30T10:00:00+08:00",
+        "items": ["ai_points"]
+      },
+      "expect": {
+        "ai_points": {
+          "allowance": 40,
+          "used": 0,
+          "remaining": 40,
+          "period_start": "2026-10-29T14:00:00+08:00",
+          "period_end": "2026-11-29T14:00:00+08:00"
+        },
+        "packs_left": 5
+      }
+    },
+    {
+      "id": "E12",
+      "title": "会员主观题批改，执行前告知",
+      "kind": "正常",
+      "rule": "R13",
+      "fn": "quote",
+      "input": {
+        "op": "subjective_grading",
+        "tier": "member",
+        "balance": {
+          "allowance_left": 19,
+          "packs": []
+        }
+      },
+      "expect": {
+        "cost": 1,
+        "enough": true,
+        "after": {
+          "allowance_left": 18,
+          "packs_left": 0
+        }
+      }
+    },
+    {
+      "id": "E13",
+      "title": "即时出题要 8 道",
+      "kind": "边界",
+      "rule": "R7、R8",
+      "fn": "quote",
+      "input": {
+        "op": "instant_questions",
+        "requested_items": 8,
+        "tier": "member",
+        "balance": {
+          "allowance_left": 19,
+          "packs": []
+        }
+      },
+      "expect": {
+        "items": 5,
+        "cost": 1,
+        "enough": true,
+        "after": {
+          "allowance_left": 18,
+          "packs_left": 0
+        }
+      }
+    },
+    {
+      "id": "E14",
+      "title": "免费档当期只剩 1 点，用两个加量包补",
+      "kind": "正常",
+      "rule": "R12、R14",
+      "fn": "charge",
+      "input": {
+        "tier": "free",
+        "balance": {
+          "allowance_left": 1,
+          "packs": [
+            {
+              "id": "p2",
+              "item": "ai_points",
+              "bought_at": "2026-10-05T10:00:00+08:00",
+              "left": 10
+            },
+            {
+              "id": "p1",
+              "item": "ai_points",
+              "bought_at": "2026-09-01T10:00:00+08:00",
+              "left": 1
+            }
+          ]
+        },
+        "requests": [
+          {
+            "key": "k1",
+            "op": "mistake_analysis",
+            "confirmed_cost": 3
+          }
+        ]
+      },
+      "expect": {
+        "results": [
+          {
+            "key": "k1",
+            "outcome": "charged"
+          }
+        ],
+        "ledger": [
+          {
+            "kind": "charge",
+            "key": "k1",
+            "op": "mistake_analysis",
+            "item": "ai_points",
+            "source": "allowance",
+            "change": -1
+          },
+          {
+            "kind": "charge",
+            "key": "k1",
+            "op": "mistake_analysis",
+            "item": "ai_points",
+            "source": "p1",
+            "change": -1
+          },
+          {
+            "kind": "charge",
+            "key": "k1",
+            "op": "mistake_analysis",
+            "item": "ai_points",
+            "source": "p2",
+            "change": -1
+          }
+        ],
+        "balance_after": {
+          "allowance_left": 0,
+          "packs": {
+            "p1": 0,
+            "p2": 9
+          }
+        }
+      }
+    },
+    {
+      "id": "E15",
+      "title": "免费档点数不够做错题分析",
+      "kind": "异常",
+      "rule": "R14、R18",
+      "fn": "charge",
+      "input": {
+        "tier": "free",
+        "balance": {
+          "allowance_left": 2,
+          "packs": []
+        },
+        "period_end": "2026-11-01T04:00:00+08:00",
+        "requests": [
+          {
+            "key": "k1",
+            "op": "mistake_analysis",
+            "confirmed_cost": 3
+          }
+        ]
+      },
+      "expect": {
+        "results": [
+          {
+            "key": "k1",
+            "outcome": "insufficient",
+            "notice": {
+              "item": "ai_points",
+              "resets_at": "2026-11-01T04:00:00+08:00",
+              "upgrade_allowance": 40,
+              "can_buy_pack": true,
+              "alternatives": ["pick_cause_myself", "view_explanation"]
+            }
+          }
+        ],
+        "ledger": [],
+        "balance_after": {
+          "allowance_left": 2,
+          "packs": {}
+        }
+      }
+    },
+    {
+      "id": "E16",
+      "title": "两台设备同时提交批改，只剩 1 点",
+      "kind": "异常",
+      "rule": "R14",
+      "fn": "charge",
+      "input": {
+        "tier": "member",
+        "balance": {
+          "allowance_left": 1,
+          "packs": []
+        },
+        "requests": [
+          {
+            "key": "a",
+            "op": "subjective_grading",
+            "confirmed_cost": 1
+          },
+          {
+            "key": "b",
+            "op": "subjective_grading",
+            "confirmed_cost": 1
+          }
+        ]
+      },
+      "expect": {
+        "results": [
+          {
+            "key": "a",
+            "outcome": "charged"
+          },
+          {
+            "key": "b",
+            "outcome": "insufficient"
+          }
+        ],
+        "balance_after": {
+          "allowance_left": 0,
+          "packs": {}
+        }
+      }
+    },
+    {
+      "id": "E17",
+      "title": "断网重发，同一个幂等键",
+      "kind": "异常",
+      "rule": "R15",
+      "fn": "charge",
+      "input": {
+        "tier": "member",
+        "balance": {
+          "allowance_left": 19,
+          "packs": []
+        },
+        "requests": [
+          {
+            "key": "k1",
+            "op": "subjective_grading",
+            "confirmed_cost": 1
+          },
+          {
+            "key": "k1",
+            "op": "subjective_grading",
+            "confirmed_cost": 1
+          }
+        ]
+      },
+      "expect": {
+        "results": [
+          {
+            "key": "k1",
+            "outcome": "charged"
+          },
+          {
+            "key": "k1",
+            "outcome": "duplicate",
+            "first_outcome": "charged"
+          }
+        ],
+        "ledger": [
+          {
+            "kind": "charge",
+            "key": "k1",
+            "source": "allowance",
+            "change": -1
+          }
+        ],
+        "balance_after": {
+          "allowance_left": 18,
+          "packs": {}
+        }
+      }
+    },
+    {
+      "id": "E18",
+      "title": "告知后价格变了",
+      "kind": "异常",
+      "rule": "R14",
+      "fn": "charge",
+      "input": {
+        "tier": "member",
+        "params": {
+          "billing.points.cost": {
+            "subjective_grading": 2,
+            "card_generation": 1,
+            "oral_check": 1,
+            "mistake_analysis": 3,
+            "instant_questions": 1
+          }
+        },
+        "balance": {
+          "allowance_left": 19,
+          "packs": []
+        },
+        "requests": [
+          {
+            "key": "k1",
+            "op": "subjective_grading",
+            "confirmed_cost": 1
+          }
+        ]
+      },
+      "expect": {
+        "results": [
+          {
+            "key": "k1",
+            "outcome": "requote",
+            "cost": 2
+          }
+        ],
+        "ledger": [],
+        "balance_after": {
+          "allowance_left": 19,
+          "packs": {}
+        }
+      }
+    },
+    {
+      "id": "E19",
+      "title": "批改超时，全额退回",
+      "kind": "异常",
+      "rule": "R16、R17",
+      "fn": "settle",
+      "input": {
+        "key": "k1",
+        "outcome": "timeout",
+        "balance": {
+          "allowance_left": 18,
+          "packs": []
+        },
+        "ledger": [
+          {
+            "id": "L1",
+            "kind": "charge",
+            "key": "k1",
+            "op": "subjective_grading",
+            "item": "ai_points",
+            "source": "allowance",
+            "change": -1
+          }
+        ]
+      },
+      "expect": {
+        "refunded": true,
+        "balance_after": {
+          "allowance_left": 19,
+          "packs": {}
+        },
+        "ledger_after": [
+          {
+            "id": "L1",
+            "kind": "charge",
+            "key": "k1",
+            "op": "subjective_grading",
+            "item": "ai_points",
+            "source": "allowance",
+            "change": -1
+          },
+          {
+            "kind": "refund",
+            "refund_of": "L1",
+            "key": "k1",
+            "item": "ai_points",
+            "source": "allowance",
+            "change": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "E20",
+      "title": "错题分析降级成只给要点，拆着扣的各退各的",
+      "kind": "异常",
+      "rule": "R16",
+      "fn": "settle",
+      "input": {
+        "key": "k2",
+        "outcome": "degraded_key_points",
+        "balance": {
+          "allowance_left": 0,
+          "packs": [
+            {
+              "id": "p1",
+              "item": "ai_points",
+              "bought_at": "2026-09-01T10:00:00+08:00",
+              "left": 0
+            },
+            {
+              "id": "p2",
+              "item": "ai_points",
+              "bought_at": "2026-10-05T10:00:00+08:00",
+              "left": 9
+            }
+          ]
+        },
+        "ledger": [
+          {
+            "id": "L1",
+            "kind": "charge",
+            "key": "k2",
+            "op": "mistake_analysis",
+            "item": "ai_points",
+            "source": "allowance",
+            "change": -1
+          },
+          {
+            "id": "L2",
+            "kind": "charge",
+            "key": "k2",
+            "op": "mistake_analysis",
+            "item": "ai_points",
+            "source": "p1",
+            "change": -1
+          },
+          {
+            "id": "L3",
+            "kind": "charge",
+            "key": "k2",
+            "op": "mistake_analysis",
+            "item": "ai_points",
+            "source": "p2",
+            "change": -1
+          }
+        ]
+      },
+      "expect": {
+        "refunded": true,
+        "balance_after": {
+          "allowance_left": 1,
+          "packs": {
+            "p1": 1,
+            "p2": 10
+          }
+        },
+        "ledger_after": [
+          {
+            "id": "L1",
+            "kind": "charge",
+            "key": "k2",
+            "op": "mistake_analysis",
+            "item": "ai_points",
+            "source": "allowance",
+            "change": -1
+          },
+          {
+            "id": "L2",
+            "kind": "charge",
+            "key": "k2",
+            "op": "mistake_analysis",
+            "item": "ai_points",
+            "source": "p1",
+            "change": -1
+          },
+          {
+            "id": "L3",
+            "kind": "charge",
+            "key": "k2",
+            "op": "mistake_analysis",
+            "item": "ai_points",
+            "source": "p2",
+            "change": -1
+          },
+          {
+            "kind": "refund",
+            "refund_of": "L1",
+            "source": "allowance",
+            "change": 1
+          },
+          {
+            "kind": "refund",
+            "refund_of": "L2",
+            "source": "p1",
+            "change": 1
+          },
+          {
+            "kind": "refund",
+            "refund_of": "L3",
+            "source": "p2",
+            "change": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "E21",
+      "title": "今天最后一次导师次数：只停计次数的那几样",
+      "kind": "边界",
+      "rule": "R7、R9、R16、R18",
+      "fn": "tutor_turns",
+      "input": {
+        "tier": "member",
+        "used_today": 39,
+        "now": "2026-10-21T22:00:00+08:00",
+        "steps": [
+          {
+            "op": "photo_search",
+            "answer": "failed"
+          },
+          {
+            "op": "photo_search",
+            "answer": "ok"
+          },
+          {
+            "op": "note_ai_organize",
+            "answer": "ok"
+          },
+          {
+            "op": "tutor_reply",
+            "answer": "ok"
+          },
+          {
+            "op": "crisis"
+          }
+        ]
+      },
+      "expect": {
+        "outcomes": ["released", "counted", "refused", "not_metered", "not_metered"],
+        "used_after": 40,
+        "notice": {
+          "item": "tutor_turns",
+          "resets_at": "2026-10-22T04:00:00+08:00",
+          "upgrade_allowance": null,
+          "can_buy_pack": false,
+          "alternatives": ["organize_myself"]
+        }
+      }
+    },
+    {
+      "id": "E22",
+      "title": "免费 3 点：跨几档只提最低的",
+      "kind": "边界",
+      "rule": "R20",
+      "fn": "remind",
+      "input": {
+        "allowance": 3,
+        "used": 0,
+        "packs_left": 0,
+        "done": [],
+        "steps": [
+          {
+            "use": 1
+          },
+          {
+            "use": 1
+          },
+          {
+            "use": 1
+          }
+        ]
+      },
+      "expect": {
+        "reminders": [null, "0.5", "exhausted"],
+        "done_after": ["0.5", "0.2", "exhausted"]
+      }
+    },
+    {
+      "id": "E23",
+      "title": "退回后又降下来，不重复提",
+      "kind": "边界",
+      "rule": "R20",
+      "fn": "remind",
+      "input": {
+        "allowance": 40,
+        "used": 19,
+        "packs_left": 0,
+        "done": [],
+        "steps": [
+          {
+            "use": 1
+          },
+          {
+            "refund": 1
+          },
+          {
+            "use": 1
+          }
+        ]
+      },
+      "expect": {
+        "reminders": ["0.5", null, null],
+        "done_after": ["0.5"]
+      }
+    },
+    {
+      "id": "E24",
+      "title": "当期用完了，接着用加量包",
+      "kind": "正常",
+      "rule": "R12、R20",
+      "fn": "remind",
+      "input": {
+        "allowance": 40,
+        "used": 39,
+        "packs_left": 10,
+        "done": ["0.5", "0.2"],
+        "steps": [
+          {
+            "use": 1
+          },
+          {
+            "use": 1
+          }
+        ]
+      },
+      "expect": {
+        "reminders": ["exhausted_using_packs", null],
+        "used_after": 40,
+        "packs_left_after": 9,
+        "done_after": ["0.5", "0.2", "exhausted"]
+      }
+    },
+    {
+      "id": "E25",
+      "title": "免费档已有 1 个进行中的目标，再建一个",
+      "kind": "异常",
+      "rule": "R21",
+      "fn": "create_goal",
+      "input": {
+        "tier": "free",
+        "guest": false,
+        "goals": [
+          {
+            "id": "g1",
+            "state": "active"
+          },
+          {
+            "id": "g0",
+            "state": "ended"
+          }
+        ]
+      },
+      "expect": {
+        "allowed": false,
+        "limit": 1,
+        "active_count": 1,
+        "ways": ["end_a_goal", "upgrade"]
+      }
+    },
+    {
+      "id": "E26",
+      "title": "会员到期后有 3 个进行中的目标",
+      "kind": "正常",
+      "rule": "R22",
+      "fn": "goal_access",
+      "input": {
+        "tier": "free",
+        "goals": [
+          {
+            "id": "g1",
+            "primary": true,
+            "last_studied_day": "2026-11-19"
+          },
+          {
+            "id": "g2",
+            "primary": false,
+            "last_studied_day": "2026-11-20"
+          },
+          {
+            "id": "g3",
+            "primary": false,
+            "last_studied_day": "2026-11-18"
+          }
+        ]
+      },
+      "expect": {
+        "access": {
+          "g1": "active",
+          "g2": "read_only",
+          "g3": "read_only"
+        },
+        "read_only": {
+          "today": ["due_review", "mistake_retry"],
+          "paused": ["new_learning", "edit_goal", "edit_plan", "add_material"],
+          "still": ["view", "export"]
+        }
+      }
+    },
+    {
+      "id": "E27",
+      "title": "换主目标，再重新开通",
+      "kind": "边界",
+      "rule": "R22",
+      "fn": "goal_access",
+      "input": {
+        "tier": "free",
+        "goals": [
+          {
+            "id": "g1",
+            "primary": true,
+            "last_studied_day": "2026-11-19"
+          },
+          {
+            "id": "g2",
+            "primary": false,
+            "last_studied_day": "2026-11-20"
+          },
+          {
+            "id": "g3",
+            "primary": false,
+            "last_studied_day": "2026-11-18"
+          }
+        ],
+        "steps": [
+          {
+            "switch_primary": "g2"
+          },
+          {
+            "tier": "member"
+          }
+        ]
+      },
+      "expect": {
+        "access": {
+          "g1": "active",
+          "g2": "read_only",
+          "g3": "read_only"
+        },
+        "after_steps": [
+          {
+            "g1": "read_only",
+            "g2": "active",
+            "g3": "read_only"
+          },
+          {
+            "g1": "active",
+            "g2": "active",
+            "g3": "active"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E28",
+      "title": "免费名额调成 2",
+      "kind": "边界",
+      "rule": "R22",
+      "fn": "goal_access",
+      "input": {
+        "tier": "free",
+        "params": {
+          "billing.quota.active_goals": {
+            "guest": 1,
+            "free": 2,
+            "member": 3,
+            "member_plus": 3
+          }
+        },
+        "goals": [
+          {
+            "id": "g1",
+            "primary": true,
+            "last_studied_day": "2026-11-19"
+          },
+          {
+            "id": "g2",
+            "primary": false,
+            "last_studied_day": "2026-11-20"
+          },
+          {
+            "id": "g3",
+            "primary": false,
+            "last_studied_day": "2026-11-18"
+          }
+        ]
+      },
+      "expect": {
+        "access": {
+          "g1": "active",
+          "g2": "active",
+          "g3": "read_only"
+        }
+      }
+    },
+    {
+      "id": "E29",
+      "title": "解析额度用完，新文件排队",
+      "kind": "边界",
+      "rule": "R19",
+      "fn": "parse_queue",
+      "input": {
+        "tier": "free",
+        "used": 5,
+        "uploads": [
+          {
+            "id": "f1",
+            "mode": "parse",
+            "at": "2026-10-25T10:00:00+08:00"
+          },
+          {
+            "id": "f2",
+            "mode": "parse",
+            "at": "2026-10-26T10:00:00+08:00"
+          },
+          {
+            "id": "f3",
+            "mode": "link_only",
+            "at": "2026-10-26T11:00:00+08:00"
+          }
+        ],
+        "new_period_at": "2026-11-01T04:00:00+08:00"
+      },
+      "expect": {
+        "on_upload": {
+          "f1": "queued",
+          "f2": "queued",
+          "f3": "no_quota"
+        },
+        "queue": ["f1", "f2"],
+        "blocks_goal_setup": false,
+        "at_new_period": {
+          "f1": "parsing",
+          "f2": "parsing"
+        },
+        "used_after": 2
+      }
+    },
+    {
+      "id": "E30",
+      "title": "解析失败，退回 1 份",
+      "kind": "异常",
+      "rule": "R16、R19",
+      "fn": "parse_queue",
+      "input": {
+        "tier": "free",
+        "used": 4,
+        "uploads": [
+          {
+            "id": "f9",
+            "mode": "parse",
+            "at": "2026-10-25T10:00:00+08:00"
+          }
+        ],
+        "results": {
+          "f9": "failed"
+        }
+      },
+      "expect": {
+        "on_upload": {
+          "f9": "parsing"
+        },
+        "used_while_parsing": 5,
+        "used_after": 4,
+        "appended": [
+          {
+            "kind": "refund",
+            "item": "parsing",
+            "file": "f9",
+            "change": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "E31",
+      "title": "错题验收要现场出变式题，点数是 0",
+      "kind": "异常",
+      "rule": "R8、R18",
+      "fn": "quote",
+      "input": {
+        "op": "instant_questions",
+        "context": "mistake_check",
+        "requested_items": 1,
+        "tier": "free",
+        "balance": {
+          "allowance_left": 0,
+          "packs": []
+        },
+        "period_end": "2026-11-01T04:00:00+08:00"
+      },
+      "expect": {
+        "items": 1,
+        "cost": 1,
+        "enough": false,
+        "notice": {
+          "item": "ai_points",
+          "resets_at": "2026-11-01T04:00:00+08:00",
+          "upgrade_allowance": 40,
+          "can_buy_pack": true,
+          "alternatives": ["use_original_question"]
+        }
+      }
+    },
+    {
+      "id": "E32",
+      "title": "额度全用完：导师照常答疑，危机照常",
+      "kind": "边界",
+      "rule": "R7",
+      "fn": "gate",
+      "input": {
+        "tier": "free",
+        "ai_available": true,
+        "left": {
+          "tutor_turns": 0,
+          "ai_points": 0,
+          "parsing": 0
+        },
+        "ops": ["tutor_reply", "reader_explain", "crisis"]
+      },
+      "expect": {
+        "blocked": [],
+        "metered": []
+      }
+    },
+    {
+      "id": "E33",
+      "title": "导师“出题考我”：按即时出题计点",
+      "kind": "正常",
+      "rule": "R7、R8",
+      "fn": "quote",
+      "input": {
+        "op": "instant_questions",
+        "context": "tutor",
+        "requested_items": 5,
+        "tier": "member",
+        "balance": {
+          "allowance_left": 30,
+          "packs": []
+        }
+      },
+      "expect": {
+        "items": 5,
+        "cost": 1,
+        "enough": true,
+        "after": {
+          "allowance_left": 29,
+          "packs_left": 0
+        }
+      }
+    },
+    {
+      "id": "E34",
+      "title": "导师出题时点数不够：只停出题，不拿导师次数顶",
+      "kind": "异常",
+      "rule": "R8、R18",
+      "fn": "quote",
+      "input": {
+        "op": "instant_questions",
+        "context": "tutor",
+        "requested_items": 5,
+        "tier": "free",
+        "balance": {
+          "allowance_left": 0,
+          "packs": []
+        },
+        "tutor_turns_left": 10,
+        "period_end": "2026-11-01T04:00:00+08:00"
+      },
+      "expect": {
+        "items": 5,
+        "cost": 1,
+        "enough": false,
+        "notice": {
+          "item": "ai_points",
+          "resets_at": "2026-11-01T04:00:00+08:00",
+          "upgrade_allowance": 40,
+          "can_buy_pack": true,
+          "alternatives": ["practice_bank"]
+        }
+      }
+    },
+    {
+      "id": "E35",
+      "title": "同一笔超时通知送来两次，只退一次",
+      "kind": "异常",
+      "rule": "R23",
+      "fn": "settle",
+      "input": {
+        "key": "k1",
+        "current_period_start": "2026-10-20T15:00:00+08:00",
+        "events": ["timeout", "timeout"],
+        "balance": {
+          "allowance_left": 18,
+          "packs": []
+        },
+        "ledger": [
+          {
+            "id": "L1",
+            "kind": "charge",
+            "key": "k1",
+            "op": "subjective_grading",
+            "item": "ai_points",
+            "source": "allowance",
+            "period_start": "2026-10-20T15:00:00+08:00",
+            "change": -1
+          }
+        ]
+      },
+      "expect": {
+        "outcomes": ["refunded", "duplicate"],
+        "balance_after": {
+          "allowance_left": 19,
+          "packs": {}
+        },
+        "ledger_after": [
+          {
+            "id": "L1",
+            "kind": "charge",
+            "key": "k1",
+            "op": "subjective_grading",
+            "item": "ai_points",
+            "source": "allowance",
+            "period_start": "2026-10-20T15:00:00+08:00",
+            "change": -1
+          },
+          {
+            "kind": "refund",
+            "refund_of": "L1",
+            "key": "k1",
+            "item": "ai_points",
+            "source": "allowance",
+            "period_start": "2026-10-20T15:00:00+08:00",
+            "change": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "E36",
+      "title": "超时已退回，结果又迟到送来",
+      "kind": "边界",
+      "rule": "R23",
+      "fn": "settle",
+      "input": {
+        "key": "k1",
+        "current_period_start": "2026-10-20T15:00:00+08:00",
+        "events": ["timeout", "ok"],
+        "balance": {
+          "allowance_left": 18,
+          "packs": []
+        },
+        "ledger": [
+          {
+            "id": "L1",
+            "kind": "charge",
+            "key": "k1",
+            "op": "subjective_grading",
+            "item": "ai_points",
+            "source": "allowance",
+            "period_start": "2026-10-20T15:00:00+08:00",
+            "change": -1
+          }
+        ]
+      },
+      "expect": {
+        "outcomes": ["refunded", "late_ignored"],
+        "result_shown": false,
+        "balance_after": {
+          "allowance_left": 19,
+          "packs": {}
+        },
+        "ledger_after": [
+          {
+            "id": "L1",
+            "kind": "charge",
+            "key": "k1",
+            "op": "subjective_grading",
+            "item": "ai_points",
+            "source": "allowance",
+            "period_start": "2026-10-20T15:00:00+08:00",
+            "change": -1
+          },
+          {
+            "kind": "refund",
+            "refund_of": "L1",
+            "key": "k1",
+            "item": "ai_points",
+            "source": "allowance",
+            "period_start": "2026-10-20T15:00:00+08:00",
+            "change": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "E37",
+      "title": "扣成以后又报失败",
+      "kind": "边界",
+      "rule": "R23",
+      "fn": "settle",
+      "input": {
+        "key": "k1",
+        "current_period_start": "2026-10-20T15:00:00+08:00",
+        "events": ["ok", "failed", "ok"],
+        "balance": {
+          "allowance_left": 18,
+          "packs": []
+        },
+        "ledger": [
+          {
+            "id": "L1",
+            "kind": "charge",
+            "key": "k1",
+            "op": "subjective_grading",
+            "item": "ai_points",
+            "source": "allowance",
+            "period_start": "2026-10-20T15:00:00+08:00",
+            "change": -1
+          }
+        ]
+      },
+      "expect": {
+        "outcomes": ["kept", "late_ignored", "duplicate"],
+        "result_shown": true,
+        "balance_after": {
+          "allowance_left": 18,
+          "packs": {}
+        },
+        "ledger_after": [
+          {
+            "id": "L1",
+            "kind": "charge",
+            "key": "k1",
+            "op": "subjective_grading",
+            "item": "ai_points",
+            "source": "allowance",
+            "period_start": "2026-10-20T15:00:00+08:00",
+            "change": -1
+          }
+        ]
+      }
+    },
+    {
+      "id": "E38",
+      "title": "旧一期扣的点，新一期开始后才超时",
+      "kind": "边界",
+      "rule": "R24、R11",
+      "fn": "settle",
+      "input": {
+        "key": "k3",
+        "at": "2026-10-29T14:01:00+08:00",
+        "current_period_start": "2026-10-29T14:00:00+08:00",
+        "events": ["timeout"],
+        "balance": {
+          "allowance_left": 40,
+          "packs": []
+        },
+        "ledger": [
+          {
+            "id": "L1",
+            "kind": "charge",
+            "key": "k3",
+            "op": "subjective_grading",
+            "item": "ai_points",
+            "source": "allowance",
+            "period_start": "2026-09-29T14:00:00+08:00",
+            "at": "2026-10-29T13:59:00+08:00",
+            "change": -1
+          }
+        ]
+      },
+      "expect": {
+        "outcomes": ["refunded"],
+        "lapsed": 1,
+        "balance_after": {
+          "allowance_left": 40,
+          "packs": {}
+        },
+        "ledger_after": [
+          {
+            "id": "L1",
+            "kind": "charge",
+            "key": "k3",
+            "source": "allowance",
+            "period_start": "2026-09-29T14:00:00+08:00",
+            "change": -1
+          },
+          {
+            "kind": "refund",
+            "refund_of": "L1",
+            "key": "k3",
+            "item": "ai_points",
+            "source": "allowance",
+            "period_start": "2026-09-29T14:00:00+08:00",
+            "change": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "E39",
+      "title": "拆着扣的跨期退回：当期那部分作废，加量包那部分退回原包",
+      "kind": "边界",
+      "rule": "R24、R12",
+      "fn": "settle",
+      "input": {
+        "key": "k4",
+        "at": "2026-10-29T14:01:00+08:00",
+        "current_period_start": "2026-10-29T14:00:00+08:00",
+        "events": ["failed"],
+        "balance": {
+          "allowance_left": 40,
+          "packs": [
+            {
+              "id": "p1",
+              "item": "ai_points",
+              "bought_at": "2026-10-01T12:00:00+08:00",
+              "left": 3
+            }
+          ]
+        },
+        "ledger": [
+          {
+            "id": "L1",
+            "kind": "charge",
+            "key": "k4",
+            "op": "mistake_analysis",
+            "item": "ai_points",
+            "source": "allowance",
+            "period_start": "2026-09-29T14:00:00+08:00",
+            "at": "2026-10-29T13:59:00+08:00",
+            "change": -1
+          },
+          {
+            "id": "L2",
+            "kind": "charge",
+            "key": "k4",
+            "op": "mistake_analysis",
+            "item": "ai_points",
+            "source": "p1",
+            "at": "2026-10-29T13:59:00+08:00",
+            "change": -2
+          }
+        ]
+      },
+      "expect": {
+        "outcomes": ["refunded"],
+        "lapsed": 1,
+        "balance_after": {
+          "allowance_left": 40,
+          "packs": {
+            "p1": 5
+          }
+        },
+        "ledger_after": [
+          {
+            "id": "L1",
+            "source": "allowance",
+            "change": -1
+          },
+          {
+            "id": "L2",
+            "source": "p1",
+            "change": -2
+          },
+          {
+            "kind": "refund",
+            "refund_of": "L1",
+            "source": "allowance",
+            "period_start": "2026-09-29T14:00:00+08:00",
+            "change": 1
+          },
+          {
+            "kind": "refund",
+            "refund_of": "L2",
+            "source": "p1",
+            "change": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "E40",
+      "title": "免费账号并入游客的另一个考试",
+      "kind": "边界",
+      "rule": "R25、R22",
+      "fn": "goal_access",
+      "input": {
+        "tier": "free",
+        "trigger": "guest_merge",
+        "goals": [
+          {
+            "id": "g1",
+            "primary": true,
+            "last_studied_day": "2026-10-20"
+          },
+          {
+            "id": "g2",
+            "primary": false,
+            "last_studied_day": "2026-10-21",
+            "from_guest": "guest1"
+          }
+        ],
+        "steps": [
+          {
+            "switch_primary": "g2"
+          },
+          {
+            "tier": "member"
+          }
+        ]
+      },
+      "expect": {
+        "access": {
+          "g1": "active",
+          "g2": "read_only"
+        },
+        "read_only": {
+          "today": ["due_review", "mistake_retry"],
+          "paused": ["new_learning", "edit_goal", "edit_plan", "add_material"],
+          "still": ["view", "export"]
+        },
+        "after_steps": [
+          {
+            "g1": "read_only",
+            "g2": "active"
+          },
+          {
+            "g1": "active",
+            "g2": "active"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E41",
+      "title": "游客的用量并入账号当期，重试不重复",
+      "kind": "边界",
+      "rule": "R26",
+      "fn": "merge_usage",
+      "input": {
+        "account": {
+          "id": "u1",
+          "tier": "free",
+          "segments": [
+            {
+              "tier": "free",
+              "from": "2026-09-01T10:00:00+08:00"
+            }
+          ],
+          "ledger": [
+            {
+              "id": "A1",
+              "at": "2026-10-05T20:00:00+08:00",
+              "item": "ai_points",
+              "change": -2,
+              "source": "allowance",
+              "period_start": "2026-10-01T04:00:00+08:00"
+            },
+            {
+              "id": "A2",
+              "at": "2026-10-21T08:00:00+08:00",
+              "item": "tutor_turns",
+              "change": -3,
+              "source": "allowance",
+              "period_start": "2026-10-21T04:00:00+08:00"
+            }
+          ]
+        },
+        "guest": {
+          "id": "guest1",
+          "ledger": [
+            {
+              "id": "G1",
+              "at": "2026-09-20T20:00:00+08:00",
+              "item": "ai_points",
+              "change": -1,
+              "source": "allowance"
+            },
+            {
+              "id": "G2",
+              "at": "2026-10-15T20:00:00+08:00",
+              "item": "ai_points",
+              "change": -2,
+              "source": "allowance"
+            },
+            {
+              "id": "G3",
+              "at": "2026-10-21T09:00:00+08:00",
+              "item": "tutor_turns",
+              "change": -2,
+              "source": "allowance"
+            }
+          ]
+        },
+        "at": "2026-10-21T10:00:00+08:00",
+        "requests": 2
+      },
+      "expect": {
+        "appended": [
+          {
+            "copy_of": "G1",
+            "from_guest": "guest1",
+            "at": "2026-09-20T20:00:00+08:00",
+            "item": "ai_points",
+            "change": -1,
+            "period_start": "2026-09-01T10:00:00+08:00"
+          },
+          {
+            "copy_of": "G2",
+            "from_guest": "guest1",
+            "at": "2026-10-15T20:00:00+08:00",
+            "item": "ai_points",
+            "change": -2,
+            "period_start": "2026-10-01T04:00:00+08:00"
+          },
+          {
+            "copy_of": "G3",
+            "from_guest": "guest1",
+            "at": "2026-10-21T09:00:00+08:00",
+            "item": "tutor_turns",
+            "change": -2,
+            "period_start": "2026-10-21T04:00:00+08:00"
+          }
+        ],
+        "duplicate_requests": 1,
+        "usage_after": {
+          "ai_points": {
+            "allowance": 3,
+            "used": 4,
+            "remaining": 0
+          },
+          "tutor_turns": {
+            "allowance": 10,
+            "used": 5,
+            "remaining": 5
+          }
+        }
+      }
+    }
+  ]
+}
