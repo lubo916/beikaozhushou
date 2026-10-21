@@ -1,7 +1,7 @@
 {
   "card": "diagnosis-start",
   "status": "draft",
-  "note": "例子表与 docs/baseline/rule-cards/diagnosis-start.md 一一对应；params 是期望值所依据的参数默认值，个别例子用 params_override 临时改小。再次诊断类例子里的 system_level、evidence_sufficient 是 R01 按全部证据（含本次新写的）算好的结果，本卡只读不算。期望值里不出现 NaN 或无穷大。",
+  "note": "例子表与 docs/baseline/rule-cards/diagnosis-start.md 一一对应；params 是期望值所依据的参数默认值，个别例子用 params_override 临时改小。再次诊断类例子里的 system_level、evidence_sufficient 是 R01 按全部证据（含本次新写的）算好的结果，本卡只读不算。期望值里不出现 NaN 或无穷大。预测类例子（E42）的 kps 照 R06 例子表的写法：level 是系统判定档，没写 evidence 就是证据充足，peer 是同类考生人数和平均得分率，start_estimate 只决定方格显示、不进预测；分数取整和容差同 R06 的 conventions。E13 的 interval、estimated_share、width_contribution 是 R06 算好的结果（width_contribution 是各章按 R06 R7 上下沿算的宽度贡献），本卡只读不算。时间类例子：grid 为 even 表示每周时长（weekly_hours 或 declared_weekly_hours）平均摊到 7 天，unavailable_days 是不可学的天数，reserved_minutes 是每天相同的机构占用分钟数；weekly_budget_minutes、weekly_org_minutes 从周一到周日给每天的声明预算和机构占用，unavailable_dates 是不可学的日期。capacity_hours 是逐天算、扣一次缓冲后的未取整小时数（按 6 位小数比较），available_hours 和 diff.hours 是显示用的四舍五入值；daily_capacity_minutes 是扣缓冲前每天可用的分钟数，按日期先后。置信度用未四舍五入的比值比较。E24、E25、E34–E36 里各档到目标日的最可能值和区间宽度是给定输入（R05-Q11=A：算法由规则卡任务补进 R06）。个别例子的 note 只作说明。",
   "params": {
     "learner.diagnosis.min_pool_items": 20,
     "learner.diagnosis.adaptive_min_pool": 60,
@@ -16,7 +16,14 @@
     "learner.diagnosis.subjective_min_seconds": 60,
     "learner.diagnosis.refresh_items": 10,
     "learner.diagnosis.suggest_chapters": 2,
-    "learner.forecast.confidence_width_ratios": [0.05, 0.12],
+    "learner.forecast.confidence_width_ratio": [0.06, 0.12],
+    "learner.forecast.level_rates": [0.2, 0.35, 0.5, 0.7, 0.85, 0.95],
+    "learner.forecast.band_halfwidth": {
+      "measured": 0.04,
+      "projected": 0.06,
+      "peer": 0.1,
+      "prior": 0.15
+    },
     "learner.report.high_freq_level": 3,
     "plan.option.steady_ratio": 0.8,
     "plan.option.intensive_ratio": 1.3,
@@ -461,14 +468,14 @@
     },
     {
       "id": "E13",
-      "desc": "自适应做了 12 题后改用快速定位，5 个模块只靠自评",
+      "desc": "自适应做了 12 题后改用快速定位，5 个模块只靠自评：区间和置信度照 R06，顶部写按估计的分值占比和补测建议，不写宽多少、不承诺收窄（R05-Q10=A）",
       "input": {
         "answered_before_switch": 12,
         "modules_with_answers": ["会计概述", "会计基础", "资产"],
         "modules_self_rated_only": ["负债", "所有者权益", "收入、费用和利润", "财务报告", "管理会计基础"],
         "full_score": 100,
         "interval": [53, 69],
-        "interval_if_self_rated_tested": [57, 65],
+        "estimated_share": 0.95,
         "width_contribution": {
           "负债": 3.1,
           "财务报告": 2.4,
@@ -491,12 +498,15 @@
         "confidence": "low",
         "basis": {
           "answered": 12,
-          "self_rated_modules": 5
+          "self_rated_modules": 5,
+          "estimated_share": 0.95
         },
         "banner": {
-          "wider_by": 8,
+          "estimated_share": 0.95,
           "suggest_chapters": ["负债", "财务报告"],
-          "minutes": 10
+          "minutes": 10,
+          "wider_by": null,
+          "promises_narrowing": false
         }
       },
       "rule": "R9,R20,R22"
@@ -567,7 +577,7 @@
     },
     {
       "id": "E16",
-      "desc": "最可能值已过目标线：不分摊，显示还能再提的分",
+      "desc": "最可能值已过目标线：差额不显示负数，写“已过目标线”；不分摊，显示还能再提的分",
       "input": {
         "target": 70,
         "interval": [68, 76],
@@ -581,6 +591,7 @@
       },
       "expect": {
         "gap": -2,
+        "reached": true,
         "gap_mode": "potential_only",
         "table_title_key": "reached_target",
         "gap_points": {
@@ -619,7 +630,7 @@
     },
     {
       "id": "E18",
-      "desc": "差距四类怎么归：只算学习范围内、当前档低于目标档的点",
+      "desc": "差距四类怎么归：只算学习范围内、系统判定低于目标档的点（和差额同一批，按 R06）；归哪一类看当前档和摸底情况",
       "input": {
         "points": [
           {
@@ -627,6 +638,8 @@
             "in_scope": true,
             "target": 3,
             "level": 0,
+            "system_level": 0,
+            "evidence_sufficient": false,
             "roi_tier": "D",
             "signal": null,
             "chapter_self_rating": null
@@ -636,6 +649,8 @@
             "in_scope": true,
             "target": 3,
             "level": 0,
+            "system_level": 0,
+            "evidence_sufficient": false,
             "roi_tier": "B",
             "signal": "wrong",
             "chapter_self_rating": null
@@ -645,6 +660,8 @@
             "in_scope": true,
             "target": 3,
             "level": 0,
+            "system_level": 0,
+            "evidence_sufficient": false,
             "roi_tier": "A",
             "signal": "dont_know",
             "chapter_self_rating": null
@@ -654,6 +671,8 @@
             "in_scope": true,
             "target": 4,
             "level": 2,
+            "system_level": 1,
+            "evidence_sufficient": false,
             "roi_tier": "B",
             "signal": "known",
             "chapter_self_rating": null
@@ -663,6 +682,8 @@
             "in_scope": true,
             "target": 2,
             "level": 1,
+            "system_level": 0,
+            "evidence_sufficient": false,
             "roi_tier": "C",
             "signal": null,
             "chapter_self_rating": "learned_not_solid"
@@ -672,6 +693,8 @@
             "in_scope": true,
             "target": 3,
             "level": 3,
+            "system_level": 3,
+            "evidence_sufficient": true,
             "roi_tier": "A",
             "signal": "known",
             "chapter_self_rating": null
@@ -681,7 +704,31 @@
             "in_scope": false,
             "target": null,
             "level": 0,
+            "system_level": 0,
+            "evidence_sufficient": false,
             "roi_tier": "C",
+            "signal": null,
+            "chapter_self_rating": null
+          },
+          {
+            "id": "kp-8",
+            "in_scope": true,
+            "target": 3,
+            "level": 3,
+            "system_level": 0,
+            "evidence_sufficient": false,
+            "roi_tier": "B",
+            "signal": null,
+            "chapter_self_rating": null
+          },
+          {
+            "id": "kp-9",
+            "in_scope": true,
+            "target": 3,
+            "level": null,
+            "system_level": 0,
+            "evidence_sufficient": false,
+            "roi_tier": "A",
             "signal": null,
             "chapter_self_rating": null
           }
@@ -695,14 +742,16 @@
           "kp-4": "unstable",
           "kp-5": "forgotten",
           "kp-6": null,
-          "kp-7": null
+          "kp-7": null,
+          "kp-8": "unstable",
+          "kp-9": "untaught_high_freq"
         }
       },
       "rule": "R24"
     },
     {
       "id": "E19",
-      "desc": "六级（分数段型）：没有合格线；宽 38 分占满分约 5.4%，置信中",
+      "desc": "六级（分数段型）：没有合格线；宽 38 分占满分约 5.35%，不超过 6%，置信高（同 R06）",
       "input": {
         "exam": {
           "rule": "score_band",
@@ -714,7 +763,7 @@
         "most_likely": 497
       },
       "expect": {
-        "confidence": "medium",
+        "confidence": "high",
         "show_pass_line": false,
         "gap": 23
       },
@@ -840,10 +889,14 @@
     },
     {
       "id": "E24",
-      "desc": "初级会计三档方案：按比例取整、固定推荐标准、模考次数与边际收益",
+      "desc": "初级会计三档方案：同 E20 的时间预算逐天算各档可投入（没有机构占用，结果和按比例一样），按比例取整时长、固定推荐标准、模考次数与边际收益",
       "input": {
         "declared_weekly_hours": 9,
-        "available_hours_standard": 237.15,
+        "today": "2026-10-11",
+        "target_date": "2027-05-16",
+        "grid": "even",
+        "unavailable_days": 0,
+        "reserved_minutes": 0,
         "need_hours": 300,
         "exam_duration_hours": 2,
         "most_likely_at_target": {
@@ -863,6 +916,7 @@
             "key": "steady",
             "weekly_hours": 7,
             "daily_minutes": 60,
+            "capacity_hours": 184.45,
             "projected_completion_percent": 61,
             "cost_keys": ["lowest_completion", "widest_interval"],
             "recommended": false
@@ -871,6 +925,7 @@
             "key": "standard",
             "weekly_hours": 9,
             "daily_minutes": 77,
+            "capacity_hours": 237.15,
             "projected_completion_percent": 79,
             "vs_steady": {
               "extra_hours": 2,
@@ -882,6 +937,7 @@
             "key": "intensive",
             "weekly_hours": 12,
             "daily_minutes": 103,
+            "capacity_hours": 316.2,
             "projected_completion_percent": 100,
             "mocks": 3,
             "vs_steady": {
@@ -896,10 +952,14 @@
     },
     {
       "id": "E25",
-      "desc": "声明每周只有 1 小时：稳妥做不到（要少 1 小时又不少于 1 小时），只给标准、冲刺两张卡；没有稳妥时冲刺改跟标准比",
+      "desc": "同 E20 的 217 天、声明每周只有 1 小时：稳妥做不到（要少 1 小时又不少于 1 小时），只给标准、冲刺两张卡；没有稳妥时冲刺改跟标准比",
       "input": {
         "declared_weekly_hours": 1,
-        "available_hours_standard": 26.35,
+        "today": "2026-10-11",
+        "target_date": "2027-05-16",
+        "grid": "even",
+        "unavailable_days": 0,
+        "reserved_minutes": 0,
         "need_hours": 300,
         "exam_duration_hours": 2,
         "most_likely_at_target": {
@@ -919,6 +979,7 @@
             "key": "standard",
             "weekly_hours": 1,
             "daily_minutes": 9,
+            "capacity_hours": 26.35,
             "projected_completion_percent": 9,
             "vs_standard": null,
             "cost_keys": [],
@@ -928,6 +989,7 @@
             "key": "intensive",
             "weekly_hours": 2,
             "daily_minutes": 17,
+            "capacity_hours": 52.7,
             "projected_completion_percent": 18,
             "vs_standard": {
               "extra_hours": 1,
@@ -975,7 +1037,7 @@
         "options_show_points": false,
         "after_recheck_pass": {
           "forecast": "shown",
-          "confidence_label": "low_until_sufficient"
+          "confidence_label": "by_width_ratio"
         }
       },
       "rule": "R23"
@@ -1305,11 +1367,15 @@
     },
     {
       "id": "E34",
-      "desc": "需要 0 小时、可投入 0 小时（声明每周 6 小时，但可学时间被机构任务占满）：需要为 0 优先，预计完成 100%，只写余量 0 小时；三档都是 100%",
+      "desc": "需要 0 小时；声明每周 6 小时（周一到周六各 1 小时），机构课表也是每天 1 小时，标准可投入 0：需要为 0 优先，预计完成 100%，只写余量 0 小时；冲刺每天多出 20 分钟、可投入 3.4 小时（机构占用不跟着放大）；三档都是 100%、都不写模考",
       "input": {
         "need_hours": 0,
-        "available_hours_standard": 0,
         "declared_weekly_hours": 6,
+        "today": "2026-10-19",
+        "target_date": "2026-11-02",
+        "weekly_budget_minutes": [60, 60, 60, 60, 60, 60, 0],
+        "weekly_org_minutes": [60, 60, 60, 60, 60, 60, 0],
+        "unavailable_dates": [],
         "exam_duration_hours": 2,
         "interval_width_at_target": {
           "steady": 8,
@@ -1319,6 +1385,7 @@
       },
       "expect": {
         "projected_completion_percent": 100,
+        "available_hours": 0,
         "diff": {
           "kind": "surplus",
           "hours": 0,
@@ -1331,6 +1398,7 @@
           {
             "key": "steady",
             "weekly_hours": 5,
+            "capacity_hours": 0,
             "projected_completion_percent": 100,
             "mocks": null,
             "cost_keys": []
@@ -1338,12 +1406,14 @@
           {
             "key": "standard",
             "weekly_hours": 6,
+            "capacity_hours": 0,
             "projected_completion_percent": 100,
             "mocks": null
           },
           {
             "key": "intensive",
             "weekly_hours": 8,
+            "capacity_hours": 3.4,
             "projected_completion_percent": 100,
             "mocks": null
           }
@@ -1353,11 +1423,14 @@
     },
     {
       "id": "E35",
-      "desc": "需要 0 小时、可投入 61 小时：预计完成 100%，只写余量不写百分比；三档都是 100%、都留出 3 次模考；稳妥卡代价只写区间最宽",
+      "desc": "需要 0 小时；同 E21 的 89 天、5 天不可学、每周 6 小时：可投入 61.2 小时，预计完成 100%，只写余量不写百分比；三档可投入 51、61.2、81.6 小时，都是 100%、都留出 3 次模考；稳妥卡代价只写区间最宽",
       "input": {
         "need_hours": 0,
-        "available_hours_standard": 61,
         "declared_weekly_hours": 6,
+        "days_to_target": 89,
+        "grid": "even",
+        "unavailable_days": 5,
+        "reserved_minutes": 0,
         "exam_duration_hours": 2,
         "interval_width_at_target": {
           "steady": 9,
@@ -1367,6 +1440,7 @@
       },
       "expect": {
         "projected_completion_percent": 100,
+        "available_hours": 61,
         "diff": {
           "kind": "surplus",
           "hours": 61,
@@ -1379,6 +1453,7 @@
           {
             "key": "steady",
             "weekly_hours": 5,
+            "capacity_hours": 51,
             "projected_completion_percent": 100,
             "mocks": 3,
             "cost_keys": ["widest_interval"]
@@ -1386,12 +1461,14 @@
           {
             "key": "standard",
             "weekly_hours": 6,
+            "capacity_hours": 61.2,
             "projected_completion_percent": 100,
             "mocks": 3
           },
           {
             "key": "intensive",
             "weekly_hours": 8,
+            "capacity_hours": 81.6,
             "projected_completion_percent": 100,
             "mocks": 3
           }
@@ -1401,11 +1478,14 @@
     },
     {
       "id": "E36",
-      "desc": "需要 50 小时、可投入 0 小时（声明每周 6 小时，但到目标日前天天不可学）：预计完成 0%，缺口 50 小时约 100%，提示先填时间、给三条出路、不出范围提议",
+      "desc": "需要 50 小时、声明每周 6 小时，但到目标日前 7 天天天不可学：三档可投入都是 0，预计完成 0%，缺口 50 小时约 100%，提示先填时间、给三条出路、不出范围提议",
       "input": {
         "need_hours": 50,
-        "available_hours_standard": 0,
         "declared_weekly_hours": 6,
+        "days_to_target": 7,
+        "grid": "even",
+        "unavailable_days": 7,
+        "reserved_minutes": 0,
         "exam_duration_hours": 2,
         "interval_width_at_target": {
           "steady": 8,
@@ -1415,6 +1495,7 @@
       },
       "expect": {
         "projected_completion_percent": 0,
+        "available_hours": 0,
         "diff": {
           "kind": "shortfall",
           "hours": 50,
@@ -1427,6 +1508,7 @@
           {
             "key": "steady",
             "weekly_hours": 5,
+            "capacity_hours": 0,
             "projected_completion_percent": 0,
             "mocks": null,
             "cost_keys": []
@@ -1434,12 +1516,14 @@
           {
             "key": "standard",
             "weekly_hours": 6,
+            "capacity_hours": 0,
             "projected_completion_percent": 0,
             "mocks": null
           },
           {
             "key": "intensive",
             "weekly_hours": 8,
+            "capacity_hours": 0,
             "projected_completion_percent": 0,
             "mocks": null
           }
@@ -1449,15 +1533,19 @@
     },
     {
       "id": "E37",
-      "desc": "声明每周 0 小时（还没填时间）、需要 50 小时：可投入 0，不出方案卡，生成计划前先去填时间，不做“方案时长 ÷ 标准时长”",
+      "desc": "声明每周 0 小时（还没填时间）、89 天、需要 50 小时：可投入 0，不出方案卡，生成计划前先去填时间，不做“方案时长 ÷ 标准时长”",
       "input": {
         "need_hours": 50,
-        "available_hours_standard": 0,
         "declared_weekly_hours": 0,
+        "days_to_target": 89,
+        "grid": "even",
+        "unavailable_days": 0,
+        "reserved_minutes": 0,
         "exam_duration_hours": 2
       },
       "expect": {
         "projected_completion_percent": 0,
+        "available_hours": 0,
         "diff": {
           "kind": "shortfall",
           "hours": 50,
@@ -1657,6 +1745,313 @@
         }
       },
       "rule": "R7,R16,R17"
+    },
+    {
+      "id": "E41",
+      "desc": "置信度分界（同 R06 R11）：正好 6%、12% 算在分界以内；比值不先四舍五入",
+      "input": {
+        "combos": [
+          {
+            "id": "c1",
+            "full_score": 100,
+            "interval": [60, 65]
+          },
+          {
+            "id": "c2",
+            "full_score": 100,
+            "interval": [58, 64]
+          },
+          {
+            "id": "c3",
+            "full_score": 710,
+            "interval": [470, 513]
+          },
+          {
+            "id": "c4",
+            "full_score": 100,
+            "interval": [55, 67]
+          },
+          {
+            "id": "c5",
+            "full_score": 710,
+            "interval": [450, 536]
+          }
+        ]
+      },
+      "expect": {
+        "c1": {
+          "width_ratio": 0.05,
+          "confidence": "high"
+        },
+        "c2": {
+          "width_ratio": 0.06,
+          "confidence": "high"
+        },
+        "c3": {
+          "width_ratio": 0.060563,
+          "confidence": "medium"
+        },
+        "c4": {
+          "width_ratio": 0.12,
+          "confidence": "medium"
+        },
+        "c5": {
+          "width_ratio": 0.121127,
+          "confidence": "low"
+        }
+      },
+      "rule": "R20"
+    },
+    {
+      "id": "E42",
+      "desc": "方格估计高于系统判定、证据不足：方格显示估计，S05 的预测照 R06（a 有足够同类考生，b 没有），起点估计不进预测",
+      "input": {
+        "combos": [
+          {
+            "id": "a",
+            "full_score": 100,
+            "target_score": 70,
+            "kps": [
+              {
+                "id": "k1",
+                "score_weight": 17,
+                "level": 4,
+                "target": 4,
+                "start_estimate": 4
+              },
+              {
+                "id": "k2",
+                "score_weight": 35,
+                "level": 3,
+                "target": 3,
+                "evidence": "insufficient",
+                "start_estimate": 4,
+                "peer": {
+                  "population": 350,
+                  "rate": 0.62
+                }
+              },
+              {
+                "id": "k3",
+                "score_weight": 35,
+                "level": 2,
+                "target": 2,
+                "evidence": "insufficient",
+                "start_estimate": 4,
+                "peer": {
+                  "population": 120,
+                  "rate": 0.55
+                }
+              },
+              {
+                "id": "k4",
+                "score_weight": 13,
+                "level": 1,
+                "target": 4,
+                "start_estimate": 1
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "full_score": 100,
+            "target_score": 70,
+            "kps": [
+              {
+                "id": "k1",
+                "score_weight": 17,
+                "level": 4,
+                "target": 4,
+                "start_estimate": 4
+              },
+              {
+                "id": "k2",
+                "score_weight": 35,
+                "level": 3,
+                "target": 3,
+                "evidence": "insufficient",
+                "start_estimate": 4,
+                "peer": {
+                  "population": 150,
+                  "rate": 0.62
+                }
+              },
+              {
+                "id": "k3",
+                "score_weight": 35,
+                "level": 2,
+                "target": 2,
+                "evidence": "insufficient",
+                "start_estimate": 4,
+                "peer": {
+                  "population": 120,
+                  "rate": 0.55
+                }
+              },
+              {
+                "id": "k4",
+                "score_weight": 13,
+                "level": 1,
+                "target": 4,
+                "start_estimate": 1
+              }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "a": {
+          "shown": {
+            "k1": 4,
+            "k2": 4,
+            "k3": 4,
+            "k4": 1
+          },
+          "shown_source": {
+            "k1": "system",
+            "k2": "estimate",
+            "k3": "estimate",
+            "k4": "system"
+          },
+          "today": {
+            "low": 48,
+            "ml": 58,
+            "high": 69
+          },
+          "gap": 12,
+          "reached": false,
+          "confidence": "low",
+          "estimated_share": 0.7,
+          "peer_kps": ["k2"]
+        },
+        "b": {
+          "shown": {
+            "k1": 4,
+            "k2": 4,
+            "k3": 4,
+            "k4": 1
+          },
+          "shown_source": {
+            "k1": "system",
+            "k2": "estimate",
+            "k3": "estimate",
+            "k4": "system"
+          },
+          "today": {
+            "low": 49,
+            "ml": 61,
+            "high": 73
+          },
+          "gap": 9,
+          "reached": false,
+          "confidence": "low",
+          "estimated_share": 0.7,
+          "peer_kps": []
+        }
+      },
+      "note": "a 与 metrics-prediction.cases.json 的 E3、b 与 E2 的预测输入相同（这里另加了起点估计），期望的预测完全一样；拿起点估计当档会算成 74–83、最可能 79，不对",
+      "rule": "R16,R19,R20,R21"
+    },
+    {
+      "id": "E43",
+      "desc": "复核反例：一个完整周，标准 10 小时、机构课表 4 小时；各档按调整后的每日预算重新扣机构占用，机构占用不跟着方案缩放",
+      "input": {
+        "today": "2026-10-19",
+        "target_date": "2026-10-26",
+        "declared_weekly_hours": 10,
+        "weekly_budget_minutes": [120, 120, 120, 120, 120, 0, 0],
+        "weekly_org_minutes": [48, 48, 48, 48, 48, 0, 0],
+        "unavailable_dates": [],
+        "need_hours": 6,
+        "exam_duration_hours": 2
+      },
+      "expect": {
+        "available_hours": 5,
+        "diff": {
+          "kind": "shortfall",
+          "hours": 1,
+          "percent": 15
+        },
+        "projected_completion_percent": 85,
+        "options": [
+          {
+            "key": "steady",
+            "weekly_hours": 8,
+            "capacity_hours": 3.4,
+            "projected_completion_percent": 57,
+            "mocks": null
+          },
+          {
+            "key": "standard",
+            "weekly_hours": 10,
+            "capacity_hours": 5.1,
+            "projected_completion_percent": 85,
+            "mocks": null
+          },
+          {
+            "key": "intensive",
+            "weekly_hours": 13,
+            "capacity_hours": 7.65,
+            "projected_completion_percent": 100,
+            "mocks": null
+          }
+        ]
+      },
+      "note": "旧写法“标准可投入 5.1 × 时长比”会得稳妥 4.08、冲刺 6.63 小时，把机构占用也一起缩放了，不对",
+      "rule": "R30,R34,R37"
+    },
+    {
+      "id": "E44",
+      "desc": "逐天算：某天被机构占满、某天占用超出预算（那天按 0，不是负数）、不可学日、0 小时的日子；缓冲只扣一次",
+      "input": {
+        "today": "2026-10-19",
+        "target_date": "2026-10-26",
+        "declared_weekly_hours": 10,
+        "weekly_budget_minutes": [60, 60, 120, 120, 120, 120, 0],
+        "weekly_org_minutes": [60, 90, 0, 30, 0, 0, 0],
+        "unavailable_dates": ["2026-10-21"],
+        "need_hours": 6,
+        "exam_duration_hours": 2
+      },
+      "expect": {
+        "available_hours": 5,
+        "diff": {
+          "kind": "shortfall",
+          "hours": 1,
+          "percent": 22
+        },
+        "projected_completion_percent": 78,
+        "daily_capacity_minutes": {
+          "steady": [0, 0, 0, 66, 96, 96, 0],
+          "standard": [0, 0, 0, 90, 120, 120, 0],
+          "intensive": [18, 0, 0, 126, 156, 156, 0]
+        },
+        "options": [
+          {
+            "key": "steady",
+            "weekly_hours": 8,
+            "capacity_hours": 3.655,
+            "projected_completion_percent": 61,
+            "mocks": null
+          },
+          {
+            "key": "standard",
+            "weekly_hours": 10,
+            "capacity_hours": 4.675,
+            "projected_completion_percent": 78,
+            "mocks": null
+          },
+          {
+            "key": "intensive",
+            "weekly_hours": 13,
+            "capacity_hours": 6.46,
+            "projected_completion_percent": 100,
+            "mocks": null
+          }
+        ]
+      },
+      "note": "按周总数相减（不可学日以外的预算 480 分钟 − 机构占用 180 分钟）只有 4.25 小时：周二超出的 30 分钟不能吃掉别的天；旧写法“标准可投入 × 时长比”会得 3.74、6.08 小时",
+      "rule": "R30,R31,R34"
     }
   ]
 }
