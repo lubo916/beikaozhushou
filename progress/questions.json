@@ -1161,8 +1161,10 @@
       ],
       "recommend": "A",
       "temp": "A",
-      "status": "open",
-      "asked": "v0016"
+      "status": "answered",
+      "asked": "v0016",
+      "answer": "A",
+      "answered": "v0016"
     },
     {
       "id": "R08-Q8",
