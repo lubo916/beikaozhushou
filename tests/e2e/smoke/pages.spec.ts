@@ -3,7 +3,16 @@
 // 一页一个测试；某一步没过，记下来接着查下一步，最后一起报，方便一次看全这一页哪里坏了。
 import { expect, test } from "@playwright/test";
 import { ALL_PAGES, PAGES_MD_IDS, pageLabel, urlOf, type PageEntry } from "../support/catalog.ts";
-import { ABNORMAL_STATES, STATE_NAMES, expectLoaded, expectOpened, expectState, firstLine, watchPage } from "../support/checks.ts";
+import {
+  ABNORMAL_STATES,
+  STATE_NAMES,
+  expectLoaded,
+  expectNoProblems,
+  expectOpened,
+  expectState,
+  firstLine,
+  watchPage,
+} from "../support/checks.ts";
 
 test.describe.configure({ timeout: 5 * 60_000 });
 
@@ -27,21 +36,21 @@ function definePageSmoke(entry: PageEntry): void {
       await watch.open(urlOf(entry));
       await expectOpened(page, entry, entry.views[0]);
       await expectLoaded(page, entry);
-      expect(watch.problems("normal"), "不应有浏览器报错").toEqual([]);
+      expectNoProblems(watch, "normal");
     });
     for (const view of entry.views.slice(1)) {
       await check(`视图 ?view=${view.key}`, async () => {
         await watch.open(urlOf(entry, { view: view.key }));
         await expectOpened(page, entry, view);
         await expectLoaded(page, entry);
-        expect(watch.problems("normal"), "不应有浏览器报错").toEqual([]);
+        expectNoProblems(watch, "normal");
       });
     }
     for (const state of ABNORMAL_STATES) {
       await check(`${STATE_NAMES[state]}态 ?state=${state}`, async () => {
         await watch.open(urlOf(entry, { state }));
         await expectState(page, entry, state);
-        expect(watch.problems(state), "不应有浏览器报错").toEqual([]);
+        expectNoProblems(watch, state);
       });
     }
 

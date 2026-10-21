@@ -71,7 +71,7 @@ function isExpected(problem: BrowserProblem, state: StateCode): boolean {
 
 function describeProblem(problem: BrowserProblem): string {
   const where = problem.url === "" ? "" : `（${problem.url}）`;
-  return `${problem.kind === "pageerror" ? "未捕获的异常" : "控制台报错"}：${problem.text}${where}`;
+  return `${problem.kind === "pageerror" ? "未捕获的异常" : "控制台报错"}：${problem.text.replace(/\s*\n\s*/g, " ")}${where}`;
 }
 
 /** 页面里记下最近一次资源加载完成的时刻（作为 init script，每次打开页面都先于页面脚本运行；函数会被序列化，不能引用外面的变量）。 */
@@ -123,6 +123,13 @@ export async function watchPage(page: Page): Promise<PageWatch> {
       return seen.filter((item) => !isExpected(item, state)).map(describeProblem);
     },
   };
+}
+
+/** 没有浏览器报错；有的话把报错本身写进失败说明（一页的冒烟测试最后只汇总每一步失败说明的第一行）。 */
+export function expectNoProblems(watch: PageWatch, state: StateCode, where = ""): void {
+  const problems = watch.problems(state);
+  const detail = problems.length === 0 ? "" : `：${problems.join("；")}`;
+  expect(problems, `${where}不应有浏览器报错${detail}`).toEqual([]);
 }
 
 /** “能打开”：外壳正文区在；页名出现在页标题（h1）或顶栏、沉浸栏里；不是“没有这个页面”；学员端的页面模式与登记一致。 */

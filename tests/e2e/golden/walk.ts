@@ -1,9 +1,9 @@
 // 黄金路径的执行（阶段 1：只走页面跳转）：每条路径手机 375、桌面 1280 各一遍，逐步打开该步的页面（带 ?exam=kj 与 ?view=），
 // 核对能打开、加载完、没有浏览器报错。每条测试带“接后端后补断言”标注，列出阶段 2 要补的断言（见 paths.ts 的 later）。
 // 由 tests/e2e/smoke/golden-paths.spec.ts 注册进冒烟入口：pnpm e2e:smoke 与 bk verify（web、full）都会跑到。
-import { expect, test } from "@playwright/test";
+import { test } from "@playwright/test";
 import { pageById, urlOf, type PageEntry, type PageView } from "../support/catalog.ts";
-import { expectLoaded, expectOpened, watchPage } from "../support/checks.ts";
+import { expectLoaded, expectNoProblems, expectOpened, watchPage } from "../support/checks.ts";
 import { GOLDEN_EXAM, GOLDEN_PATHS, GOLDEN_VIEWPORTS, type GoldenStep } from "./paths.ts";
 
 export const LATER_ANNOTATION = "接后端后补断言";
@@ -42,7 +42,7 @@ export function defineGoldenPathTests(): void {
               await watch.open(url);
               await expectOpened(page, entry, view);
               await expectLoaded(page, entry);
-              expect(watch.problems("normal"), `${where}：不应有浏览器报错`).toEqual([]);
+              expectNoProblems(watch, "normal", `${where}：`);
             });
           }
         });
