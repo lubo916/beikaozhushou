@@ -534,7 +534,7 @@
       "id": "E24",
       "kind": "turn",
       "title": "异常：导师不可用、额度用完时出现风险信号",
-      "rule": "R15",
+      "rule": "R2、R15",
       "input": {
         "classify": {
           "risk": "crisis"
