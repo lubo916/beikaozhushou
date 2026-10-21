@@ -1,7 +1,7 @@
 {
   "card": "docs/baseline/rule-cards/mock-exam.md",
   "status": "草稿",
-  "round": "R07-r1",
+  "round": "R07-r2",
   "decided": {
     "R07-Q1": "A",
     "R07-Q2": "A",
@@ -9,11 +9,12 @@
     "R07-Q4": "B",
     "R07-Q5": "A",
     "R07-Q6": "A",
-    "R07-Q7": "A"
+    "R07-Q7": "A",
+    "R07-Q8": "A",
+    "跨设备补交": "A"
   },
-  "temp_decisions": {
-    "R07-Q8": "A"
-  },
+  "temp_decisions": {},
+  "decisions": ["docs/decisions/D-2026-10-21-R07-r1.md", "docs/decisions/D-2026-10-21-R07-paper-sync.md"],
   "conventions": [
     "每条例子是 input → expect；expect 只列要核对的字段，没列的不核对。带 variants 的例子，input.variants[i] 与 input 其余字段合并后对应 expect.variants[i]，各自独立。",
     "时间写成带时区的 ISO 8601（例子用北京时间 +08:00，便于对照规则卡）；“哪一天”按 day 设置、用 packages/shared/src/today 的 today() 算。名字以 _at 结尾的是时刻，date 是日期。",
@@ -23,7 +24,8 @@
     "题目、知识点用 q1、k1 这样的简写，实际是 UUID。custom_pick 的 kps.group 直接给出知识点在哪一组：weak＝薄弱名单（R01 R20）、open_mistake＝有没毕业的错题（R03）、learned＝其余有证据的；gap＝还差几档；questions 没写 last_done 表示没做过，没写 credibility 的是 reviewed。spec 为 stage 时按 R4：只出 chapters 里的知识点，kps 写 chapter 和 has_evidence，不看 group。",
     "attribute 的 start_snapshot 是开考那一刻的档位快照（R26）；questions 没写 answered 的都是已答，score 是得分，expression_loss 是批改给出的表达扣分；by_category、by_question 的单位是分。",
     "params 为空：本卡没有直接用到 contracts/params.yaml 里已有的参数；params_proposed 是建议新增、待整合任务登记的参数（规则卡参数表“待整合登记”各行），例子都按这些默认值算。",
-    "带 decision 的例子对应你已拍板的问题（decided）；带 pending 的例子按 temp_decisions 的临时默认写，expect_if_B 是改选 B 时要变的字段。",
+    "带 decision 的例子对应你已拍板的事（decided）：R07-Qn 是交接单的问题编号；“跨设备补交”没有问题编号，见 decisions 里的 D-2026-10-21-R07-paper-sync。本卡已没有待拍板的点，temp_decisions 为空。",
+    "跨设备的例子（E45–E50）：device_a 是被接管的旧设备（甲），device_b 是接管的新设备（乙）；connected_at_takeover 是被接管那一刻甲连没连着服务器，connected_at_end 是到结束时间时乙连没连着；sync_done_at 是各设备联网把本机这一场的答案传完（或确认没有要传的）的时刻，null 表示一直没有；save_id 是设备上生成的保存编号（R15），同一编号收到几次只算一次；deadline 是补交期限（结束时间＋practice.mock.sync_grace_hours），期限那一刻收到的已算迟到；waiting_for_* 是那一刻还要等的设备，按名字排序；final 只列要核对的题，null 表示没答。",
     "functions 是建议的纯函数划分（放 packages/domains/practice/core/），名字可以改。"
   ],
   "day": {
@@ -47,15 +49,15 @@
     "snapshot": "开考快照、下架与事后更正（R6）",
     "clock": "结束时间、暂离、提醒与收卷时刻（R9–R12）",
     "process": "每题用时、作答顺序、改答案次数（R13）",
-    "sync": "断点续考、断网补交、多端接管后每题取哪个答案（R14–R16）",
-    "settle": "结算时机，正常交卷还是中途放弃（R17、R18）",
+    "sync": "断点续考、断网补交、多端接管后每题取哪个答案、哪台设备待补交、重复补交去重（R13–R16）",
+    "settle": "结算时机（等补交、补交期限、迟到与重复补交），正常交卷还是中途放弃（R17、R18）",
     "score": "判分、暂定分、折算分、与目标线的差、进不进趋势、不显示排名（R19–R23）",
     "handoff": "交给证据和错题本的内容（R8、R24、R25）",
     "attribute": "失分归因与显示（R26–R28）",
     "analysis": "错因分布、知识点诊断、时间策略、信心校准、策略模拟（R29–R33）",
     "boost": "补强清单与提议（R35）",
     "narrative": "解读一句话与降级句式（R36）",
-    "paper_mode": "纸笔模式（R37）"
+    "paper_mode": "纸笔模式：上传即交卷、结束后等上传、补交期限（R37）"
   },
   "cases": [
     {
@@ -1872,7 +1874,7 @@
       "title": "纸笔模式",
       "rule": "R37",
       "fn": "paper_mode",
-      "pending": "R07-Q8",
+      "decision": "R07-Q8",
       "input": {
         "spec": "full",
         "mode": "paper",
@@ -1894,10 +1896,6 @@
         "time_strategy": false,
         "calibration": false,
         "strategy_simulation": false
-      },
-      "expect_if_B": {
-        "in_trend": false,
-        "to_prediction": false
       }
     },
     {
@@ -1985,6 +1983,604 @@
       "expect": {
         "picked": ["q1", "q2", "q3"],
         "shortage": 0
+      }
+    },
+    {
+      "id": "E45",
+      "kind": "边界",
+      "title": "新设备提前交卷，旧设备后补交",
+      "rule": "R7、R12、R16、R17",
+      "fn": "settle",
+      "decision": "跨设备补交",
+      "input": {
+        "ends_at": "2026-10-21T11:00:00+08:00",
+        "device_a": {
+          "connected_at_takeover": false,
+          "saves": [
+            {
+              "save_id": "a1",
+              "question": "q20",
+              "answer": "B",
+              "saved_at": "2026-10-21T10:05:00+08:00"
+            },
+            {
+              "save_id": "a2",
+              "question": "q30",
+              "answer": "D",
+              "saved_at": "2026-10-21T10:08:00+08:00"
+            },
+            {
+              "save_id": "a3",
+              "question": "q21",
+              "answer": "C",
+              "saved_at": "2026-10-21T10:20:00+08:00"
+            }
+          ]
+        },
+        "device_b": {
+          "takeover_at": "2026-10-21T10:10:00+08:00",
+          "saves": [
+            {
+              "save_id": "b1",
+              "question": "q20",
+              "answer": "C",
+              "saved_at": "2026-10-21T10:15:00+08:00"
+            },
+            {
+              "save_id": "b2",
+              "question": "q21",
+              "answer": "A",
+              "saved_at": "2026-10-21T10:16:00+08:00"
+            }
+          ],
+          "submitted_at": "2026-10-21T10:40:00+08:00"
+        },
+        "variants": [
+          {
+            "sync_done_at": {
+              "device_a": "2026-10-21T10:50:00+08:00"
+            }
+          },
+          {
+            "sync_done_at": {
+              "device_a": "2026-10-21T12:30:00+08:00"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "waiting_for_at_submit": ["device_a"],
+            "status_at_submit": "awaiting_sync",
+            "revealed_before_settle": false,
+            "notice": "这场已收卷，等另一台设备联网补交答案后出报告，最晚 {{deadline}}",
+            "deadline": "2026-10-22T11:00:00+08:00",
+            "final": {
+              "q20": "C",
+              "q21": "A",
+              "q30": "D"
+            },
+            "rejected": [
+              {
+                "device": "device_a",
+                "question": "q21",
+                "answer": "C"
+              }
+            ],
+            "status": "submitted",
+            "submitted_at": "2026-10-21T10:40:00+08:00",
+            "settled_at": "2026-10-21T10:50:00+08:00"
+          },
+          {
+            "waiting_for_at_submit": ["device_a"],
+            "status_at_submit": "awaiting_sync",
+            "revealed_before_settle": false,
+            "notice": "这场已收卷，等另一台设备联网补交答案后出报告，最晚 {{deadline}}",
+            "deadline": "2026-10-22T11:00:00+08:00",
+            "final": {
+              "q20": "C",
+              "q21": "A",
+              "q30": "D"
+            },
+            "rejected": [
+              {
+                "device": "device_a",
+                "question": "q21",
+                "answer": "C"
+              }
+            ],
+            "status": "submitted",
+            "submitted_at": "2026-10-21T10:40:00+08:00",
+            "settled_at": "2026-10-21T12:30:00+08:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E46",
+      "kind": "边界",
+      "title": "到点新设备连着，旧设备还待补交",
+      "rule": "R16、R17、R18",
+      "fn": "settle",
+      "decision": "跨设备补交",
+      "input": {
+        "ends_at": "2026-10-21T11:00:00+08:00",
+        "all_answered": false,
+        "device_b": {
+          "takeover_at": "2026-10-21T10:10:00+08:00",
+          "last_action_at": "2026-10-21T10:20:00+08:00",
+          "connected_at_end": true
+        },
+        "variants": [
+          {
+            "device_a": {
+              "connected_at_takeover": false,
+              "saves": [
+                {
+                  "save_id": "a1",
+                  "question": "q30",
+                  "answer": "D",
+                  "saved_at": "2026-10-21T10:08:00+08:00"
+                }
+              ]
+            },
+            "sync_done_at": {
+              "device_a": "2026-10-21T13:00:00+08:00"
+            }
+          },
+          {
+            "device_a": {
+              "connected_at_takeover": true,
+              "saves": [
+                {
+                  "save_id": "a1",
+                  "question": "q30",
+                  "answer": "D",
+                  "saved_at": "2026-10-21T10:08:00+08:00"
+                }
+              ]
+            }
+          },
+          {
+            "device_a": {
+              "connected_at_takeover": false,
+              "saves": [
+                {
+                  "save_id": "a1",
+                  "question": "q30",
+                  "answer": "D",
+                  "saved_at": "2026-10-21T10:08:00+08:00"
+                }
+              ]
+            },
+            "sync_done_at": {
+              "device_a": "2026-10-21T10:30:00+08:00"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "waiting_for_at_end": ["device_a"],
+            "status_at_end": "awaiting_sync",
+            "revealed_before_settle": false,
+            "settled_at": "2026-10-21T13:00:00+08:00",
+            "status": "submitted",
+            "final": {
+              "q30": "D"
+            }
+          },
+          {
+            "waiting_for_at_end": [],
+            "settled_at": "2026-10-21T11:00:00+08:00",
+            "status": "submitted",
+            "final": {
+              "q30": "D"
+            }
+          },
+          {
+            "waiting_for_at_end": [],
+            "settled_at": "2026-10-21T11:00:00+08:00",
+            "status": "submitted",
+            "final": {
+              "q30": "D"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "E47",
+      "kind": "边界",
+      "title": "到点两台都没连着",
+      "rule": "R16、R17、R18",
+      "fn": "settle",
+      "decision": "跨设备补交",
+      "input": {
+        "ends_at": "2026-10-21T11:00:00+08:00",
+        "all_answered": false,
+        "device_a": {
+          "connected_at_takeover": false,
+          "saves": [
+            {
+              "save_id": "a1",
+              "question": "q30",
+              "answer": "D",
+              "saved_at": "2026-10-21T10:08:00+08:00"
+            },
+            {
+              "save_id": "a2",
+              "question": "q31",
+              "answer": "A",
+              "saved_at": "2026-10-21T10:55:00+08:00"
+            }
+          ]
+        },
+        "sync_done_at": {
+          "device_a": "2026-10-21T13:00:00+08:00",
+          "device_b": "2026-10-21T12:00:00+08:00"
+        },
+        "variants": [
+          {
+            "device_b": {
+              "takeover_at": "2026-10-21T10:10:00+08:00",
+              "last_action_at": "2026-10-21T10:20:00+08:00",
+              "connected_at_end": false
+            }
+          },
+          {
+            "device_b": {
+              "takeover_at": "2026-10-21T10:10:00+08:00",
+              "last_action_at": "2026-10-21T10:20:00+08:00",
+              "connected_at_end": false,
+              "submitted_at": "2026-10-21T10:22:00+08:00"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "waiting_for_at_end": ["device_a", "device_b"],
+            "status_at_end": "awaiting_sync",
+            "settled_at": "2026-10-21T13:00:00+08:00",
+            "rejected": [
+              {
+                "device": "device_a",
+                "question": "q31",
+                "answer": "A"
+              }
+            ],
+            "last_valid_action_at": "2026-10-21T10:20:00+08:00",
+            "status": "abandoned",
+            "formal_score": false
+          },
+          {
+            "waiting_for_at_end": ["device_a", "device_b"],
+            "status_at_end": "awaiting_sync",
+            "settled_at": "2026-10-21T13:00:00+08:00",
+            "rejected": [
+              {
+                "device": "device_a",
+                "question": "q31",
+                "answer": "A"
+              }
+            ],
+            "status": "submitted",
+            "submitted_at": "2026-10-21T10:22:00+08:00",
+            "formal_score": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "E48",
+      "kind": "边界",
+      "title": "补交期限到了",
+      "rule": "R17",
+      "fn": "settle",
+      "decision": "跨设备补交",
+      "input": {
+        "ends_at": "2026-10-21T11:00:00+08:00",
+        "device_a": {
+          "connected_at_takeover": false,
+          "saves": [
+            {
+              "save_id": "a1",
+              "question": "q30",
+              "answer": "D",
+              "saved_at": "2026-10-21T10:08:00+08:00"
+            }
+          ]
+        },
+        "device_b": {
+          "takeover_at": "2026-10-21T10:10:00+08:00",
+          "connected_at_end": true
+        },
+        "variants": [
+          {
+            "sync_done_at": {
+              "device_a": "2026-10-22T10:59:00+08:00"
+            }
+          },
+          {
+            "sync_done_at": {
+              "device_a": null
+            }
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "deadline": "2026-10-22T11:00:00+08:00",
+            "status_at_end": "awaiting_sync",
+            "settled_at": "2026-10-22T10:59:00+08:00",
+            "status": "submitted",
+            "formal_score": true,
+            "final": {
+              "q30": "D"
+            }
+          },
+          {
+            "deadline": "2026-10-22T11:00:00+08:00",
+            "status_at_end": "awaiting_sync",
+            "settled_at": "2026-10-22T11:00:00+08:00",
+            "status": "submitted",
+            "formal_score": true,
+            "final": {
+              "q30": null
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "E49",
+      "kind": "异常",
+      "title": "结算后迟到补交",
+      "rule": "R17、R24、R25、R28",
+      "fn": "settle",
+      "decision": "跨设备补交",
+      "input": {
+        "deadline": "2026-10-22T11:00:00+08:00",
+        "settled": {
+          "settled_at": "2026-10-22T11:00:00+08:00",
+          "status": "submitted",
+          "formal_score": true,
+          "score": 61,
+          "final": {
+            "q30": null
+          },
+          "evidence_sent": true,
+          "mistakes_collected": true
+        },
+        "late_upload": {
+          "device": "device_a",
+          "saves": [
+            {
+              "save_id": "a1",
+              "question": "q30",
+              "answer": "D",
+              "saved_at": "2026-10-21T10:08:00+08:00"
+            }
+          ]
+        },
+        "variants": [
+          {
+            "received_at": "2026-10-22T11:00:00+08:00"
+          },
+          {
+            "received_at": "2026-10-22T15:00:00+08:00"
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "late": true,
+            "counted": false,
+            "recorded_as": "迟到未计",
+            "score": 61,
+            "final": {
+              "q30": null
+            },
+            "new_evidence": 0,
+            "new_mistakes": 0,
+            "attribution_changed": false,
+            "report_changed": false,
+            "device_notice": "这场已结算，这台设备后传的答案没有计入成绩"
+          },
+          {
+            "late": true,
+            "counted": false,
+            "recorded_as": "迟到未计",
+            "score": 61,
+            "final": {
+              "q30": null
+            },
+            "new_evidence": 0,
+            "new_mistakes": 0,
+            "attribution_changed": false,
+            "report_changed": false,
+            "device_notice": "这场已结算，这台设备后传的答案没有计入成绩"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E50",
+      "kind": "异常",
+      "title": "重复补交",
+      "rule": "R13、R17、R24",
+      "fn": "sync",
+      "decision": "跨设备补交",
+      "input": {
+        "ends_at": "2026-10-21T11:00:00+08:00",
+        "device_a": {
+          "connected_at_takeover": false,
+          "saves": [
+            {
+              "save_id": "s1",
+              "question": "q20",
+              "answer": "B",
+              "saved_at": "2026-10-21T10:05:00+08:00"
+            },
+            {
+              "save_id": "s2",
+              "question": "q30",
+              "answer": "D",
+              "saved_at": "2026-10-21T10:08:00+08:00"
+            }
+          ]
+        },
+        "device_b": {
+          "takeover_at": "2026-10-21T10:10:00+08:00",
+          "saves": [
+            {
+              "save_id": "b1",
+              "question": "q20",
+              "answer": "C",
+              "saved_at": "2026-10-21T10:15:00+08:00"
+            }
+          ],
+          "submit_received": [
+            {
+              "submit_id": "t1",
+              "received_at": "2026-10-21T10:40:00+08:00"
+            },
+            {
+              "submit_id": "t1",
+              "received_at": "2026-10-21T10:40:05+08:00"
+            }
+          ]
+        },
+        "uploads": [
+          {
+            "device": "device_a",
+            "received_at": "2026-10-21T12:00:00+08:00",
+            "save_ids": ["s1", "s2"]
+          },
+          {
+            "device": "device_a",
+            "received_at": "2026-10-21T12:00:20+08:00",
+            "save_ids": ["s1", "s2"]
+          },
+          {
+            "device": "device_a",
+            "received_at": "2026-10-21T12:30:00+08:00",
+            "save_ids": ["s1", "s2"]
+          }
+        ],
+        "sync_done_at": {
+          "device_a": "2026-10-21T12:00:30+08:00"
+        }
+      },
+      "expect": {
+        "submissions_counted": 1,
+        "submitted_at": "2026-10-21T10:40:00+08:00",
+        "accepted_saves": ["s1", "s2", "b1"],
+        "change_count": {
+          "q20": 1
+        },
+        "final": {
+          "q20": "C",
+          "q30": "D"
+        },
+        "settled_at": "2026-10-21T12:00:30+08:00",
+        "settle_count": 1,
+        "duplicate_after_settle": {
+          "changed": false,
+          "evidence_count": {
+            "q20": 1,
+            "q30": 1
+          },
+          "new_mistakes": 0
+        }
+      }
+    },
+    {
+      "id": "E51",
+      "kind": "边界",
+      "title": "纸笔全真卷结束后上传",
+      "rule": "R37",
+      "fn": "paper_mode",
+      "decision": "R07-Q8",
+      "input": {
+        "spec": "full",
+        "mode": "paper",
+        "started_at": "2026-10-21T09:00:00+08:00",
+        "duration_minutes": 120,
+        "uploaded_at": "2026-10-21T15:30:00+08:00",
+        "recognized_score": 61,
+        "paper_full_score": 100,
+        "exam_full_score": 100
+      },
+      "expect": {
+        "deadline": "2026-10-22T11:00:00+08:00",
+        "status_after_end": "awaiting_sync",
+        "notice": "这场已到时间，等你上传答题卡照片",
+        "submitted_at": "2026-10-21T15:30:00+08:00",
+        "status": "submitted",
+        "formal_score": true,
+        "scaled_score": 61,
+        "in_trend": true,
+        "to_prediction": true,
+        "tag": "纸笔，用时由自己掌握"
+      }
+    },
+    {
+      "id": "E52",
+      "kind": "边界",
+      "title": "纸笔半卷与补交期限",
+      "rule": "R21、R37",
+      "fn": "paper_mode",
+      "decision": "R07-Q8",
+      "input": {
+        "spec": "half",
+        "mode": "paper",
+        "started_at": "2026-10-21T09:00:00+08:00",
+        "duration_minutes": 62,
+        "paper_full_score": 51,
+        "exam_full_score": 100,
+        "target": 70,
+        "variants": [
+          {
+            "uploaded_at": "2026-10-22T10:01:00+08:00",
+            "recognized_score": 30
+          },
+          {
+            "uploaded_at": "2026-10-22T10:02:00+08:00"
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "deadline": "2026-10-22T10:02:00+08:00",
+            "accepted": true,
+            "submitted_at": "2026-10-22T10:01:00+08:00",
+            "status": "submitted",
+            "formal_score": true,
+            "scaled_score": 58.8,
+            "vs_target": -11.2,
+            "in_trend": true,
+            "to_prediction": true,
+            "tag": "纸笔，用时由自己掌握"
+          },
+          {
+            "deadline": "2026-10-22T10:02:00+08:00",
+            "accepted": false,
+            "settled_at": "2026-10-22T10:02:00+08:00",
+            "status": "abandoned",
+            "formal_score": false,
+            "in_trend": false,
+            "to_prediction": false,
+            "evidence_sent": 0
+          }
+        ]
       }
     }
   ]
