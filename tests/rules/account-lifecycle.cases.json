@@ -19,7 +19,10 @@
     "合并模式：upgrade_in_place＝游客原地转正、merge_into＝并入已有账号、hold＝先不合并、already_merged＝已合并过。下线原因：other_device＝其他设备让你下线、credential_changed＝改了密码或换绑了手机号、platform_forced＝平台为保护账号让所有设备下线。这些代码是建议，待写进 docs/product/glossary.yaml。",
     "删除范围的处理代码：delete 删除、invalidate 作废、keep_legal 按法定要求保留、keep_deidentified 去掉身份后保留、keep_unchanged 原样保留、deidentify_for_class_stats 去掉身份只进班级统计、purge_copies 机构侧副本在 compliance.revoke.purge_days 天内删除。",
     "时刻比较：验证码“5 分钟内有效”指早于发出时刻加 5 分钟；“隔 60 秒”“满 30 天”“到期满时刻”“到受限到期时刻”都含正好那一刻；密码输错的 60 分钟窗口含正好 60 分钟前那次。",
-    "E9、E31 对应的 R08-Q7、Q8 已获用户确认，分别采用 A、B；整卡仍等待第 2 轮三处边界修订与最终定稿。"
+    "merge_age：reconfirm 表示要不要请本人再确认；result、birth_month 是账号里记下的年龄段和出生年月；until_answer 是等本人回答期间、until_verified 是等人工核验期间，实际按哪个年龄段的权限；manual_verification 为 true 表示转 R7 人工核验，conflict 写和什么对不上。账号已有的 birth_month 不被游客填的、也不被再次确认时的选择覆盖（R17）。",
+    "age_reconfirm：state 为 awaiting_second_confirm 表示等二次确认的临时门禁。gate.allowed 是门禁期间唯一放行的操作：export 导出全部数据、second_confirm 继续二次确认、request_manual_verification 申请人工核验，不在里面的一律暂停；gate.paused 列出必须核对被拦下的几样：study 学习、payment 付费；gate.scope 为 account 表示门禁记在账号上，哪台设备都一样；gate.self_change_age_entry 为 false 表示不因此多出本人改年龄段的入口。account_after 是门禁期间账号里记着的年龄段和状态（和之前一样），data_deleted 为 false 表示数据一条不删，revoke 为 none 表示设备不下线；manual_verification 为 pending 表示已申请人工核验、还没结果，门禁照旧（R4）。",
+    "deregister：delete_at_local 是删除时刻按用户时区写成的完整日期时刻 YYYY-MM-DD HH:MM；hint 为 full_datetime 表示冷静期屏的删除提示一律写这个完整日期时刻（页面用统一的日期时间格式、带年份显示），还剩 0 天时也不写“今天”“明天”（R31）。",
+    "R08-Q1～Q8 均已获用户确认（按推荐）。第 2 轮按本地复查补清三处边界：R17/E19 已有出生年月不被覆盖、R4/E9 等二次确认的临时门禁、R31/E33–E35 删除时刻写完整日期时刻。整卡仍是草稿，等“规则确认 R08”后定稿。"
   ],
   "day": {
     "time_zone": "Asia/Shanghai",
@@ -54,11 +57,11 @@
     "access": "未成年人模式、三个开关与不推送底线（R1、R4、R5、R8）",
     "self_change_age": "本人改年龄段或出生年月（R7）",
     "quiet_hours": "实际不推送的时段，安全提醒何时送达（R8）",
-    "age_reconfirm": "已登录账号再确认年龄段时选了“14 岁以下”（R4，R08-Q7）",
+    "age_reconfirm": "已登录账号再确认年龄段时选了“14 岁以下”：等二次确认的临时门禁、二次确认后删除（R4，R08-Q7）",
     "guest_start": "点“先体验，不注册”（R1、R4、R9）",
     "guest_purge": "游客是否到期清除（R10）",
     "merge": "游客登录时的转正或合并（R11–R16）",
-    "merge_age": "合并时的年龄段（R17）",
+    "merge_age": "合并时的年龄段：要不要再确认、确认或核验前按哪个算、已有出生年月不被覆盖（R17）",
     "login": "登录结果、设备上限、受限屏、登录后去哪（R19、R22、R23、R28）",
     "consent": "协议与隐私政策的同意记录（R18）",
     "otp_check": "验证码校验（R20）",
@@ -68,7 +71,7 @@
     "revoke": "哪些设备下线、原因代码（R24–R26）",
     "remote_login_confirm": "异地登录确认（R27）",
     "phone_gate": "待绑手机号的账号能做什么（R21，R08-Q8）",
-    "deregister": "申请、冷静期内登录、撤销、期满（R29–R33）",
+    "deregister": "申请、冷静期内登录（还剩几天、删除时刻提示）、撤销、期满（R29–R33）",
     "deletion_scope": "期满删除的范围（R34、R35）"
   },
   "cases": [
@@ -394,7 +397,7 @@
     },
     {
       "id": "E9",
-      "title": "已登录账号再确认时选了“14 岁以下”",
+      "title": "已登录账号再确认时选了“14 岁以下”：等二次确认的临时门禁",
       "kind": "异常",
       "rule": "R4",
       "fn": "age_reconfirm",
@@ -411,6 +414,10 @@
           },
           {
             "second_confirm": true
+          },
+          {
+            "second_confirm": false,
+            "manual_verification": "requested"
           }
         ]
       },
@@ -419,7 +426,18 @@
           {
             "state": "awaiting_second_confirm",
             "offer_export": true,
-            "changed": false
+            "gate": {
+              "scope": "account",
+              "allowed": ["export", "second_confirm", "request_manual_verification"],
+              "paused": ["study", "payment"],
+              "self_change_age_entry": false
+            },
+            "account_after": {
+              "age_band": "adult",
+              "status": "active"
+            },
+            "data_deleted": false,
+            "revoke": "none"
           },
           {
             "age_band": "under_min",
@@ -428,6 +446,22 @@
             "delete": "now",
             "cooling_off": false,
             "scope": "R34"
+          },
+          {
+            "state": "awaiting_second_confirm",
+            "manual_verification": "pending",
+            "gate": {
+              "scope": "account",
+              "allowed": ["export", "second_confirm", "request_manual_verification"],
+              "paused": ["study", "payment"],
+              "self_change_age_entry": false
+            },
+            "account_after": {
+              "age_band": "adult",
+              "status": "active"
+            },
+            "data_deleted": false,
+            "revoke": "none"
           }
         ]
       }
@@ -957,6 +991,43 @@
               "choice": "minor",
               "birth_month": "2010-03"
             }
+          },
+          {
+            "account": {
+              "age_band": "adult",
+              "birth_month": "2008-03"
+            },
+            "guest": {
+              "age_band": "minor",
+              "birth_month": "2010-03"
+            }
+          },
+          {
+            "account": {
+              "age_band": "adult",
+              "birth_month": "2008-03"
+            },
+            "guest": {
+              "age_band": "minor",
+              "birth_month": "2010-03"
+            },
+            "answer": {
+              "choice": "adult"
+            }
+          },
+          {
+            "account": {
+              "age_band": "adult",
+              "birth_month": "2008-03"
+            },
+            "guest": {
+              "age_band": "minor",
+              "birth_month": "2010-03"
+            },
+            "answer": {
+              "choice": "minor",
+              "birth_month": "2010-03"
+            }
           }
         ]
       },
@@ -986,6 +1057,22 @@
           {
             "result": "minor",
             "birth_month": "2010-03"
+          },
+          {
+            "reconfirm": true,
+            "until_answer": "minor",
+            "birth_month": "2008-03"
+          },
+          {
+            "result": "adult",
+            "birth_month": "2008-03"
+          },
+          {
+            "result": "adult",
+            "birth_month": "2008-03",
+            "conflict": "birth_month",
+            "manual_verification": true,
+            "until_verified": "minor"
           }
         ]
       }
@@ -1630,26 +1717,49 @@
       "expect": {
         "outcome": "cooling_off",
         "days_left": 9,
+        "hint": "full_datetime",
+        "delete_at_local": "2026-10-20 10:00",
         "auto_cancel": false,
         "actions": ["cancel", "continue", "export"]
       }
     },
     {
       "id": "E34",
-      "title": "凌晨 4 点前申请",
+      "title": "凌晨 4 点前申请、凌晨到期",
       "kind": "边界",
       "rule": "R30、R31",
       "fn": "deregister",
       "input": {
         "op": "apply_then_login",
         "applied_at": "2026-10-05T02:30:00+08:00",
-        "now": "2026-10-11T09:00:00+08:00"
+        "variants": [
+          {
+            "now": "2026-10-11T09:00:00+08:00"
+          },
+          {
+            "now": "2026-10-19T20:00:00+08:00"
+          }
+        ]
       },
       "expect": {
-        "applied_day": "2026-10-04",
-        "expires_at": "2026-10-20T02:30:00+08:00",
-        "expiry_day": "2026-10-19",
-        "days_left": 8
+        "variants": [
+          {
+            "applied_day": "2026-10-04",
+            "expires_at": "2026-10-20T02:30:00+08:00",
+            "expiry_day": "2026-10-19",
+            "days_left": 8,
+            "delete_due": false,
+            "hint": "full_datetime",
+            "delete_at_local": "2026-10-20 02:30"
+          },
+          {
+            "expiry_day": "2026-10-19",
+            "days_left": 0,
+            "delete_due": false,
+            "hint": "full_datetime",
+            "delete_at_local": "2026-10-20 02:30"
+          }
+        ]
       }
     },
     {
@@ -1677,13 +1787,15 @@
         "variants": [
           {
             "days_left": 1,
-            "delete_due": false
+            "delete_due": false,
+            "hint": "full_datetime",
+            "delete_at_local": "2026-10-20 10:00"
           },
           {
             "days_left": 0,
             "delete_due": false,
-            "hint": "today_at",
-            "hint_time": "10:00"
+            "hint": "full_datetime",
+            "delete_at_local": "2026-10-20 10:00"
           },
           {
             "delete_due": true
