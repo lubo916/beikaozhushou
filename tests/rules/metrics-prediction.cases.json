@@ -1,19 +1,19 @@
 {
   "card": "docs/baseline/rule-cards/metrics-prediction.md",
-  "status": "草稿",
-  "rule_version": "R06-r2",
+  "status": "业务已确认（验证通过后定稿）",
+  "rule_version": "R06-r3",
   "decided": {
     "R06-Q1": "A",
     "R06-Q2": "A",
     "R06-Q3": "A",
     "R06-Q4": "A",
     "R06-Q5": "A",
-    "R06-Q6": "B"
-  },
-  "pending": {
+    "R06-Q6": "B",
     "R06-Q7": "A",
-    "R06-Q8": "A"
+    "R06-Q8": "A",
+    "R06-Q9": "A"
   },
+  "pending": {},
   "conventions": [
     "每条例子是 input → expect；expect 只列要核对的字段，没列的不核对。带 variants 的例子，input.variants[i] 对应 expect.variants[i]，各自独立。",
     "fn 是建议的纯函数（名字可改）：forecast_subject、week_change、pick_headline、effective_time 放 learner 领域 core；completion、health、report_gate 放 plan 领域 core；accuracy 放 practice 领域 core。预测记录与指标快照由 metrics 领域保存。",
@@ -1815,6 +1815,7 @@
       "kind": "边界",
       "rule": "R31",
       "fn": "report_gate",
+      "decision": "R06-Q9",
       "input": {
         "variants": [
           {
@@ -1832,6 +1833,14 @@
           {
             "effective_days": 3,
             "effective_minutes": 120
+          },
+          {
+            "effective_days": 0,
+            "effective_minutes": 0
+          },
+          {
+            "effective_days": 3,
+            "effective_minutes": 119
           }
         ]
       },
@@ -1841,13 +1850,19 @@
             "report": "full"
           },
           {
-            "report": "none"
+            "report": "data_only"
           },
           {
             "report": "data_only"
           },
           {
             "report": "full"
+          },
+          {
+            "report": "data_only"
+          },
+          {
+            "report": "data_only"
           }
         ]
       }
