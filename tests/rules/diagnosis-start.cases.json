@@ -1,0 +1,1662 @@
+{
+  "card": "diagnosis-start",
+  "status": "draft",
+  "note": "例子表与 docs/baseline/rule-cards/diagnosis-start.md 一一对应；params 是期望值所依据的参数默认值，个别例子用 params_override 临时改小。再次诊断类例子里的 system_level、evidence_sufficient 是 R01 按全部证据（含本次新写的）算好的结果，本卡只读不算。期望值里不出现 NaN 或无穷大。",
+  "params": {
+    "learner.diagnosis.min_pool_items": 20,
+    "learner.diagnosis.adaptive_min_pool": 60,
+    "learner.diagnosis.min_items": 20,
+    "learner.diagnosis.max_items": 30,
+    "learner.diagnosis.stop_uncertainty": 0.75,
+    "learner.diagnosis.chapter_items": [2, 3],
+    "learner.diagnosis.quick_check_items": 5,
+    "learner.diagnosis.self_rating_uncertainty": 1.5,
+    "learner.diagnosis.correct_min_level": 2,
+    "learner.diagnosis.wrong_max_level": 1,
+    "learner.diagnosis.subjective_min_seconds": 60,
+    "learner.diagnosis.refresh_items": 10,
+    "learner.diagnosis.suggest_chapters": 2,
+    "learner.forecast.confidence_width_ratios": [0.05, 0.12],
+    "learner.report.high_freq_level": 3,
+    "plan.option.steady_ratio": 0.8,
+    "plan.option.intensive_ratio": 1.3,
+    "plan.option.min_step_hours": 1,
+    "plan.option.mock_cap": 3,
+    "plan.option.mock_hours_factor": 2,
+    "learner.evidence.fast_answer_ratio": 0.3,
+    "learner.prior.min_population": 200,
+    "learner.forecast.coverage_target": 0.8,
+    "plan.week.buffer_ratio": 0.15,
+    "plan.disconnect.tiers_days": [3, 14],
+    "map.health.min_question_coverage": 0.3,
+    "map.health.max_missing_target_ratio": 0.2
+  },
+  "cases": [
+    {
+      "id": "E1",
+      "desc": "官方地图，带难度标定的审定题充足：三种方式都能用，默认自适应、不标推荐",
+      "input": {
+        "pool": {
+          "reviewed_calibrated": 320,
+          "own": 0
+        }
+      },
+      "expect": {
+        "modes": {
+          "adaptive": "available",
+          "chapter_sample": "available",
+          "quick": "available"
+        },
+        "default_mode": "adaptive",
+        "recommended_mode": null,
+        "page_state": "normal"
+      },
+      "rule": "R2,R3"
+    },
+    {
+      "id": "E2",
+      "desc": "自建地图没有审定题、有 45 道自有题：自适应不可用，默认并推荐章节抽测",
+      "input": {
+        "pool": {
+          "reviewed_calibrated": 0,
+          "own": 45
+        }
+      },
+      "expect": {
+        "modes": {
+          "adaptive": "unavailable",
+          "chapter_sample": "available",
+          "quick": "available"
+        },
+        "unavailable_reason": {
+          "adaptive": "reviewed_pool_too_small"
+        },
+        "default_mode": "chapter_sample",
+        "recommended_mode": "chapter_sample",
+        "items_per_chapter": [2, 3],
+        "page_state": "normal"
+      },
+      "rule": "R2,R3"
+    },
+    {
+      "id": "E3",
+      "desc": "一、二级题合计只有 19 道：摸底页为空态，只能快速定位",
+      "input": {
+        "pool": {
+          "reviewed_calibrated": 0,
+          "own": 19
+        }
+      },
+      "expect": {
+        "modes": {
+          "adaptive": "unavailable",
+          "chapter_sample": "unavailable",
+          "quick": "available"
+        },
+        "default_mode": "quick",
+        "page_state": "empty",
+        "primary_action": "switch_to_quick"
+      },
+      "rule": "R3"
+    },
+    {
+      "id": "E4",
+      "desc": "一、二级题合计正好 20 道：章节抽测可用（不足 20 道不含 20）",
+      "input": {
+        "pool": {
+          "reviewed_calibrated": 0,
+          "own": 20
+        }
+      },
+      "expect": {
+        "modes": {
+          "adaptive": "unavailable",
+          "chapter_sample": "available",
+          "quick": "available"
+        },
+        "default_mode": "chapter_sample",
+        "page_state": "normal"
+      },
+      "rule": "R2,R3"
+    },
+    {
+      "id": "E5",
+      "desc": "自适应已答 24 题，各已测模块不确定度都不超过 0.75：结束，精度已够",
+      "input": {
+        "mode": "adaptive",
+        "answered": 24,
+        "module_uncertainty": {
+          "会计概述": 0.6,
+          "会计基础": 0.7,
+          "资产": 0.75,
+          "负债": 0.5
+        }
+      },
+      "expect": {
+        "finished": true,
+        "finish_reason": "precision_reached"
+      },
+      "rule": "R13"
+    },
+    {
+      "id": "E6",
+      "desc": "自适应已答 15 题，精度已够但没到题量下限：继续出题",
+      "input": {
+        "mode": "adaptive",
+        "answered": 15,
+        "module_uncertainty": {
+          "会计概述": 0.5,
+          "资产": 0.6
+        }
+      },
+      "expect": {
+        "finished": false
+      },
+      "rule": "R13"
+    },
+    {
+      "id": "E7",
+      "desc": "自适应已答 30 题，仍有模块不确定度 0.9：到上限结束",
+      "input": {
+        "mode": "adaptive",
+        "answered": 30,
+        "module_uncertainty": {
+          "资产": 0.6,
+          "负债": 0.9
+        }
+      },
+      "expect": {
+        "finished": true,
+        "finish_reason": "max_items"
+      },
+      "rule": "R13"
+    },
+    {
+      "id": "E8",
+      "desc": "审定题、用时正常的五种作答：起点估计与证据分开计，并累计把握度校准",
+      "input": {
+        "question_credibility": "reviewed",
+        "suggested_seconds": 60,
+        "responses": [
+          {
+            "q": "q1",
+            "correct": true,
+            "confidence": "sure",
+            "seconds": 40
+          },
+          {
+            "q": "q2",
+            "correct": true,
+            "confidence": "vague",
+            "seconds": 45
+          },
+          {
+            "q": "q3",
+            "correct": true,
+            "confidence": "guess",
+            "seconds": 50
+          },
+          {
+            "q": "q4",
+            "correct": false,
+            "confidence": "sure",
+            "seconds": 35
+          },
+          {
+            "q": "q5",
+            "correct": null,
+            "confidence": "dont_know",
+            "seconds": 20
+          }
+        ]
+      },
+      "expect": {
+        "signal": {
+          "q1": "known",
+          "q2": "known",
+          "q3": "guess_not_counted",
+          "q4": "wrong",
+          "q5": "dont_know"
+        },
+        "evidence": {
+          "q1": "strong",
+          "q2": "medium",
+          "q3": "pending",
+          "q4": null,
+          "q5": null
+        },
+        "calibration": {
+          "sure": {
+            "answered": 2,
+            "correct": 1
+          },
+          "vague": {
+            "answered": 1,
+            "correct": 1
+          },
+          "guess": {
+            "answered": 1,
+            "correct": 1
+          },
+          "dont_know": 1
+        }
+      },
+      "rule": "R6,R7"
+    },
+    {
+      "id": "E9",
+      "desc": "秒答：选确定且做对，但用时 5 秒低于 30 秒 × 0.3 = 9 秒",
+      "input": {
+        "question_credibility": "own",
+        "suggested_seconds": 30,
+        "responses": [
+          {
+            "q": "q1",
+            "correct": true,
+            "confidence": "sure",
+            "seconds": 5
+          }
+        ]
+      },
+      "expect": {
+        "signal": {
+          "q1": "known"
+        },
+        "evidence": {
+          "q1": "pending"
+        },
+        "fast_threshold_seconds": 9
+      },
+      "rule": "R7"
+    },
+    {
+      "id": "E10",
+      "desc": "没选把握度不能提交；选不会可以不选答案，选了答案也按不会算",
+      "input": {
+        "submit": [
+          {
+            "q": "q1",
+            "answer": "B",
+            "confidence": null
+          },
+          {
+            "q": "q2",
+            "answer": null,
+            "confidence": "dont_know"
+          },
+          {
+            "q": "q3",
+            "answer": "C",
+            "confidence": "dont_know"
+          }
+        ]
+      },
+      "expect": {
+        "accepted": {
+          "q1": false,
+          "q2": true,
+          "q3": true
+        },
+        "reject_reason": {
+          "q1": "confidence_required"
+        },
+        "signal": {
+          "q2": "dont_know",
+          "q3": "dont_know"
+        }
+      },
+      "rule": "R6"
+    },
+    {
+      "id": "E11",
+      "desc": "起点估计的依据优先级、档位换算与群体先验门槛（同类人数门槛 200）",
+      "input": {
+        "modules": {
+          "资产": {
+            "tested": true,
+            "ability": 2.4
+          },
+          "负债": {
+            "tested": false,
+            "self_rating": "basic"
+          },
+          "所有者权益": {
+            "tested": false,
+            "self_rating": null,
+            "population": 350
+          },
+          "财务报告": {
+            "tested": false,
+            "self_rating": null,
+            "population": 120
+          }
+        },
+        "points": [
+          {
+            "id": "kp-a1",
+            "module": "资产",
+            "signal": "known"
+          },
+          {
+            "id": "kp-a2",
+            "module": "资产",
+            "signal": null
+          },
+          {
+            "id": "kp-a3",
+            "module": "资产",
+            "signal": "wrong"
+          },
+          {
+            "id": "kp-b1",
+            "module": "负债",
+            "signal": null
+          },
+          {
+            "id": "kp-c1",
+            "module": "所有者权益",
+            "signal": null
+          },
+          {
+            "id": "kp-d1",
+            "module": "财务报告",
+            "signal": null
+          }
+        ]
+      },
+      "expect": {
+        "basis": {
+          "kp-a1": "tested",
+          "kp-a2": "module_inferred",
+          "kp-a3": "tested",
+          "kp-b1": "self_rated",
+          "kp-c1": "population",
+          "kp-d1": "none"
+        },
+        "level": {
+          "kp-a1": 3,
+          "kp-a2": 2,
+          "kp-a3": 1,
+          "kp-b1": 2,
+          "kp-d1": null
+        },
+        "grid_style": {
+          "kp-d1": "dashed"
+        },
+        "label": {
+          "kp-c1": "estimated_from_population"
+        },
+        "modules_without_basis": 1
+      },
+      "rule": "R15"
+    },
+    {
+      "id": "E12",
+      "desc": "再次诊断只升不降、只动起点估计：证据充足的点显示系统判定；做错不降档、不写负证据，交给复习",
+      "input": {
+        "kind": "rediagnosis",
+        "points": [
+          {
+            "id": "kp-1",
+            "system_level": 3,
+            "evidence_sufficient": true,
+            "start_estimate_before": 3,
+            "tested": true,
+            "new_estimate": 1,
+            "signal": "wrong"
+          },
+          {
+            "id": "kp-2",
+            "system_level": null,
+            "evidence_sufficient": false,
+            "start_estimate_before": 2,
+            "tested": true,
+            "new_estimate": 3,
+            "signal": "known"
+          },
+          {
+            "id": "kp-3",
+            "system_level": null,
+            "evidence_sufficient": false,
+            "start_estimate_before": 2,
+            "tested": true,
+            "new_estimate": 1,
+            "signal": "wrong"
+          },
+          {
+            "id": "kp-4",
+            "system_level": null,
+            "evidence_sufficient": false,
+            "start_estimate_before": 2,
+            "tested": false,
+            "new_estimate": null,
+            "signal": null
+          }
+        ]
+      },
+      "expect": {
+        "start_estimate_after": {
+          "kp-1": 3,
+          "kp-2": 3,
+          "kp-3": 2,
+          "kp-4": 2
+        },
+        "shown_after": {
+          "kp-1": 3,
+          "kp-2": 3,
+          "kp-3": 2,
+          "kp-4": 2
+        },
+        "shown_source": {
+          "kp-1": "system",
+          "kp-2": "estimate",
+          "kp-3": "estimate",
+          "kp-4": "estimate"
+        },
+        "system_level_written_by_diagnosis": [],
+        "negative_evidence": [],
+        "review_flagged": ["kp-1", "kp-3"]
+      },
+      "rule": "R16,R17"
+    },
+    {
+      "id": "E13",
+      "desc": "自适应做了 12 题后改用快速定位，5 个模块只靠自评",
+      "input": {
+        "answered_before_switch": 12,
+        "modules_with_answers": ["会计概述", "会计基础", "资产"],
+        "modules_self_rated_only": ["负债", "所有者权益", "收入、费用和利润", "财务报告", "管理会计基础"],
+        "full_score": 100,
+        "interval": [53, 69],
+        "interval_if_self_rated_tested": [57, 65],
+        "width_contribution": {
+          "负债": 3.1,
+          "财务报告": 2.4,
+          "管理会计基础": 1.2,
+          "所有者权益": 0.8,
+          "收入、费用和利润": 0.5
+        },
+        "chapter_sample_minutes": {
+          "负债": 5,
+          "财务报告": 5,
+          "管理会计基础": 4,
+          "所有者权益": 4,
+          "收入、费用和利润": 6
+        }
+      },
+      "expect": {
+        "answers_kept": 12,
+        "view": "quick",
+        "page_state": "insufficient_data",
+        "confidence": "low",
+        "basis": {
+          "answered": 12,
+          "self_rated_modules": 5
+        },
+        "banner": {
+          "wider_by": 8,
+          "suggest_chapters": ["负债", "财务报告"],
+          "minutes": 10
+        }
+      },
+      "rule": "R9,R20,R22"
+    },
+    {
+      "id": "E14",
+      "desc": "初级会计：区间、置信、差额、四类分摊与一句解读",
+      "input": {
+        "exam": {
+          "rule": "pass_line",
+          "full_score": 100,
+          "pass_line": 60
+        },
+        "target": 70,
+        "interval": [57, 65],
+        "most_likely": 61,
+        "basis": {
+          "mode": "adaptive",
+          "answered": 26,
+          "population_used": true
+        },
+        "potential": {
+          "untaught_high_freq": 20,
+          "forgotten": 8,
+          "unstable": 4,
+          "low_freq": 4
+        }
+      },
+      "expect": {
+        "confidence": "medium",
+        "show_pass_line": true,
+        "gap": 9,
+        "gap_mode": "allocated",
+        "gap_points": {
+          "untaught_high_freq": 5,
+          "forgotten": 2,
+          "unstable": 1,
+          "low_freq": 1
+        },
+        "row_order": ["untaught_high_freq", "forgotten", "unstable", "low_freq"],
+        "summary_key": "untaught_high_freq"
+      },
+      "rule": "R19,R20,R21,R25,R26"
+    },
+    {
+      "id": "E15",
+      "desc": "分摊取整有尾差：差记到潜在提分最大的一类，并列按固定顺序",
+      "input": {
+        "gap": 9,
+        "potential": {
+          "untaught_high_freq": 10,
+          "forgotten": 10,
+          "unstable": 7,
+          "low_freq": 0
+        }
+      },
+      "expect": {
+        "gap_mode": "allocated",
+        "gap_points": {
+          "untaught_high_freq": 4,
+          "forgotten": 3,
+          "unstable": 2,
+          "low_freq": 0
+        },
+        "row_order": ["untaught_high_freq", "forgotten", "unstable", "low_freq"]
+      },
+      "rule": "R25"
+    },
+    {
+      "id": "E16",
+      "desc": "最可能值已过目标线：不分摊，显示还能再提的分",
+      "input": {
+        "target": 70,
+        "interval": [68, 76],
+        "most_likely": 72,
+        "potential": {
+          "untaught_high_freq": 6,
+          "forgotten": 2,
+          "unstable": 1,
+          "low_freq": 1
+        }
+      },
+      "expect": {
+        "gap": -2,
+        "gap_mode": "potential_only",
+        "table_title_key": "reached_target",
+        "gap_points": {
+          "untaught_high_freq": 6,
+          "forgotten": 2,
+          "unstable": 1,
+          "low_freq": 1
+        },
+        "summary_key": "reached_target"
+      },
+      "rule": "R21,R25,R26"
+    },
+    {
+      "id": "E17",
+      "desc": "全部补到目标档也不够差额：不放大数字，写明还差几分",
+      "input": {
+        "gap": 9,
+        "potential": {
+          "untaught_high_freq": 3,
+          "forgotten": 1,
+          "unstable": 1,
+          "low_freq": 0
+        }
+      },
+      "expect": {
+        "gap_mode": "potential_only",
+        "gap_points": {
+          "untaught_high_freq": 3,
+          "forgotten": 1,
+          "unstable": 1,
+          "low_freq": 0
+        },
+        "shortfall_after_all": 4
+      },
+      "rule": "R25"
+    },
+    {
+      "id": "E18",
+      "desc": "差距四类怎么归：只算学习范围内、当前档低于目标档的点",
+      "input": {
+        "points": [
+          {
+            "id": "kp-1",
+            "in_scope": true,
+            "target": 3,
+            "level": 0,
+            "roi_tier": "D",
+            "signal": null,
+            "chapter_self_rating": null
+          },
+          {
+            "id": "kp-2",
+            "in_scope": true,
+            "target": 3,
+            "level": 0,
+            "roi_tier": "B",
+            "signal": "wrong",
+            "chapter_self_rating": null
+          },
+          {
+            "id": "kp-3",
+            "in_scope": true,
+            "target": 3,
+            "level": 0,
+            "roi_tier": "A",
+            "signal": "dont_know",
+            "chapter_self_rating": null
+          },
+          {
+            "id": "kp-4",
+            "in_scope": true,
+            "target": 4,
+            "level": 2,
+            "roi_tier": "B",
+            "signal": "known",
+            "chapter_self_rating": null
+          },
+          {
+            "id": "kp-5",
+            "in_scope": true,
+            "target": 2,
+            "level": 1,
+            "roi_tier": "C",
+            "signal": null,
+            "chapter_self_rating": "learned_not_solid"
+          },
+          {
+            "id": "kp-6",
+            "in_scope": true,
+            "target": 3,
+            "level": 3,
+            "roi_tier": "A",
+            "signal": "known",
+            "chapter_self_rating": null
+          },
+          {
+            "id": "kp-7",
+            "in_scope": false,
+            "target": null,
+            "level": 0,
+            "roi_tier": "C",
+            "signal": null,
+            "chapter_self_rating": null
+          }
+        ]
+      },
+      "expect": {
+        "source": {
+          "kp-1": "low_freq",
+          "kp-2": "forgotten",
+          "kp-3": "untaught_high_freq",
+          "kp-4": "unstable",
+          "kp-5": "forgotten",
+          "kp-6": null,
+          "kp-7": null
+        }
+      },
+      "rule": "R24"
+    },
+    {
+      "id": "E19",
+      "desc": "六级（分数段型）：没有合格线；宽 38 分占满分约 5.4%，置信中",
+      "input": {
+        "exam": {
+          "rule": "score_band",
+          "full_score": 710,
+          "pass_line": null
+        },
+        "target": 520,
+        "interval": [478, 516],
+        "most_likely": 497
+      },
+      "expect": {
+        "confidence": "medium",
+        "show_pass_line": false,
+        "gap": 23
+      },
+      "rule": "R19,R20,R21"
+    },
+    {
+      "id": "E20",
+      "desc": "初级会计：217 天、每周 9 小时、扣 15% 缓冲后可投入 237 小时，需要 300 小时",
+      "input": {
+        "today": "2026-10-11",
+        "target_date": "2027-05-16",
+        "weekly_hours": 9,
+        "grid": "even",
+        "unavailable_days": 0,
+        "reserved_minutes": 0,
+        "need_hours": 300
+      },
+      "expect": {
+        "available_hours": 237,
+        "diff": {
+          "kind": "shortfall",
+          "hours": 63,
+          "percent": 21
+        },
+        "projected_completion_percent": 79,
+        "show_three_outlets": true
+      },
+      "rule": "R30,R31"
+    },
+    {
+      "id": "E21",
+      "desc": "有余量：89 天里 5 天不可学、每周 6 小时，可投入 61 小时，需要 50 小时",
+      "input": {
+        "days_to_target": 89,
+        "weekly_hours": 6,
+        "grid": "even",
+        "unavailable_days": 5,
+        "reserved_minutes": 0,
+        "need_hours": 50
+      },
+      "expect": {
+        "available_hours": 61,
+        "diff": {
+          "kind": "surplus",
+          "hours": 11,
+          "percent": 22
+        },
+        "projected_completion_percent": 100,
+        "show_three_outlets": false,
+        "scope_proposal": null
+      },
+      "rule": "R30,R31,R32"
+    },
+    {
+      "id": "E22",
+      "desc": "学习范围初稿：缺口 10 小时，只从 D 级里按每小时提分从低到高挑，够了就停",
+      "input": {
+        "shortfall_hours": 10,
+        "map_health": "passed",
+        "d_points": [
+          {
+            "id": "kp-d1",
+            "hours": 4,
+            "potential": 0.2
+          },
+          {
+            "id": "kp-d2",
+            "hours": 3,
+            "potential": 0.3
+          },
+          {
+            "id": "kp-d3",
+            "hours": 5,
+            "potential": 0.6
+          },
+          {
+            "id": "kp-d4",
+            "hours": 2,
+            "potential": 0.4
+          }
+        ]
+      },
+      "expect": {
+        "scope_proposal": {
+          "remove": ["kp-d1", "kp-d2", "kp-d3"],
+          "saved_hours": 12,
+          "cost_points": 1,
+          "remaining_shortfall_hours": 0,
+          "buttons": ["confirm", "keep"],
+          "after_confirm": "removed"
+        }
+      },
+      "rule": "R32"
+    },
+    {
+      "id": "E23",
+      "desc": "D 级全挑完仍不够：建议移出全部 D 级，写明剩下的缺口",
+      "input": {
+        "shortfall_hours": 30,
+        "map_health": "passed",
+        "d_points": [
+          {
+            "id": "kp-d1",
+            "hours": 4,
+            "potential": 0.2
+          },
+          {
+            "id": "kp-d2",
+            "hours": 3,
+            "potential": 0.4
+          }
+        ]
+      },
+      "expect": {
+        "scope_proposal": {
+          "remove": ["kp-d1", "kp-d2"],
+          "saved_hours": 7,
+          "cost_points": 1,
+          "remaining_shortfall_hours": 23
+        }
+      },
+      "rule": "R32"
+    },
+    {
+      "id": "E24",
+      "desc": "初级会计三档方案：按比例取整、固定推荐标准、模考次数与边际收益",
+      "input": {
+        "declared_weekly_hours": 9,
+        "available_hours_standard": 237.15,
+        "need_hours": 300,
+        "exam_duration_hours": 2,
+        "most_likely_at_target": {
+          "steady": 60,
+          "standard": 63,
+          "intensive": 65
+        },
+        "interval_width_at_target": {
+          "steady": 12,
+          "standard": 10,
+          "intensive": 9
+        }
+      },
+      "expect": {
+        "options": [
+          {
+            "key": "steady",
+            "weekly_hours": 7,
+            "daily_minutes": 60,
+            "projected_completion_percent": 61,
+            "cost_keys": ["lowest_completion", "widest_interval"],
+            "recommended": false
+          },
+          {
+            "key": "standard",
+            "weekly_hours": 9,
+            "daily_minutes": 77,
+            "projected_completion_percent": 79,
+            "vs_steady": {
+              "extra_hours": 2,
+              "uplift_points": 3
+            },
+            "recommended": true
+          },
+          {
+            "key": "intensive",
+            "weekly_hours": 12,
+            "daily_minutes": 103,
+            "projected_completion_percent": 100,
+            "mocks": 3,
+            "vs_steady": {
+              "extra_hours": 5,
+              "uplift_points": 5
+            },
+            "recommended": false
+          }
+        ]
+      },
+      "rule": "R33,R34,R35,R36"
+    },
+    {
+      "id": "E25",
+      "desc": "声明每周只有 1 小时：稳妥做不到（要少 1 小时又不少于 1 小时），只给标准、冲刺两张卡；没有稳妥时冲刺改跟标准比",
+      "input": {
+        "declared_weekly_hours": 1,
+        "available_hours_standard": 26.35,
+        "need_hours": 300,
+        "exam_duration_hours": 2,
+        "most_likely_at_target": {
+          "standard": 52,
+          "intensive": 56
+        }
+      },
+      "expect": {
+        "option_keys": ["standard", "intensive"],
+        "weekly_hours": {
+          "standard": 1,
+          "intensive": 2
+        },
+        "recommended": "standard",
+        "options": [
+          {
+            "key": "standard",
+            "weekly_hours": 1,
+            "daily_minutes": 9,
+            "projected_completion_percent": 9,
+            "vs_standard": null,
+            "cost_keys": [],
+            "recommended": true
+          },
+          {
+            "key": "intensive",
+            "weekly_hours": 2,
+            "daily_minutes": 17,
+            "projected_completion_percent": 18,
+            "vs_standard": {
+              "extra_hours": 1,
+              "uplift_points": 4
+            },
+            "cost_keys": [],
+            "recommended": false
+          }
+        ]
+      },
+      "rule": "R33,R34,R35,R36"
+    },
+    {
+      "id": "E26",
+      "desc": "自建《数据结构》期末：地图体检不通过，不给预测，给逐项修复清单",
+      "input": {
+        "map_health": {
+          "status": "blocked",
+          "kp_total": 78,
+          "kp_with_questions": 19,
+          "kp_missing_target_or_type": 24
+        },
+        "diagnosis_done": true
+      },
+      "expect": {
+        "forecast": null,
+        "forecast_blocks": "locked",
+        "hero_key": "health_blocked",
+        "gap_points": null,
+        "repair_items": [
+          {
+            "check": "map.health.min_question_coverage",
+            "current_percent": 24,
+            "threshold_percent": 30,
+            "at_least_fix": 5
+          },
+          {
+            "check": "map.health.max_missing_target_ratio",
+            "current_percent": 31,
+            "threshold_percent": 20,
+            "at_least_fix": 9
+          }
+        ],
+        "still_shown": ["mastery_grid", "weak_chapters", "time_feasibility", "plan_options", "round_draft"],
+        "options_show_points": false,
+        "after_recheck_pass": {
+          "forecast": "shown",
+          "confidence_label": "low_until_sufficient"
+        }
+      },
+      "rule": "R23"
+    },
+    {
+      "id": "E27",
+      "desc": "薄弱章节：分母只算学习范围内；同比例按地图章节顺序；平均考情级不低于 3 标高频",
+      "input": {
+        "chapters": [
+          {
+            "name": "会计概述",
+            "order": 1,
+            "kp_total": 18,
+            "out_of_scope": 4,
+            "reached": 8,
+            "unlearned": 6,
+            "avg_exam_level": 2.6
+          },
+          {
+            "name": "所有者权益",
+            "order": 5,
+            "kp_total": 14,
+            "out_of_scope": 0,
+            "reached": 7,
+            "unlearned": 1,
+            "avg_exam_level": 2.8
+          },
+          {
+            "name": "收入、费用和利润",
+            "order": 6,
+            "kp_total": 32,
+            "out_of_scope": 0,
+            "reached": 16,
+            "unlearned": 7,
+            "avg_exam_level": 3.2
+          }
+        ]
+      },
+      "expect": {
+        "order": ["所有者权益", "收入、费用和利润", "会计概述"],
+        "reach_percent": {
+          "会计概述": 57,
+          "所有者权益": 50,
+          "收入、费用和利润": 50
+        },
+        "grid_suffix": {
+          "会计概述": "8/14",
+          "所有者权益": "7/14",
+          "收入、费用和利润": "16/32"
+        },
+        "high_freq": ["收入、费用和利润"]
+      },
+      "rule": "R27,R28"
+    },
+    {
+      "id": "E28",
+      "desc": "游客没选方案就点生成我的计划：这时才要求登录，登录后数据并入账号，按推荐档生成",
+      "input": {
+        "user": "guest",
+        "action": "generate_plan",
+        "chosen_option": null
+      },
+      "expect": {
+        "can_view_report_before_login": true,
+        "login_required": true,
+        "merge_after_login": ["goal", "diagnosis", "learning_records"],
+        "option_used": "standard"
+      },
+      "rule": "R37,R39"
+    },
+    {
+      "id": "E29",
+      "desc": "断连 16 天回来：可做补充诊断，只抽已掌握及以上、遗忘风险高的先抽；做错不降档",
+      "input": {
+        "disconnect_days": 16,
+        "params_override": {
+          "learner.diagnosis.refresh_items": 2
+        },
+        "candidates": [
+          {
+            "id": "kp-1",
+            "shown_level": 4,
+            "forget_risk": 0.7,
+            "evidence_sufficient": false,
+            "start_estimate_before": 4
+          },
+          {
+            "id": "kp-2",
+            "shown_level": 3,
+            "forget_risk": 0.9,
+            "evidence_sufficient": false,
+            "start_estimate_before": 3
+          },
+          {
+            "id": "kp-3",
+            "shown_level": 2,
+            "forget_risk": 0.95,
+            "evidence_sufficient": false,
+            "start_estimate_before": 2
+          },
+          {
+            "id": "kp-4",
+            "shown_level": 5,
+            "forget_risk": 0.2,
+            "evidence_sufficient": false,
+            "start_estimate_before": 5
+          }
+        ],
+        "results": {
+          "kp-2": "wrong",
+          "kp-1": "known"
+        },
+        "new_estimates": {
+          "kp-1": 4,
+          "kp-2": 1
+        }
+      },
+      "expect": {
+        "offer_refresh": true,
+        "picked": ["kp-2", "kp-1"],
+        "start_estimate_after": {
+          "kp-1": 4,
+          "kp-2": 3
+        },
+        "shown_after": {
+          "kp-1": 4,
+          "kp-2": 3
+        },
+        "shown_source": {
+          "kp-1": "estimate",
+          "kp-2": "estimate"
+        },
+        "review_flagged": ["kp-2"]
+      },
+      "rule": "R17,R18"
+    },
+    {
+      "id": "E30",
+      "desc": "断连 13 天（没到 14 天）：不提示补充诊断",
+      "input": {
+        "disconnect_days": 13
+      },
+      "expect": {
+        "offer_refresh": false
+      },
+      "rule": "R18"
+    },
+    {
+      "id": "E31",
+      "desc": "一次摸底都没做完（含快速定位）：起点报告为空态，按钮去摸底",
+      "input": {
+        "diagnosis_finished": false,
+        "quick_finished": false
+      },
+      "expect": {
+        "page_state": "empty",
+        "primary_action": "go_diagnosis"
+      },
+      "rule": "R39"
+    },
+    {
+      "id": "E32",
+      "desc": "快速定位：自评“没学过”的章核对答错或选“不会”，仍按 0 档，不出现负档",
+      "input": {
+        "mode": "quick",
+        "question_credibility": "reviewed",
+        "suggested_seconds": 60,
+        "chapters": [
+          {
+            "name": "所有者权益",
+            "self_rating": "not_learned"
+          },
+          {
+            "name": "财务报告",
+            "self_rating": "not_learned"
+          }
+        ],
+        "check_answers": {
+          "所有者权益": {
+            "point": "kp-c1",
+            "correct": false,
+            "confidence": "sure",
+            "seconds": 40
+          },
+          "财务报告": {
+            "point": "kp-d1",
+            "correct": null,
+            "confidence": "dont_know",
+            "seconds": 20
+          }
+        },
+        "points": [
+          {
+            "id": "kp-c1",
+            "chapter": "所有者权益"
+          },
+          {
+            "id": "kp-c2",
+            "chapter": "所有者权益"
+          },
+          {
+            "id": "kp-d1",
+            "chapter": "财务报告"
+          },
+          {
+            "id": "kp-d2",
+            "chapter": "财务报告"
+          }
+        ]
+      },
+      "expect": {
+        "chapter_level": {
+          "所有者权益": 0,
+          "财务报告": 0
+        },
+        "basis": {
+          "kp-c1": "tested",
+          "kp-c2": "self_rated",
+          "kp-d1": "tested",
+          "kp-d2": "self_rated"
+        },
+        "level": {
+          "kp-c1": 0,
+          "kp-c2": 0,
+          "kp-d1": 0,
+          "kp-d2": 0
+        },
+        "evidence": {
+          "kp-c1": null,
+          "kp-d1": null
+        },
+        "min_level_in_output": 0
+      },
+      "rule": "R10,R15"
+    },
+    {
+      "id": "E33",
+      "desc": "快速定位的核对题：每章最多 1 道，按自评从高到低出；答错或蒙对低一档，做对不往上抬",
+      "input": {
+        "mode": "quick",
+        "question_credibility": "reviewed",
+        "suggested_seconds": 60,
+        "chapters": [
+          {
+            "name": "会计基础",
+            "self_rating": "learned_not_solid"
+          },
+          {
+            "name": "资产",
+            "self_rating": "proficient"
+          },
+          {
+            "name": "负债",
+            "self_rating": "basic"
+          }
+        ],
+        "check_answers": {
+          "资产": {
+            "point": "kp-a1",
+            "correct": false,
+            "confidence": "sure",
+            "seconds": 40
+          },
+          "负债": {
+            "point": "kp-b1",
+            "correct": true,
+            "confidence": "sure",
+            "seconds": 45
+          },
+          "会计基础": {
+            "point": "kp-e1",
+            "correct": true,
+            "confidence": "guess",
+            "seconds": 50
+          }
+        },
+        "points": [
+          {
+            "id": "kp-e1",
+            "chapter": "会计基础"
+          },
+          {
+            "id": "kp-e2",
+            "chapter": "会计基础"
+          },
+          {
+            "id": "kp-a1",
+            "chapter": "资产"
+          },
+          {
+            "id": "kp-a2",
+            "chapter": "资产"
+          },
+          {
+            "id": "kp-b1",
+            "chapter": "负债"
+          },
+          {
+            "id": "kp-b2",
+            "chapter": "负债"
+          }
+        ]
+      },
+      "expect": {
+        "check_count": 3,
+        "check_order": ["资产", "负债", "会计基础"],
+        "chapter_level": {
+          "会计基础": 0,
+          "资产": 2,
+          "负债": 2
+        },
+        "level": {
+          "kp-e1": 0,
+          "kp-e2": 0,
+          "kp-a1": 1,
+          "kp-a2": 2,
+          "kp-b1": 2,
+          "kp-b2": 2
+        },
+        "evidence": {
+          "kp-a1": null,
+          "kp-b1": "strong",
+          "kp-e1": "pending"
+        }
+      },
+      "rule": "R7,R10,R15"
+    },
+    {
+      "id": "E34",
+      "desc": "需要 0 小时、可投入 0 小时（声明每周 6 小时，但可学时间被机构任务占满）：需要为 0 优先，预计完成 100%，只写余量 0 小时；三档都是 100%",
+      "input": {
+        "need_hours": 0,
+        "available_hours_standard": 0,
+        "declared_weekly_hours": 6,
+        "exam_duration_hours": 2,
+        "interval_width_at_target": {
+          "steady": 8,
+          "standard": 8,
+          "intensive": 8
+        }
+      },
+      "expect": {
+        "projected_completion_percent": 100,
+        "diff": {
+          "kind": "surplus",
+          "hours": 0,
+          "percent": null
+        },
+        "show_three_outlets": false,
+        "scope_proposal": null,
+        "fill_time_hint": false,
+        "options": [
+          {
+            "key": "steady",
+            "weekly_hours": 5,
+            "projected_completion_percent": 100,
+            "mocks": null,
+            "cost_keys": []
+          },
+          {
+            "key": "standard",
+            "weekly_hours": 6,
+            "projected_completion_percent": 100,
+            "mocks": null
+          },
+          {
+            "key": "intensive",
+            "weekly_hours": 8,
+            "projected_completion_percent": 100,
+            "mocks": null
+          }
+        ]
+      },
+      "rule": "R31,R33,R34,R35"
+    },
+    {
+      "id": "E35",
+      "desc": "需要 0 小时、可投入 61 小时：预计完成 100%，只写余量不写百分比；三档都是 100%、都留出 3 次模考；稳妥卡代价只写区间最宽",
+      "input": {
+        "need_hours": 0,
+        "available_hours_standard": 61,
+        "declared_weekly_hours": 6,
+        "exam_duration_hours": 2,
+        "interval_width_at_target": {
+          "steady": 9,
+          "standard": 8,
+          "intensive": 8
+        }
+      },
+      "expect": {
+        "projected_completion_percent": 100,
+        "diff": {
+          "kind": "surplus",
+          "hours": 61,
+          "percent": null
+        },
+        "show_three_outlets": false,
+        "scope_proposal": null,
+        "fill_time_hint": false,
+        "options": [
+          {
+            "key": "steady",
+            "weekly_hours": 5,
+            "projected_completion_percent": 100,
+            "mocks": 3,
+            "cost_keys": ["widest_interval"]
+          },
+          {
+            "key": "standard",
+            "weekly_hours": 6,
+            "projected_completion_percent": 100,
+            "mocks": 3
+          },
+          {
+            "key": "intensive",
+            "weekly_hours": 8,
+            "projected_completion_percent": 100,
+            "mocks": 3
+          }
+        ]
+      },
+      "rule": "R31,R33,R34,R35"
+    },
+    {
+      "id": "E36",
+      "desc": "需要 50 小时、可投入 0 小时（声明每周 6 小时，但到目标日前天天不可学）：预计完成 0%，缺口 50 小时约 100%，提示先填时间、给三条出路、不出范围提议",
+      "input": {
+        "need_hours": 50,
+        "available_hours_standard": 0,
+        "declared_weekly_hours": 6,
+        "exam_duration_hours": 2,
+        "interval_width_at_target": {
+          "steady": 8,
+          "standard": 8,
+          "intensive": 8
+        }
+      },
+      "expect": {
+        "projected_completion_percent": 0,
+        "diff": {
+          "kind": "shortfall",
+          "hours": 50,
+          "percent": 100
+        },
+        "show_three_outlets": true,
+        "scope_proposal": null,
+        "fill_time_hint": true,
+        "options": [
+          {
+            "key": "steady",
+            "weekly_hours": 5,
+            "projected_completion_percent": 0,
+            "mocks": null,
+            "cost_keys": []
+          },
+          {
+            "key": "standard",
+            "weekly_hours": 6,
+            "projected_completion_percent": 0,
+            "mocks": null
+          },
+          {
+            "key": "intensive",
+            "weekly_hours": 8,
+            "projected_completion_percent": 0,
+            "mocks": null
+          }
+        ]
+      },
+      "rule": "R31,R32,R33,R34,R35"
+    },
+    {
+      "id": "E37",
+      "desc": "声明每周 0 小时（还没填时间）、需要 50 小时：可投入 0，不出方案卡，生成计划前先去填时间，不做“方案时长 ÷ 标准时长”",
+      "input": {
+        "need_hours": 50,
+        "available_hours_standard": 0,
+        "declared_weekly_hours": 0,
+        "exam_duration_hours": 2
+      },
+      "expect": {
+        "projected_completion_percent": 0,
+        "diff": {
+          "kind": "shortfall",
+          "hours": 50,
+          "percent": 100
+        },
+        "show_three_outlets": true,
+        "scope_proposal": null,
+        "fill_time_hint": true,
+        "option_keys": [],
+        "primary_action": "fill_time_first"
+      },
+      "rule": "R31,R33,R34"
+    },
+    {
+      "id": "E38",
+      "desc": "档差 1 小时（默认）的低时长：0、0.5、1、2 小时；稳妥做不到就不出，展示的档不倒挂",
+      "input": {
+        "combos": [
+          {
+            "id": "c1",
+            "declared_weekly_hours": 0
+          },
+          {
+            "id": "c2",
+            "declared_weekly_hours": 0.5
+          },
+          {
+            "id": "c3",
+            "declared_weekly_hours": 1
+          },
+          {
+            "id": "c4",
+            "declared_weekly_hours": 2
+          }
+        ]
+      },
+      "expect": {
+        "c1": {
+          "option_keys": [],
+          "weekly_hours": {},
+          "primary_action": "fill_time_first"
+        },
+        "c2": {
+          "option_keys": ["standard", "intensive"],
+          "weekly_hours": {
+            "standard": 0.5,
+            "intensive": 2
+          },
+          "daily_minutes": {
+            "standard": 4,
+            "intensive": 17
+          }
+        },
+        "c3": {
+          "option_keys": ["standard", "intensive"],
+          "weekly_hours": {
+            "standard": 1,
+            "intensive": 2
+          }
+        },
+        "c4": {
+          "option_keys": ["steady", "standard", "intensive"],
+          "weekly_hours": {
+            "steady": 1,
+            "standard": 2,
+            "intensive": 3
+          }
+        }
+      },
+      "rule": "R33"
+    },
+    {
+      "id": "E39",
+      "desc": "最小档差大于或接近声明时长：不到 2 倍档差就没有稳妥，冲刺至少多一个档差并取整到小时",
+      "input": {
+        "combos": [
+          {
+            "id": "c1",
+            "declared_weekly_hours": 2,
+            "params_override": {
+              "plan.option.min_step_hours": 3
+            }
+          },
+          {
+            "id": "c2",
+            "declared_weekly_hours": 0.5,
+            "params_override": {
+              "plan.option.min_step_hours": 2
+            }
+          },
+          {
+            "id": "c3",
+            "declared_weekly_hours": 5,
+            "params_override": {
+              "plan.option.min_step_hours": 3
+            }
+          },
+          {
+            "id": "c4",
+            "declared_weekly_hours": 6,
+            "params_override": {
+              "plan.option.min_step_hours": 3
+            }
+          }
+        ]
+      },
+      "expect": {
+        "c1": {
+          "option_keys": ["standard", "intensive"],
+          "weekly_hours": {
+            "standard": 2,
+            "intensive": 5
+          }
+        },
+        "c2": {
+          "option_keys": ["standard", "intensive"],
+          "weekly_hours": {
+            "standard": 0.5,
+            "intensive": 3
+          }
+        },
+        "c3": {
+          "option_keys": ["standard", "intensive"],
+          "weekly_hours": {
+            "standard": 5,
+            "intensive": 8
+          }
+        },
+        "c4": {
+          "option_keys": ["steady", "standard", "intensive"],
+          "weekly_hours": {
+            "steady": 3,
+            "standard": 6,
+            "intensive": 9
+          }
+        }
+      },
+      "rule": "R33"
+    },
+    {
+      "id": "E40",
+      "desc": "证据充足且摸底估计高于系统判定：起点估计更新，但当前档仍显示系统判定，估计不写进系统判定",
+      "input": {
+        "kind": "rediagnosis",
+        "question_credibility": "reviewed",
+        "suggested_seconds": 60,
+        "points": [
+          {
+            "id": "kp-1",
+            "system_level": 2,
+            "evidence_sufficient": true,
+            "start_estimate_before": 2,
+            "tested": true,
+            "new_estimate": 4,
+            "response": {
+              "correct": true,
+              "confidence": "sure",
+              "seconds": 40
+            }
+          },
+          {
+            "id": "kp-2",
+            "system_level": null,
+            "evidence_sufficient": false,
+            "start_estimate_before": 2,
+            "tested": true,
+            "new_estimate": 4,
+            "response": {
+              "correct": true,
+              "confidence": "sure",
+              "seconds": 40
+            }
+          }
+        ]
+      },
+      "expect": {
+        "start_estimate_after": {
+          "kp-1": 4,
+          "kp-2": 4
+        },
+        "shown_after": {
+          "kp-1": 2,
+          "kp-2": 4
+        },
+        "shown_source": {
+          "kp-1": "system",
+          "kp-2": "estimate"
+        },
+        "label": {
+          "kp-1": null,
+          "kp-2": "estimate"
+        },
+        "system_level_written_by_diagnosis": [],
+        "evidence": {
+          "kp-1": "strong",
+          "kp-2": "strong"
+        }
+      },
+      "rule": "R7,R16,R17"
+    }
+  ]
+}
