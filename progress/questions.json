@@ -1489,6 +1489,157 @@
       "asked": "v0022",
       "answer": "A",
       "answered": "v0022"
+    },
+    {
+      "id": "R10-Q1",
+      "task": "R10",
+      "q": "AI 现场出题（练习中心、错题验收要现出一道变式题时）扣几点？",
+      "options": [
+        "A 每次扣 1 点，一次最多出 5 道",
+        "B 每道题扣 1 点",
+        "C 不扣点，只占当天的导师次数"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0024",
+      "answer": "A",
+      "answered": "v0024"
+    },
+    {
+      "id": "R10-Q2",
+      "task": "R10",
+      "q": "原型说要计额度、但会员页没标价的拍照搜题、笔记 AI 整理、复盘里的教练点评，怎么算？",
+      "options": [
+        "A 都只算导师次数，每次 1 次，不扣 AI 点数",
+        "B 也扣 AI 点数，逐项定价"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0024",
+      "answer": "A",
+      "answered": "v0024"
+    },
+    {
+      "id": "R10-Q3",
+      "task": "R10",
+      "q": "每月的额度（AI 点数、资料解析）从哪天算、哪天重给？",
+      "options": [
+        "A 付费的从开通那一刻起每满一个月重给，免费的按自然月",
+        "B 一律每月 1 日重给"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0024",
+      "answer": "A",
+      "answered": "v0024"
+    },
+    {
+      "id": "R10-Q4",
+      "task": "R10",
+      "q": "当月没用完的点数怎么办？",
+      "options": [
+        "A 每月额度不结转；加量包单独记，先用每月额度再用加量包，没用完可退",
+        "B 每月额度可以结转一个月"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0024",
+      "answer": "A",
+      "answered": "v0024"
+    },
+    {
+      "id": "R10-Q5",
+      "task": "R10",
+      "q": "同时进行的目标数各档几个？（原型只说“随档位”）",
+      "options": [
+        "A 游客 1、免费 1、会员 3（写成参数，随时可改）",
+        "B 免费给 2 个"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0024",
+      "answer": "A",
+      "answered": "v0024"
+    },
+    {
+      "id": "R10-Q6",
+      "task": "R10",
+      "q": "会员到期后，多出来的目标怎么办？",
+      "options": [
+        "A 主目标照常；其余转只读，但到期复习和错题回炉照样推，只是不排新学、不能改",
+        "B 其余目标整个停住，只能看和导出"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0024",
+      "answer": "A",
+      "answered": "v0024"
+    },
+    {
+      "id": "R10-Q7",
+      "task": "R10",
+      "q": "退款试算、升级补差、续费扣款这些算钱的公式放哪？",
+      "options": [
+        "A 另开一张小规则卡（订单与权益），在后端做退款前定",
+        "B 在这张卡的第 2 轮补上"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0024",
+      "answer": "A",
+      "answered": "v0024"
+    },
+    {
+      "id": "R10-Q8",
+      "task": "R10",
+      "q": "额度用完后导师的普通问答照常（R09 已定）。那档位表里的“导师次数”（免费每天 10 次、会员 40 次）还管什么？",
+      "options": [
+        "A 只管拍照搜题、笔记 AI 整理、复盘里的教练点评这三样（页面或导师里发起都算），向导师提问不计次数",
+        "B 取消导师次数，这三样也不限次数"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0024",
+      "answer": "A",
+      "answered": "v0024"
+    },
+    {
+      "id": "R10-Q9",
+      "task": "R10",
+      "q": "AI 超时、点数已经退回之后，结果又迟到送来，怎么办？",
+      "options": [
+        "A 仍算“没给出结果”：迟到的结果不显示，也不再扣点；学员要就再点一次，重新告知、确认",
+        "B 把迟到的结果免费给学员看，不再扣点"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0024",
+      "answer": "A",
+      "answered": "v0024"
+    },
+    {
+      "id": "R10-Q10",
+      "task": "R10",
+      "q": "游客期间用掉的 AI 点数等额度，并入正式账号后怎么算？",
+      "options": [
+        "A 落在账号当期的算进当期已用，剩余最少为 0；游客没用完的不加给账号；重复合并不多算",
+        "B 不算进账号，账号当期额度不受影响（同一个人一期可能多用一份免费额度）"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0024",
+      "answer": "A",
+      "answered": "v0024"
     }
   ]
 }
