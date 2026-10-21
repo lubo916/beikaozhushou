@@ -953,7 +953,7 @@
       "status": "answered",
       "asked": "v0015",
       "answer": "A",
-      "answered": "v0015"
+      "answered": "v0018"
     },
     {
       "id": "R06-Q2",
@@ -968,7 +968,7 @@
       "status": "answered",
       "asked": "v0015",
       "answer": "A",
-      "answered": "v0015"
+      "answered": "v0018"
     },
     {
       "id": "R06-Q3",
@@ -983,7 +983,7 @@
       "status": "answered",
       "asked": "v0015",
       "answer": "A",
-      "answered": "v0015"
+      "answered": "v0018"
     },
     {
       "id": "R06-Q4",
@@ -998,7 +998,7 @@
       "status": "answered",
       "asked": "v0015",
       "answer": "A",
-      "answered": "v0015"
+      "answered": "v0018"
     },
     {
       "id": "R06-Q5",
@@ -1013,7 +1013,7 @@
       "status": "answered",
       "asked": "v0015",
       "answer": "A",
-      "answered": "v0015"
+      "answered": "v0018"
     },
     {
       "id": "R06-Q6",
@@ -1028,7 +1028,7 @@
       "status": "answered",
       "asked": "v0015",
       "answer": "B",
-      "answered": "v0015"
+      "answered": "v0018"
     },
     {
       "id": "R06-Q7",
@@ -1040,8 +1040,10 @@
       ],
       "recommend": "A",
       "temp": "A",
-      "status": "open",
-      "asked": "v0015"
+      "status": "answered",
+      "asked": "v0015",
+      "answer": "A",
+      "answered": "v0018"
     },
     {
       "id": "R06-Q8",
@@ -1053,8 +1055,10 @@
       ],
       "recommend": "A",
       "temp": "A",
-      "status": "open",
-      "asked": "v0015"
+      "status": "answered",
+      "asked": "v0015",
+      "answer": "A",
+      "answered": "v0018"
     },
     {
       "id": "R08-Q1",
@@ -1181,6 +1185,21 @@
       "asked": "v0016",
       "answer": "B",
       "answered": "v0016"
+    },
+    {
+      "id": "R06-Q9",
+      "task": "R06",
+      "q": "有效学习不足周报门槛时，是否仍展示数据？",
+      "options": [
+        "A 只展示数据，不给结论，沿用 metrics.md",
+        "B 不生成周报"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0018",
+      "answer": "A",
+      "answered": "v0018"
     }
   ]
 }
