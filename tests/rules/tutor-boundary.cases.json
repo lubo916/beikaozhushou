@@ -1,6 +1,6 @@
 {
   "card": "docs/baseline/rule-cards/tutor-boundary.md",
-  "status": "草稿",
+  "status": "已定稿",
   "rule_version": "R09-r1",
   "notes": [
     "kind 表示测哪段规则：turn＝一次提问的判定（R1–R22、R24、R26、R30–R33）；write＝导师工具的一次写操作（R23–R26）；label＝一段内容在显示、复制、存下、导出时的标识（R27–R29）；queue＝不可用期间存下的提问在恢复时怎么办（R31）；hotline＝危机规程里显示哪些热线（R20）。",
@@ -28,11 +28,10 @@
     "R09-Q2": "A",
     "R09-Q3": "A",
     "R09-Q4": "A",
-    "R09-Q5": "A"
-  },
-  "temp_decisions": {
+    "R09-Q5": "A",
     "R09-Q6": "A"
   },
+  "temp_decisions": {},
   "defaults": {
     "turn": {
       "end": "learner",
