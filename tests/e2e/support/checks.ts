@@ -31,9 +31,12 @@ interface UiCopy {
 /** 公共状态组件的文案（packages/ui/src/copy.zh-CN.json）：出错标题“{{page}}没能加载”与“重试”按钮。 */
 const COPY = JSON.parse(readFileSync(join(ROOT, "packages/ui/src/copy.zh-CN.json"), "utf8")) as UiCopy;
 
-/** 假数据层在出错、离线、受限三态下故意让接口失败（500、断网、403），浏览器会为每个失败的接口请求记一条“资源加载失败”：预期内，不算报错。 */
+/** 假数据层在出错、离线、受限三态下故意让接口失败（500、断网、403），失败的接口请求会在控制台记报错（查询失败后还会自动重试几次）：预期内，不算报错。 */
 const API_FAILURE_STATES: ReadonlySet<StateCode> = new Set<StateCode>(["error", "offline", "restricted"]);
+/** Chromium 的记法（网页沙箱里实测，含 Service Worker 回 500、403 与断网）：正文是“Failed to load resource: …”，出处是失败的接口地址。 */
 const RESOURCE_FAILURE = /^Failed to load resource\b/;
+/** 别的浏览器可能把失败的接口地址写进正文（出处不是接口地址），这种也认。 */
+const API_URL_IN_TEXT = /\bhttps?:\/\/[^\s'"‘’“”]+\/api\//;
 
 /** “页面安静”：这么久没有新加载完成的资源。 */
 const QUIET_MS = 500;
@@ -59,10 +62,11 @@ function isApiRequest(url: string): boolean {
   }
 }
 
-/** 该状态下预期内的报错：出错、离线、受限三态里，接口请求失败时浏览器记的“资源加载失败”。 */
+/** 该状态下预期内的报错：出错、离线、受限三态里，失败的接口请求在控制台记的报错（未捕获的异常从不放过）。 */
 function isExpected(problem: BrowserProblem, state: StateCode): boolean {
   if (problem.kind !== "console" || !API_FAILURE_STATES.has(state)) return false;
-  return RESOURCE_FAILURE.test(problem.text) && isApiRequest(problem.url);
+  if (RESOURCE_FAILURE.test(problem.text) && isApiRequest(problem.url)) return true;
+  return API_URL_IN_TEXT.test(problem.text);
 }
 
 function describeProblem(problem: BrowserProblem): string {
