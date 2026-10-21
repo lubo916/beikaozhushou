@@ -937,6 +937,122 @@
       "asked": "v0014",
       "answer": "A",
       "answered": "v0014"
+    },
+    {
+      "id": "R06-Q1",
+      "task": "R06",
+      "q": "每科都要过的考试（如初级会计两科），今日页的三个数显示哪一科？",
+      "options": [
+        "A 显示差距最大的那一科，并写明科目名",
+        "B 各科合起来算一个数"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0015",
+      "answer": "A",
+      "answered": "v0015"
+    },
+    {
+      "id": "R06-Q2",
+      "task": "R06",
+      "q": "完成度从哪儿算起？",
+      "options": [
+        "A 从 0 档算起，原来就会的也算走过的路",
+        "B 从开始用产品那天算，起点一律 0%"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0015",
+      "answer": "A",
+      "answered": "v0015"
+    },
+    {
+      "id": "R06-Q3",
+      "task": "R06",
+      "q": "健康度的“近 7 天”遇到不可学日怎么算？",
+      "options": [
+        "A 只看最近 7 个自然日，不可学日不算天数",
+        "B 往前凑满 7 个可学的日子"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0015",
+      "answer": "A",
+      "answered": "v0015"
+    },
+    {
+      "id": "R06-Q4",
+      "task": "R06",
+      "q": "“已过线”比的是哪条线？",
+      "options": [
+        "A 比学员自己的目标分，文案写“已过目标线”",
+        "B 比合格线"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0015",
+      "answer": "A",
+      "answered": "v0015"
+    },
+    {
+      "id": "R06-Q5",
+      "task": "R06",
+      "q": "正确率的分母怎么算？",
+      "options": [
+        "A 每道题只算第一次作答",
+        "B 所有作答都算"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0015",
+      "answer": "A",
+      "answered": "v0015"
+    },
+    {
+      "id": "R06-Q6",
+      "task": "R06",
+      "q": "“待检测”的阅读与视听，多久内补做检测还能算进有效学习时长？",
+      "options": [
+        "A 不限期",
+        "B 7 天内（天数做成参数）"
+      ],
+      "recommend": "B",
+      "temp": "B",
+      "status": "answered",
+      "asked": "v0015",
+      "answer": "B",
+      "answered": "v0015"
+    },
+    {
+      "id": "R06-Q7",
+      "task": "R06",
+      "q": "读后即测没通过，读的那段时间算不算“有效学习时长”？",
+      "options": [
+        "A 算：做了检测就有证据，时间确实花在学习上；没通过只说明这一节还不算“完成”（按统计口径 metrics.md）",
+        "B 不算：只有检测通过了，读的时间才算有效（按词汇表第 9 节的字面）"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "open",
+      "asked": "v0015"
+    },
+    {
+      "id": "R06-Q8",
+      "task": "R06",
+      "q": "“较上周”和哪一天比？",
+      "options": [
+        "A 和上周最后一条预测比（本周一凌晨 4 点之前）：今日页的“较上周”和周报的“预测变化”是同一个数；周一早上会接近 0",
+        "B 和 7 天前比：每天看到的都是整整一周的变化，但会和周报的数对不上"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "open",
+      "asked": "v0015"
     }
   ]
 }
