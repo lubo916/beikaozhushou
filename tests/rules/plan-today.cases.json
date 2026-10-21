@@ -2,7 +2,7 @@
   "card": "docs/baseline/rule-cards/plan-today.md",
   "status": "草稿",
   "updated": "2026-10-21",
-  "decisions": ["docs/decisions/D-2026-10-21-R04-r1.md", "docs/decisions/D-2026-10-21-R04-r2.md"],
+  "decisions": ["docs/decisions/D-2026-10-21-R04-r1.md", "docs/decisions/D-2026-10-21-R04-r2.md", "docs/decisions/D-2026-10-21-R04-r3.md"],
   "conventions": {
     "op": "这个例子测哪一步：generate_today 生成当天清单；plan_week 排本周；daytime 白天的变化；nightly_carryover 夜间顺延；undo 撤销顺延；late_evidence 证据晚到；fill 装法（短时重组、三档）；after_all_done 全部完成；judge_items 完成判定；completion_rates 完成率；interruption_tier 中断分档；proposal_check 提议触发；proposal_lifecycle 提议状态；apply_change 谁能直接改",
     "day": "学习日 YYYY-MM-DD，按学员时区与日界线（默认 Asia/Shanghai、凌晨 4 点），统一用 packages/shared/src/today 的“今天”函数；weekday：1＝周一 … 7＝周日",
@@ -10,12 +10,15 @@
     "row": "到期队列的一行：同一来源合成一行 {source, count, unit_minutes}，用时＝count × unit_minutes；截短＝减少 count，至少留 1 条",
     "item": "推进或收尾的一项 {id, source, minutes 或 count＋unit_minutes, value（提分性价比）, importance, deadline, locked, kind（org 机构／custom 自定）}；带 count 的可以截短",
     "free": "某天还放得下多少＝available（当天预算 − 机构占用，小于 0 按 0）− planned_personal（那天已排的个人占用：预计巩固段＋收尾段＋锁定任务＋已排的推进任务，含之前顺延来的和这一晚已经放进去的）；顺延（R20）要求放进去后 ≤ available，排本周（R11）要求 ≤ available × (1 − plan.week.buffer_ratio)；写成 planned {consolidate, closing, locked, advance} 时，planned_personal 是四项之和",
-    "steps": "R1 的步骤：1 巩固段装到保底额，2 口述回顾，3 周复盘（周日），4 锁定的推进任务，5 巩固段第一轮余下的额度，6 其余推进任务，7 补巩固；left_after＝这一步之后还剩多少分钟；没列出的步骤什么也没放",
+    "steps": "R1 的步骤：1 巩固段装到保底额，2 口述回顾，3 周复盘（周日），4 锁定的推进任务，5 巩固段第一轮余下的额度，6 其余推进任务，7 补巩固；left_after＝这一步之后还剩多少分钟；没列出的步骤什么也没放；中断回归那天第 1 步先放启动任务（took 写 start_task），再接着装到保底额（R29）",
     "status": "清单项状态：todo 未开始、in_progress 进行中、seen 看过、done 完成、self_reported 自报做完、skipped_today 今天不做",
-    "optional": "optional: true 的项不占 available、不进完成率，页面写明“可选”：不可学日与机构占满时的最小版（R27、R28）、全部完成后的加练（R19）",
+    "optional": "optional: true 的项不占 available、不进完成率，页面写明“可选”：不可学日与机构占满时的最小版（R27、R28），以及中断回归那天改给的同一项最小版（R29，E49）、全部完成后的加练（R19）",
     "linked": "机构或自定任务关联了什么：questions、cards、reading、recitation；空数组＝系统里没有作答或阅读记录（R15 的表）；只在完成判定和完成率的例子里写",
     "null": "比值的分母为 0 时 rate（gap、round_coverage）写 null 并给 reason：no_counted_items、declared_zero、scope_empty；任何地方都不出现 NaN、Infinity（R18 的表）",
-    "fill_order": "装法（R24）看项的顺序：巩固段 → 口述回顾 → 推进段 → 周复盘；结果显示时仍按清单顺序",
+    "fill_order": "装法（R24）看项的顺序：巩固段 → 口述回顾 → 推进段 → 周复盘；结果显示时仍按清单顺序。最小版和启动任务的复习部分不用装法，用 R02 的 R10（见 review_batch）",
+    "review_batch": "到期复习也可以写成 R02 给的今天这一批 {source: due_review, items: [{id, est_seconds}]}，按 R02 的顺序，不含新卡和到期错题。不可学日与机构占满时的最小版（R27、R28）、启动任务的复习部分（R29）直接用 R02 的 R10 取（quick_slice，同 tests/rules/review-scheduling.cases.json 的 E19）：从顶上连续累加，下一项放不下就停，不跳过去取后面的；一项都放不下时只取第一项。最小版的时长是 plan.review.quick_minutes。旧例子里 {source: due_review, count, unit_minutes} 的一行，等于 count 项、每项 unit_minutes × 60 秒的这一批（E9、E10、E26、E27 两种取法结果相同）。输出里 ids 是取到的编号，seconds 是它们的预计秒数之和；page_minutes 是页面上写的分钟数＝取出各项预计用时之和，不写参数值",
+    "start_task": "启动任务（R29）：limit_minutes＝plan.disconnect.start_task_minutes 和当天可用时间中较小的；review_slice_seconds＝留给复习部分的秒数（limit 减去那道上次做对过的错题）；minutes 是实际取出各项之和，R10 只取了第一项时可能比 limit_minutes 长（longer_than_limit）；它占当天的可用时间，算在巩固段里（minutes.consolidate 含它）；start_task 为 null 表示这天不出启动任务",
+    "checks": "带 checks 的例子：input 里 checks 以外的字段是几个检查共用的；input.checks[i] 对应 expect.checks[i]，各自独立",
     "codes": "source、segment、mix_mode（roi／review_first／new_first）、tier（full／lite／minimal）、提议状态（pending／confirmed／declined／undone）用术语表与 packages/shared/src/vocab/supplement.ts 的代码；weekly_review、todo、in_progress、seen、done、self_reported、skipped_today、optional、linked、off_day、start_task、sprint_mode 与各个提议 kind、reason 是临时代码，待术语表登记"
   },
   "params": {
@@ -31,7 +34,7 @@
     "plan.short_mode.minutes": 15,
     "plan.degrade.lite_ratio": 0.5,
     "plan.degrade.minimal_minutes": 20,
-    "plan.off_day.review_minutes": 10,
+    "plan.review.quick_minutes": 10,
     "plan.closing.recap_minutes": 3,
     "plan.closing.weekly_review_minutes": 10,
     "plan.practice.accuracy_band": [0.6, 0.8],
@@ -43,12 +46,12 @@
     "plan.mix.roi_consolidate_cap",
     "plan.degrade.lite_ratio",
     "plan.degrade.minimal_minutes",
-    "plan.off_day.review_minutes",
     "plan.closing.recap_minutes",
     "plan.closing.weekly_review_minutes",
     "plan.disconnect.recovery_days",
     "plan.practice.accuracy_band"
   ],
+  "params_note": "plan.review.quick_minutes 是已定稿 R02 建议新增的参数（R02 的 R10），本卡的最小版沿用，按 R02 登记；第 2 轮建议的 plan.off_day.review_minutes 撤回（第 3 轮）",
   "cases": [
     {
       "id": "E1",
@@ -1713,6 +1716,313 @@
         ],
         "compress_scope": { "propose": false },
         "mastery_reset": false
+      }
+    },
+    {
+      "id": "E45",
+      "rule": "R27",
+      "op": "generate_today",
+      "title": "不可学日的最小版按已定稿 R02 的 R10 取：下一项放不下就停，不跳过去取后面的；一项都放不下时只取第一项（复核的反例）",
+      "input": {
+        "day": "2026-10-25",
+        "weekday": 7,
+        "off_day": true,
+        "mix_mode": "roi",
+        "sprint_mode": false,
+        "budget_minutes": 145,
+        "reservations": [],
+        "checks": [
+          {
+            "due_queue": [
+              {
+                "source": "due_review",
+                "items": [
+                  { "id": "a", "est_seconds": 240 },
+                  { "id": "b", "est_seconds": 200 },
+                  { "id": "c", "est_seconds": 180 },
+                  { "id": "d", "est_seconds": 60 }
+                ]
+              },
+              { "source": "mistake_retry", "count": 1, "unit_minutes": 4 }
+            ],
+            "scheduled": [{ "id": "N1", "source": "new_learning", "minutes": 30, "value": 0.2, "importance": 3 }]
+          },
+          {
+            "due_queue": [
+              {
+                "source": "due_review",
+                "items": [
+                  { "id": "s1", "est_seconds": 720 },
+                  { "id": "c1", "est_seconds": 30 }
+                ]
+              }
+            ],
+            "scheduled": []
+          }
+        ]
+      },
+      "expect": {
+        "slice_seconds": 600,
+        "checks": [
+          {
+            "consolidate": [{ "source": "due_review", "ids": ["a", "b"], "seconds": 440, "optional": true }],
+            "why": "c 放不下（440＋180＝620 > 600）就停，不跳过 c 去取 d；第 2 轮的装法会取 a、b、d 共 500 秒",
+            "budget_used_minutes": 0,
+            "in_completion_rate": false,
+            "carried_out": ["N1"],
+            "carry_search_from": "2026-10-26",
+            "left_in_due_queue": [
+              { "source": "due_review", "ids": ["c", "d"] },
+              { "source": "mistake_retry", "count": 1 }
+            ]
+          },
+          {
+            "consolidate": [{ "source": "due_review", "ids": ["s1"], "seconds": 720, "optional": true }],
+            "why": "一项都放不下（720 > 600），只取第一项；第 2 轮的装法会取空",
+            "page_minutes": 12,
+            "budget_used_minutes": 0,
+            "in_completion_rate": false,
+            "left_in_due_queue": [{ "source": "due_review", "ids": ["c1"] }]
+          }
+        ],
+        "notice": "今天不可学，其余已顺延，不影响进度数字"
+      }
+    },
+    {
+      "id": "E46",
+      "rule": "R27 R28",
+      "op": "generate_today",
+      "title": "机构占满，最小版第一项就超过 N：只取这一项（可选、不占预算）；“占用超出”提议按实际取出的分钟数",
+      "input": {
+        "day": "2026-10-15",
+        "weekday": 4,
+        "mix_mode": "roi",
+        "sprint_mode": false,
+        "budget_minutes": 30,
+        "reservations": [{ "id": "O1", "source": "org_or_custom", "kind": "org", "minutes": 40, "deadline": "2026-10-15" }],
+        "due_queue": [
+          {
+            "source": "due_review",
+            "items": [
+              { "id": "s1", "est_seconds": 720 },
+              { "id": "c1", "est_seconds": 30 },
+              { "id": "c2", "est_seconds": 30 }
+            ]
+          }
+        ],
+        "scheduled": [{ "id": "N1", "source": "new_learning", "minutes": 20, "value": 0.2, "importance": 3 }]
+      },
+      "expect": {
+        "available_minutes_raw": -10,
+        "available_minutes": 0,
+        "consolidate": [{ "source": "due_review", "ids": ["s1"], "seconds": 720, "optional": true }],
+        "page_minutes": 12,
+        "in_completion_rate": false,
+        "notice": "机构作业和课表占满了今天的时间",
+        "advance": ["O1"],
+        "closing": [],
+        "carried_out": ["N1"],
+        "left_in_due_queue": [{ "source": "due_review", "ids": ["c1", "c2"] }],
+        "proposal": {
+          "kind": "budget_conflict",
+          "status": "pending",
+          "change": { "day": "2026-10-15", "budget_from": 30, "budget_to": 52 }
+        },
+        "budget_until_confirmed": 30
+      }
+    },
+    {
+      "id": "E47",
+      "rule": "R1 R29",
+      "op": "generate_today",
+      "title": "中断 5 天回来：启动任务的复习部分按 R02 的 R10 在放不下的那项停下；启动任务就是巩固段最前面的几项，占当天的时间",
+      "input": {
+        "day": "2026-10-22",
+        "weekday": 4,
+        "mix_mode": "roi",
+        "sprint_mode": false,
+        "budget_minutes": 30,
+        "reservations": [],
+        "interruption": { "last_effective_day": "2026-10-16", "off_days": [] },
+        "due_queue": [
+          {
+            "source": "due_review",
+            "items": [
+              { "id": "r1", "est_seconds": 180 },
+              { "id": "r2", "est_seconds": 120 },
+              { "id": "r3", "est_seconds": 240 },
+              { "id": "r4", "est_seconds": 60 }
+            ]
+          },
+          {
+            "source": "mistake_retry",
+            "items": [
+              { "id": "M1", "minutes": 4, "last_retry_correct": true },
+              { "id": "M2", "minutes": 4, "last_retry_correct": false }
+            ]
+          }
+        ],
+        "scheduled": [
+          { "id": "N1", "source": "new_learning", "minutes": 12, "value": 0.2, "importance": 3 },
+          { "id": "P1", "source": "practice", "minutes": 8, "value": 0.1, "importance": 3 }
+        ]
+      },
+      "expect": {
+        "gap_days": 5,
+        "tier": 1,
+        "available_minutes": 30,
+        "consolidate_floor_minutes": 9,
+        "consolidate_cap_minutes": 15,
+        "start_task": {
+          "limit_minutes": 10,
+          "review_slice_seconds": 360,
+          "minutes": 9,
+          "items": [
+            { "source": "due_review", "ids": ["r1", "r2"], "seconds": 300 },
+            { "source": "mistake_retry", "id": "M1", "minutes": 4 }
+          ],
+          "why": "r3 放不进复习部分剩下的 60 秒就停，不跳过 r3 去取 r4（装法会取 r1、r2、r4 共 360 秒）"
+        },
+        "rest_of_list_visible": "做完启动任务之后",
+        "steps": [
+          { "step": 1, "took": ["start_task"], "left_after": 21 },
+          { "step": 2, "took": ["bedtime_review"], "left_after": 18 },
+          {
+            "step": 5,
+            "took": [{ "source": "due_review", "ids": ["r3", "r4"] }],
+            "skipped": [{ "source": "mistake_retry", "id": "M2", "why": "4 分钟放不进上限剩下的 1 分钟" }],
+            "left_after": 13
+          },
+          { "step": 6, "took": ["N1"], "carried_out": ["P1"], "left_after": 1 }
+        ],
+        "consolidate": [
+          { "source": "due_review", "ids": ["r1", "r2", "r3", "r4"], "seconds": 600 },
+          { "source": "mistake_retry", "ids": ["M1"], "minutes": 4 }
+        ],
+        "advance": ["N1"],
+        "closing": ["bedtime_review"],
+        "carried_out": ["P1"],
+        "carry_search_from": "2026-10-23",
+        "left_in_due_queue": [{ "source": "mistake_retry", "ids": ["M2"] }],
+        "minutes": { "consolidate": 14, "start_task": 9, "advance_personal": 12, "closing": 3, "total": 29 },
+        "unused_minutes": 1,
+        "show_backlog_count": false,
+        "proposal": { "kind": "reconnect_reorganize", "status": "pending", "recovery_days": 14 }
+      }
+    },
+    {
+      "id": "E48",
+      "rule": "R29",
+      "op": "generate_today",
+      "title": "启动任务第一项复习就超出留给它的时间：不带错题，用整段时长按 R10 重取；第一项比整段还长时只给这一项（R04-Q11＝A）",
+      "input": {
+        "day": "2026-10-11",
+        "weekday": 7,
+        "mix_mode": "roi",
+        "sprint_mode": false,
+        "budget_minutes": 145,
+        "reservations": [],
+        "interruption": { "last_effective_day": "2026-10-05", "off_days": [] },
+        "checks": [
+          {
+            "due_queue": [
+              {
+                "source": "due_review",
+                "items": [
+                  { "id": "s1", "est_seconds": 420 },
+                  { "id": "c1", "est_seconds": 30 }
+                ]
+              },
+              { "source": "mistake_retry", "items": [{ "id": "M1", "minutes": 4, "last_retry_correct": true }] }
+            ]
+          },
+          {
+            "due_queue": [
+              {
+                "source": "due_review",
+                "items": [
+                  { "id": "s1", "est_seconds": 720 },
+                  { "id": "c1", "est_seconds": 30 }
+                ]
+              },
+              { "source": "mistake_retry", "items": [{ "id": "M1", "minutes": 4, "last_retry_correct": true }] }
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "checks": [
+          {
+            "gap_days": 5,
+            "tier": 1,
+            "start_task": {
+              "limit_minutes": 10,
+              "review_slice_seconds": 360,
+              "minutes": 7.5,
+              "items": [{ "source": "due_review", "ids": ["s1", "c1"], "seconds": 450 }]
+            },
+            "why": "s1 一项就超过留给复习的 360 秒、R10 只取了它：不带 M1，复习部分改用整段 600 秒再取，取到 s1、c1",
+            "mistake_in_start_task": false,
+            "mistakes_left_for_list": ["M1"]
+          },
+          {
+            "gap_days": 5,
+            "tier": 1,
+            "start_task": {
+              "limit_minutes": 10,
+              "minutes": 12,
+              "longer_than_limit": true,
+              "items": [{ "source": "due_review", "ids": ["s1"], "seconds": 720 }]
+            },
+            "why": "s1 比整段 600 秒还长，R10 只取第一项",
+            "page_minutes": 12,
+            "mistake_in_start_task": false,
+            "mistakes_left_for_list": ["M1"]
+          }
+        ],
+        "start_task_in_budget": true
+      }
+    },
+    {
+      "id": "E49",
+      "rule": "R1 R27 R29",
+      "op": "generate_today",
+      "title": "回来那天的可用时间比启动任务那一项还短：不出启动任务，改给可选的最小版，其余照常排（R04-Q12＝A）",
+      "input": {
+        "day": "2026-10-22",
+        "weekday": 4,
+        "mix_mode": "roi",
+        "sprint_mode": false,
+        "budget_minutes": 15,
+        "reservations": [{ "id": "O1", "source": "org_or_custom", "kind": "org", "minutes": 12, "deadline": "2026-10-24" }],
+        "interruption": { "last_effective_day": "2026-10-16", "off_days": [] },
+        "due_queue": [
+          {
+            "source": "due_review",
+            "items": [
+              { "id": "s1", "est_seconds": 240 },
+              { "id": "c1", "est_seconds": 60 },
+              { "id": "c2", "est_seconds": 60 }
+            ]
+          },
+          { "source": "mistake_retry", "items": [{ "id": "M1", "minutes": 4, "last_retry_correct": true }] }
+        ],
+        "scheduled": []
+      },
+      "expect": {
+        "gap_days": 5,
+        "tier": 1,
+        "available_minutes": 3,
+        "start_task": null,
+        "why": "启动任务时长取 3 分钟（10 和可用的 3 中较小的）；M1 要 4 分钟，不带；R10 只取得出 s1（240 秒），它比可用的 3 分钟还长",
+        "consolidate": [{ "source": "due_review", "ids": ["s1", "c1", "c2"], "seconds": 360, "optional": true }],
+        "in_completion_rate": false,
+        "advance": ["O1"],
+        "closing": ["bedtime_review"],
+        "left_in_due_queue": [{ "source": "mistake_retry", "ids": ["M1"] }],
+        "minutes": { "consolidate": 0, "advance_personal": 0, "org_reserved": 12, "closing": 3, "total": 15 },
+        "show_backlog_count": false,
+        "proposal": { "kind": "reconnect_reorganize", "status": "pending", "recovery_days": 14 }
       }
     }
   ]
