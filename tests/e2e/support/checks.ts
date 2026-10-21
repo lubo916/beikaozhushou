@@ -45,6 +45,12 @@ interface BrowserProblem {
   readonly url: string;
 }
 
+/** 报错的第一行（Playwright 断言失败时第一行就是我们写的说明），用来汇总。 */
+export function firstLine(error: unknown): string {
+  const text = error instanceof Error ? error.message : String(error);
+  return text.split("\n")[0] ?? text;
+}
+
 function isApiRequest(url: string): boolean {
   try {
     return new URL(url).pathname.startsWith("/api/");
