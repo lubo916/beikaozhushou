@@ -1,0 +1,170 @@
+/// <reference lib="dom" />
+// 冒烟检查本身的回归测试（F06 第 2 轮，按第 1 轮收包复核找到的反例补）：随冒烟入口（pnpm e2e:smoke、bk verify）在 Chromium、WebKit、Firefox 里都跑。
+// 页面来自本机小网站 tests/e2e/support/check-fixtures.ts，照学员端外壳的结构写；被测的检查与冒烟、黄金路径、页面画廊用的是同一份 support/checks.ts。
+import { expect, test } from "@playwright/test";
+import { pageById } from "../support/catalog.ts";
+import { WHOLE_PAGE_STATES, closedPort, startCheckFixtures, type CheckFixtures } from "../support/check-fixtures.ts";
+import {
+  STATE_NAMES,
+  expectLoaded,
+  expectNoProblems,
+  expectOpened,
+  navigationProblem,
+  settle,
+  waitForAppReady,
+  watchPage,
+  type NavigationResponse,
+  type StateCode,
+} from "../support/checks.ts";
+
+/** 小网站上的页面都按学员端 S06 今日核对（页名、页面模式取页面清单）。 */
+const TODAY = pageById("S06");
+const TODAY_VIEW = TODAY.views[0];
+
+interface ApiFailure {
+  readonly state: StateCode;
+  /** 小网站 Service Worker 的参数：回哪个状态码，或断网。 */
+  readonly fail: string;
+  readonly label: string;
+}
+
+/** 出错、受限、离线三态里假数据层各自故意给的接口失败。 */
+const API_FAILURES: readonly ApiFailure[] = [
+  { state: "error", fail: "500", label: "接口回 500" },
+  { state: "restricted", fail: "403", label: "接口回 403" },
+  { state: "offline", fail: "network", label: "接口断网" },
+];
+
+let site: CheckFixtures;
+let unreachable = 0;
+
+test.beforeAll(async () => {
+  site = await startCheckFixtures(TODAY.name);
+  unreachable = await closedPort();
+});
+
+test.afterAll(async () => {
+  await site.close();
+});
+
+/** 造一个 page.goto 的回应（只用得到成功与否、状态码与状态文字）。 */
+function reply(status: number, statusText: string): NavigationResponse {
+  return { ok: () => status >= 200 && status < 300, status: () => status, statusText: () => statusText };
+}
+
+test.describe("自测：打开页面（复核问题 1：合法的缓存响应被误报）", () => {
+  test("打开成功的判定：2xx 与缓存仍然有效的 304 算成功，没有回应、4xx、5xx 不算", () => {
+    expect(navigationProblem(reply(200, "OK"), "/today")).toBeNull();
+    expect(navigationProblem(reply(204, "No Content"), "/today")).toBeNull();
+    expect(navigationProblem(reply(304, "Not Modified"), "/today"), "缓存仍然有效的 304 应算打开成功").toBeNull();
+    expect(navigationProblem(reply(404, "Not Found"), "/today")).toContain("实际是 404 Not Found");
+    expect(navigationProblem(reply(500, "Internal Server Error"), "/today")).toContain("实际是 500 Internal Server Error");
+    expect(navigationProblem(null, "/today")).toContain("没有拿到回应");
+  });
+
+  test("重复打开同一地址（走缓存，WebKit 报 304）仍算打开成功，页面照常核对", async ({ page }) => {
+    const watch = await watchPage(page);
+    for (const visit of [1, 2, 3]) {
+      await test.step(`第 ${visit} 次打开`, async () => {
+        await watch.open(site.url("/cached/today"));
+        await expectOpened(page, TODAY, TODAY_VIEW);
+        await expectLoaded(page, TODAY);
+        expectNoProblems(watch, "normal");
+      });
+    }
+    expect(site.notModified("/cached/today"), "再次打开应走缓存：服务器要回过 304").toBeGreaterThan(0);
+  });
+
+  test("打不开的地址照样报错：404、500、连不上", async ({ page }) => {
+    const watch = await watchPage(page);
+    await expect(watch.open(site.url("/status/404")), "404").rejects.toThrow(/应返回成功/);
+    await expect(watch.open(site.url("/status/500")), "500").rejects.toThrow(/应返回成功/);
+    await expect(watch.open(`http://127.0.0.1:${unreachable}/today`), "连不上").rejects.toThrow();
+  });
+});
+
+test.describe("自测：浏览器报错的放行（复核问题 2：带接口网址的应用报错被漏掉）", () => {
+  for (const failure of API_FAILURES) {
+    test(`${STATE_NAMES[failure.state]}态：假数据层故意让${failure.label}，浏览器记下的报错在这一态放过，换到别的状态照样算报错`, async ({ page }) => {
+      const watch = await watchPage(page);
+      await watch.open(site.url(`/api-failure?fail=${failure.fail}`));
+      const outcome = `${failure.fail},${failure.fail}`;
+      await expect(page.locator("#outcome"), "页面要先真的拿到这种接口失败").toHaveAttribute("data-outcome", outcome);
+      await settle(page);
+      const all = watch.problems("normal");
+      test.info().annotations.push({ type: "这个浏览器实际记下的报错", description: all.length === 0 ? "（没有）" : all.join("；") });
+      expect(watch.problems(failure.state), `${STATE_NAMES[failure.state]}态应放过${failure.label}`).toEqual([]);
+      // 别的状态里照样算报错（失败说明末尾会补一句为什么不放过，比较时去掉）
+      const withoutNote = (texts: readonly string[]): string[] => texts.map((text) => text.replace(/（浏览器记[^）]*）$/, ""));
+      for (const other of API_FAILURES.filter((item) => item.state !== failure.state)) {
+        expect(withoutNote(watch.problems(other.state)), `${STATE_NAMES[other.state]}态不该放过${failure.label}`).toEqual(all);
+      }
+    });
+  }
+
+  for (const failure of API_FAILURES) {
+    test(`${STATE_NAMES[failure.state]}态：应用自己的报错一律不放过（正文带接口网址、带这次真失败的接口网址、不带网址、未捕获的异常）`, async ({ page }) => {
+      const watch = await watchPage(page);
+      await watch.open(site.url(`/api-failure?fail=${failure.fail}&log=app`));
+      await expect(page.locator("#outcome")).toHaveAttribute("data-outcome", `${failure.fail},${failure.fail}`);
+      await settle(page);
+      const fromApp = (text: string): boolean => text.includes("Application parser crashed");
+      const message = "应用自己的四条报错都要报出来";
+      await expect.poll(() => watch.problems(failure.state).filter(fromApp).length, { message }).toBe(4);
+      const reported = watch.problems(failure.state);
+      expect(reported.filter((text) => text.includes("http://127.0.0.1:5173/api/quiz/demo")), "复核里的反例原文").toHaveLength(1);
+      expect(reported.filter((text) => text.startsWith("未捕获的异常")), "未捕获的异常").toHaveLength(1);
+      expect(reported.filter((text) => !fromApp(text)), "假数据层故意给的接口失败照常放过").toEqual([]);
+    });
+  }
+});
+
+test.describe("自测：正常态的正文（复核问题 3：顶栏正确、正文整页出错仍能通过）", () => {
+  for (const state of WHOLE_PAGE_STATES) {
+    test(`顶栏页名正确、正文整页是${STATE_NAMES[state]}占位：正常态的检查不通过`, async ({ page }) => {
+      const watch = await watchPage(page);
+      await watch.open(site.url(`/shell/whole-${state}`));
+      // 顶栏里的页名让“能打开”照样通过；正文整页是状态占位，要由正常态的加载检查拦下
+      await expectOpened(page, TODAY, TODAY_VIEW);
+      await expect(expectLoaded(page, TODAY)).rejects.toThrow(/正常态的正文区不应整页显示状态占位：\S/);
+      expectNoProblems(watch, "normal");
+    });
+  }
+
+  test("顶栏页名正确、正文区空白：正常态的检查不通过", async ({ page }) => {
+    const watch = await watchPage(page);
+    await watch.open(site.url("/shell/blank"));
+    await expectOpened(page, TODAY, TODAY_VIEW);
+    await expect(expectLoaded(page, TODAY)).rejects.toThrow(/正常态的正文区除了状态占位还应有看得见的正文/);
+  });
+
+  test("正常页面里卡片中的局部空态、数据不足和加载完就换成内容的加载：不误判", async ({ page }) => {
+    const watch = await watchPage(page);
+    await watch.open(site.url("/shell/local-states"));
+    await expectOpened(page, TODAY, TODAY_VIEW);
+    await expectLoaded(page, TODAY);
+    expectNoProblems(watch, "normal");
+    await expect(page.locator("main#main .ui-state--empty"), "卡片里的局部空态确实显示着").toBeVisible();
+    await expect(page.locator("main#main .ui-state--insufficient_data"), "卡片里的数据不足确实显示着").toBeVisible();
+  });
+});
+
+test.describe("自测：等页面就绪（Firefox 冒烟里外壳超过 5 秒才出现、期间还有导航）", () => {
+  test("打开后页面自己刷新一次、6 秒后才出外壳（学员端等假数据层重新接上时就是这样）：等到最终页面就绪再核对", async ({ page }) => {
+    const watch = await watchPage(page);
+    await watch.open(site.url("/late-shell?delay=6000"));
+    await expectOpened(page, TODAY, TODAY_VIEW);
+    await expectLoaded(page, TODAY);
+    expectNoProblems(watch, "normal");
+    expect(await page.evaluate(() => sessionStorage.getItem("bk-fixture-reloaded")), "页面确实自己刷新过一次").toBe("1");
+  });
+
+  test("外壳一直不出现：在给定的上限内报错，并写明地址、等待期间的导航与页面状态", async ({ page }) => {
+    await page.goto(site.url("/no-shell?reloads=2"));
+    const error = await waitForAppReady(page, 3_000).then(() => null, (reason: unknown) => String(reason));
+    expect(error, "外壳没出现时应报错").toContain("外壳的正文区 main#main 在 3 秒内没出现");
+    expect(error).toMatch(/地址 \S*no-shell/);
+    expect(error).toMatch(/等待期间主框架导航 \d+ 次/);
+    expect(error).toContain("受 Service Worker 控制：否");
+  });
+});
