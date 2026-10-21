@@ -297,6 +297,13 @@ export async function watchPage(page: Page): Promise<PageWatch> {
             firefoxRemaining.set(failure.url, (firefoxRemaining.get(failure.url) ?? 0) + 1);
           }
         }
+        // Firefox 即使把首次请求记为取消，Service Worker 仍可能为它记录原生错误（本地 S12/S13/S24/S27 trace）。
+        // 只有同次打开、同 URL 已存在确证离线失败时，才给取消的请求各一条额外额度；取消本身不是离线证据。
+        for (const failure of traffic.failed) {
+          if (failure.outcome === "network" && failure.failureText === "NS_BINDING_ABORTED" && firefoxRemaining.has(failure.url)) {
+            firefoxRemaining.set(failure.url, (firefoxRemaining.get(failure.url) ?? 0) + 1);
+          }
+        }
       }
       return seen.flatMap((item) => {
         if (item.nativeWebKitOffline && remaining[item.kind] > 0) {

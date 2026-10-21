@@ -292,6 +292,54 @@ test.describe("自测：浏览器报错的放行（复核问题 2：带接口网
     exact.fail(api, "<unknown error>");
     expect(exact.watch.problems("offline"), "两个真实失败请求各有一份额度").toHaveLength(browserName === "firefox" ? 0 : 2);
   });
+
+  test("Firefox 取消后重发的离线日志按同 URL 确证失败配对，事件到达顺序不改变严格额度", async ({ browserName }) => {
+    const api = "http://127.0.0.1/api/v1/today";
+    const paired = await nativeFailureProbe(browserName);
+    paired.fail(api, "NS_BINDING_ABORTED");
+    paired.firefox();
+    paired.firefox();
+    expect(paired.watch.problems("offline"), "只有取消没有确证失败时，两条消息都应报错").toHaveLength(2);
+    paired.fail(api, "<unknown error>");
+    expect(paired.watch.problems("offline"), "同 URL 确证失败后，取消与重发各对应一条原生消息").toHaveLength(
+      browserName === "firefox" ? 0 : 2,
+    );
+    paired.firefox();
+    expect(paired.watch.problems("offline"), "超出这两个真实请求的消息仍应报错").toHaveLength(browserName === "firefox" ? 1 : 3);
+    for (const state of ["normal", "error", "restricted"] as const) {
+      expect(paired.watch.problems(state), "非离线态不能使用配对额度").toHaveLength(3);
+    }
+    paired.app();
+    expect(paired.watch.problems("offline"), "配对额度不能吞掉应用同文案的报错").toHaveLength(browserName === "firefox" ? 3 : 5);
+
+    const reordered = await nativeFailureProbe(browserName);
+    reordered.firefox();
+    reordered.firefox();
+    reordered.fail(api, "<unknown error>");
+    expect(reordered.watch.problems("offline"), "取消事件还没到达时不能预支它的额度").toHaveLength(browserName === "firefox" ? 1 : 2);
+    reordered.fail(api, "NS_BINDING_ABORTED");
+    expect(reordered.watch.problems("offline"), "取消事件后到也按同一套证据重新计算").toHaveLength(browserName === "firefox" ? 0 : 2);
+
+    const otherCancelled = await nativeFailureProbe(browserName);
+    otherCancelled.fail("http://127.0.0.1/api/v1/other", "NS_BINDING_ABORTED");
+    otherCancelled.fail(api, "<unknown error>");
+    otherCancelled.firefox();
+    otherCancelled.firefox();
+    expect(otherCancelled.watch.problems("offline"), "其他 URL 的取消不能补足本接口的额度").toHaveLength(browserName === "firefox" ? 1 : 2);
+
+    const otherConfirmed = await nativeFailureProbe(browserName);
+    otherConfirmed.fail(api, "NS_BINDING_ABORTED");
+    otherConfirmed.fail("http://127.0.0.1/api/v1/other", "<unknown error>");
+    otherConfirmed.firefox();
+    expect(otherConfirmed.watch.problems("offline"), "其他 URL 的确证失败不能使本接口的取消变成证据").toHaveLength(1);
+
+    const otherReason = await nativeFailureProbe(browserName);
+    otherReason.fail(api, "Load request cancelled");
+    otherReason.fail(api, "<unknown error>");
+    otherReason.firefox();
+    otherReason.firefox();
+    expect(otherReason.watch.problems("offline"), "未观察到的取消格式不能获得额外额度").toHaveLength(browserName === "firefox" ? 1 : 2);
+  });
 });
 
 test.describe("自测：正常态的正文（复核问题 3：顶栏正确、正文整页出错仍能通过）", () => {
