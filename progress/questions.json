@@ -781,8 +781,10 @@
       ],
       "recommend": "A",
       "temp": "A",
-      "status": "open",
-      "asked": "v0013"
+      "status": "answered",
+      "asked": "v0013",
+      "answer": "A",
+      "answered": "v0015"
     },
     {
       "id": "R04-Q1",
