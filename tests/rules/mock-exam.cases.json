@@ -1,0 +1,1991 @@
+{
+  "card": "docs/baseline/rule-cards/mock-exam.md",
+  "status": "草稿",
+  "round": "R07-r1",
+  "decided": {
+    "R07-Q1": "A",
+    "R07-Q2": "A",
+    "R07-Q3": "A",
+    "R07-Q4": "B",
+    "R07-Q5": "A",
+    "R07-Q6": "A",
+    "R07-Q7": "A"
+  },
+  "temp_decisions": {
+    "R07-Q8": "A"
+  },
+  "conventions": [
+    "每条例子是 input → expect；expect 只列要核对的字段，没列的不核对。带 variants 的例子，input.variants[i] 与 input 其余字段合并后对应 expect.variants[i]，各自独立。",
+    "时间写成带时区的 ISO 8601（例子用北京时间 +08:00，便于对照规则卡）；“哪一天”按 day 设置、用 packages/shared/src/today 的 today() 算。名字以 _at 结尾的是时刻，date 是日期。",
+    "分数按写出来的值核对，允许 1e-9 误差；折算分、与目标线的差四舍五入保留 1 位小数；分钟和百分比四舍五入到整数（.5 进位）；名字以 _pct 结尾的是百分比的整数部分。",
+    "建议代码（待整合任务写进 docs/product/glossary.yaml）：规格 full 全真套卷、half 半卷、stage 阶段测评、custom 定制卷；会话状态 in_progress 作答中、awaiting_sync 等补交、submitted 已交卷、abandoned 中途放弃；把握度没选写 none；知识点诊断按钮 tackle 攻坚、retest 补测；提议来源 assessment 测评；模式 paper 纸笔。",
+    "术语表现有代码：失分归因 loss_attribution（unfinished、expression_loss、not_learned、wrong_guess、careless、forgot）；把握度 sure、vague、guess；错因 error_cause；可信度 reviewed、own、generated_confirmed、generated_instant；性价比阶梯 roi_tier（s–d）；提议状态 proposal_status。题型和部分用考试画像 question_types 的代码。",
+    "题目、知识点用 q1、k1 这样的简写，实际是 UUID。custom_pick 的 kps.group 直接给出知识点在哪一组：weak＝薄弱名单（R01 R20）、open_mistake＝有没毕业的错题（R03）、learned＝其余有证据的；gap＝还差几档；questions 没写 last_done 表示没做过，没写 credibility 的是 reviewed。spec 为 stage 时按 R4：只出 chapters 里的知识点，kps 写 chapter 和 has_evidence，不看 group。",
+    "attribute 的 start_snapshot 是开考那一刻的档位快照（R26）；questions 没写 answered 的都是已答，score 是得分，expression_loss 是批改给出的表达扣分；by_category、by_question 的单位是分。",
+    "params 为空：本卡没有直接用到 contracts/params.yaml 里已有的参数；params_proposed 是建议新增、待整合任务登记的参数（规则卡参数表“待整合登记”各行），例子都按这些默认值算。",
+    "带 decision 的例子对应你已拍板的问题（decided）；带 pending 的例子按 temp_decisions 的临时默认写，expect_if_B 是改选 B 时要变的字段。",
+    "functions 是建议的纯函数划分（放 packages/domains/practice/core/），名字可以改。"
+  ],
+  "day": {
+    "time_zone": "Asia/Shanghai",
+    "day_start_hour": 4
+  },
+  "params": {},
+  "params_proposed": {
+    "practice.mock.warn_minutes": [30, 10, 5],
+    "practice.mock.abandon_offline_minutes": 30,
+    "practice.mock.sync_grace_hours": 24,
+    "practice.mock.careless_min_level": 3,
+    "practice.mock.recent_exclude_days": 14,
+    "practice.mock.boost_max_items": 3,
+    "practice.mock.boost_days": 7
+  },
+  "functions": {
+    "half_paper": "由全真卷做半卷（R2）",
+    "custom_count": "定制卷的题数与各题型分配（R3）",
+    "custom_pick": "定制卷与自组阶段测评挑题（R3、R4）",
+    "snapshot": "开考快照、下架与事后更正（R6）",
+    "clock": "结束时间、暂离、提醒与收卷时刻（R9–R12）",
+    "process": "每题用时、作答顺序、改答案次数（R13）",
+    "sync": "断点续考、断网补交、多端接管后每题取哪个答案（R14–R16）",
+    "settle": "结算时机，正常交卷还是中途放弃（R17、R18）",
+    "score": "判分、暂定分、折算分、与目标线的差、进不进趋势、不显示排名（R19–R23）",
+    "handoff": "交给证据和错题本的内容（R8、R24、R25）",
+    "attribute": "失分归因与显示（R26–R28）",
+    "analysis": "错因分布、知识点诊断、时间策略、信心校准、策略模拟（R29–R33）",
+    "boost": "补强清单与提议（R35）",
+    "narrative": "解读一句话与降级句式（R36）",
+    "paper_mode": "纸笔模式（R37）"
+  },
+  "cases": [
+    {
+      "id": "E1",
+      "kind": "正常",
+      "title": "由全真卷做半卷",
+      "rule": "R2",
+      "fn": "half_paper",
+      "input": {
+        "full_paper": {
+          "duration_minutes": 120,
+          "full_score": 100,
+          "parts": [
+            {
+              "part": "single_choice",
+              "first_no": 1,
+              "questions": 20,
+              "points_each": 2
+            },
+            {
+              "part": "multi_choice",
+              "first_no": 21,
+              "questions": 10,
+              "points_each": 2
+            },
+            {
+              "part": "true_false",
+              "first_no": 31,
+              "questions": 10,
+              "points_each": 1
+            },
+            {
+              "part": "indefinite_choice",
+              "first_no": 41,
+              "questions": 15,
+              "points_each": 2
+            }
+          ]
+        }
+      },
+      "expect": {
+        "parts": [
+          {
+            "part": "single_choice",
+            "from_no": 1,
+            "to_no": 10
+          },
+          {
+            "part": "multi_choice",
+            "from_no": 21,
+            "to_no": 25
+          },
+          {
+            "part": "true_false",
+            "from_no": 31,
+            "to_no": 35
+          },
+          {
+            "part": "indefinite_choice",
+            "from_no": 41,
+            "to_no": 48
+          }
+        ],
+        "full_score": 51,
+        "duration_minutes": 62
+      }
+    },
+    {
+      "id": "E2",
+      "kind": "边界",
+      "title": "只有 1 题的部分",
+      "rule": "R2",
+      "fn": "half_paper",
+      "input": {
+        "full_paper": {
+          "duration_minutes": 60,
+          "full_score": 70,
+          "parts": [
+            {
+              "part": "writing",
+              "first_no": 1,
+              "questions": 1,
+              "points_each": 15
+            },
+            {
+              "part": "listening",
+              "first_no": 2,
+              "questions": 4,
+              "points_each": 5
+            },
+            {
+              "part": "reading",
+              "first_no": 6,
+              "questions": 5,
+              "points_each": 7
+            }
+          ]
+        }
+      },
+      "expect": {
+        "parts": [
+          {
+            "part": "writing",
+            "from_no": 1,
+            "to_no": 1
+          },
+          {
+            "part": "listening",
+            "from_no": 2,
+            "to_no": 3
+          },
+          {
+            "part": "reading",
+            "from_no": 6,
+            "to_no": 8
+          }
+        ],
+        "full_score": 46,
+        "duration_minutes": 40
+      }
+    },
+    {
+      "id": "E3",
+      "kind": "正常",
+      "title": "定制卷几道题",
+      "rule": "R3",
+      "fn": "custom_count",
+      "input": {
+        "profile": {
+          "duration_minutes": 120,
+          "question_types": [
+            {
+              "type": "single_choice",
+              "count": 20
+            },
+            {
+              "type": "multi_choice",
+              "count": 10
+            },
+            {
+              "type": "true_false",
+              "count": 10
+            },
+            {
+              "type": "indefinite_choice",
+              "count": 15
+            }
+          ]
+        },
+        "custom_minutes": 30
+      },
+      "expect": {
+        "total": 13,
+        "by_type": {
+          "single_choice": 5,
+          "multi_choice": 2,
+          "true_false": 2,
+          "indefinite_choice": 4
+        }
+      }
+    },
+    {
+      "id": "E4",
+      "kind": "正常",
+      "title": "定制卷挑题的先后",
+      "rule": "R3",
+      "fn": "custom_pick",
+      "input": {
+        "now": "2026-10-21T20:00:00+08:00",
+        "need": {
+          "single_choice": 3
+        },
+        "kps": [
+          {
+            "id": "k1",
+            "group": "weak",
+            "importance": 3
+          },
+          {
+            "id": "k2",
+            "group": "open_mistake",
+            "importance": 4
+          },
+          {
+            "id": "k3",
+            "group": "learned",
+            "gap": 2,
+            "importance": 2
+          },
+          {
+            "id": "k4",
+            "group": "learned",
+            "gap": 1,
+            "importance": 4
+          }
+        ],
+        "questions": [
+          {
+            "id": "q1",
+            "type": "single_choice",
+            "kps": ["k1"],
+            "last_done": "2026-10-18T20:00:00+08:00"
+          },
+          {
+            "id": "q2",
+            "type": "single_choice",
+            "kps": ["k1"]
+          },
+          {
+            "id": "q3",
+            "type": "single_choice",
+            "kps": ["k2"],
+            "credibility": "own"
+          },
+          {
+            "id": "q4",
+            "type": "single_choice",
+            "kps": ["k3"],
+            "credibility": "generated_instant"
+          },
+          {
+            "id": "q5",
+            "type": "single_choice",
+            "kps": ["k3"]
+          },
+          {
+            "id": "q6",
+            "type": "single_choice",
+            "kps": ["k4"]
+          }
+        ]
+      },
+      "expect": {
+        "picked": ["q2", "q3", "q5"],
+        "shortage": 0
+      }
+    },
+    {
+      "id": "E5",
+      "kind": "边界",
+      "title": "题不够",
+      "rule": "R3",
+      "fn": "custom_pick",
+      "input": {
+        "now": "2026-10-21T20:00:00+08:00",
+        "need": {
+          "multi_choice": 4
+        },
+        "kps": [
+          {
+            "id": "k1",
+            "group": "learned",
+            "gap": 1,
+            "importance": 2
+          },
+          {
+            "id": "k2",
+            "group": "learned",
+            "gap": 1,
+            "importance": 2
+          },
+          {
+            "id": "k3",
+            "group": "learned",
+            "gap": 1,
+            "importance": 2
+          },
+          {
+            "id": "k4",
+            "group": "learned",
+            "gap": 1,
+            "importance": 2
+          }
+        ],
+        "questions": [
+          {
+            "id": "q1",
+            "type": "multi_choice",
+            "kps": ["k1"]
+          },
+          {
+            "id": "q2",
+            "type": "multi_choice",
+            "kps": ["k2"]
+          },
+          {
+            "id": "q3",
+            "type": "multi_choice",
+            "kps": ["k3"],
+            "last_done": "2026-10-16T20:00:00+08:00"
+          },
+          {
+            "id": "q4",
+            "type": "multi_choice",
+            "kps": ["k4"],
+            "credibility": "generated_instant"
+          }
+        ]
+      },
+      "expect": {
+        "picked": ["q1", "q2", "q3"],
+        "shortage": 1,
+        "notice": "这类题不够，少了 1 道"
+      }
+    },
+    {
+      "id": "E6",
+      "kind": "边界",
+      "title": "一道题挂两个知识点",
+      "rule": "R3",
+      "fn": "custom_pick",
+      "input": {
+        "now": "2026-10-21T20:00:00+08:00",
+        "need": {
+          "single_choice": 2
+        },
+        "kps": [
+          {
+            "id": "k1",
+            "group": "weak",
+            "importance": 4
+          },
+          {
+            "id": "k2",
+            "group": "weak",
+            "importance": 3
+          }
+        ],
+        "questions": [
+          {
+            "id": "q1",
+            "type": "single_choice",
+            "kps": ["k1", "k2"]
+          },
+          {
+            "id": "q2",
+            "type": "single_choice",
+            "kps": ["k2"]
+          }
+        ]
+      },
+      "expect": {
+        "picked": ["q1", "q2"],
+        "shortage": 0
+      }
+    },
+    {
+      "id": "E7",
+      "kind": "正常",
+      "title": "开考后题目被更正",
+      "rule": "R6",
+      "fn": "snapshot",
+      "input": {
+        "started_at": "2026-10-21T09:00:00+08:00",
+        "snapshot": {
+          "q3": {
+            "version": 1,
+            "answer": "B"
+          }
+        },
+        "content_changes": [
+          {
+            "at": "2026-10-21T09:30:00+08:00",
+            "question": "q3",
+            "kind": "corrected",
+            "new_version": 2,
+            "answer": "C"
+          }
+        ],
+        "learner_answer": {
+          "q3": "B"
+        }
+      },
+      "expect": {
+        "q3_correct_in_session": true,
+        "score_changed": false,
+        "attribution_changed": false,
+        "review_flag": "corrected",
+        "correct_under_new_answer": false
+      }
+    },
+    {
+      "id": "E8",
+      "kind": "边界",
+      "title": "开考时有题下架",
+      "rule": "R6、R21、R22",
+      "fn": "snapshot",
+      "input": {
+        "paper": {
+          "spec": "full",
+          "questions": 20,
+          "points_each": 5,
+          "full_score": 100
+        },
+        "retired_before_start": ["q7"],
+        "score": 76,
+        "exam_full_score": 100
+      },
+      "expect": {
+        "questions": 19,
+        "paper_full_score": 95,
+        "notice": "本卷少了 1 题",
+        "scaled_score": 80,
+        "in_trend": true
+      }
+    },
+    {
+      "id": "E9",
+      "kind": "正常",
+      "title": "改系统时间不影响",
+      "rule": "R9",
+      "fn": "clock",
+      "input": {
+        "started_at": "2026-10-21T09:00:00+08:00",
+        "duration_minutes": 120,
+        "server_now": "2026-10-21T10:00:00+08:00",
+        "device_system_time": "2026-10-21T08:00:00+08:00"
+      },
+      "expect": {
+        "ends_at": "2026-10-21T11:00:00+08:00",
+        "remaining_minutes": 60
+      }
+    },
+    {
+      "id": "E10",
+      "kind": "正常",
+      "title": "暂离时间照走",
+      "rule": "R10、R13",
+      "fn": "clock",
+      "input": {
+        "started_at": "2026-10-21T09:00:00+08:00",
+        "duration_minutes": 120,
+        "events": [
+          {
+            "at": "2026-10-21T09:40:00+08:00",
+            "kind": "leave",
+            "question": "q5"
+          },
+          {
+            "at": "2026-10-21T10:10:00+08:00",
+            "kind": "return"
+          }
+        ]
+      },
+      "expect": {
+        "ends_at": "2026-10-21T11:00:00+08:00",
+        "remaining_minutes": 50,
+        "q5_seconds_added_while_away": 0
+      }
+    },
+    {
+      "id": "E11",
+      "kind": "边界",
+      "title": "提醒点",
+      "rule": "R11",
+      "fn": "clock",
+      "input": {
+        "variants": [
+          {
+            "duration_minutes": 30
+          },
+          {
+            "duration_minutes": 120,
+            "away_from_remaining": 35,
+            "back_at_remaining": 8
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "warnings_fired": [10, 5]
+          },
+          {
+            "warnings_fired": [5],
+            "not_resent": [30, 10]
+          }
+        ]
+      }
+    },
+    {
+      "id": "E12",
+      "kind": "边界",
+      "title": "卡在结束时刻",
+      "rule": "R12、R15",
+      "fn": "clock",
+      "input": {
+        "ends_at": "2026-10-21T11:00:00+08:00",
+        "saves": [
+          {
+            "question": "q20",
+            "answer": "B",
+            "saved_at": "2026-10-21T10:59:59+08:00",
+            "received_at": "2026-10-21T11:00:02+08:00"
+          },
+          {
+            "question": "q20",
+            "answer": "C",
+            "saved_at": "2026-10-21T11:00:01+08:00",
+            "received_at": "2026-10-21T11:00:03+08:00"
+          }
+        ]
+      },
+      "expect": {
+        "final": {
+          "q20": "B"
+        },
+        "rejected": [
+          {
+            "question": "q20",
+            "answer": "C"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E13",
+      "kind": "正常",
+      "title": "过程记录",
+      "rule": "R13",
+      "fn": "process",
+      "input": {
+        "events": [
+          {
+            "at": "2026-10-21T09:00:00+08:00",
+            "kind": "show",
+            "question": "q1"
+          },
+          {
+            "at": "2026-10-21T09:01:30+08:00",
+            "kind": "save",
+            "question": "q1",
+            "answer": "A",
+            "confidence": "sure"
+          },
+          {
+            "at": "2026-10-21T09:01:40+08:00",
+            "kind": "show",
+            "question": "q2"
+          },
+          {
+            "at": "2026-10-21T09:03:00+08:00",
+            "kind": "save",
+            "question": "q2",
+            "answer": "C",
+            "confidence": "vague"
+          },
+          {
+            "at": "2026-10-21T09:03:05+08:00",
+            "kind": "confidence",
+            "question": "q2",
+            "confidence": "sure"
+          },
+          {
+            "at": "2026-10-21T09:03:10+08:00",
+            "kind": "show",
+            "question": "q1"
+          },
+          {
+            "at": "2026-10-21T09:03:40+08:00",
+            "kind": "save",
+            "question": "q1",
+            "answer": "B",
+            "confidence": "sure"
+          },
+          {
+            "at": "2026-10-21T09:03:50+08:00",
+            "kind": "save",
+            "question": "q1",
+            "answer": "A",
+            "confidence": "sure"
+          },
+          {
+            "at": "2026-10-21T09:04:00+08:00",
+            "kind": "submit"
+          }
+        ]
+      },
+      "expect": {
+        "per_question": {
+          "q1": {
+            "seconds": 150,
+            "changes": 2,
+            "final_answer": "A",
+            "final_confidence": "sure"
+          },
+          "q2": {
+            "seconds": 90,
+            "changes": 0,
+            "final_answer": "C",
+            "final_confidence": "sure"
+          }
+        },
+        "answer_order": ["q1", "q2"]
+      }
+    },
+    {
+      "id": "E14",
+      "kind": "边界",
+      "title": "同屏几道题",
+      "rule": "R13",
+      "fn": "process",
+      "input": {
+        "events": [
+          {
+            "at": "2026-10-21T10:00:00+08:00",
+            "kind": "show",
+            "questions": ["q31", "q32", "q33"]
+          },
+          {
+            "at": "2026-10-21T10:06:00+08:00",
+            "kind": "show",
+            "questions": ["q34"]
+          }
+        ]
+      },
+      "expect": {
+        "seconds": {
+          "q31": 120,
+          "q32": 120,
+          "q33": 120
+        }
+      }
+    },
+    {
+      "id": "E15",
+      "kind": "正常",
+      "title": "意外中断后续考",
+      "rule": "R14",
+      "fn": "sync",
+      "input": {
+        "started_at": "2026-10-21T09:00:00+08:00",
+        "duration_minutes": 120,
+        "interrupted_at": "2026-10-21T09:50:00+08:00",
+        "saved_before_interrupt": {
+          "answered": ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10", "q11", "q12"],
+          "marked": ["q7"],
+          "position": "q13"
+        },
+        "reopened_at": "2026-10-21T10:20:00+08:00"
+      },
+      "expect": {
+        "restored_answers": 12,
+        "restored_marks": ["q7"],
+        "position": "q13",
+        "remaining_minutes": 40
+      }
+    },
+    {
+      "id": "E16",
+      "kind": "异常",
+      "title": "断网接着答",
+      "rule": "R15、R17、R18",
+      "fn": "sync",
+      "input": {
+        "ends_at": "2026-10-21T11:00:00+08:00",
+        "offline_from": "2026-10-21T10:30:00+08:00",
+        "page_kept_open": true,
+        "offline_saves": [
+          {
+            "question": "q15",
+            "saved_at": "2026-10-21T10:50:00+08:00"
+          },
+          {
+            "question": "q16",
+            "saved_at": "2026-10-21T10:58:00+08:00"
+          }
+        ],
+        "device_stops_at": "2026-10-21T11:00:00+08:00",
+        "back_online_at": "2026-10-21T11:20:00+08:00",
+        "all_answered": false
+      },
+      "expect": {
+        "accepted": ["q15", "q16"],
+        "status_at_deadline": "awaiting_sync",
+        "settled_at": "2026-10-21T11:20:00+08:00",
+        "status": "submitted"
+      }
+    },
+    {
+      "id": "E17",
+      "kind": "异常",
+      "title": "断网时关了页面",
+      "rule": "R15",
+      "fn": "sync",
+      "input": {
+        "offline_from": "2026-10-21T10:30:00+08:00",
+        "page_closed_at": "2026-10-21T10:40:00+08:00",
+        "reopened_offline_at": "2026-10-21T10:45:00+08:00"
+      },
+      "expect": {
+        "can_continue": false,
+        "message": "需要联网才能继续",
+        "local_answers_uploaded_when_online": true
+      }
+    },
+    {
+      "id": "E18",
+      "kind": "边界",
+      "title": "换设备接管",
+      "rule": "R16",
+      "fn": "sync",
+      "input": {
+        "device_a": {
+          "offline_from": "2026-10-21T10:00:00+08:00",
+          "back_online_at": "2026-10-21T10:30:00+08:00",
+          "saves": [
+            {
+              "question": "q20",
+              "answer": "B",
+              "saved_at": "2026-10-21T10:05:00+08:00"
+            },
+            {
+              "question": "q21",
+              "answer": "D",
+              "saved_at": "2026-10-21T10:20:00+08:00"
+            }
+          ]
+        },
+        "device_b": {
+          "takeover_at": "2026-10-21T10:10:00+08:00",
+          "saves": [
+            {
+              "question": "q20",
+              "answer": "C",
+              "saved_at": "2026-10-21T10:15:00+08:00"
+            },
+            {
+              "question": "q21",
+              "answer": "A",
+              "saved_at": "2026-10-21T10:16:00+08:00"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "final": {
+          "q20": "C",
+          "q21": "A"
+        },
+        "rejected": [
+          {
+            "device": "device_a",
+            "question": "q21",
+            "answer": "D"
+          }
+        ],
+        "device_a_read_only": true
+      }
+    },
+    {
+      "id": "E19",
+      "kind": "正常",
+      "title": "到点自动收卷",
+      "rule": "R12、R17",
+      "fn": "settle",
+      "input": {
+        "ends_at": "2026-10-21T11:00:00+08:00",
+        "device_connected_at_end": true,
+        "questions": 55,
+        "answered": 52,
+        "last_action_at": "2026-10-21T10:59:00+08:00"
+      },
+      "expect": {
+        "settled_at": "2026-10-21T11:00:00+08:00",
+        "status": "submitted",
+        "unfinished_questions": 3
+      }
+    },
+    {
+      "id": "E20",
+      "kind": "正常",
+      "title": "中途放弃",
+      "rule": "R17、R18",
+      "fn": "settle",
+      "decision": "R07-Q4",
+      "input": {
+        "started_at": "2026-10-21T09:00:00+08:00",
+        "ends_at": "2026-10-21T11:00:00+08:00",
+        "questions": 55,
+        "answered": 10,
+        "last_action_at": "2026-10-21T09:25:00+08:00",
+        "device_connected_at_end": false,
+        "device_report": {
+          "at": "2026-10-21T12:00:00+08:00",
+          "uploaded_saves": 0
+        }
+      },
+      "expect": {
+        "status_at_deadline": "awaiting_sync",
+        "settled_at": "2026-10-21T12:00:00+08:00",
+        "status": "abandoned",
+        "formal_score": false,
+        "in_trend": false,
+        "to_prediction": false,
+        "answered_graded_and_sent_to_evidence": true,
+        "wrong_answered_collected": true
+      }
+    },
+    {
+      "id": "E21",
+      "kind": "边界",
+      "title": "答完了忘了交",
+      "rule": "R17、R18",
+      "fn": "settle",
+      "input": {
+        "ends_at": "2026-10-21T11:00:00+08:00",
+        "questions": 55,
+        "answered": 55,
+        "last_action_at": "2026-10-21T10:20:00+08:00",
+        "device_connected_at_end": false,
+        "device_report": null
+      },
+      "expect": {
+        "status_at_deadline": "awaiting_sync",
+        "settled_at": "2026-10-22T11:00:00+08:00",
+        "status": "submitted",
+        "formal_score": true
+      }
+    },
+    {
+      "id": "E22",
+      "kind": "边界",
+      "title": "离开没到放弃线",
+      "rule": "R18",
+      "fn": "settle",
+      "input": {
+        "ends_at": "2026-10-21T11:00:00+08:00",
+        "questions": 55,
+        "answered": 40,
+        "last_action_at": "2026-10-21T10:40:00+08:00",
+        "device_connected_at_end": false,
+        "device_report": {
+          "at": "2026-10-21T13:00:00+08:00",
+          "uploaded_saves": 0
+        }
+      },
+      "expect": {
+        "settled_at": "2026-10-21T13:00:00+08:00",
+        "status": "submitted",
+        "unfinished_questions": 15
+      }
+    },
+    {
+      "id": "E23",
+      "kind": "正常",
+      "title": "多选部分给分",
+      "rule": "R19、R24、R25",
+      "fn": "score",
+      "input": {
+        "question": {
+          "type": "multi_choice",
+          "points": 2,
+          "answer": ["A", "B", "D"]
+        },
+        "learner_answer": ["A", "B"],
+        "variants": [
+          {
+            "partial_rule": {
+              "per_correct_option": 0.5,
+              "any_wrong_option": 0
+            }
+          },
+          {
+            "partial_rule": null
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "score": 1,
+            "counted_as_wrong": true
+          },
+          {
+            "score": 0,
+            "counted_as_wrong": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "E24",
+      "kind": "正常",
+      "title": "主观题暂定分",
+      "rule": "R20、R22",
+      "fn": "score",
+      "input": {
+        "spec": "full",
+        "paper_full_score": 100,
+        "objective": {
+          "full": 80,
+          "score": 52
+        },
+        "subjective": [
+          {
+            "question": "q56",
+            "points": 10,
+            "graded": true,
+            "score": 6,
+            "expression_loss": 1
+          },
+          {
+            "question": "q57",
+            "points": 10,
+            "graded": false
+          }
+        ],
+        "later_grading": {
+          "q57": 7
+        }
+      },
+      "expect": {
+        "provisional": true,
+        "score": 58,
+        "notice": "另有 1 道主观题共 10 分待评",
+        "history_tag": "暂定",
+        "on_trend_line": false,
+        "after_grading": {
+          "provisional": false,
+          "score": 65,
+          "on_trend_line": true
+        }
+      }
+    },
+    {
+      "id": "E25",
+      "kind": "正常",
+      "title": "半卷折算与目标线",
+      "rule": "R21、R22",
+      "fn": "score",
+      "input": {
+        "spec": "half",
+        "paper_full_score": 51,
+        "score": 30,
+        "exam_full_score": 100,
+        "target": 70
+      },
+      "expect": {
+        "scaled_score": 58.8,
+        "vs_target": -11.2,
+        "text": "离目标线 70 还差 11.2 分",
+        "in_trend": true
+      }
+    },
+    {
+      "id": "E26",
+      "kind": "边界",
+      "title": "阶段测评",
+      "rule": "R22",
+      "fn": "score",
+      "input": {
+        "spec": "stage",
+        "paper_full_score": 30,
+        "score": 24,
+        "target": 70
+      },
+      "expect": {
+        "score": 24,
+        "score_rate_pct": 80,
+        "vs_target": null,
+        "in_history": false,
+        "in_trend": false
+      }
+    },
+    {
+      "id": "E27",
+      "kind": "边界",
+      "title": "只有一场正式分",
+      "rule": "R22",
+      "fn": "score",
+      "input": {
+        "history": [
+          {
+            "date": "2026-09-12",
+            "spec": "full",
+            "scaled_score": 52,
+            "provisional": false
+          },
+          {
+            "date": "2026-09-26",
+            "spec": "full",
+            "scaled_score": 55,
+            "provisional": true
+          },
+          {
+            "date": "2026-10-03",
+            "spec": "stage",
+            "score": 24,
+            "provisional": false
+          }
+        ]
+      },
+      "expect": {
+        "listed": ["2026-09-12", "2026-09-26"],
+        "tags": {
+          "2026-09-26": "暂定"
+        },
+        "trend_points": ["2026-09-12"],
+        "draw_line": false
+      }
+    },
+    {
+      "id": "E28",
+      "kind": "边界",
+      "title": "做的人再多也不排名",
+      "rule": "R23",
+      "fn": "score",
+      "decision": "R07-Q1",
+      "input": {
+        "spec": "full",
+        "same_paper_takers": 1200
+      },
+      "expect": {
+        "shows_rank": false,
+        "shows_percentile": false,
+        "shows_participants": false
+      }
+    },
+    {
+      "id": "E29",
+      "kind": "正常",
+      "title": "交给证据和错题本",
+      "rule": "R24、R25",
+      "fn": "handoff",
+      "input": {
+        "submitted_at": "2026-10-21T11:00:00+08:00",
+        "answers": [
+          {
+            "question": "q3",
+            "type": "single_choice",
+            "final_answer": "A",
+            "last_saved_at": "2026-10-21T09:20:10+08:00",
+            "seconds": 95,
+            "confidence": "sure",
+            "correct": true,
+            "credibility": "reviewed"
+          },
+          {
+            "question": "q4",
+            "type": "single_choice",
+            "final_answer": null
+          },
+          {
+            "question": "q5",
+            "type": "single_choice",
+            "final_answer": "C",
+            "last_saved_at": "2026-10-21T09:30:00+08:00",
+            "seconds": 60,
+            "confidence": "vague",
+            "correct": false,
+            "credibility": "reviewed"
+          },
+          {
+            "question": "q6",
+            "type": "short_answer",
+            "final_answer": "（作答文本）",
+            "graded": false
+          }
+        ]
+      },
+      "expect": {
+        "evidence": [
+          {
+            "question": "q3",
+            "source": "mock",
+            "duration_s": 95,
+            "confidence": "sure",
+            "credibility": "reviewed",
+            "hint_level": 0,
+            "answered_at": "2026-10-21T09:20:10+08:00"
+          },
+          {
+            "question": "q5",
+            "source": "mock",
+            "duration_s": 60,
+            "confidence": "vague",
+            "credibility": "reviewed",
+            "hint_level": 0,
+            "answered_at": "2026-10-21T09:30:00+08:00"
+          }
+        ],
+        "not_sent": ["q4"],
+        "sent_by_grading_later": ["q6"],
+        "mistakes_collected": ["q5"]
+      }
+    },
+    {
+      "id": "E30",
+      "kind": "边界",
+      "title": "没选把握度就到点",
+      "rule": "R8、R24、R27",
+      "fn": "handoff",
+      "decision": "R07-Q3",
+      "input": {
+        "question": "q9",
+        "final_answer": "B",
+        "confidence": null,
+        "closed_by": "deadline",
+        "kp_start": {
+          "has_evidence": true,
+          "level": 2
+        },
+        "variants": [
+          {
+            "correct": true
+          },
+          {
+            "correct": false
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "score_counted": true,
+            "evidence_confidence": "none",
+            "in_calibration": false
+          },
+          {
+            "evidence_confidence": "none",
+            "in_calibration": false,
+            "attribution": "forgot"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E31",
+      "kind": "正常",
+      "title": "失分归因六类",
+      "rule": "R27、R28",
+      "fn": "attribute",
+      "input": {
+        "questions": [
+          {
+            "question": "q1",
+            "type": "single_choice",
+            "points": 2,
+            "answered": false,
+            "kps": ["k1"]
+          },
+          {
+            "question": "q2",
+            "type": "single_choice",
+            "points": 2,
+            "score": 0,
+            "confidence": "sure",
+            "kps": ["k2"]
+          },
+          {
+            "question": "q3",
+            "type": "single_choice",
+            "points": 2,
+            "score": 0,
+            "confidence": "guess",
+            "kps": ["k3"]
+          },
+          {
+            "question": "q4",
+            "type": "single_choice",
+            "points": 2,
+            "score": 0,
+            "confidence": "sure",
+            "kps": ["k4"]
+          },
+          {
+            "question": "q5",
+            "type": "single_choice",
+            "points": 2,
+            "score": 0,
+            "confidence": "vague",
+            "kps": ["k5"]
+          },
+          {
+            "question": "q6",
+            "type": "short_answer",
+            "points": 10,
+            "score": 6,
+            "expression_loss": 1,
+            "confidence": "sure",
+            "kps": ["k6"]
+          },
+          {
+            "question": "q7",
+            "type": "multi_choice",
+            "points": 2,
+            "score": 1,
+            "confidence": "vague",
+            "kps": ["k7"]
+          },
+          {
+            "question": "q8",
+            "type": "multi_choice",
+            "points": 2,
+            "score": 0,
+            "confidence": "sure",
+            "kps": ["k8", "k2"]
+          },
+          {
+            "question": "q9",
+            "type": "single_choice",
+            "points": 2,
+            "score": 2,
+            "confidence": "sure",
+            "kps": ["k9"]
+          }
+        ],
+        "start_snapshot": {
+          "k1": {
+            "has_evidence": true,
+            "level": 2
+          },
+          "k2": {
+            "has_evidence": false,
+            "level": 0
+          },
+          "k3": {
+            "has_evidence": true,
+            "level": 2
+          },
+          "k4": {
+            "has_evidence": true,
+            "level": 3
+          },
+          "k5": {
+            "has_evidence": true,
+            "level": 2
+          },
+          "k6": {
+            "has_evidence": true,
+            "level": 3
+          },
+          "k7": {
+            "has_evidence": true,
+            "level": 1
+          },
+          "k8": {
+            "has_evidence": true,
+            "level": 4
+          },
+          "k9": {
+            "has_evidence": true,
+            "level": 3
+          }
+        }
+      },
+      "expect": {
+        "by_category": {
+          "unfinished": 2,
+          "expression_loss": 1,
+          "not_learned": 4,
+          "wrong_guess": 2,
+          "careless": 5,
+          "forgot": 3
+        },
+        "total_lost": 17,
+        "paper_full_score": 26,
+        "score": 9,
+        "by_question": {
+          "q1": {
+            "unfinished": 2
+          },
+          "q2": {
+            "not_learned": 2
+          },
+          "q3": {
+            "wrong_guess": 2
+          },
+          "q4": {
+            "careless": 2
+          },
+          "q5": {
+            "forgot": 2
+          },
+          "q6": {
+            "expression_loss": 1,
+            "careless": 3
+          },
+          "q7": {
+            "forgot": 1
+          },
+          "q8": {
+            "not_learned": 2
+          }
+        }
+      }
+    },
+    {
+      "id": "E32",
+      "kind": "边界",
+      "title": "用开考时的档位",
+      "rule": "R26、R27、R30",
+      "fn": "attribute",
+      "input": {
+        "question": {
+          "question": "q4",
+          "points": 2,
+          "score": 0,
+          "confidence": "sure",
+          "kps": ["k4"]
+        },
+        "start_snapshot": {
+          "k4": {
+            "has_evidence": true,
+            "level": 3
+          }
+        },
+        "level_now": {
+          "k4": 2
+        }
+      },
+      "expect": {
+        "attribution": {
+          "careless": 2
+        },
+        "diagnosis": {
+          "kp": "k4",
+          "level_now": 2,
+          "dropped_from": 3,
+          "text": "已熟悉（本场后由已掌握降下来）"
+        }
+      }
+    },
+    {
+      "id": "E33",
+      "kind": "边界",
+      "title": "表达扣分怎么显示",
+      "rule": "R28",
+      "fn": "attribute",
+      "input": {
+        "variants": [
+          {
+            "has_subjective": false
+          },
+          {
+            "has_subjective": true,
+            "pending_subjective": 0,
+            "expression_loss_total": 0
+          },
+          {
+            "has_subjective": true,
+            "pending_subjective": 1
+          }
+        ]
+      },
+      "expect": {
+        "variants": [
+          {
+            "expression_loss_display": "—"
+          },
+          {
+            "expression_loss_display": "0"
+          },
+          {
+            "pending_note": "另有 1 道待评分，评完后更新",
+            "pending_counted_in_total": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "E34",
+      "kind": "边界",
+      "title": "事后选错因",
+      "rule": "R28、R29",
+      "fn": "attribute",
+      "input": {
+        "question": "q5",
+        "attribution": {
+          "forgot": 2
+        },
+        "later": {
+          "at": "2026-10-22T20:00:00+08:00",
+          "error_cause": "misread"
+        }
+      },
+      "expect": {
+        "attribution": {
+          "forgot": 2
+        },
+        "error_cause_counts": {
+          "misread": 1
+        },
+        "unattributed_count_change": -1
+      }
+    },
+    {
+      "id": "E35",
+      "kind": "正常",
+      "title": "时间策略",
+      "rule": "R31",
+      "fn": "analysis",
+      "input": {
+        "duration_minutes": 62,
+        "paper_full_score": 51,
+        "parts": [
+          {
+            "part": "single_choice",
+            "questions": 10,
+            "points": 20,
+            "seconds": 1860,
+            "answered": 10,
+            "first_answer_at": "2026-10-21T09:00:40+08:00"
+          },
+          {
+            "part": "multi_choice",
+            "questions": 5,
+            "points": 10,
+            "seconds": 780,
+            "answered": 5,
+            "first_answer_at": "2026-10-21T09:32:10+08:00"
+          },
+          {
+            "part": "true_false",
+            "questions": 5,
+            "points": 5,
+            "seconds": 360,
+            "answered": 5,
+            "first_answer_at": "2026-10-21T09:45:20+08:00"
+          },
+          {
+            "part": "indefinite_choice",
+            "questions": 8,
+            "points": 16,
+            "seconds": 720,
+            "answered": 6,
+            "first_answer_at": "2026-10-21T09:51:30+08:00"
+          }
+        ]
+      },
+      "expect": {
+        "rows": [
+          {
+            "part": "single_choice",
+            "used_minutes": 31,
+            "suggested_minutes": 24,
+            "completion_pct": 100
+          },
+          {
+            "part": "multi_choice",
+            "used_minutes": 13,
+            "suggested_minutes": 12,
+            "completion_pct": 100
+          },
+          {
+            "part": "true_false",
+            "used_minutes": 6,
+            "suggested_minutes": 6,
+            "completion_pct": 100
+          },
+          {
+            "part": "indefinite_choice",
+            "used_minutes": 12,
+            "suggested_minutes": 19,
+            "completion_pct": 75
+          }
+        ],
+        "last_part_completion_pct": 75,
+        "order": ["single_choice", "multi_choice", "true_false", "indefinite_choice"]
+      }
+    },
+    {
+      "id": "E36",
+      "kind": "正常",
+      "title": "策略模拟",
+      "rule": "R33",
+      "fn": "analysis",
+      "input": {
+        "rows": [
+          {
+            "part": "single_choice",
+            "label": "单选",
+            "questions": 10,
+            "used_minutes": 31,
+            "suggested_minutes": 24
+          },
+          {
+            "part": "multi_choice",
+            "label": "多选",
+            "questions": 5,
+            "used_minutes": 13,
+            "suggested_minutes": 12
+          },
+          {
+            "part": "true_false",
+            "label": "判断",
+            "questions": 5,
+            "used_minutes": 6,
+            "suggested_minutes": 6
+          },
+          {
+            "part": "indefinite_choice",
+            "label": "不定项",
+            "questions": 8,
+            "used_minutes": 12,
+            "suggested_minutes": 19
+          }
+        ],
+        "unfinished_lost": 4,
+        "unanswered": [
+          {
+            "question": "q47",
+            "part": "indefinite_choice",
+            "points": 2
+          },
+          {
+            "question": "q48",
+            "part": "indefinite_choice",
+            "points": 2
+          }
+        ],
+        "answered_in_part": {
+          "indefinite_choice": {
+            "score": 6,
+            "full": 12
+          }
+        }
+      },
+      "expect": {
+        "from_part": "single_choice",
+        "minutes_saved": 7,
+        "to_part": "indefinite_choice",
+        "can_finish": ["q47", "q48"],
+        "extra_points": 2,
+        "text": "单选少用 7 分钟，留给不定项，预计多拿约 2 分"
+      }
+    },
+    {
+      "id": "E37",
+      "kind": "正常",
+      "title": "信心校准",
+      "rule": "R32",
+      "fn": "analysis",
+      "input": {
+        "answered_graded": {
+          "sure": {
+            "total": 22,
+            "wrong": 4
+          },
+          "vague": {
+            "total": 10,
+            "wrong": 3
+          },
+          "guess": {
+            "total": 5,
+            "right": 3
+          }
+        }
+      },
+      "expect": {
+        "sure_wrong": 4,
+        "sure_wrong_pct": 18,
+        "guess_right": 3,
+        "guess_right_pct": 60,
+        "pending_verification": 3
+      }
+    },
+    {
+      "id": "E38",
+      "kind": "正常",
+      "title": "知识点诊断",
+      "rule": "R30",
+      "fn": "analysis",
+      "input": {
+        "losses": [
+          {
+            "question": "qa",
+            "kps": ["k1"],
+            "lost": 3
+          },
+          {
+            "question": "qb",
+            "kps": ["k2"],
+            "lost": 2
+          },
+          {
+            "question": "qc",
+            "kps": ["k3"],
+            "lost": 2
+          },
+          {
+            "question": "qd",
+            "kps": ["k4", "k5"],
+            "lost": 2
+          }
+        ],
+        "kps": {
+          "k1": {
+            "sufficient": true,
+            "importance": 3,
+            "level_start": 3,
+            "level_now": 2
+          },
+          "k2": {
+            "sufficient": false,
+            "importance": 3,
+            "level_start": 2,
+            "level_now": 2
+          },
+          "k3": {
+            "sufficient": true,
+            "importance": 4,
+            "level_start": 2,
+            "level_now": 2
+          },
+          "k4": {
+            "sufficient": true,
+            "importance": 2,
+            "level_start": 2,
+            "level_now": 2
+          },
+          "k5": {
+            "sufficient": true,
+            "importance": 2,
+            "level_start": 2,
+            "level_now": 2
+          }
+        }
+      },
+      "expect": {
+        "rows": [
+          {
+            "kp": "k1",
+            "lost": 3,
+            "action": "tackle",
+            "level_now": 2,
+            "dropped_from": 3
+          },
+          {
+            "kp": "k3",
+            "lost": 2,
+            "action": "tackle"
+          },
+          {
+            "kp": "k2",
+            "lost": 2,
+            "action": "retest"
+          },
+          {
+            "kp": "k4",
+            "lost": 1,
+            "action": "tackle"
+          },
+          {
+            "kp": "k5",
+            "lost": 1,
+            "action": "tackle"
+          }
+        ]
+      }
+    },
+    {
+      "id": "E39",
+      "kind": "正常",
+      "title": "补强清单",
+      "rule": "R35",
+      "fn": "boost",
+      "input": {
+        "max_items": 3,
+        "days": 7,
+        "roi_available": true,
+        "kps": [
+          {
+            "kp": "k1",
+            "lost_by_category": {
+              "careless": 3
+            },
+            "roi_tier": "s",
+            "importance": 3
+          },
+          {
+            "kp": "k2",
+            "lost_by_category": {
+              "not_learned": 2
+            },
+            "roi_tier": "s",
+            "importance": 2
+          },
+          {
+            "kp": "k3",
+            "lost_by_category": {
+              "forgot": 2
+            },
+            "roi_tier": "a",
+            "importance": 4
+          },
+          {
+            "kp": "k6",
+            "lost_by_category": {
+              "unfinished": 4
+            },
+            "roi_tier": "s",
+            "importance": 4
+          },
+          {
+            "kp": "k7",
+            "lost_by_category": {
+              "expression_loss": 1
+            },
+            "roi_tier": "s",
+            "importance": 4
+          },
+          {
+            "kp": "k8",
+            "lost_by_category": {
+              "wrong_guess": 1
+            },
+            "roi_tier": "b",
+            "importance": 4
+          }
+        ]
+      },
+      "expect": {
+        "items": [
+          {
+            "kp": "k1",
+            "lost": 3,
+            "roi_tier": "s"
+          },
+          {
+            "kp": "k2",
+            "lost": 2,
+            "roi_tier": "s"
+          },
+          {
+            "kp": "k3",
+            "lost": 2,
+            "roi_tier": "a"
+          }
+        ],
+        "not_candidates": ["k6", "k7"],
+        "proposal": {
+          "status": "pending",
+          "source": "assessment",
+          "days": 7,
+          "lines": ["what", "why", "cost", "if_not"]
+        },
+        "plan_changed_before_confirm": false
+      }
+    },
+    {
+      "id": "E40",
+      "kind": "边界",
+      "title": "没有性价比",
+      "rule": "R35",
+      "fn": "boost",
+      "input": {
+        "max_items": 3,
+        "roi_available": false,
+        "kps": [
+          {
+            "kp": "k1",
+            "lost_by_category": {
+              "forgot": 2
+            },
+            "importance": 2
+          },
+          {
+            "kp": "k2",
+            "lost_by_category": {
+              "careless": 2
+            },
+            "importance": 4
+          },
+          {
+            "kp": "k3",
+            "lost_by_category": {
+              "not_learned": 3
+            },
+            "importance": 1
+          }
+        ]
+      },
+      "expect": {
+        "items": [
+          {
+            "kp": "k3",
+            "lost": 3
+          },
+          {
+            "kp": "k2",
+            "lost": 2
+          },
+          {
+            "kp": "k1",
+            "lost": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "E41",
+      "kind": "异常",
+      "title": "AI 不可用",
+      "rule": "R36",
+      "fn": "narrative",
+      "input": {
+        "ai_available": false,
+        "top_category": {
+          "category": "not_learned",
+          "lost": 21
+        },
+        "first_boost_item": "会计信息质量要求"
+      },
+      "expect": {
+        "text": "最该在意的：没学过丢了 21 分，先补会计信息质量要求",
+        "ai_label": false
+      }
+    },
+    {
+      "id": "E42",
+      "kind": "边界",
+      "title": "纸笔模式",
+      "rule": "R37",
+      "fn": "paper_mode",
+      "pending": "R07-Q8",
+      "input": {
+        "spec": "full",
+        "mode": "paper",
+        "started_at": "2026-10-21T09:00:00+08:00",
+        "duration_minutes": 120,
+        "uploaded_at": "2026-10-21T10:58:00+08:00",
+        "recognized_score": 61,
+        "paper_full_score": 100,
+        "exam_full_score": 100
+      },
+      "expect": {
+        "submitted_at": "2026-10-21T10:58:00+08:00",
+        "status": "submitted",
+        "scaled_score": 61,
+        "in_trend": true,
+        "to_prediction": true,
+        "tag": "纸笔，用时由自己掌握",
+        "evidence_confidence": "none",
+        "time_strategy": false,
+        "calibration": false,
+        "strategy_simulation": false
+      },
+      "expect_if_B": {
+        "in_trend": false,
+        "to_prediction": false
+      }
+    },
+    {
+      "id": "E43",
+      "kind": "异常",
+      "title": "纸笔一直没上传",
+      "rule": "R37",
+      "fn": "paper_mode",
+      "input": {
+        "mode": "paper",
+        "started_at": "2026-10-21T09:00:00+08:00",
+        "duration_minutes": 120,
+        "uploaded_at": null,
+        "now": "2026-10-22T11:00:00+08:00"
+      },
+      "expect": {
+        "status": "abandoned",
+        "answered": 0,
+        "formal_score": false
+      }
+    },
+    {
+      "id": "E44",
+      "kind": "边界",
+      "title": "自组阶段测评",
+      "rule": "R4",
+      "fn": "custom_pick",
+      "input": {
+        "spec": "stage",
+        "chapters": ["资产"],
+        "now": "2026-10-21T20:00:00+08:00",
+        "need": {
+          "single_choice": 3
+        },
+        "kps": [
+          {
+            "id": "k1",
+            "chapter": "资产",
+            "has_evidence": false,
+            "importance": 4
+          },
+          {
+            "id": "k2",
+            "chapter": "资产",
+            "has_evidence": true,
+            "importance": 3
+          },
+          {
+            "id": "k3",
+            "chapter": "资产",
+            "has_evidence": true,
+            "importance": 2
+          },
+          {
+            "id": "k9",
+            "chapter": "负债",
+            "has_evidence": true,
+            "group": "weak",
+            "importance": 4
+          }
+        ],
+        "questions": [
+          {
+            "id": "q1",
+            "type": "single_choice",
+            "kps": ["k1"]
+          },
+          {
+            "id": "q2",
+            "type": "single_choice",
+            "kps": ["k2"]
+          },
+          {
+            "id": "q3",
+            "type": "single_choice",
+            "kps": ["k3"]
+          },
+          {
+            "id": "q9",
+            "type": "single_choice",
+            "kps": ["k9"]
+          }
+        ]
+      },
+      "expect": {
+        "picked": ["q1", "q2", "q3"],
+        "shortage": 0
+      }
+    }
+  ]
+}
