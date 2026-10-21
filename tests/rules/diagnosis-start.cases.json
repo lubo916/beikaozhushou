@@ -1,6 +1,6 @@
 {
   "card": "diagnosis-start",
-  "status": "draft",
+  "status": "已定稿",
   "note": "例子表与 docs/baseline/rule-cards/diagnosis-start.md 一一对应；params 是期望值所依据的参数默认值，个别例子用 params_override 临时改小。再次诊断类例子里的 system_level、evidence_sufficient 是 R01 按全部证据（含本次新写的）算好的结果，本卡只读不算。期望值里不出现 NaN 或无穷大。预测类例子（E42）的 kps 照 R06 例子表的写法：level 是系统判定档，没写 evidence 就是证据充足，peer 是同类考生人数和平均得分率，start_estimate 只决定方格显示、不进预测；分数取整和容差同 R06 的 conventions。E13 的 interval、estimated_share、width_contribution 是 R06 算好的结果（width_contribution 是各章按 R06 R7 上下沿算的宽度贡献），本卡只读不算。时间类例子：grid 为 even 表示每周时长（weekly_hours 或 declared_weekly_hours）平均摊到 7 天，unavailable_days 是不可学的天数，reserved_minutes 是每天相同的机构占用分钟数；weekly_budget_minutes、weekly_org_minutes 从周一到周日给每天的声明预算和机构占用，unavailable_dates 是不可学的日期。capacity_hours 是逐天算、扣一次缓冲后的未取整小时数（按 6 位小数比较），available_hours 和 diff.hours 是显示用的四舍五入值；daily_capacity_minutes 是扣缓冲前每天可用的分钟数，按日期先后。置信度用未四舍五入的比值比较。E24、E25、E34–E36 里各档到目标日的最可能值和区间宽度是给定输入（R05-Q11=A：算法由规则卡任务补进 R06）。个别例子的 note 只作说明。",
   "params": {
     "learner.diagnosis.min_pool_items": 20,
