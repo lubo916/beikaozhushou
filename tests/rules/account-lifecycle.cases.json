@@ -7,12 +7,11 @@
     "R08-Q3": "B",
     "R08-Q4": "A",
     "R08-Q5": "A",
-    "R08-Q6": "A"
-  },
-  "pending": {
+    "R08-Q6": "A",
     "R08-Q7": "A",
     "R08-Q8": "B"
   },
+  "pending": {},
   "conventions": [
     "每条例子是 input → expect；expect 只列要核对的字段，没列的不核对。带 variants 的例子，input.variants[i] 对应 expect.variants[i]，各自独立；input 里 variants 以外的字段是各变体共用的。",
     "时间写成带时区的 ISO 8601（例子都用北京时间）；“哪一天”按 day 设置、用 packages/shared/src/today 的 today() 算（凌晨 4 点切日）。名字以 _day 结尾的字段是学习日 YYYY-MM-DD；birth_month 是出生年月 YYYY-MM。",
@@ -20,7 +19,7 @@
     "合并模式：upgrade_in_place＝游客原地转正、merge_into＝并入已有账号、hold＝先不合并、already_merged＝已合并过。下线原因：other_device＝其他设备让你下线、credential_changed＝改了密码或换绑了手机号、platform_forced＝平台为保护账号让所有设备下线。这些代码是建议，待写进 docs/product/glossary.yaml。",
     "删除范围的处理代码：delete 删除、invalidate 作废、keep_legal 按法定要求保留、keep_deidentified 去掉身份后保留、keep_unchanged 原样保留、deidentify_for_class_stats 去掉身份只进班级统计、purge_copies 机构侧副本在 compliance.revoke.purge_days 天内删除。",
     "时刻比较：验证码“5 分钟内有效”指早于发出时刻加 5 分钟；“隔 60 秒”“满 30 天”“到期满时刻”“到受限到期时刻”都含正好那一刻；密码输错的 60 分钟窗口含正好 60 分钟前那次。",
-    "带 pending 字段的例子（E9、E31）按待拍板问题的临时默认写，拍板结果不同就改例子。"
+    "E9、E31 对应的 R08-Q7、Q8 已获用户确认，分别采用 A、B；整卡仍等待第 2 轮三处边界修订与最终定稿。"
   ],
   "day": {
     "time_zone": "Asia/Shanghai",
@@ -31,10 +30,16 @@
     "account.day.time_zone": "Asia/Shanghai",
     "account.day.start_hour": 4,
     "compliance.revoke.purge_days": 30,
-    "engagement.quiet_hours": ["22:00", "08:00"]
+    "engagement.quiet_hours": [
+      "22:00",
+      "08:00"
+    ]
   },
   "params_proposed": {
-    "account.minor.quiet_window": ["22:00", "06:00"],
+    "account.minor.quiet_window": [
+      "22:00",
+      "06:00"
+    ],
     "account.age.min_service_age": 14,
     "account.age.adult_age": 18,
     "account.guest.retention_days": 30,
@@ -271,7 +276,10 @@
               "payment": false,
               "video_analysis": false
             },
-            "quiet_floor": ["22:00", "06:00"]
+            "quiet_floor": [
+              "22:00",
+              "06:00"
+            ]
           },
           {
             "service": true,
@@ -281,7 +289,10 @@
               "payment": false,
               "video_analysis": false
             },
-            "quiet_floor": ["22:00", "06:00"],
+            "quiet_floor": [
+              "22:00",
+              "06:00"
+            ],
             "requires_age_confirmation": true
           },
           {
@@ -337,23 +348,38 @@
         "variants": [
           {
             "minor_mode": true,
-            "learner_quiet_hours": ["22:00", "08:00"]
+            "learner_quiet_hours": [
+              "22:00",
+              "08:00"
+            ]
           },
           {
             "minor_mode": true,
-            "learner_quiet_hours": ["23:00", "07:00"]
+            "learner_quiet_hours": [
+              "23:00",
+              "07:00"
+            ]
           },
           {
             "minor_mode": false,
-            "learner_quiet_hours": ["23:00", "07:00"]
+            "learner_quiet_hours": [
+              "23:00",
+              "07:00"
+            ]
           },
           {
             "minor_mode": true,
-            "learner_quiet_hours": ["21:00", "05:00"]
+            "learner_quiet_hours": [
+              "21:00",
+              "05:00"
+            ]
           },
           {
             "minor_mode": true,
-            "learner_quiet_hours": ["22:00", "08:00"],
+            "learner_quiet_hours": [
+              "22:00",
+              "08:00"
+            ],
             "push": {
               "kind": "security",
               "at": "2026-10-21T23:30:00+08:00"
@@ -361,7 +387,10 @@
           },
           {
             "minor_mode": false,
-            "learner_quiet_hours": ["22:00", "08:00"],
+            "learner_quiet_hours": [
+              "22:00",
+              "08:00"
+            ],
             "push": {
               "kind": "security",
               "at": "2026-10-21T23:30:00+08:00"
@@ -372,16 +401,28 @@
       "expect": {
         "variants": [
           {
-            "quiet": ["22:00", "08:00"]
+            "quiet": [
+              "22:00",
+              "08:00"
+            ]
           },
           {
-            "quiet": ["22:00", "07:00"]
+            "quiet": [
+              "22:00",
+              "07:00"
+            ]
           },
           {
-            "quiet": ["23:00", "07:00"]
+            "quiet": [
+              "23:00",
+              "07:00"
+            ]
           },
           {
-            "quiet": ["21:00", "06:00"]
+            "quiet": [
+              "21:00",
+              "06:00"
+            ]
           },
           {
             "deliver_at": "2026-10-22T06:00:00+08:00",
@@ -399,7 +440,6 @@
       "kind": "异常",
       "rule": "R4",
       "fn": "age_reconfirm",
-      "pending": "R08-Q7",
       "input": {
         "account": {
           "kind": "registered",
@@ -564,7 +604,10 @@
         "account_id": "g1",
         "kind": "registered",
         "copied_records": 0,
-        "consent_records": ["user_agreement", "privacy_policy"]
+        "consent_records": [
+          "user_agreement",
+          "privacy_policy"
+        ]
       }
     },
     {
@@ -619,7 +662,13 @@
           "answers": 40,
           "evidence": 52
         },
-        "recompute": ["mastery", "memory", "forecast", "completion", "health"],
+        "recompute": [
+          "mastery",
+          "memory",
+          "forecast",
+          "completion",
+          "health"
+        ],
         "summary": {
           "goals_added": 1,
           "answers_appended": 40
@@ -672,7 +721,10 @@
             "plan": "plan-u"
           }
         ],
-        "dropped": ["guest_goal:junior-accounting", "plan:plan-g"],
+        "dropped": [
+          "guest_goal:junior-accounting",
+          "plan:plan-g"
+        ],
         "appended": {
           "answers": 25
         }
@@ -751,7 +803,9 @@
             {
               "id": "m-g",
               "question": "q9",
-              "answers": ["a2"]
+              "answers": [
+                "a2"
+              ]
             }
           ]
         },
@@ -778,7 +832,9 @@
             {
               "id": "m-a",
               "question": "q9",
-              "answers": ["a1"]
+              "answers": [
+                "a1"
+              ]
             }
           ]
         }
@@ -786,13 +842,23 @@
       "expect": {
         "recall_cards": {
           "kept": "c-a",
-          "appended_reviews": ["r3"],
-          "replay_order": ["r1", "r3", "r2"],
-          "not_added": ["c-g"]
+          "appended_reviews": [
+            "r3"
+          ],
+          "replay_order": [
+            "r1",
+            "r3",
+            "r2"
+          ],
+          "not_added": [
+            "c-g"
+          ]
         },
         "mistakes": {
           "kept": "m-a",
-          "appended_answers": ["a2"],
+          "appended_answers": [
+            "a2"
+          ],
           "status": "recompute_by_R03"
         }
       }
@@ -1069,7 +1135,10 @@
           "age_band": "unconfirmed",
           "minor_mode": true
         },
-        "consent_records": ["user_agreement", "privacy_policy"],
+        "consent_records": [
+          "user_agreement",
+          "privacy_policy"
+        ],
         "next": "age_confirm"
       }
     },
@@ -1139,8 +1208,13 @@
           },
           {
             "outcome": "need_reconsent",
-            "docs": ["privacy_policy"],
-            "allowed_meanwhile": ["export", "deregister"]
+            "docs": [
+              "privacy_policy"
+            ],
+            "allowed_meanwhile": [
+              "export",
+              "deregister"
+            ]
           }
         ]
       }
@@ -1155,7 +1229,11 @@
         "account": {
           "status": "active"
         },
-        "online": ["d1", "d2", "d3"],
+        "online": [
+          "d1",
+          "d2",
+          "d3"
+        ],
         "new_device": "d4",
         "variants": [
           {
@@ -1174,7 +1252,11 @@
       "expect": {
         "variants": [
           {
-            "listed": ["d1", "d2", "d3"],
+            "listed": [
+              "d1",
+              "d2",
+              "d3"
+            ],
             "outcome": "ok",
             "revoked": [
               {
@@ -1184,7 +1266,11 @@
             ]
           },
           {
-            "listed": ["d1", "d2", "d3"],
+            "listed": [
+              "d1",
+              "d2",
+              "d3"
+            ],
             "outcome": "cancelled",
             "session_created": false
           },
@@ -1432,7 +1518,10 @@
           {
             "outcome": "restricted",
             "until": "2026-10-12T09:30:00+08:00",
-            "actions": ["appeal", "export"],
+            "actions": [
+              "appeal",
+              "export"
+            ],
             "learning": false
           },
           {
@@ -1449,7 +1538,11 @@
       "rule": "R24、R25、R26",
       "fn": "revoke",
       "input": {
-        "online": ["d1", "d2", "d3"],
+        "online": [
+          "d1",
+          "d2",
+          "d3"
+        ],
         "variants": [
           {
             "action": "password_change",
@@ -1476,23 +1569,39 @@
       "expect": {
         "variants": [
           {
-            "revoked": ["d2", "d3"],
+            "revoked": [
+              "d2",
+              "d3"
+            ],
             "reason": "credential_changed"
           },
           {
-            "revoked": ["d1", "d3"],
+            "revoked": [
+              "d1",
+              "d3"
+            ],
             "reason": "credential_changed"
           },
           {
-            "revoked": ["d1", "d2", "d3"],
+            "revoked": [
+              "d1",
+              "d2",
+              "d3"
+            ],
             "reason": "credential_changed"
           },
           {
-            "revoked": ["d1", "d2", "d3"],
+            "revoked": [
+              "d1",
+              "d2",
+              "d3"
+            ],
             "reason": "platform_forced"
           },
           {
-            "revoked": ["d3"],
+            "revoked": [
+              "d3"
+            ],
             "reason": "other_device"
           }
         ]
@@ -1540,32 +1649,43 @@
       "kind": "边界",
       "rule": "R21",
       "fn": "phone_gate",
-      "pending": "R08-Q8",
       "input": {
         "phone": null,
         "variants": [
           {
-            "credentials": ["wechat"],
+            "credentials": [
+              "wechat"
+            ],
             "action": "study"
           },
           {
-            "credentials": ["wechat"],
+            "credentials": [
+              "wechat"
+            ],
             "action": "pay"
           },
           {
-            "credentials": ["wechat"],
+            "credentials": [
+              "wechat"
+            ],
             "action": "manage_devices"
           },
           {
-            "credentials": ["wechat"],
+            "credentials": [
+              "wechat"
+            ],
             "action": "deregister"
           },
           {
-            "credentials": ["apple"],
+            "credentials": [
+              "apple"
+            ],
             "action": "deregister"
           },
           {
-            "credentials": ["apple"],
+            "credentials": [
+              "apple"
+            ],
             "action": "pay"
           }
         ]
@@ -1634,7 +1754,11 @@
         "outcome": "cooling_off",
         "days_left": 9,
         "auto_cancel": false,
-        "actions": ["cancel", "continue", "export"]
+        "actions": [
+          "cancel",
+          "continue",
+          "export"
+        ]
       }
     },
     {
@@ -1830,7 +1954,10 @@
         },
         "phone_released": true,
         "purge_copies_within_days": 30,
-        "legal_review": ["crisis_records", "orders_invoices"]
+        "legal_review": [
+          "crisis_records",
+          "orders_invoices"
+        ]
       }
     },
     {
@@ -1841,7 +1968,9 @@
       "fn": "deletion_scope",
       "input": {
         "account": "u1",
-        "merged_guests": ["g1"],
+        "merged_guests": [
+          "g1"
+        ],
         "imports_by_others": [
           {
             "user": "u9",
@@ -1851,8 +1980,13 @@
         ]
       },
       "expect": {
-        "delete": ["u1", "g1_originals"],
-        "keep": ["u9:cards-1"]
+        "delete": [
+          "u1",
+          "g1_originals"
+        ],
+        "keep": [
+          "u9:cards-1"
+        ]
       }
     }
   ]
