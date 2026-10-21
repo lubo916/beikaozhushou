@@ -1177,8 +1177,10 @@
       ],
       "recommend": "B",
       "temp": "B",
-      "status": "open",
-      "asked": "v0016"
+      "status": "answered",
+      "asked": "v0016",
+      "answer": "B",
+      "answered": "v0016"
     }
   ]
 }
