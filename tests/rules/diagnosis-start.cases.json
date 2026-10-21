@@ -1,7 +1,7 @@
 {
   "card": "diagnosis-start",
   "status": "draft",
-  "note": "例子表与 docs/baseline/rule-cards/diagnosis-start.md 一一对应；params 是期望值所依据的参数默认值，个别例子用 params_override 临时改小。",
+  "note": "例子表与 docs/baseline/rule-cards/diagnosis-start.md 一一对应；params 是期望值所依据的参数默认值，个别例子用 params_override 临时改小。再次诊断类例子里的 system_level、evidence_sufficient 是 R01 按全部证据（含本次新写的）算好的结果，本卡只读不算。期望值里不出现 NaN 或无穷大。",
   "params": {
     "learner.diagnosis.min_pool_items": 20,
     "learner.diagnosis.adaptive_min_pool": 60,
@@ -392,7 +392,7 @@
     },
     {
       "id": "E12",
-      "desc": "再次诊断只升不降：做错不降档、不写负证据，交给复习",
+      "desc": "再次诊断只升不降、只动起点估计：证据充足的点显示系统判定；做错不降档、不写负证据，交给复习",
       "input": {
         "kind": "rediagnosis",
         "points": [
@@ -400,7 +400,7 @@
             "id": "kp-1",
             "system_level": 3,
             "evidence_sufficient": true,
-            "shown_before": 3,
+            "start_estimate_before": 3,
             "tested": true,
             "new_estimate": 1,
             "signal": "wrong"
@@ -409,7 +409,7 @@
             "id": "kp-2",
             "system_level": null,
             "evidence_sufficient": false,
-            "shown_before": 2,
+            "start_estimate_before": 2,
             "tested": true,
             "new_estimate": 3,
             "signal": "known"
@@ -418,7 +418,7 @@
             "id": "kp-3",
             "system_level": null,
             "evidence_sufficient": false,
-            "shown_before": 2,
+            "start_estimate_before": 2,
             "tested": true,
             "new_estimate": 1,
             "signal": "wrong"
@@ -427,7 +427,7 @@
             "id": "kp-4",
             "system_level": null,
             "evidence_sufficient": false,
-            "shown_before": 2,
+            "start_estimate_before": 2,
             "tested": false,
             "new_estimate": null,
             "signal": null
@@ -435,16 +435,29 @@
         ]
       },
       "expect": {
+        "start_estimate_after": {
+          "kp-1": 3,
+          "kp-2": 3,
+          "kp-3": 2,
+          "kp-4": 2
+        },
         "shown_after": {
           "kp-1": 3,
           "kp-2": 3,
           "kp-3": 2,
           "kp-4": 2
         },
+        "shown_source": {
+          "kp-1": "system",
+          "kp-2": "estimate",
+          "kp-3": "estimate",
+          "kp-4": "estimate"
+        },
+        "system_level_written_by_diagnosis": [],
         "negative_evidence": [],
         "review_flagged": ["kp-1", "kp-3"]
       },
-      "rule": "R17"
+      "rule": "R16,R17"
     },
     {
       "id": "E13",
@@ -883,9 +896,16 @@
     },
     {
       "id": "E25",
-      "desc": "声明每周只有 1 小时：稳妥算出来和标准一样，只给两张卡",
+      "desc": "声明每周只有 1 小时：稳妥做不到（要少 1 小时又不少于 1 小时），只给标准、冲刺两张卡；没有稳妥时冲刺改跟标准比",
       "input": {
-        "declared_weekly_hours": 1
+        "declared_weekly_hours": 1,
+        "available_hours_standard": 26.35,
+        "need_hours": 300,
+        "exam_duration_hours": 2,
+        "most_likely_at_target": {
+          "standard": 52,
+          "intensive": 56
+        }
       },
       "expect": {
         "option_keys": ["standard", "intensive"],
@@ -893,9 +913,32 @@
           "standard": 1,
           "intensive": 2
         },
-        "recommended": "standard"
+        "recommended": "standard",
+        "options": [
+          {
+            "key": "standard",
+            "weekly_hours": 1,
+            "daily_minutes": 9,
+            "projected_completion_percent": 9,
+            "vs_standard": null,
+            "cost_keys": [],
+            "recommended": true
+          },
+          {
+            "key": "intensive",
+            "weekly_hours": 2,
+            "daily_minutes": 17,
+            "projected_completion_percent": 18,
+            "vs_standard": {
+              "extra_hours": 1,
+              "uplift_points": 4
+            },
+            "cost_keys": [],
+            "recommended": false
+          }
+        ]
       },
-      "rule": "R33,R36"
+      "rule": "R33,R34,R35,R36"
     },
     {
       "id": "E26",
@@ -1015,35 +1058,55 @@
           {
             "id": "kp-1",
             "shown_level": 4,
-            "forget_risk": 0.7
+            "forget_risk": 0.7,
+            "evidence_sufficient": false,
+            "start_estimate_before": 4
           },
           {
             "id": "kp-2",
             "shown_level": 3,
-            "forget_risk": 0.9
+            "forget_risk": 0.9,
+            "evidence_sufficient": false,
+            "start_estimate_before": 3
           },
           {
             "id": "kp-3",
             "shown_level": 2,
-            "forget_risk": 0.95
+            "forget_risk": 0.95,
+            "evidence_sufficient": false,
+            "start_estimate_before": 2
           },
           {
             "id": "kp-4",
             "shown_level": 5,
-            "forget_risk": 0.2
+            "forget_risk": 0.2,
+            "evidence_sufficient": false,
+            "start_estimate_before": 5
           }
         ],
         "results": {
           "kp-2": "wrong",
           "kp-1": "known"
+        },
+        "new_estimates": {
+          "kp-1": 4,
+          "kp-2": 1
         }
       },
       "expect": {
         "offer_refresh": true,
         "picked": ["kp-2", "kp-1"],
+        "start_estimate_after": {
+          "kp-1": 4,
+          "kp-2": 3
+        },
         "shown_after": {
           "kp-1": 4,
           "kp-2": 3
+        },
+        "shown_source": {
+          "kp-1": "estimate",
+          "kp-2": "estimate"
         },
         "review_flagged": ["kp-2"]
       },
@@ -1072,6 +1135,528 @@
         "primary_action": "go_diagnosis"
       },
       "rule": "R39"
+    },
+    {
+      "id": "E32",
+      "desc": "快速定位：自评“没学过”的章核对答错或选“不会”，仍按 0 档，不出现负档",
+      "input": {
+        "mode": "quick",
+        "question_credibility": "reviewed",
+        "suggested_seconds": 60,
+        "chapters": [
+          {
+            "name": "所有者权益",
+            "self_rating": "not_learned"
+          },
+          {
+            "name": "财务报告",
+            "self_rating": "not_learned"
+          }
+        ],
+        "check_answers": {
+          "所有者权益": {
+            "point": "kp-c1",
+            "correct": false,
+            "confidence": "sure",
+            "seconds": 40
+          },
+          "财务报告": {
+            "point": "kp-d1",
+            "correct": null,
+            "confidence": "dont_know",
+            "seconds": 20
+          }
+        },
+        "points": [
+          {
+            "id": "kp-c1",
+            "chapter": "所有者权益"
+          },
+          {
+            "id": "kp-c2",
+            "chapter": "所有者权益"
+          },
+          {
+            "id": "kp-d1",
+            "chapter": "财务报告"
+          },
+          {
+            "id": "kp-d2",
+            "chapter": "财务报告"
+          }
+        ]
+      },
+      "expect": {
+        "chapter_level": {
+          "所有者权益": 0,
+          "财务报告": 0
+        },
+        "basis": {
+          "kp-c1": "tested",
+          "kp-c2": "self_rated",
+          "kp-d1": "tested",
+          "kp-d2": "self_rated"
+        },
+        "level": {
+          "kp-c1": 0,
+          "kp-c2": 0,
+          "kp-d1": 0,
+          "kp-d2": 0
+        },
+        "evidence": {
+          "kp-c1": null,
+          "kp-d1": null
+        },
+        "min_level_in_output": 0
+      },
+      "rule": "R10,R15"
+    },
+    {
+      "id": "E33",
+      "desc": "快速定位的核对题：每章最多 1 道，按自评从高到低出；答错或蒙对低一档，做对不往上抬",
+      "input": {
+        "mode": "quick",
+        "question_credibility": "reviewed",
+        "suggested_seconds": 60,
+        "chapters": [
+          {
+            "name": "会计基础",
+            "self_rating": "learned_not_solid"
+          },
+          {
+            "name": "资产",
+            "self_rating": "proficient"
+          },
+          {
+            "name": "负债",
+            "self_rating": "basic"
+          }
+        ],
+        "check_answers": {
+          "资产": {
+            "point": "kp-a1",
+            "correct": false,
+            "confidence": "sure",
+            "seconds": 40
+          },
+          "负债": {
+            "point": "kp-b1",
+            "correct": true,
+            "confidence": "sure",
+            "seconds": 45
+          },
+          "会计基础": {
+            "point": "kp-e1",
+            "correct": true,
+            "confidence": "guess",
+            "seconds": 50
+          }
+        },
+        "points": [
+          {
+            "id": "kp-e1",
+            "chapter": "会计基础"
+          },
+          {
+            "id": "kp-e2",
+            "chapter": "会计基础"
+          },
+          {
+            "id": "kp-a1",
+            "chapter": "资产"
+          },
+          {
+            "id": "kp-a2",
+            "chapter": "资产"
+          },
+          {
+            "id": "kp-b1",
+            "chapter": "负债"
+          },
+          {
+            "id": "kp-b2",
+            "chapter": "负债"
+          }
+        ]
+      },
+      "expect": {
+        "check_count": 3,
+        "check_order": ["资产", "负债", "会计基础"],
+        "chapter_level": {
+          "会计基础": 0,
+          "资产": 2,
+          "负债": 2
+        },
+        "level": {
+          "kp-e1": 0,
+          "kp-e2": 0,
+          "kp-a1": 1,
+          "kp-a2": 2,
+          "kp-b1": 2,
+          "kp-b2": 2
+        },
+        "evidence": {
+          "kp-a1": null,
+          "kp-b1": "strong",
+          "kp-e1": "pending"
+        }
+      },
+      "rule": "R7,R10,R15"
+    },
+    {
+      "id": "E34",
+      "desc": "需要 0 小时、可投入 0 小时（声明每周 6 小时，但可学时间被机构任务占满）：需要为 0 优先，预计完成 100%，只写余量 0 小时；三档都是 100%",
+      "input": {
+        "need_hours": 0,
+        "available_hours_standard": 0,
+        "declared_weekly_hours": 6,
+        "exam_duration_hours": 2,
+        "interval_width_at_target": {
+          "steady": 8,
+          "standard": 8,
+          "intensive": 8
+        }
+      },
+      "expect": {
+        "projected_completion_percent": 100,
+        "diff": {
+          "kind": "surplus",
+          "hours": 0,
+          "percent": null
+        },
+        "show_three_outlets": false,
+        "scope_proposal": null,
+        "fill_time_hint": false,
+        "options": [
+          {
+            "key": "steady",
+            "weekly_hours": 5,
+            "projected_completion_percent": 100,
+            "mocks": null,
+            "cost_keys": []
+          },
+          {
+            "key": "standard",
+            "weekly_hours": 6,
+            "projected_completion_percent": 100,
+            "mocks": null
+          },
+          {
+            "key": "intensive",
+            "weekly_hours": 8,
+            "projected_completion_percent": 100,
+            "mocks": null
+          }
+        ]
+      },
+      "rule": "R31,R33,R34,R35"
+    },
+    {
+      "id": "E35",
+      "desc": "需要 0 小时、可投入 61 小时：预计完成 100%，只写余量不写百分比；三档都是 100%、都留出 3 次模考；稳妥卡代价只写区间最宽",
+      "input": {
+        "need_hours": 0,
+        "available_hours_standard": 61,
+        "declared_weekly_hours": 6,
+        "exam_duration_hours": 2,
+        "interval_width_at_target": {
+          "steady": 9,
+          "standard": 8,
+          "intensive": 8
+        }
+      },
+      "expect": {
+        "projected_completion_percent": 100,
+        "diff": {
+          "kind": "surplus",
+          "hours": 61,
+          "percent": null
+        },
+        "show_three_outlets": false,
+        "scope_proposal": null,
+        "fill_time_hint": false,
+        "options": [
+          {
+            "key": "steady",
+            "weekly_hours": 5,
+            "projected_completion_percent": 100,
+            "mocks": 3,
+            "cost_keys": ["widest_interval"]
+          },
+          {
+            "key": "standard",
+            "weekly_hours": 6,
+            "projected_completion_percent": 100,
+            "mocks": 3
+          },
+          {
+            "key": "intensive",
+            "weekly_hours": 8,
+            "projected_completion_percent": 100,
+            "mocks": 3
+          }
+        ]
+      },
+      "rule": "R31,R33,R34,R35"
+    },
+    {
+      "id": "E36",
+      "desc": "需要 50 小时、可投入 0 小时（声明每周 6 小时，但到目标日前天天不可学）：预计完成 0%，缺口 50 小时约 100%，提示先填时间、给三条出路、不出范围提议",
+      "input": {
+        "need_hours": 50,
+        "available_hours_standard": 0,
+        "declared_weekly_hours": 6,
+        "exam_duration_hours": 2,
+        "interval_width_at_target": {
+          "steady": 8,
+          "standard": 8,
+          "intensive": 8
+        }
+      },
+      "expect": {
+        "projected_completion_percent": 0,
+        "diff": {
+          "kind": "shortfall",
+          "hours": 50,
+          "percent": 100
+        },
+        "show_three_outlets": true,
+        "scope_proposal": null,
+        "fill_time_hint": true,
+        "options": [
+          {
+            "key": "steady",
+            "weekly_hours": 5,
+            "projected_completion_percent": 0,
+            "mocks": null,
+            "cost_keys": []
+          },
+          {
+            "key": "standard",
+            "weekly_hours": 6,
+            "projected_completion_percent": 0,
+            "mocks": null
+          },
+          {
+            "key": "intensive",
+            "weekly_hours": 8,
+            "projected_completion_percent": 0,
+            "mocks": null
+          }
+        ]
+      },
+      "rule": "R31,R32,R33,R34,R35"
+    },
+    {
+      "id": "E37",
+      "desc": "声明每周 0 小时（还没填时间）、需要 50 小时：可投入 0，不出方案卡，生成计划前先去填时间，不做“方案时长 ÷ 标准时长”",
+      "input": {
+        "need_hours": 50,
+        "available_hours_standard": 0,
+        "declared_weekly_hours": 0,
+        "exam_duration_hours": 2
+      },
+      "expect": {
+        "projected_completion_percent": 0,
+        "diff": {
+          "kind": "shortfall",
+          "hours": 50,
+          "percent": 100
+        },
+        "show_three_outlets": true,
+        "scope_proposal": null,
+        "fill_time_hint": true,
+        "option_keys": [],
+        "primary_action": "fill_time_first"
+      },
+      "rule": "R31,R33,R34"
+    },
+    {
+      "id": "E38",
+      "desc": "档差 1 小时（默认）的低时长：0、0.5、1、2 小时；稳妥做不到就不出，展示的档不倒挂",
+      "input": {
+        "combos": [
+          {
+            "id": "c1",
+            "declared_weekly_hours": 0
+          },
+          {
+            "id": "c2",
+            "declared_weekly_hours": 0.5
+          },
+          {
+            "id": "c3",
+            "declared_weekly_hours": 1
+          },
+          {
+            "id": "c4",
+            "declared_weekly_hours": 2
+          }
+        ]
+      },
+      "expect": {
+        "c1": {
+          "option_keys": [],
+          "weekly_hours": {},
+          "primary_action": "fill_time_first"
+        },
+        "c2": {
+          "option_keys": ["standard", "intensive"],
+          "weekly_hours": {
+            "standard": 0.5,
+            "intensive": 2
+          },
+          "daily_minutes": {
+            "standard": 4,
+            "intensive": 17
+          }
+        },
+        "c3": {
+          "option_keys": ["standard", "intensive"],
+          "weekly_hours": {
+            "standard": 1,
+            "intensive": 2
+          }
+        },
+        "c4": {
+          "option_keys": ["steady", "standard", "intensive"],
+          "weekly_hours": {
+            "steady": 1,
+            "standard": 2,
+            "intensive": 3
+          }
+        }
+      },
+      "rule": "R33"
+    },
+    {
+      "id": "E39",
+      "desc": "最小档差大于或接近声明时长：不到 2 倍档差就没有稳妥，冲刺至少多一个档差并取整到小时",
+      "input": {
+        "combos": [
+          {
+            "id": "c1",
+            "declared_weekly_hours": 2,
+            "params_override": {
+              "plan.option.min_step_hours": 3
+            }
+          },
+          {
+            "id": "c2",
+            "declared_weekly_hours": 0.5,
+            "params_override": {
+              "plan.option.min_step_hours": 2
+            }
+          },
+          {
+            "id": "c3",
+            "declared_weekly_hours": 5,
+            "params_override": {
+              "plan.option.min_step_hours": 3
+            }
+          },
+          {
+            "id": "c4",
+            "declared_weekly_hours": 6,
+            "params_override": {
+              "plan.option.min_step_hours": 3
+            }
+          }
+        ]
+      },
+      "expect": {
+        "c1": {
+          "option_keys": ["standard", "intensive"],
+          "weekly_hours": {
+            "standard": 2,
+            "intensive": 5
+          }
+        },
+        "c2": {
+          "option_keys": ["standard", "intensive"],
+          "weekly_hours": {
+            "standard": 0.5,
+            "intensive": 3
+          }
+        },
+        "c3": {
+          "option_keys": ["standard", "intensive"],
+          "weekly_hours": {
+            "standard": 5,
+            "intensive": 8
+          }
+        },
+        "c4": {
+          "option_keys": ["steady", "standard", "intensive"],
+          "weekly_hours": {
+            "steady": 3,
+            "standard": 6,
+            "intensive": 9
+          }
+        }
+      },
+      "rule": "R33"
+    },
+    {
+      "id": "E40",
+      "desc": "证据充足且摸底估计高于系统判定：起点估计更新，但当前档仍显示系统判定，估计不写进系统判定",
+      "input": {
+        "kind": "rediagnosis",
+        "question_credibility": "reviewed",
+        "suggested_seconds": 60,
+        "points": [
+          {
+            "id": "kp-1",
+            "system_level": 2,
+            "evidence_sufficient": true,
+            "start_estimate_before": 2,
+            "tested": true,
+            "new_estimate": 4,
+            "response": {
+              "correct": true,
+              "confidence": "sure",
+              "seconds": 40
+            }
+          },
+          {
+            "id": "kp-2",
+            "system_level": null,
+            "evidence_sufficient": false,
+            "start_estimate_before": 2,
+            "tested": true,
+            "new_estimate": 4,
+            "response": {
+              "correct": true,
+              "confidence": "sure",
+              "seconds": 40
+            }
+          }
+        ]
+      },
+      "expect": {
+        "start_estimate_after": {
+          "kp-1": 4,
+          "kp-2": 4
+        },
+        "shown_after": {
+          "kp-1": 2,
+          "kp-2": 4
+        },
+        "shown_source": {
+          "kp-1": "system",
+          "kp-2": "estimate"
+        },
+        "label": {
+          "kp-1": null,
+          "kp-2": "estimate"
+        },
+        "system_level_written_by_diagnosis": [],
+        "evidence": {
+          "kp-1": "strong",
+          "kp-2": "strong"
+        }
+      },
+      "rule": "R7,R16,R17"
     }
   ]
 }
