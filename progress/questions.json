@@ -1246,7 +1246,7 @@
       "status": "answered",
       "asked": "v0020",
       "answer": "A",
-      "answered": "v0020"
+      "answered": "v0022"
     },
     {
       "id": "R05-Q2",
@@ -1261,7 +1261,7 @@
       "status": "answered",
       "asked": "v0020",
       "answer": "A",
-      "answered": "v0020"
+      "answered": "v0022"
     },
     {
       "id": "R05-Q3",
@@ -1276,7 +1276,7 @@
       "status": "answered",
       "asked": "v0020",
       "answer": "B",
-      "answered": "v0020"
+      "answered": "v0022"
     },
     {
       "id": "R05-Q4",
@@ -1291,7 +1291,7 @@
       "status": "answered",
       "asked": "v0020",
       "answer": "A",
-      "answered": "v0020"
+      "answered": "v0022"
     },
     {
       "id": "R05-Q5",
@@ -1306,7 +1306,7 @@
       "status": "answered",
       "asked": "v0020",
       "answer": "A",
-      "answered": "v0020"
+      "answered": "v0022"
     },
     {
       "id": "R05-Q6",
@@ -1321,7 +1321,7 @@
       "status": "answered",
       "asked": "v0020",
       "answer": "A",
-      "answered": "v0020"
+      "answered": "v0022"
     },
     {
       "id": "R05-Q7",
@@ -1336,7 +1336,7 @@
       "status": "answered",
       "asked": "v0020",
       "answer": "A",
-      "answered": "v0020"
+      "answered": "v0022"
     },
     {
       "id": "R05-Q8",
@@ -1351,7 +1351,7 @@
       "status": "answered",
       "asked": "v0020",
       "answer": "A",
-      "answered": "v0020"
+      "answered": "v0022"
     },
     {
       "id": "R05-Q9",
@@ -1366,7 +1366,7 @@
       "status": "answered",
       "asked": "v0020",
       "answer": "A",
-      "answered": "v0020"
+      "answered": "v0022"
     },
     {
       "id": "R09-Q1",
@@ -1457,6 +1457,38 @@
       "asked": "v0021",
       "answer": "A",
       "answered": "v0021"
+    },
+    {
+      "id": "R05-Q10",
+      "task": "R05",
+      "q": "只做了快速定位时，起点报告顶部怎么提示？原型写“区间比完整诊断宽约 8 分，补做两章章节抽测可以收窄”；但按已定稿 R06，区间只看各知识点证据是否充分，刚摸底时多数点证据都不够，完整诊断和快速定位的区间差不多，每章补 2–3 题通常也收不窄，这句话用 R06 算不出来",
+      "options": [
+        "A 照 R06：写“约 X% 的分值是按估计算的”，仍建议补测几章让起点估计更准，不写宽多少、不承诺收窄",
+        "B 授权改 R06，让摸底估计也进预测，原型那句话才成立；进度页、今日页的数会一起变",
+        "C 照 R06，只写原因，不给补测建议"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0022",
+      "answer": "A",
+      "answered": "v0022"
+    },
+    {
+      "id": "R05-Q11",
+      "task": "R05",
+      "q": "三张方案卡各自的“到目标日”区间和“区间上移约几分”（R05-Q9 也靠它）怎么算？已定稿 R06 只算“照计划学完”一种情景，和每周投入几小时无关，按 R06 三张卡的区间会一样、上移永远是 0",
+      "options": [
+        "A 授权由规则卡任务给 R06 补一条“按各档每周时长算到目标日区间”的规则，本卡和例子不用改",
+        "B 不改 R06：方案卡不写各档区间和“区间上移约几分”",
+        "C 不改 R06：三张卡都写同一个“照计划学完”的区间，不写上移"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0022",
+      "answer": "A",
+      "answered": "v0022"
     }
   ]
 }
