@@ -1,0 +1,102 @@
+# S14 笔记本；写操作尚未登记权限，只提供确认前预览。
+paths:
+  /learner/notebook:
+    get:
+      operationId: getS14Notebook
+      x-owner: content
+      x-action: content.note.read
+      summary: 笔记、收藏、完整性检查和考前汇编
+      parameters:
+        - {name: search, in: query, schema: {type: string}}
+        - {name: note_type, in: query, schema: {type: string}}
+        - {name: source, in: query, schema: {type: string}}
+        - {name: subject, in: query, schema: {type: string}}
+        - {name: period, in: query, schema: {type: string}}
+        - {$ref: "#/components/parameters/Cursor"}
+        - {$ref: "#/components/parameters/Limit"}
+      responses:
+        "200":
+          description: 业务计数由接口返回；开发阶段为示例数据
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S14Notebook"}
+        "403": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S14Notebook:
+      type: object
+      required: [exam_name, time_zone, notes, next_cursor, subjects, favorites, integrity, handbook, paper, ai_available, paper_available, data_source]
+      properties:
+        exam_name: {type: string}
+        time_zone: {type: string}
+        notes: {type: array, items: {$ref: "#/components/schemas/S14NoteItem"}}
+        next_cursor: {$ref: "#/components/schemas/NextCursor"}
+        subjects: {type: array, items: {type: string}}
+        favorites: {type: array, items: {$ref: "#/components/schemas/S14Favorite"}}
+        integrity: {$ref: "#/components/schemas/S14Integrity"}
+        handbook: {$ref: "#/components/schemas/S14Compilation"}
+        paper: {$ref: "#/components/schemas/S14Compilation"}
+        ai_available: {type: boolean}
+        paper_available: {type: boolean}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+    S14NoteItem:
+      type: object
+      required: [note, source, author, subject, point_path, source_title, reader_id, copy_reminder, preview]
+      properties:
+        note: {$ref: "#/components/schemas/Note"}
+        source: {type: string, enum: [reading, classroom, practice, dialogue, voice, photo]}
+        author: {type: string, enum: [manual, ai, ai_edited]}
+        subject: {type: string}
+        point_path: {type: string}
+        source_title: {type: string}
+        reader_id: {type: string}
+        copy_reminder: {type: boolean}
+        preview: {$ref: "#/components/schemas/Card"}
+    S14Favorite:
+      type: object
+      required: [id, kind, title, point_path, excerpt, ai_generated]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        kind: {type: string, enum: [question, paragraph, explanation, note]}
+        title: {type: string}
+        point_path: {type: string}
+        excerpt: {type: string}
+        ai_generated: {type: boolean}
+    S14Integrity:
+      type: object
+      required: [covered, total, missing]
+      properties:
+        covered: {type: integer, minimum: 0}
+        total: {type: integer, minimum: 0}
+        missing: {type: array, items: {$ref: "#/components/schemas/S14MissingPoint"}}
+    S14MissingPoint:
+      type: object
+      required: [id, title, high_frequency]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        title: {type: string}
+        high_frequency: {type: boolean}
+    S14Compilation:
+      type: object
+      required: [title, description, note_count, sections, lengths]
+      properties:
+        title: {type: string}
+        description: {type: string}
+        note_count: {type: integer, minimum: 0}
+        sections: {type: array, items: {$ref: "#/components/schemas/S14Section"}}
+        lengths: {type: array, items: {$ref: "#/components/schemas/S14Length"}}
+    S14Section:
+      type: object
+      required: [id, title, body, origin]
+      properties:
+        id: {type: string}
+        title: {type: string}
+        body: {type: string}
+        origin: {type: string}
+    S14Length:
+      type: object
+      required: [id, label, sections]
+      properties:
+        id: {type: string}
+        label: {type: string}
+        sections: {type: array, items: {$ref: "#/components/schemas/S14Section"}}

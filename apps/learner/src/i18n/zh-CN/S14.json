@@ -1,1 +1,178 @@
-{}
+{
+  "title": "笔记本",
+  "description": "把学过的知识，变成自己的理解。",
+  "sample": "示例数据",
+  "soon": "即将上线",
+  "tabsLabel": "笔记本视图",
+  "tabs": {
+    "notes": "笔记",
+    "favorites": "收藏",
+    "handbook": "一本通",
+    "paper": "最后一页纸"
+  },
+  "actions": {
+    "new": "新笔记",
+    "organize": "AI 整理",
+    "export": "导出",
+    "print": "打印",
+    "cancel": "取消",
+    "save": "保存笔记",
+    "confirm": "确认后保存",
+    "cards": "转为卡片",
+    "questions": "转为自测题",
+    "open": "打开笔记",
+    "clear": "清除筛选",
+    "more": "下一页",
+    "previous": "返回首页",
+    "map": "章节导图",
+    "recite": "导图背诵",
+    "reader": "查看出处",
+    "changePoint": "修改归属",
+    "createExam": "用收藏题组卷",
+    "confirmQueue": "确认并加入队列",
+    "make": "生成预览",
+    "edit": "继续编辑"
+  },
+  "filter": {
+    "search": "全文搜索",
+    "placeholder": "搜索标题、正文或知识点",
+    "type": "笔记类型",
+    "source": "来源",
+    "subject": "科目",
+    "since": "更新起始日期",
+    "all": "全部",
+    "noResults": "没有符合筛选条件的笔记",
+    "noResultsBody": "换个关键词，或清除筛选再看看。",
+    "advanced": "搜索与筛选"
+  },
+  "type": {
+    "general": "综合",
+    "mnemonic": "口诀",
+    "definition": "释义",
+    "key_points": "要点",
+    "pitfall": "易错"
+  },
+  "source": {
+    "reading": "阅读",
+    "classroom": "看课",
+    "practice": "做题",
+    "dialogue": "对话",
+    "voice": "语音",
+    "photo": "拍照手写"
+  },
+  "author": {
+    "manual": "手写",
+    "ai": "导师生成",
+    "ai_edited": "导师生成后编辑"
+  },
+  "list": {
+    "select": "选择笔记：{{title}}",
+    "selection": "已选择 {{total}} 条笔记",
+    "intro": "笔记按知识点归位，阅读、看课、做题、对话、语音和拍照手写都汇聚到这里。",
+    "updated": "更新于 {{date}}",
+    "source": "出处：{{source}}"
+  },
+  "integrity": {
+    "title": "完整性检查",
+    "coverage": "已覆盖 {{covered}} / {{total}} 个知识点",
+    "body": "对照知识地图，看看哪些要点还没有记下来。",
+    "missing": "建议补充",
+    "high": "高频",
+    "write": "去补一条",
+    "mapBody": "沿着知识点逐层回忆，先说出自己的理解，再展开核对。",
+    "hide": "遮挡要点",
+    "show": "展开要点"
+  },
+  "favorites": {
+    "title": "我的收藏",
+    "description": "题目、段落、讲解与笔记，放在一处回看。",
+    "kind": {
+      "all": "全部",
+      "question": "题目",
+      "paragraph": "段落",
+      "explanation": "讲解",
+      "note": "笔记"
+    }
+  },
+  "compilation": {
+    "notes": "汇编来源：{{total}} 条笔记",
+    "preview": "AI 生成 · 待确认预览",
+    "confirm": "确认保存汇编",
+    "length": "选择篇幅",
+    "origin": "来源：{{origin}}",
+    "templateTitle": "最后一页纸模板",
+    "templateBody": "核心概念、易混边界、常错步骤：先写下自己的回忆，再补充例子。",
+    "template": "使用模板",
+    "noHandbook": "记下第一条笔记后，就可以按知识地图汇编。"
+  },
+  "editor": {
+    "title": "笔记编辑器",
+    "name": "笔记标题",
+    "namePlaceholder": "给这条理解起个名字",
+    "point": "知识点归属",
+    "body": "笔记正文",
+    "bodyPlaceholder": "用自己的话记下理解；输入 / 查看命令",
+    "tools": "编辑工具",
+    "bold": "加粗",
+    "formula": "公式",
+    "table": "表格",
+    "image": "图片",
+    "drawing": "手写画板",
+    "slash": "斜杠命令",
+    "toolSoon": "{{tool}}即将上线",
+    "saveHint": "当前为前端演示，保存能力即将上线。",
+    "copyTitle": "试着换成自己的话",
+    "copyBody": "这段内容与原文较接近。补一句自己的解释或举个例子，会更容易回忆。",
+    "draft": "未保存的编辑预览",
+    "imageBody": "图片插入即将上线，可先把图片要点记在正文。",
+    "formulaBody": "公式编辑即将上线，可先输入公式的文字表达。",
+    "tableBody": "表格编辑即将上线，可先用分行文字整理对比。",
+    "drawBody": "手写画板即将上线，可先记录要点。"
+  },
+  "organize": {
+    "title": "AI 整理预览",
+    "body": "把零散笔记理顺成结构化内容。确认后才会保存；当前仅展示示例预览。",
+    "pending": "待确认，不会自动替换原笔记。"
+  },
+  "conversion": {
+    "title": "转为卡片",
+    "questionTitle": "转为自测题",
+    "body": "先核对内容与知识点归属，确认后才会加入队列。当前仅展示示例预览。",
+    "front": "正面 / 问题",
+    "back": "背面 / 参考答案",
+    "pending": "待确认，尚未入队"
+  },
+  "exportDialog": {
+    "title": "导出与打印",
+    "body": "当前视图可导出通用文本，或通过浏览器打印；不限次数。AI 内容会保留“AI 生成”标识。",
+    "download": "下载文本",
+    "filename": "笔记本",
+    "empty": "当前视图没有可导出的内容",
+    "ai": "AI 生成"
+  },
+  "state": {
+    "empty": {
+      "title": "还没有笔记",
+      "body": "在阅读、做题、问导师时随手记，都会归到知识点"
+    },
+    "error": {
+      "title": "笔记本没能加载",
+      "body": "笔记本的数据暂时没取到：网络或服务异常。已保存的内容不受影响，点“重试”即可；连续失败会自动上报。"
+    },
+    "offline": {
+      "title": "当前处于离线状态",
+      "body": "笔记可离线编辑，联网后同步",
+      "draft": "可继续编辑本次打开的草稿；保存与同步能力即将上线。"
+    },
+    "restricted": {
+      "title": "AI 整理暂时暂停",
+      "body": "AI 整理属于高成本 AI，额度用完时暂停，手写不受影响",
+      "action": "查看权益"
+    },
+    "insufficient": {
+      "title": "先从模板开始",
+      "body": "笔记太少时不生成最后一页纸，只给模板"
+    }
+  },
+  "errorReport": "即将上线"
+}
