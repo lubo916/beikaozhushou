@@ -426,7 +426,16 @@
         "GitHub Actions 的 verify 通过"
       ],
       "pages": [],
-      "status": "todo"
+      "status": "done",
+      "history": [
+        {
+          "round": 1,
+          "version": "v0027",
+          "tool": "local",
+          "date": "2026-10-22 15:39",
+          "status": "done"
+        }
+      ]
     },
     {
       "id": "F08",
