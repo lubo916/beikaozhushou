@@ -1,0 +1,193 @@
+{
+  "user": {
+    "id": "0192b000-0000-7000-8000-000000000001",
+    "display_name": "林同学",
+    "is_guest": false
+  },
+  "member": "pass",
+  "joined_on": "2025-09-10",
+  "stats": {
+    "goals": 3,
+    "effective_weeks": 18,
+    "graduated_mistakes": 126,
+    "mastered_points": 238
+  },
+  "shortcuts": [
+    {
+      "page": "S08",
+      "status": "ready",
+      "count": 0
+    },
+    {
+      "page": "S11",
+      "status": "connected",
+      "count": 4
+    },
+    {
+      "page": "S31",
+      "status": "ready",
+      "count": 0
+    },
+    {
+      "page": "S32",
+      "status": "private",
+      "count": 0
+    },
+    {
+      "page": "S33",
+      "status": "ready",
+      "count": 0
+    },
+    {
+      "page": "S35",
+      "status": "unread",
+      "count": 2
+    }
+  ],
+  "goals": [
+    {
+      "id": "0192b000-0000-7000-8000-000000000011",
+      "name": "中学教师资格笔试",
+      "target_date": "2027-05-15",
+      "status": "active",
+      "completion": 0.46
+    },
+    {
+      "id": "0192b000-0000-7000-8000-000000000021",
+      "name": "大学英语六级",
+      "target_date": "2027-06-12",
+      "status": "paused",
+      "completion": 0.28
+    },
+    {
+      "id": "0192b000-0000-7000-8000-000000000031",
+      "name": "自建《学习方法》阶段目标",
+      "target_date": "2026-09-20",
+      "status": "archived",
+      "completion": 1
+    }
+  ],
+  "milestones": [
+    {
+      "id": "0192b000-0000-7000-8000-000000000040",
+      "kind": "mistakes",
+      "value": 126,
+      "achieved_on": "2026-10-20"
+    },
+    {
+      "id": "0192b000-0000-7000-8000-000000000041",
+      "kind": "mastery",
+      "value": 238,
+      "achieved_on": "2026-10-18"
+    },
+    {
+      "id": "0192b000-0000-7000-8000-000000000042",
+      "kind": "phase",
+      "value": 1,
+      "detail": "第 1 轮 打基础",
+      "achieved_on": "2026-10-12"
+    },
+    {
+      "id": "0192b000-0000-7000-8000-000000000043",
+      "kind": "mock",
+      "value": 1,
+      "detail": "中学教师资格笔试",
+      "achieved_on": "2026-10-10"
+    },
+    {
+      "id": "0192b000-0000-7000-8000-000000000044",
+      "kind": "weeks",
+      "value": 18,
+      "achieved_on": "2026-10-05"
+    }
+  ],
+  "abilities": [
+    {
+      "id": "0192b000-0000-7000-8000-000000000050",
+      "name": "教育知识",
+      "scope": "中学教师资格笔试",
+      "coverage": 0.76
+    },
+    {
+      "id": "0192b000-0000-7000-8000-000000000051",
+      "name": "教学设计",
+      "scope": "中学教师资格笔试",
+      "coverage": 0.65
+    },
+    {
+      "id": "0192b000-0000-7000-8000-000000000052",
+      "name": "材料分析",
+      "scope": "跨考试技能",
+      "coverage": 0.71
+    }
+  ],
+  "comparison": {
+    "available": true,
+    "attempts": 2,
+    "items": [
+      {
+        "name": "有效学习周",
+        "previous": 12,
+        "current": 18
+      },
+      {
+        "name": "错题已毕业",
+        "previous": 78,
+        "current": 126
+      },
+      {
+        "name": "知识点已达标",
+        "previous": 172,
+        "current": 238
+      }
+    ]
+  },
+  "packages": [
+    {
+      "id": "0192b000-0000-7000-8000-000000000060",
+      "name": "综合素质学习包",
+      "status": "published",
+      "imports": 23,
+      "updated_on": "2026-10-20"
+    },
+    {
+      "id": "0192b000-0000-7000-8000-000000000061",
+      "name": "易混点辨析卡合集",
+      "status": "reviewing",
+      "imports": 0,
+      "updated_on": "2026-10-19"
+    },
+    {
+      "id": "0192b000-0000-7000-8000-000000000062",
+      "name": "旧版复习提纲",
+      "status": "withdrawn",
+      "imports": 8,
+      "updated_on": "2026-09-30"
+    }
+  ],
+  "history": [
+    {
+      "id": "0192b000-0000-7000-8000-000000000070",
+      "name": "中学教师资格笔试",
+      "completed_on": "2026-05-18",
+      "status": "passed",
+      "minutes": 5280,
+      "scores": [
+        {
+          "name": "综合成绩",
+          "value": 78,
+          "total": 100
+        }
+      ]
+    },
+    {
+      "id": "0192b000-0000-7000-8000-000000000071",
+      "name": "自建《学习方法》阶段目标",
+      "completed_on": "2026-02-10",
+      "status": "completed",
+      "minutes": 2160,
+      "scores": []
+    }
+  ],
+  "data_source": "sample"
+}
