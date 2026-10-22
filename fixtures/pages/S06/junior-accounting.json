@@ -2,30 +2,252 @@
   "week": 8,
   "date_estimated": true,
   "capped": false,
-  "tiers": { "lite": 55, "minimal": 20 },
+  "tiers": {
+    "lite": 55,
+    "minimal": 20
+  },
   "minutes_spent": 108,
-  "tomorrow_first": { "source": "due_review", "title": "到期复习 18 项", "minutes": 18 },
-  "first_skip": ["consolidate"],
+  "tomorrow_first": {
+    "source": "due_review",
+    "title": "到期复习 18 项",
+    "minutes": 18
+  },
+  "first_skip": [
+    "consolidate"
+  ],
   "tasks": [
-    { "id": "019a0106-0000-7000-8000-000000000001", "order": 10, "status": "done", "reasons": [{ "kind": "due", "count": 26 }], "go": { "page": "S15" } },
-    { "id": "019a0106-0000-7000-8000-000000000009", "order": 20, "status": "done", "segment": "consolidate", "source": "mistake_retry", "title": "错题回炉 5 道", "minutes": 16, "reasons": [{ "kind": "mistake_due", "count": 5 }], "go": { "page": "S18" } },
-    { "id": "019a0106-0000-7000-8000-000000000061", "order": 30, "status": "in_progress", "segment": "consolidate", "source": "verify_recheck", "title": "待验证复核 2 道", "minutes": 4, "reasons": [{ "kind": "guess_correct", "count": 2 }], "go": { "page": "S18" } },
-    { "id": "019a0106-0000-7000-8000-000000000062", "order": 10, "segment": "advance", "source": "to_target", "title": "补到目标：会计信息质量要求", "minutes": 12, "reasons": [{ "kind": "gap", "gap": 1 }, { "kind": "roi_tier", "tier": "S" }], "go": { "page": "S18" } },
-    { "id": "019a0106-0000-7000-8000-000000000003", "order": 20, "reasons": [{ "kind": "not_learned" }, { "kind": "frequency", "years": 5, "times": 4, "score": 6 }, { "kind": "new_rank", "rank": 1 }], "polished": "还没学过；近 5 年考了 4 次、年均约 6 分，在新学里性价比排第 1", "go": { "page": "S12" } },
-    { "id": "019a0106-0000-7000-8000-000000000002", "order": 30, "reasons": [{ "kind": "accuracy_band", "low": 0.6, "high": 0.8 }], "go": { "page": "S18" } },
-    { "id": "019a0106-0000-7000-8000-000000000063", "order": 40, "segment": "advance", "source": "org_or_custom", "title": "第 3 章分录专项 15 题", "minutes": 25, "reasons": [{ "kind": "weak_match" }, { "kind": "shared_budget" }], "go": { "page": "S18" } },
-    { "id": "019a0106-0000-7000-8000-000000000064", "order": 50, "segment": "advance", "source": "practice", "title": "分组聚合实操 1 题", "minutes": 15, "reasons": [{ "kind": "goal_deadline", "name": "认证", "days": 69 }, { "kind": "no_pass", "name": "分组聚合" }], "go": { "page": "S18" } },
-    { "id": "019a0106-0000-7000-8000-000000000004", "order": 10, "title": "口述回顾", "reasons": [{ "kind": "bedtime_recall" }], "go": { "page": "S16" } },
-    { "id": "019a0106-0000-7000-8000-000000000065", "order": 20, "segment": "closing", "source": "bedtime_review", "title": "周复盘", "minutes": 10, "reasons": [{ "kind": "weekly" }], "go": { "page": "S08" } }
+    {
+      "id": "019a0106-0000-7000-8000-000000000001",
+      "order": 10,
+      "status": "done",
+      "reasons": [
+        {
+          "kind": "due",
+          "count": 26
+        }
+      ],
+      "go": {
+        "page": "S15"
+      }
+    },
+    {
+      "id": "019a0106-0000-7000-8000-000000000009",
+      "order": 20,
+      "status": "done",
+      "segment": "consolidate",
+      "source": "mistake_retry",
+      "title": "错题回炉 5 道",
+      "minutes": 16,
+      "reasons": [
+        {
+          "kind": "mistake_due",
+          "count": 5
+        }
+      ],
+      "go": {
+        "page": "S18"
+      }
+    },
+    {
+      "id": "019a0106-0000-7000-8000-000000000061",
+      "order": 30,
+      "status": "in_progress",
+      "segment": "consolidate",
+      "source": "verify_recheck",
+      "title": "待验证复核 2 道",
+      "minutes": 4,
+      "reasons": [
+        {
+          "kind": "guess_correct",
+          "count": 2
+        }
+      ],
+      "go": {
+        "page": "S18"
+      }
+    },
+    {
+      "id": "019a0106-0000-7000-8000-000000000062",
+      "order": 10,
+      "segment": "advance",
+      "source": "to_target",
+      "title": "补到目标：会计信息质量要求",
+      "minutes": 12,
+      "reasons": [
+        {
+          "kind": "gap",
+          "gap": 1
+        },
+        {
+          "kind": "roi_tier",
+          "tier": "S"
+        }
+      ],
+      "go": {
+        "page": "S18"
+      }
+    },
+    {
+      "id": "019a0106-0000-7000-8000-000000000003",
+      "order": 20,
+      "reasons": [
+        {
+          "kind": "not_learned"
+        },
+        {
+          "kind": "frequency",
+          "years": 5,
+          "times": 4,
+          "score": 6
+        },
+        {
+          "kind": "new_rank",
+          "rank": 1
+        }
+      ],
+      "polished": "还没学过；近 5 年考了 4 次、年均约 6 分，在新学里性价比排第 1",
+      "go": {
+        "page": "S12"
+      }
+    },
+    {
+      "id": "019a0106-0000-7000-8000-000000000002",
+      "order": 30,
+      "reasons": [
+        {
+          "kind": "accuracy_band",
+          "low": 0.6,
+          "high": 0.8
+        }
+      ],
+      "go": {
+        "page": "S18"
+      }
+    },
+    {
+      "id": "019a0106-0000-7000-8000-000000000063",
+      "order": 40,
+      "segment": "advance",
+      "source": "org_or_custom",
+      "title": "第 3 章分录专项 15 题",
+      "minutes": 25,
+      "reasons": [
+        {
+          "kind": "weak_match"
+        },
+        {
+          "kind": "shared_budget"
+        }
+      ],
+      "go": {
+        "page": "S18"
+      }
+    },
+    {
+      "id": "019a0106-0000-7000-8000-000000000064",
+      "order": 50,
+      "segment": "advance",
+      "source": "practice",
+      "title": "分组聚合实操 1 题",
+      "minutes": 15,
+      "reasons": [
+        {
+          "kind": "goal_deadline",
+          "name": "认证",
+          "days": 69
+        },
+        {
+          "kind": "no_pass",
+          "name": "分组聚合"
+        }
+      ],
+      "go": {
+        "page": "S18"
+      }
+    },
+    {
+      "id": "019a0106-0000-7000-8000-000000000004",
+      "order": 10,
+      "reasons": [
+        {
+          "kind": "bedtime_recall"
+        }
+      ],
+      "go": {
+        "page": "S16"
+      }
+    },
+    {
+      "id": "019a0106-0000-7000-8000-000000000065",
+      "order": 20,
+      "segment": "closing",
+      "source": "bedtime_review",
+      "title": "周复盘",
+      "minutes": 10,
+      "reasons": [
+        {
+          "kind": "weekly"
+        }
+      ],
+      "go": {
+        "page": "S08"
+      }
+    }
   ],
   "off": [
-    { "id": "019a0106-0000-7000-8000-000000000066", "order": 10, "segment": "consolidate", "source": "due_review", "title": "到期复习（最小版）10 项", "minutes": 10, "reasons": [{ "kind": "off_day_moved", "count": 9 }], "go": { "page": "S15" } }
+    {
+      "id": "019a0106-0000-7000-8000-000000000066",
+      "order": 10,
+      "segment": "consolidate",
+      "source": "due_review",
+      "title": "到期复习（最小版）10 项",
+      "minutes": 10,
+      "reasons": [
+        {
+          "kind": "off_day_moved",
+          "count": 9
+        }
+      ],
+      "go": {
+        "page": "S15"
+      }
+    }
   ],
   "back": {
     "away_days": 5,
     "tasks": [
-      { "id": "019a0106-0000-7000-8000-000000000067", "order": 10, "segment": "consolidate", "source": "due_review", "title": "到期复习 8 张", "minutes": 6, "reasons": [{ "kind": "restart_due" }], "go": { "page": "S15" } },
-      { "id": "019a0106-0000-7000-8000-000000000068", "order": 20, "segment": "consolidate", "source": "mistake_retry", "title": "错题回炉 1 道", "minutes": 4, "reasons": [{ "kind": "restart_easy" }], "go": { "page": "S18" } }
+      {
+        "id": "019a0106-0000-7000-8000-000000000067",
+        "order": 10,
+        "segment": "consolidate",
+        "source": "due_review",
+        "title": "到期复习 8 张",
+        "minutes": 6,
+        "reasons": [
+          {
+            "kind": "restart_due"
+          }
+        ],
+        "go": {
+          "page": "S15"
+        }
+      },
+      {
+        "id": "019a0106-0000-7000-8000-000000000068",
+        "order": 20,
+        "segment": "consolidate",
+        "source": "mistake_retry",
+        "title": "错题回炉 1 道",
+        "minutes": 4,
+        "reasons": [
+          {
+            "kind": "restart_easy"
+          }
+        ],
+        "go": {
+          "page": "S18"
+        }
+      }
     ]
   }
 }
