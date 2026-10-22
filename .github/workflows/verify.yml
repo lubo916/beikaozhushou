@@ -31,6 +31,8 @@ jobs:
           --health-interval 5s --health-timeout 5s --health-retries 20
     env:
       CI: "1"
+      # 显式配置浏览器并发，让全量冒烟在 bk 的 25 分钟上限内跑完。
+      E2E_WORKERS: "4"
       DATABASE_URL: postgresql://exam_prep@127.0.0.1:5432/exam_prep
       TEST_DATABASE_URL: postgresql://exam_prep@127.0.0.1:5432/exam_prep_test
       REDIS_URL: redis://127.0.0.1:6379

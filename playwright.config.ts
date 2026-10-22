@@ -10,6 +10,7 @@ const CI = Boolean(process.env["CI"]);
 // 网页沙箱（claude.ai，有 /mnt/user-data）只带 Chromium，在那里只跑 Chromium；本地与 CI 跑三个浏览器。E2E_BROWSERS 可显式指定（逗号分隔）。
 const WEB_SANDBOX = existsSync("/mnt/user-data");
 const BROWSERS = (process.env["E2E_BROWSERS"] || (WEB_SANDBOX ? "chromium" : "chromium,webkit,firefox")).split(",");
+const WORKERS = process.env["E2E_WORKERS"];
 const BK_CHROMIUM = process.env["BK_CHROMIUM"] || "";
 const SANDBOX_CHROMIUM = BK_CHROMIUM !== "" && existsSync(BK_CHROMIUM) ? { launchOptions: { executablePath: BK_CHROMIUM } } : {};
 const PAGE_GALLERY = new RegExp(PAGE_GALLERY_TAG);
@@ -33,6 +34,7 @@ export default defineConfig({
   testDir: "tests/e2e",
   outputDir: ".test-results/playwright-artifacts",
   fullyParallel: true,
+  ...(WORKERS ? { workers: Number(WORKERS) } : {}),
   forbidOnly: CI,
   retries: CI ? 1 : 0,
   reporter: [["list"], ["json", { outputFile: ".test-results/playwright.json" }]],
