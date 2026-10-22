@@ -100,13 +100,16 @@
     "cell_pending": "有待验证的作答",
     "cell_dim": "不符合筛选",
     "locked": "“性价比阶梯”着色已置灰：地图体检未通过，性价比阶梯锁定。",
-    "fix": "去修复"
+    "fix": "去修复",
+    "cell": "{{name}}：{{text}}",
+    "and": "{{a}}；{{b}}"
   },
   "tree": {
     "label": "按章达标进度",
     "row": "{{reached}}/{{total}} 达标",
     "uncertain": "证据不足",
-    "out": "范围外"
+    "out": "范围外",
+    "status": "{{level}} · {{gap}}"
   },
   "graph": {
     "title": "以“{{name}}”为中心的关系",
@@ -222,7 +225,8 @@
       "isolated": "给孤立点补上前置或上下位关系",
       "duplicate": "核对后合并重复的点"
     },
-    "fix_action": "去修复"
+    "fix_action": "去修复",
+    "issue_line": "{{issue}}{{count}}：{{fix}}"
   },
   "state": {
     "empty": {
@@ -258,5 +262,6 @@
     "adopt_high": "一键采纳高置信即将上线：你确认后才生效。",
     "fix": "按体检建议修复即将上线。",
     "report": "反馈问题即将上线；连续失败会自动上报。"
-  }
+  },
+  "joiner": "、"
 }
