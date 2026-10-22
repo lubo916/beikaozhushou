@@ -107,19 +107,38 @@ interface Harness {
 function json(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 }
+/** 本页接口的“迟迟不回”：hold 改回 false 时放行，挂着的请求照常交给假数据层返回（像慢网络终于回来）。
+ *  原先挂着的请求永远不回，而 TanStack Query 对“还没有数据、正在请求”的查询再 refetch 只会等原来那次请求，
+ *  测试会在“回来后”这一步自己卡死（30 秒超时）；这里只改测试替身，断言不变。 */
+function createMode(): { readonly mode: Harness["mode"]; readonly whenReleased: () => Promise<void> } {
+  const waiting: (() => void)[] = [];
+  let hold = false;
+  const mode = {
+    deny: false,
+    offline: false,
+    get hold(): boolean {
+      return hold;
+    },
+    set hold(value: boolean) {
+      hold = value;
+      if (!value) for (const release of waiting.splice(0)) release();
+    },
+  };
+  return { mode, whenReleased: () => new Promise<void>((resolve) => waiting.push(resolve)) };
+}
 function harness(state = "", context: MeContext = DEMO_CONTEXT): Harness {
   const { api, control } = setupApi(state);
-  const mode = { hold: false, deny: false, offline: false };
-  stubFetch(api, mode);
+  const { mode, whenReleased } = createMode();
+  stubFetch(api, mode, whenReleased);
   return { client: testClient(context), control, mode };
 }
-function stubFetch(api: MockApi, mode: Harness["mode"]): void {
+function stubFetch(api: MockApi, mode: Harness["mode"], whenReleased: () => Promise<void>): void {
   vi.stubGlobal("fetch", async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const url = new URL(typeof input === "string" ? input : input instanceof URL ? input.href : input.url, "http://localhost");
     if (url.pathname.endsWith(SEARCH_PATH)) {
       if (mode.offline) throw new TypeError("network");
       if (mode.deny) return json(403, new ApiError("COMMON_FORBIDDEN").toBody());
-      if (mode.hold) return new Promise<Response>(() => undefined);
+      if (mode.hold) await whenReleased();
     }
     const outcome = await api.handle({
       method: init?.method ?? "GET",
@@ -396,10 +415,10 @@ describe("S29 AI 内容与拍照流程", () => {
       await settle(() => resultTitles(host).length > 0);
       const tutor = host.querySelector(`section[aria-label="${copy.kind.tutor}"]`);
       const tutorAi = tutor?.querySelector(".ui-ai .ui-ai__body");
-      expect(tutorAi, "导师答过的内容要用 AiContent 包起来").not.toBeNull();
+      expect(tutorAi, "导师答过的内容要用 AiContent 包起来").toBeInstanceOf(HTMLElement);
       if (tutorAi) expect(copyFrom(tutorAi)).toMatch(/^【AI 生成】/);
       const quick = host.querySelector(".ui-cols__aside .ui-ai .ui-ai__body");
-      expect(quick?.querySelector("table"), "AI 汇成的速查表要用 AiContent 包起来").not.toBeNull();
+      expect(quick?.querySelector("table"), "AI 汇成的速查表要用 AiContent 包起来").toBeInstanceOf(HTMLTableElement);
       if (quick) expect(copyFrom(quick)).toMatch(/^【AI 生成】/);
       const point = host.querySelector(`section[aria-label="${copy.kind.point}"]`);
       expect(point?.querySelector(".ui-ai"), "不是 AI 生成的结果不加标识").toBeNull();
