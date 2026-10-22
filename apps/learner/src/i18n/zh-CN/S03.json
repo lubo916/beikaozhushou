@@ -49,8 +49,8 @@
   },
   "view": {
     "label": "时间与资料步骤",
-    "time": "3a 时间",
-    "res": "3b 资料"
+    "time": "时间",
+    "res": "资料"
   },
   "identity": {
     "working": "在职",
