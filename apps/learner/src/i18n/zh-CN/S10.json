@@ -1,1 +1,224 @@
-{}
+{
+  "sample": "示例数据",
+  "header": {
+    "path": "第 {{no}} 章 {{chapter}}",
+    "path_section": "第 {{no}} 章 {{chapter}} › {{section}}",
+    "source": "来源：{{source}}地图",
+    "add_today": "加入今日",
+    "attack_pack": "{{minutes}} 分钟攻坚包",
+    "importance": "重要度",
+    "importance_overridden": "我改过，默认 {{level}} 级",
+    "importance_change": "改重要度",
+    "exam_level": "考情 {{level}} 级",
+    "exam_level_estimated": "考情 {{level}} 级（按重要度估算）",
+    "in_scope": "在学习范围内",
+    "in_scope_added": "在学习范围内（{{state}}）",
+    "out_of_scope": "不在学习范围（{{state}}）",
+    "scope_remove": "移出学习范围",
+    "scope_add": "加回学习范围",
+    "star": "星标",
+    "starred": "已星标",
+    "difficulty_personal": "对你：{{level}}",
+    "difficulty_objective": "客观难度：{{level}}",
+    "difficulty_title": "客观难度：{{objective}}；同类人群：{{peer}}；对你：{{personal}}",
+    "difficulty_unknown": "暂无"
+  },
+  "difficulty": {
+    "easier": "偏易",
+    "typical": "适中",
+    "harder": "偏难"
+  },
+  "ladder": {
+    "title": "掌握阶梯",
+    "meta": "系统判定由证据算出；自评并列显示",
+    "self_higher": "你的自评比系统判定高 {{n}} 档",
+    "self_lower": "你的自评比系统判定低 {{n}} 档",
+    "self_same": "你的自评和系统判定一致",
+    "verify": "去验证（{{items}} 题）",
+    "self_assess": "自评已掌握",
+    "change_target": "改目标档",
+    "target_default": "目标档按知识类型默认，可以改成自己的"
+  },
+  "methods": {
+    "title": "建议学法",
+    "note": "按知识类型“{{type}}”给出；类型可以改，学法随之变。",
+    "step": {
+      "learn": "学",
+      "memorize": "记",
+      "practice": "练",
+      "test": "测"
+    },
+    "concept": { "learn": "讲解、类比、正反例", "memorize": "要点回顾卡、辨析卡", "practice": "选择、判断、辨析", "test": "换个问法再考" },
+    "fact": { "learn": "对照表与口诀", "memorize": "挖空卡、数字卡、配对", "practice": "填空、配对、排序", "test": "隔天默写" },
+    "statute": { "learn": "原文精读、要件拆解", "memorize": "渐进挖空、要点背诵", "practice": "条文辨析、情境判断", "test": "默写或口述覆盖要点" },
+    "procedure": { "learn": "例题示范、步骤拆解", "memorize": "步骤卡、公式卡", "practice": "分步作答", "test": "换一组数据再走一遍" },
+    "application": { "learn": "案例拆解、思路模板", "memorize": "思路卡", "practice": "材料题、案例题", "test": "采分点命中达标" },
+    "essay": { "learn": "范文结构、素材积累", "memorize": "要点背诵、规范表述本", "practice": "限时写作", "test": "按细则得分区间达标" },
+    "oral": { "learn": "范例、答题框架", "memorize": "框架卡、关键句跟读", "practice": "仿真作答", "test": "多维评估加追问应对" },
+    "practical": { "learn": "演示、步骤清单", "memorize": "步骤卡", "practice": "提交作品或步骤记录", "test": "核对表逐项通过" },
+    "accumulation": { "learn": "卡片流", "memorize": "间隔复习", "practice": "抽测", "test": "抽测正确率（不进方格与预测）" }
+  },
+  "mistakes": {
+    "title": "我在这里怎么错",
+    "pattern": "最常见的错：{{text}}",
+    "pattern_note": "导师按你的错题归纳",
+    "caption": "做错过的选项",
+    "col_chosen": "你选的",
+    "col_reason": "为什么错",
+    "col_trap": "陷阱",
+    "cause_note": "（{{cause}}，不是陷阱）",
+    "none": "还没有在这个知识点上做错过。",
+    "compare": "对比易混点",
+    "make_card": "生成辨析卡"
+  },
+  "questions": {
+    "title": "关联题目",
+    "caption": "关联题目与变式",
+    "col_title": "题目",
+    "col_source": "来源",
+    "col_status": "状态",
+    "variant_group": "同类变式 {{n}} 道",
+    "past_group": "往年真题 {{n}} 道",
+    "wrong": "做错 {{n}} 次",
+    "correct": "做对 {{n}} 次",
+    "untried": "未做",
+    "none": "还没有关联题目。",
+    "practice": "去练这些题",
+    "add": "补一道题"
+  },
+  "evidence": {
+    "title": "我的证据",
+    "meta": "档位只看证据",
+    "kind": {
+      "answer": "作答",
+      "recall": "卡片回忆",
+      "check": "检验题"
+    },
+    "interval": "间隔 {{days}} 天",
+    "pending_note": "换个问法再考一次才算",
+    "mistake_note": "已进错题本",
+    "how": "档位是这样算的：隔了几天还独立做对、标“确定”的记强证据；蒙对或答得太快先记待验证，换个问法再考对才算；做错记负证据。",
+    "none": "还没有证据：做一道题或复习一张卡片，就会记下第一条。",
+    "all": "看全部 {{total}} 条"
+  },
+  "materials": {
+    "title": "在哪里学",
+    "licensed": "平台授权",
+    "section": "第 {{section}} 节",
+    "section_minutes": "第 {{section}} 节，约 {{duration}}",
+    "pages": "第 {{from}} 至 {{to}} 页",
+    "lecture": "第 {{lecture}} 讲，{{time}}起",
+    "video": "{{time}}起",
+    "none": "还没挂上资料。"
+  },
+  "profile": {
+    "title": "考点档案",
+    "syllabus": "考纲要求",
+    "frequency": "考频",
+    "frequency_value": "近 {{years}} 年 {{times}} 次",
+    "score": "分值",
+    "score_value": "年均约 {{score}}",
+    "types": "题型",
+    "angles": "考察角度",
+    "traps": "常见陷阱",
+    "trend": "趋势",
+    "trend_value": {
+      "rising": "考得越来越多",
+      "steady": "基本稳定",
+      "falling": "考得越来越少"
+    },
+    "updated": "更新于 {{year}} 年 {{month}} 月",
+    "unit_times": "次",
+    "unit_years": "年",
+    "cold": {
+      "title": "考点档案暂不展示",
+      "body": "考点档案在冷启动阶段不展示，成熟中只显示原始次数。学习照常，其他卡片不受影响。"
+    },
+    "maturing": {
+      "title": "考情数据还不够，先不下结论",
+      "body": "考情数据不足时按重要度估算，并标“按重要度估算”。",
+      "appearances": "真题里出现",
+      "years": "已收录真题",
+      "missing": "再收录 {{n}} 年真题，就能出完整的考点档案。"
+    }
+  },
+  "relations": {
+    "title": "知识关系",
+    "type": {
+      "prerequisite": "前置",
+      "confusable": "易混",
+      "hierarchy": "上下位",
+      "parallel": "并列",
+      "causal": "因果",
+      "case": "案例",
+      "boundary": "边界",
+      "exception": "例外"
+    },
+    "item": "{{type}}：{{name}}",
+    "origin_tutor": "导师建议，待你采纳",
+    "origin_tutor_done": "导师建议",
+    "compare": "对比",
+    "adopt": "采纳",
+    "none": "还没有登记关系。"
+  },
+  "cards": {
+    "title": "卡片与笔记",
+    "cards": "卡片",
+    "cards_unit": "张",
+    "cards_due": "{{n}} 张明天到期",
+    "notes": "笔记",
+    "notes_unit": "条",
+    "notes_tutor": "{{n}} 条来自导师对话",
+    "review": "去复习卡片",
+    "open_notes": "看笔记",
+    "add_card": "补一张卡片",
+    "add_note": "补一条笔记"
+  },
+  "add_today": {
+    "title": "加入今日",
+    "estimate": "预计要 {{duration}}。",
+    "displaces": "加入后会挤掉今天的「{{task}}」，它会顺延。",
+    "fits": "今天的时间还放得下，不会挤掉别的任务。",
+    "already": "它已经在今天的清单里了。",
+    "confirm": "加入今日",
+    "cancel": "先不加"
+  },
+  "state": {
+    "empty": {
+      "title": "这个知识点还没有内容",
+      "body": "还没挂上资料与题目",
+      "action": "去挂资料"
+    },
+    "offline": {
+      "body": "已缓存的讲解与笔记可看；做题记录联网后同步",
+      "notes": "去笔记本",
+      "stale": "现在没有联网，下面是上次取到的内容"
+    },
+    "restricted": {
+      "title": "知识点主页暂时看不了",
+      "body": "当前账号暂时不能查看这个知识点，常见原因是档位、年龄段或账号状态的限制；其他页面照常可用。",
+      "action": "看看会员与权益"
+    }
+  },
+  "soon": {
+    "add_today": "加入今日即将上线：确认后会排进今天的清单。",
+    "attack_pack": "攻坚包即将上线：诊断卡点、讲解、示范、渐退练习、检验，前后测证明有效。",
+    "verify": "检验题即将上线：做对了自评才生效。",
+    "self_assess": "自评即将上线：选了以后系统会随即出检验题。",
+    "target": "改目标档即将上线。",
+    "importance": "改重要度即将上线：你改的只影响自己，官方或模板的默认值不变。",
+    "scope": "范围开关即将上线：移出不删数据、仍可学，只是不计工作量、不进今日推荐。",
+    "star": "我的星标即将上线：只是个人收藏，不改重要度。",
+    "learn": "还没挂上能在阅读器里打开的资料。",
+    "practice": "按本知识点出题即将上线。",
+    "test": "换一组数据再考即将上线。",
+    "compare": "易混对比即将上线：差异点来自你自己的错题。",
+    "make_card": "生成辨析卡即将上线：生成后先进待确认区，你确认了才生效。",
+    "add_question": "补题即将上线。",
+    "add_card": "补卡片即将上线。",
+    "add_note": "补笔记即将上线。",
+    "evidence_all": "查看全部证据即将上线。",
+    "adopt": "采纳关系即将上线：你确认后才生效。",
+    "report": "反馈问题即将上线；连续失败会自动上报。"
+  }
+}
