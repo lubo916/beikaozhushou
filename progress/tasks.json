@@ -397,7 +397,16 @@
         "bk verify --level web 在网页端能跑通（数据库相关跳过）"
       ],
       "pages": [],
-      "status": "todo"
+      "status": "done",
+      "history": [
+        {
+          "round": 3,
+          "version": "v0026",
+          "tool": "local",
+          "date": "2026-10-22 08:05",
+          "status": "done"
+        }
+      ]
     },
     {
       "id": "F07",
