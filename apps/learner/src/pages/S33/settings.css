@@ -1,0 +1,16 @@
+.s33-settings .ui-tablist {
+  flex-wrap: wrap;
+  overflow: visible;
+}
+.s33-settings .ui-tab {
+  white-space: normal;
+}
+.s33-settings input,
+.s33-settings select {
+  font: inherit;
+}
+@container /* style-exempt: 860 对应 size.breakpoint.content-md */ (width >= 860px) {
+  .s33-settings .s33-learning {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

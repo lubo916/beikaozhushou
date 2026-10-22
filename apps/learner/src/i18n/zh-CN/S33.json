@@ -1,1 +1,272 @@
-{}
+{
+  "title": "设置",
+  "subtitle": "按自己的节奏学习，每个选择都清楚说明影响。",
+  "sample": "示例数据",
+  "tabs_label": "设置分类",
+  "tabs": {
+    "learning": "学习与记忆",
+    "tutor": "导师与阅读",
+    "reminders": "提醒",
+    "appearance": "外观与无障碍",
+    "account": "账号"
+  },
+  "save": "保存当前设置",
+  "preview": "当前为偏好预览，保存设置即将上线。",
+  "soon": "即将上线",
+  "reset": "使用默认设置",
+  "actions": {
+    "password": "修改密码",
+    "phone": "换绑手机号",
+    "bind": "补绑手机号",
+    "avatar": "修改头像",
+    "guide": "重开新手引导",
+    "hints": "重置“不再提示”",
+    "handoff": "跨端接力",
+    "offline": "管理离线包",
+    "privacy": "数据与隐私",
+    "help": "消息与帮助",
+    "classroom": "视听课堂"
+  },
+  "sections": {
+    "memory": "记忆参数",
+    "reading": "阅读与标注",
+    "assist": "做题辅助",
+    "delivery": "提醒时段与频控",
+    "accessibility": "无障碍",
+    "devices": "多端与离线",
+    "security": "账号安全",
+    "guide": "帮助与引导",
+    "rhythm": "学习节奏"
+  },
+  "hint": {
+    "bounds": "所有数值只提供平台允许的选项；学习节奏与学习计划使用同一设置。",
+    "new_cards": "调高每日新卡上限后，之后的复习量可能超过每日复习上限。",
+    "evidence": "关闭前请查看证据影响；重新开启不会补记之前的证据。",
+    "reminders": "各类别、各通道可分别管理；统一控制频次，深夜不推送。",
+    "quiet": "免打扰时段内暂停提醒，必要的账号安全通知除外。",
+    "account": "修改密码前验证旧密码；换绑手机号须两步验证。成功后其他设备下线。",
+    "bind": "仅微信登录且未绑手机号时，付费、注销、换绑与管理设备前须先补绑手机号。",
+    "nickname": "昵称保存前须做敏感词与仿冒检查。",
+    "offline": "离线包与跨端接力即将上线；联网后同步设置。",
+    "accessibility": "支持键盘操作与读屏，控件均提供可读名称。",
+    "preview": "此页为示例数据。调整只用于当前界面预览，真实保存与安全验证即将上线。"
+  },
+  "confirm": {
+    "title": "确认偏好影响",
+    "new_cards": "你正在调整每日新卡上限。调高后，之后的复习量可能超过每日复习上限。",
+    "confidence": "关闭把握度标注后，正确作答最高只记中证据。",
+    "reading_check": "关闭读后即测后，阅读仅记“看过”，不作为有效学习证据。",
+    "confirm": "了解影响并预览",
+    "cancel": "保留原设置"
+  },
+  "security": {
+    "password_title": "修改密码",
+    "old_password": "旧密码",
+    "new_password": "新密码",
+    "verify": "验证并修改",
+    "phone_title": "手机号验证",
+    "old_code": "原手机号验证码",
+    "new_phone": "新手机号",
+    "new_code": "新手机号验证码",
+    "phone_verify": "完成两步验证",
+    "verification": "验证与保存即将上线；本页不收集或发送真实账号信息。",
+    "nickname": "昵称",
+    "bound": "已绑定手机号",
+    "unbound": "尚未绑定手机号"
+  },
+  "state": {
+    "empty": {
+      "title": "使用默认设置",
+      "body": "所有设置都有默认值，可以不改"
+    },
+    "offline": {
+      "title": "当前离线",
+      "body": "设置可离线修改，联网后同步"
+    },
+    "restricted": {
+      "title": "可调范围受限",
+      "body": "学员端可调参数只能在平台允许的区间内取值",
+      "action": "查看允许的选项"
+    },
+    "insufficient_data": {
+      "title": "本页不适用数据不足",
+      "body": "设置使用默认值，不依赖学习样本。"
+    },
+    "error": {
+      "body": "设置的数据暂时没取到：网络或服务异常。已保存的内容不受影响，点“重试”即可；连续失败会自动上报。"
+    }
+  },
+  "option": {
+    "enabled": "开启",
+    "disabled": "关闭",
+    "duration": "{{value}}",
+    "number": "{{value}}",
+    "ratio": "{{value}}",
+    "value": "{{value}}",
+    "cost": "按性价比",
+    "review_first": "复习优先",
+    "new_first": "新学优先",
+    "direct": "直接讲",
+    "guided": "引导提问",
+    "explain_back": "讲给我听",
+    "gentle": "先提示再纠错",
+    "direct_fix": "直接指出问题",
+    "note": "综合",
+    "highlight": "要点",
+    "error": "易错",
+    "brand": "主题色",
+    "warning": "提醒色",
+    "text": "文字与颜色",
+    "color": "颜色与图标",
+    "light": "浅色",
+    "dark": "深色",
+    "eye": "护眼",
+    "system": "跟随系统",
+    "standard": "标准",
+    "large": "较大",
+    "larger": "更大",
+    "comfortable": "舒适",
+    "loose": "宽松",
+    "normal": "标准对比度",
+    "high": "高对比度",
+    "shape": "色觉友好（颜色与形状）"
+  },
+  "field": {
+    "daily_minutes": {
+      "label": "每日学习时长",
+      "help": "与学习计划中的时间预算同步。"
+    },
+    "pace": {
+      "label": "配比模式",
+      "help": "选择今日清单的学习偏好。"
+    },
+    "retention": {
+      "label": "目标保持率",
+      "help": "保持率越高，通常需要更频繁地复习。"
+    },
+    "review_limit": {
+      "label": "每日复习上限",
+      "help": "只在平台允许范围内调整。"
+    },
+    "new_limit": {
+      "label": "每日新卡上限",
+      "help": "调高前先了解之后的复习量。"
+    },
+    "confidence": {
+      "label": "把握度标注",
+      "help": "默认开启；关闭后正确作答最高只记中证据。"
+    },
+    "reading_check": {
+      "label": "读后即测",
+      "help": "默认开启；关闭后阅读仅记“看过”，不计有效学习证据。"
+    },
+    "explanation": {
+      "label": "默认讲法",
+      "help": "选择导师讲解方式。"
+    },
+    "correction": {
+      "label": "纠错方式",
+      "help": "选择更适合自己的纠错节奏。"
+    },
+    "warmup": {
+      "label": "学习前预热",
+      "help": "进入学习前先回顾背景。"
+    },
+    "card_count": {
+      "label": "建议制卡数量",
+      "help": "仅预览偏好；AI 生成内容仍需确认。"
+    },
+    "reading_size": {
+      "label": "阅读字号",
+      "help": "调节阅读器默认字号。"
+    },
+    "line_height": {
+      "label": "阅读行高",
+      "help": "调节阅读器默认行间距。"
+    },
+    "annotation": {
+      "label": "默认标注类型",
+      "help": "选择新标注使用的类型。"
+    },
+    "annotation_color": {
+      "label": "默认标注颜色",
+      "help": "颜色之外保留文字标识。"
+    },
+    "importance": {
+      "label": "重要度显示",
+      "help": "同时呈现文字或图标，便于辨认。"
+    },
+    "review_reminder": {
+      "label": "到期复习提醒",
+      "help": "管理到期复习类提醒。"
+    },
+    "plan_reminder": {
+      "label": "计划与顺延通知",
+      "help": "管理今日清单与自动顺延通知。"
+    },
+    "system_reminder": {
+      "label": "系统与服务通知",
+      "help": "管理服务与更新消息。"
+    },
+    "in_app": {
+      "label": "站内消息",
+      "help": "在消息与帮助里查看。"
+    },
+    "push": {
+      "label": "设备推送",
+      "help": "需设备授权后使用。"
+    },
+    "sms": {
+      "label": "短信提醒",
+      "help": "使用已绑定手机号。"
+    },
+    "reminder_start": {
+      "label": "提醒开始时间",
+      "help": "按账号时区显示。"
+    },
+    "reminder_end": {
+      "label": "提醒结束时间",
+      "help": "深夜不推送。"
+    },
+    "quiet_start": {
+      "label": "免打扰开始",
+      "help": "按账号时区显示。"
+    },
+    "quiet_end": {
+      "label": "免打扰结束",
+      "help": "免打扰结束后恢复提醒。"
+    },
+    "theme": {
+      "label": "界面外观",
+      "help": "浅色、深色、护眼或跟随系统。"
+    },
+    "font_size": {
+      "label": "界面字号",
+      "help": "增强页面可读性。"
+    },
+    "contrast": {
+      "label": "对比度",
+      "help": "提升文字与背景的区分度。"
+    },
+    "mastery_color": {
+      "label": "掌握档配色",
+      "help": "颜色与文字、形状共同表达。"
+    },
+    "screen_reader": {
+      "label": "读屏增强",
+      "help": "提供控件名称与状态提示。"
+    },
+    "reduced_motion": {
+      "label": "减少动效",
+      "help": "减少非必要动画。"
+    },
+    "keyboard": {
+      "label": "键盘操作提示",
+      "help": "显示焦点与可操作提示。"
+    },
+    "nickname": {
+      "label": "显示昵称",
+      "help": "保存前检查敏感词与仿冒。"
+    }
+  }
+}

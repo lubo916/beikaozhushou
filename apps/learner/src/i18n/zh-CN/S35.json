@@ -1,1 +1,115 @@
-{}
+{
+  "title": "消息与帮助",
+  "description": "提醒有用，反馈有回音。",
+  "sample": "示例数据",
+  "notification": {
+    "title": "通知中心",
+    "filter": "通知类别",
+    "all": "全部",
+    "review": "复习提醒",
+    "node": "考试节点",
+    "completion": "任务完成",
+    "security": "账号安全",
+    "unread": "未读",
+    "read": "已读",
+    "open": "去处理",
+    "mark": "标记已读",
+    "no_match": "这个类别暂时没有消息。",
+    "discipline": "学习类提醒每天最多 {{cap}} 条；连续被忽略会自动降频。",
+    "quiet": "免打扰 {{start}}—{{end}}；静默时段的提醒次日送达并说明。",
+    "delayed": "因免打扰延后送达",
+    "settings": "设置提醒"
+  },
+  "announcement": {
+    "title": "系统公告",
+    "detail": "查看公告"
+  },
+  "push": {
+    "title": "开启推送，及时收到有用提醒",
+    "body": "可接收复习提醒与考试节点。开启前会申请系统权限；拒绝后仍可在站内查看消息，并节制地再次询问。",
+    "action": "了解并开启推送",
+    "later": "暂不开启",
+    "confirm": "申请系统权限",
+    "enabled": "推送权限已开启"
+  },
+  "service": {
+    "title": "客服与反馈",
+    "intro": "AI 先答；费用、投诉和账号安全问题转人工。",
+    "question": "描述问题",
+    "placeholder": "请说明遇到的问题，不要填写密码或验证码",
+    "ask": "询问智能客服",
+    "human": "联系人工客服",
+    "hours": "工作时间",
+    "contact": "联系方式",
+    "outside": "当前非工作时间，留言后将转为工单。",
+    "available": "当前在工作时间内",
+    "feedback": "提交问题反馈",
+    "context": "自动带入的页面上下文",
+    "order": "关联订单号",
+    "no_order": "未关联订单",
+    "current_page": "当前页面",
+    "source_page": "来源页面",
+    "feedback_desc": "反馈会自动带上页面与订单上下文，处理进度可在“我的工单与反馈”查看。",
+    "submit": "发送反馈",
+    "message": "问题描述",
+    "close": "关闭",
+    "ai_title": "智能客服示例回复",
+    "ai_note": "AI 生成，仅供参考；涉及费用、投诉、账号安全请联系人工。"
+  },
+  "tickets": {
+    "title": "我的工单与反馈",
+    "description": "处理进度与回复只读；报错会收到结论。",
+    "processing": "处理中",
+    "replied": "已回复",
+    "resolved": "已解决",
+    "detail": "查看进度与回复",
+    "context": "反馈上下文",
+    "reply": "客服回复",
+    "conclusion": "处理结论",
+    "satisfaction": "评价本次处理",
+    "satisfied": "满意",
+    "unsatisfied": "还需帮助",
+    "readonly": "此处仅查看处理进度与回复，不能修改原始反馈。",
+    "empty": "暂无工单与反馈。"
+  },
+  "help": {
+    "title": "帮助中心",
+    "description": "常见问题与使用说明"
+  },
+  "state": {
+    "empty": {
+      "title": "没有新消息",
+      "body": "提醒每天最多 {{cap}} 条，深夜不推",
+      "action": "去设置提醒"
+    },
+    "offline": {
+      "title": "当前离线",
+      "body": "显示已缓存的消息。新消息、客服与反馈需要联网。",
+      "no_cache": "当前没有可读取的消息缓存，联网后重试即可。",
+      "stale": "正在显示已缓存的消息",
+      "retry": "重试"
+    },
+    "restricted": {
+      "title": "推送权限未开启",
+      "body": "只在站内显示消息；仍可查看通知、帮助和工单。"
+    },
+    "insufficient_data": {
+      "title": "本页不作数据推断",
+      "body": "消息与帮助不适用数据不足判断，已有通知、帮助与工单照常显示。"
+    },
+    "error": {
+      "title": "消息与帮助没能加载",
+      "body": "消息与帮助的数据暂时没取到：网络或服务异常。已保存的内容不受影响，点“重试”即可；连续失败会自动上报。"
+    }
+  },
+  "soon": {
+    "read": "标记已读即将上线",
+    "push": "推送授权即将上线，当前仍可在站内查看消息",
+    "ask": "智能客服即将上线",
+    "human": "人工客服留言即将上线",
+    "feedback": "反馈发送即将上线，当前未提交",
+    "satisfaction": "满意度评价即将上线",
+    "report": "问题反馈即将上线"
+  },
+  "feedback_validation": "请先填写问题描述。"
+}
