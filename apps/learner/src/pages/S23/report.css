@@ -1,0 +1,17 @@
+.s23-hero.ui-card {
+  background: var(--color-brand-primary-ink);
+  color: var(--color-bg-surface);
+}
+.s23-hero .ui-card__title,
+.s23-hero .ui-stat__label,
+.s23-hero .ui-stat__value,
+.s23-hero .ui-stat__hint {
+  color: var(--color-bg-surface);
+}
+.s23-hero .ui-stat:first-child .ui-stat__value {
+  font-size: calc(var(--font-size-title) * 2);
+}
+.s23-hero .ui-ai,
+.s23-hero .ui-state {
+  color: var(--color-ink-primary);
+}

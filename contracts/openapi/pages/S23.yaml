@@ -1,0 +1,540 @@
+{
+  "paths": {
+    "/practice/reports/{reportId}": {
+      "get": {
+        "operationId": "getAssessmentReport",
+        "x-owner": "practice",
+        "x-action": "learner.mastery.read",
+        "summary": "整卷测评报告（阶段一示例数据，仅本人）",
+        "description": "仅假数据阶段临时复用本人掌握数据读取权限。接通真实后端前须由整合任务登记 practice.report.read，不得直接作为真实报告鉴权。",
+        "parameters": [
+          {
+            "name": "reportId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "测评报告，业务数字与提议均由接口提供",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/S23AssessmentReport"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "S23AssessmentReport": {
+        "type": "object",
+        "required": [
+          "id",
+          "exam_id",
+          "title",
+          "completed_at",
+          "time_zone",
+          "available",
+          "data_source",
+          "summary",
+          "losses",
+          "error_causes",
+          "traps",
+          "question_types",
+          "knowledge_points",
+          "time_strategy",
+          "confidence",
+          "simulation",
+          "reinforcement",
+          "questions",
+          "pending_grading",
+          "unattributed_count",
+          "unattributed_question_ids",
+          "demo_exam_key"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "exam_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "completed_at": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "time_zone": {
+            "type": "string"
+          },
+          "available": {
+            "type": "boolean"
+          },
+          "data_source": {
+            "$ref": "#/components/schemas/DataSource"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/S23Summary"
+          },
+          "losses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S23Distribution"
+            }
+          },
+          "error_causes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S23Distribution"
+            }
+          },
+          "traps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S23Distribution"
+            }
+          },
+          "question_types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S23Analysis"
+            }
+          },
+          "knowledge_points": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S23Analysis"
+            }
+          },
+          "time_strategy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S23TimeStrategy"
+            }
+          },
+          "confidence": {
+            "$ref": "#/components/schemas/S23Confidence"
+          },
+          "simulation": {
+            "$ref": "#/components/schemas/S23Simulation"
+          },
+          "reinforcement": {
+            "$ref": "#/components/schemas/S23Reinforcement"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S23Question"
+            }
+          },
+          "pending_grading": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "unattributed_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "unattributed_question_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "demo_exam_key": {
+            "type": "string",
+            "description": "阶段一演示考试上下文，供示例报告缓存隔离；不参与业务计算。"
+          }
+        }
+      },
+      "S23Summary": {
+        "type": "object",
+        "required": [
+          "score",
+          "total",
+          "target",
+          "gap",
+          "gap_kind",
+          "interpretation",
+          "low_score_path",
+          "sample_count",
+          "minimum_sample_count",
+          "rank_visible",
+          "percentile",
+          "screen_switches",
+          "duration_minutes"
+        ],
+        "properties": {
+          "score": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "target": {
+            "type": "number"
+          },
+          "gap": {
+            "type": "number"
+          },
+          "gap_kind": {
+            "type": "string",
+            "enum": [
+              "above",
+              "below",
+              "on_target"
+            ]
+          },
+          "interpretation": {
+            "type": "string"
+          },
+          "low_score_path": {
+            "type": "string"
+          },
+          "sample_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "minimum_sample_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "rank_visible": {
+            "type": "boolean"
+          },
+          "percentile": {
+            "type": "number"
+          },
+          "screen_switches": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "duration_minutes": {
+            "type": "number"
+          }
+        }
+      },
+      "S23Distribution": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "count",
+          "lost_score",
+          "ratio",
+          "question_ids"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "lost_score": {
+            "type": "number"
+          },
+          "ratio": {
+            "type": "number"
+          },
+          "question_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "S23Analysis": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "score",
+          "total",
+          "rate",
+          "note"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "name": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "rate": {
+            "type": "number"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      },
+      "S23TimeStrategy": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "actual_minutes",
+          "suggested_minutes",
+          "completion_rate",
+          "order",
+          "note"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "actual_minutes": {
+            "type": "number"
+          },
+          "suggested_minutes": {
+            "type": "number"
+          },
+          "completion_rate": {
+            "type": "number"
+          },
+          "order": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      },
+      "S23Confidence": {
+        "type": "object",
+        "required": [
+          "sure_wrong_ratio",
+          "guess_correct_ratio",
+          "sure_wrong_count",
+          "guess_correct_count",
+          "advice"
+        ],
+        "properties": {
+          "sure_wrong_ratio": {
+            "type": "number"
+          },
+          "guess_correct_ratio": {
+            "type": "number"
+          },
+          "sure_wrong_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "guess_correct_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "advice": {
+            "type": "string"
+          }
+        }
+      },
+      "S23Simulation": {
+        "type": "object",
+        "required": [
+          "before_order",
+          "after_order",
+          "gain_low",
+          "gain_high",
+          "note"
+        ],
+        "properties": {
+          "before_order": {
+            "type": "string"
+          },
+          "after_order": {
+            "type": "string"
+          },
+          "gain_low": {
+            "type": "number"
+          },
+          "gain_high": {
+            "type": "number"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      },
+      "S23Reinforcement": {
+        "type": "object",
+        "required": [
+          "days",
+          "tasks",
+          "proposal"
+        ],
+        "properties": {
+          "days": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S23Task"
+            }
+          },
+          "proposal": {
+            "$ref": "#/components/schemas/S23Proposal"
+          }
+        }
+      },
+      "S23Task": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "day_label",
+          "minutes",
+          "tier",
+          "reason"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "day_label": {
+            "type": "string"
+          },
+          "minutes": {
+            "type": "number"
+          },
+          "tier": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "S23Proposal": {
+        "type": "object",
+        "required": [
+          "what",
+          "why",
+          "cost",
+          "if_not"
+        ],
+        "properties": {
+          "what": {
+            "type": "string"
+          },
+          "why": {
+            "type": "string"
+          },
+          "cost": {
+            "type": "string"
+          },
+          "if_not": {
+            "type": "string"
+          }
+        }
+      },
+      "S23Question": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "title",
+          "question_type",
+          "answer",
+          "expected_answer",
+          "correct",
+          "score",
+          "total",
+          "duration_seconds",
+          "confidence",
+          "analysis",
+          "loss_id",
+          "error_cause",
+          "trap",
+          "pending_grading"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "number": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "title": {
+            "type": "string"
+          },
+          "question_type": {
+            "type": "string"
+          },
+          "answer": {
+            "$ref": "#/components/schemas/AnswerResponse"
+          },
+          "expected_answer": {
+            "type": "string"
+          },
+          "correct": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "score": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "duration_seconds": {
+            "type": "number"
+          },
+          "confidence": {
+            "$ref": "#/components/schemas/Confidence"
+          },
+          "analysis": {
+            "type": "string"
+          },
+          "loss_id": {
+            "type": "string"
+          },
+          "error_cause": {
+            "type": "string"
+          },
+          "trap": {
+            "type": "string"
+          },
+          "pending_grading": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,391 @@
+{
+  "id": "019a0023-0003-7000-8000-000000000100",
+  "exam_id": "ds-final-custom",
+  "title": "数据结构 · 单元测评",
+  "completed_at": "2026-10-21T12:30:00Z",
+  "time_zone": "Asia/Shanghai",
+  "available": true,
+  "data_source": "sample",
+  "summary": {
+    "score": 46,
+    "total": 100,
+    "target": 60,
+    "gap": 14,
+    "gap_kind": "below",
+    "interpretation": "先在最熟悉的部分找回稳定性。会但做错和时间分配值得优先关注；一次测评只是一张快照。",
+    "low_score_path": "先复盘一道确定却做错的题，再完成对应知识点的短练习；从一个能开始的小任务恢复节奏。",
+    "sample_count": 36,
+    "minimum_sample_count": 200,
+    "rank_visible": false,
+    "percentile": 0.64,
+    "screen_switches": 2,
+    "duration_minutes": 92
+  },
+  "losses": [
+    {
+      "id": "loss-0",
+      "name": "没学过",
+      "count": 3,
+      "lost_score": 10,
+      "ratio": 0.1852,
+      "question_ids": [
+        "019a0023-0003-7000-8000-000000000001"
+      ]
+    },
+    {
+      "id": "loss-1",
+      "name": "学过忘了",
+      "count": 4,
+      "lost_score": 12,
+      "ratio": 0.2222,
+      "question_ids": [
+        "019a0023-0003-7000-8000-000000000002"
+      ]
+    },
+    {
+      "id": "loss-2",
+      "name": "会但做错",
+      "count": 5,
+      "lost_score": 14,
+      "ratio": 0.2593,
+      "question_ids": [
+        "019a0023-0003-7000-8000-000000000001",
+        "019a0023-0003-7000-8000-000000000005"
+      ]
+    },
+    {
+      "id": "loss-3",
+      "name": "没做完",
+      "count": 2,
+      "lost_score": 8,
+      "ratio": 0.1481,
+      "question_ids": [
+        "019a0023-0003-7000-8000-000000000004"
+      ]
+    },
+    {
+      "id": "loss-4",
+      "name": "蒙错",
+      "count": 1,
+      "lost_score": 4,
+      "ratio": 0.0741,
+      "question_ids": [
+        "019a0023-0003-7000-8000-000000000005"
+      ]
+    },
+    {
+      "id": "loss-5",
+      "name": "表达扣分",
+      "count": 1,
+      "lost_score": 6,
+      "ratio": 0.1111,
+      "question_ids": [
+        "019a0023-0003-7000-8000-000000000006"
+      ]
+    }
+  ],
+  "error_causes": [
+    {
+      "id": "cause-1",
+      "name": "概念没懂",
+      "count": 3,
+      "lost_score": 6,
+      "ratio": 0.3,
+      "question_ids": [
+        "019a0023-0003-7000-8000-000000000001"
+      ]
+    },
+    {
+      "id": "cause-2",
+      "name": "审题失误",
+      "count": 4,
+      "lost_score": 8,
+      "ratio": 0.4,
+      "question_ids": [
+        "019a0023-0003-7000-8000-000000000005"
+      ]
+    },
+    {
+      "id": "cause-3",
+      "name": "时间不够",
+      "count": 3,
+      "lost_score": 6,
+      "ratio": 0.3,
+      "question_ids": [
+        "019a0023-0003-7000-8000-000000000004"
+      ]
+    }
+  ],
+  "traps": [
+    {
+      "id": "trap-1",
+      "name": "偷换概念",
+      "count": 3,
+      "lost_score": 6,
+      "ratio": 0.6,
+      "question_ids": [
+        "019a0023-0003-7000-8000-000000000001"
+      ]
+    },
+    {
+      "id": "trap-2",
+      "name": "忽略例外",
+      "count": 2,
+      "lost_score": 4,
+      "ratio": 0.4,
+      "question_ids": [
+        "019a0023-0003-7000-8000-000000000002"
+      ]
+    }
+  ],
+  "question_types": [
+    {
+      "id": "019a0023-0003-7000-8000-000000000201",
+      "name": "单选",
+      "score": 28,
+      "total": 60,
+      "rate": 0.47,
+      "note": "先读限制条件，再选答案。"
+    },
+    {
+      "id": "019a0023-0003-7000-8000-000000000202",
+      "name": "材料题",
+      "score": 18,
+      "total": 40,
+      "rate": 0.45,
+      "note": "先列要点，再展开论证。"
+    }
+  ],
+  "knowledge_points": [
+    {
+      "id": "019a0403-0000-7000-8000-000000000001",
+      "name": "时间复杂度分析",
+      "score": 3,
+      "total": 5,
+      "rate": 0.6,
+      "note": "优先补强"
+    },
+    {
+      "id": "019a0403-0000-7000-8000-000000000002",
+      "name": "线性表的顺序存储",
+      "score": 2,
+      "total": 5,
+      "rate": 0.4,
+      "note": "换个问法再考"
+    },
+    {
+      "id": "019a0403-0000-7000-8000-000000000003",
+      "name": "链表的插入与删除",
+      "score": 4,
+      "total": 5,
+      "rate": 0.8,
+      "note": "保持间隔复习"
+    }
+  ],
+  "time_strategy": [
+    {
+      "id": "part-1",
+      "name": "客观题",
+      "actual_minutes": 42,
+      "suggested_minutes": 35,
+      "completion_rate": 1,
+      "order": "先做",
+      "note": "遇到不确定的题先标记，避免反复纠缠。"
+    },
+    {
+      "id": "part-2",
+      "name": "材料题",
+      "actual_minutes": 38,
+      "suggested_minutes": 45,
+      "completion_rate": 0.8,
+      "order": "随后",
+      "note": "先列采分要点，留出写完整答案的时间。"
+    },
+    {
+      "id": "tail",
+      "name": "末段检查",
+      "actual_minutes": 12,
+      "suggested_minutes": 10,
+      "completion_rate": 0.75,
+      "order": "最后",
+      "note": "优先补全漏答，再回看标记题。"
+    }
+  ],
+  "confidence": {
+    "sure_wrong_ratio": 0.18,
+    "guess_correct_ratio": 0.12,
+    "sure_wrong_count": 4,
+    "guess_correct_count": 2,
+    "advice": "确定却做错时先检查概念边界；蒙对先标为待验证，换个问法再考。"
+  },
+  "simulation": {
+    "before_order": "客观题 → 材料题 → 检查",
+    "after_order": "熟悉的客观题 → 材料题 → 标记题",
+    "gain_low": 3,
+    "gain_high": 6,
+    "note": "仅基于本次作答过程的示例模拟；不直接改变成绩或预测。"
+  },
+  "reinforcement": {
+    "days": 7,
+    "tasks": [
+      {
+        "id": "task-1",
+        "name": "时间复杂度分析：辨清易混边界",
+        "day_label": "第 1–2 天",
+        "minutes": 20,
+        "tier": "S",
+        "reason": "先补确定却做错的概念，短练后再检验。"
+      },
+      {
+        "id": "task-2",
+        "name": "线性表的顺序存储：限时小练习",
+        "day_label": "第 3–4 天",
+        "minutes": 25,
+        "tier": "A",
+        "reason": "把步骤走完整，再练时间分配。"
+      },
+      {
+        "id": "task-3",
+        "name": "整卷节奏复测",
+        "day_label": "第 5–7 天",
+        "minutes": 30,
+        "tier": "A",
+        "reason": "用新题检验补强效果，与自己比较。"
+      }
+    ],
+    "proposal": {
+      "what": "把本报告的补强任务加入近期计划。",
+      "why": "优先补本次暴露的易混边界与时间策略。",
+      "cost": "占用近期可用时段；不挤占到期复习，具体调整接通后确认。",
+      "if_not": "原计划保持原样，可自行复盘本场错题。"
+    }
+  },
+  "questions": [
+    {
+      "id": "019a0023-0003-7000-8000-000000000001",
+      "number": 1,
+      "title": "时间复杂度分析：情境应用与关键条件辨析",
+      "question_type": "单选",
+      "answer": {
+        "text": "选项乙"
+      },
+      "expected_answer": "选项甲",
+      "correct": false,
+      "score": 0,
+      "total": 2,
+      "duration_seconds": 86,
+      "confidence": "sure",
+      "analysis": "先找出题干的限制条件，再核对每个选项的适用范围。不能只凭关键词作答。",
+      "loss_id": "loss-0",
+      "error_cause": "概念没懂",
+      "trap": "偷换概念",
+      "pending_grading": false
+    },
+    {
+      "id": "019a0023-0003-7000-8000-000000000002",
+      "number": 2,
+      "title": "线性表的顺序存储：情境应用与关键条件辨析",
+      "question_type": "单选",
+      "answer": {
+        "text": "选项乙"
+      },
+      "expected_answer": "选项甲",
+      "correct": false,
+      "score": 0,
+      "total": 2,
+      "duration_seconds": 110,
+      "confidence": "vague",
+      "analysis": "先找出题干的限制条件，再核对每个选项的适用范围。不能只凭关键词作答。",
+      "loss_id": "loss-1",
+      "error_cause": "学过忘了",
+      "trap": "忽略例外",
+      "pending_grading": false
+    },
+    {
+      "id": "019a0023-0003-7000-8000-000000000003",
+      "number": 3,
+      "title": "链表的插入与删除：情境应用与关键条件辨析",
+      "question_type": "单选",
+      "answer": {
+        "text": "选项甲"
+      },
+      "expected_answer": "选项甲",
+      "correct": true,
+      "score": 2,
+      "total": 2,
+      "duration_seconds": 45,
+      "confidence": "sure",
+      "analysis": "先找出题干的限制条件，再核对每个选项的适用范围。不能只凭关键词作答。",
+      "loss_id": "",
+      "error_cause": "",
+      "trap": "",
+      "pending_grading": false
+    },
+    {
+      "id": "019a0023-0003-7000-8000-000000000004",
+      "number": 4,
+      "title": "时间复杂度分析：情境应用与关键条件辨析",
+      "question_type": "单选",
+      "answer": {
+        "text": "选项乙"
+      },
+      "expected_answer": "选项甲",
+      "correct": false,
+      "score": 0,
+      "total": 2,
+      "duration_seconds": 136,
+      "confidence": "vague",
+      "analysis": "先找出题干的限制条件，再核对每个选项的适用范围。不能只凭关键词作答。",
+      "loss_id": "loss-3",
+      "error_cause": "时间不够",
+      "trap": "边界突破",
+      "pending_grading": false
+    },
+    {
+      "id": "019a0023-0003-7000-8000-000000000005",
+      "number": 5,
+      "title": "线性表的顺序存储：情境应用与关键条件辨析",
+      "question_type": "单选",
+      "answer": {
+        "text": "选项乙"
+      },
+      "expected_answer": "选项甲",
+      "correct": false,
+      "score": 0,
+      "total": 2,
+      "duration_seconds": 18,
+      "confidence": "guess",
+      "analysis": "先找出题干的限制条件，再核对每个选项的适用范围。不能只凭关键词作答。",
+      "loss_id": "loss-4",
+      "error_cause": "审题失误",
+      "trap": "局部正确",
+      "pending_grading": false
+    },
+    {
+      "id": "019a0023-0003-7000-8000-000000000006",
+      "number": 6,
+      "title": "链表的插入与删除：情境应用与关键条件辨析",
+      "question_type": "材料题",
+      "answer": {
+        "text": "根据材料，先识别适用条件，再逐项核对结论。"
+      },
+      "expected_answer": "结合适用条件解释结论，并写出关键依据。",
+      "correct": false,
+      "score": 4,
+      "total": 8,
+      "duration_seconds": 420,
+      "confidence": "vague",
+      "analysis": "先找出题干的限制条件，再核对每个选项的适用范围。不能只凭关键词作答。",
+      "loss_id": "loss-5",
+      "error_cause": "",
+      "trap": "",
+      "pending_grading": false
+    }
+  ],
+  "pending_grading": 0,
+  "unattributed_count": 1,
+  "unattributed_question_ids": [
+    "019a0023-0003-7000-8000-000000000006"
+  ],
+  "demo_exam_key": "ds"
+}
