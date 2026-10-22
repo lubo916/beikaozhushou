@@ -1,11 +1,10 @@
 // feat:S10-13 关联知识（P1）：按八类关系分组显示，强度高的在前（顺序由接口给）；点名字去那个知识点的主页。
 // 导师建议的关系带 AI 标识，只是待采纳的提议（红线 3）；易混的可以对比（feat:S10-14）。
 import { useTranslation } from "react-i18next";
-import type { S10RelatedPoint, S10RelationType } from "@exam-prep/contract";
+import type { S10RelatedPoint, S10RelationGroup, S10RelationType } from "@exam-prep/contract";
 import { formatTierGap } from "@exam-prep/shared/format";
 import { VOCAB } from "@exam-prep/shared/vocab";
 import { AiBadge, Button, Card, List, ListRow, Tag } from "@exam-prep/ui";
-import type { S10RelationGroup } from "@exam-prep/contract";
 import { useToast } from "../../../app/toast.tsx";
 import { pathTo } from "../../../routes.ts";
 
