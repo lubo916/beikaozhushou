@@ -1,0 +1,166 @@
+{
+  "exam_title": "大学英语六级",
+  "courses": [
+    {
+      "id": "0ac076aa-f7e1-5766-8867-b9093cac2275",
+      "title": "六级 · 高频学术词汇 A 组精讲",
+      "source": "platform",
+      "duration_seconds": 900,
+      "progress_ratio": 0.38,
+      "current_segment_id": "4c994872-5acd-53d3-85d6-67a0d83fd42b",
+      "segments": [
+        {
+          "id": "d733778b-22f9-52ab-9212-aad5e862e69b",
+          "point_id": "019a0303-0000-7000-8000-000000000001",
+          "point_name": "高频学术词汇 A 组",
+          "start_seconds": 0,
+          "duration_seconds": 246,
+          "mastery_level": 3,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「高频学术词汇 A 组」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "4c994872-5acd-53d3-85d6-67a0d83fd42b",
+          "point_id": "019a0303-0000-7000-8000-000000000002",
+          "point_name": "形近词辨析：mitigate 与 militate",
+          "start_seconds": 246,
+          "duration_seconds": 364,
+          "mastery_level": 1,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「形近词辨析：mitigate 与 militate」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "8db79e8d-c6bb-5150-9df3-3f64e691af9e",
+          "point_id": "019a0303-0000-7000-8000-000000000003",
+          "point_name": "长难句：非谓语结构",
+          "start_seconds": 610,
+          "duration_seconds": 290,
+          "mastery_level": 0,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「长难句：非谓语结构」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        }
+      ]
+    },
+    {
+      "id": "1ca54ad7-274c-51a0-8cc9-516ab1a3b64b",
+      "title": "六级 · 高频学术词汇 A 组精讲",
+      "source": "institution",
+      "duration_seconds": 900,
+      "progress_ratio": 0.38,
+      "current_segment_id": "4c994872-5acd-53d3-85d6-67a0d83fd42b",
+      "segments": [
+        {
+          "id": "d733778b-22f9-52ab-9212-aad5e862e69b",
+          "point_id": "019a0303-0000-7000-8000-000000000001",
+          "point_name": "高频学术词汇 A 组",
+          "start_seconds": 0,
+          "duration_seconds": 246,
+          "mastery_level": 3,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「高频学术词汇 A 组」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "4c994872-5acd-53d3-85d6-67a0d83fd42b",
+          "point_id": "019a0303-0000-7000-8000-000000000002",
+          "point_name": "形近词辨析：mitigate 与 militate",
+          "start_seconds": 246,
+          "duration_seconds": 364,
+          "mastery_level": 1,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「形近词辨析：mitigate 与 militate」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "8db79e8d-c6bb-5150-9df3-3f64e691af9e",
+          "point_id": "019a0303-0000-7000-8000-000000000003",
+          "point_name": "长难句：非谓语结构",
+          "start_seconds": 610,
+          "duration_seconds": 290,
+          "mastery_level": 0,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「长难句：非谓语结构」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        }
+      ]
+    },
+    {
+      "id": "22d9591a-ea04-5a23-9a3a-7cc596117b7d",
+      "title": "六级 · 高频学术词汇 A 组精讲",
+      "source": "personal",
+      "duration_seconds": 900,
+      "progress_ratio": 0.38,
+      "current_segment_id": "4c994872-5acd-53d3-85d6-67a0d83fd42b",
+      "segments": [
+        {
+          "id": "d733778b-22f9-52ab-9212-aad5e862e69b",
+          "point_id": "019a0303-0000-7000-8000-000000000001",
+          "point_name": "高频学术词汇 A 组",
+          "start_seconds": 0,
+          "duration_seconds": 246,
+          "mastery_level": 3,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「高频学术词汇 A 组」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "4c994872-5acd-53d3-85d6-67a0d83fd42b",
+          "point_id": "019a0303-0000-7000-8000-000000000002",
+          "point_name": "形近词辨析：mitigate 与 militate",
+          "start_seconds": 246,
+          "duration_seconds": 364,
+          "mastery_level": 1,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「形近词辨析：mitigate 与 militate」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "8db79e8d-c6bb-5150-9df3-3f64e691af9e",
+          "point_id": "019a0303-0000-7000-8000-000000000003",
+          "point_name": "长难句：非谓语结构",
+          "start_seconds": 610,
+          "duration_seconds": 290,
+          "mastery_level": 0,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「长难句：非谓语结构」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "id": "70f9adb3-2000-5b07-af13-7a4153f6f4ea",
+      "segment_id": "4c994872-5acd-53d3-85d6-67a0d83fd42b",
+      "at_seconds": 246,
+      "text": "先检查适用条件，再看例子；把容易混淆的边界写下来。",
+      "ai_generated": false
+    }
+  ],
+  "external_courses": [
+    {
+      "id": "29cd1ee9-7def-532f-b67f-e6bdd313412b",
+      "title": "我的外部网课（示例）",
+      "platform_name": "中国大学慕课",
+      "url": "https://www.icourse163.org/",
+      "progress_label": "看到第二讲，尚未检测",
+      "point_id": "019a0303-0000-7000-8000-000000000001",
+      "point_name": "高频学术词汇 A 组",
+      "mapped_time": "第二讲 · 04:06"
+    }
+  ],
+  "audio_available": true,
+  "data_source": "sample"
+}

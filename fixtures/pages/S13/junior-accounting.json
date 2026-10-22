@@ -1,0 +1,166 @@
+{
+  "exam_title": "初级会计职称",
+  "courses": [
+    {
+      "id": "2aeee3c3-63e4-58a9-badd-306454623cf4",
+      "title": "初级会计 · 会计基本假设精讲",
+      "source": "platform",
+      "duration_seconds": 900,
+      "progress_ratio": 0.38,
+      "current_segment_id": "143b8802-6390-5603-8986-50673572ddc5",
+      "segments": [
+        {
+          "id": "6328ef9e-5109-5ee0-b85c-fc27cefd54a9",
+          "point_id": "019a0103-0000-7000-8000-000000000001",
+          "point_name": "会计基本假设",
+          "start_seconds": 0,
+          "duration_seconds": 246,
+          "mastery_level": 3,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「会计基本假设」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "143b8802-6390-5603-8986-50673572ddc5",
+          "point_id": "019a0103-0000-7000-8000-000000000002",
+          "point_name": "会计信息质量要求",
+          "start_seconds": 246,
+          "duration_seconds": 364,
+          "mastery_level": 1,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「会计信息质量要求」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "b5b19ecf-bc4b-5e6d-8c98-428d63268767",
+          "point_id": "019a0103-0000-7000-8000-000000000003",
+          "point_name": "借贷记账法",
+          "start_seconds": 610,
+          "duration_seconds": 290,
+          "mastery_level": 0,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「借贷记账法」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        }
+      ]
+    },
+    {
+      "id": "f9ffe12b-03d0-5242-a7a1-49a8cdf4cd4b",
+      "title": "初级会计 · 会计基本假设精讲",
+      "source": "institution",
+      "duration_seconds": 900,
+      "progress_ratio": 0.38,
+      "current_segment_id": "143b8802-6390-5603-8986-50673572ddc5",
+      "segments": [
+        {
+          "id": "6328ef9e-5109-5ee0-b85c-fc27cefd54a9",
+          "point_id": "019a0103-0000-7000-8000-000000000001",
+          "point_name": "会计基本假设",
+          "start_seconds": 0,
+          "duration_seconds": 246,
+          "mastery_level": 3,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「会计基本假设」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "143b8802-6390-5603-8986-50673572ddc5",
+          "point_id": "019a0103-0000-7000-8000-000000000002",
+          "point_name": "会计信息质量要求",
+          "start_seconds": 246,
+          "duration_seconds": 364,
+          "mastery_level": 1,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「会计信息质量要求」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "b5b19ecf-bc4b-5e6d-8c98-428d63268767",
+          "point_id": "019a0103-0000-7000-8000-000000000003",
+          "point_name": "借贷记账法",
+          "start_seconds": 610,
+          "duration_seconds": 290,
+          "mastery_level": 0,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「借贷记账法」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        }
+      ]
+    },
+    {
+      "id": "ed65288e-9ad3-5944-b2ca-bc667ab13efc",
+      "title": "初级会计 · 会计基本假设精讲",
+      "source": "personal",
+      "duration_seconds": 900,
+      "progress_ratio": 0.38,
+      "current_segment_id": "143b8802-6390-5603-8986-50673572ddc5",
+      "segments": [
+        {
+          "id": "6328ef9e-5109-5ee0-b85c-fc27cefd54a9",
+          "point_id": "019a0103-0000-7000-8000-000000000001",
+          "point_name": "会计基本假设",
+          "start_seconds": 0,
+          "duration_seconds": 246,
+          "mastery_level": 3,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「会计基本假设」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "143b8802-6390-5603-8986-50673572ddc5",
+          "point_id": "019a0103-0000-7000-8000-000000000002",
+          "point_name": "会计信息质量要求",
+          "start_seconds": 246,
+          "duration_seconds": 364,
+          "mastery_level": 1,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「会计信息质量要求」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "b5b19ecf-bc4b-5e6d-8c98-428d63268767",
+          "point_id": "019a0103-0000-7000-8000-000000000003",
+          "point_name": "借贷记账法",
+          "start_seconds": 610,
+          "duration_seconds": 290,
+          "mastery_level": 0,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「借贷记账法」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "id": "49431c42-a6f2-5808-9f4b-d0666f5c44e0",
+      "segment_id": "143b8802-6390-5603-8986-50673572ddc5",
+      "at_seconds": 246,
+      "text": "先检查适用条件，再看例子；把容易混淆的边界写下来。",
+      "ai_generated": false
+    }
+  ],
+  "external_courses": [
+    {
+      "id": "5795c3b9-4bea-5a51-aaec-7493c5842985",
+      "title": "我的外部网课（示例）",
+      "platform_name": "中国大学慕课",
+      "url": "https://www.icourse163.org/",
+      "progress_label": "看到第二讲，尚未检测",
+      "point_id": "019a0103-0000-7000-8000-000000000001",
+      "point_name": "会计基本假设",
+      "mapped_time": "第二讲 · 04:06"
+    }
+  ],
+  "audio_available": true,
+  "data_source": "sample"
+}

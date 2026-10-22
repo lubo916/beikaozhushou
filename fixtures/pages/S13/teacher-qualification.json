@@ -1,0 +1,166 @@
+{
+  "exam_title": "中学教师资格（笔试）",
+  "courses": [
+    {
+      "id": "5185adcc-8427-52f6-a2ec-981438875e96",
+      "title": "教师资格 · 教育的本质与功能精讲",
+      "source": "platform",
+      "duration_seconds": 900,
+      "progress_ratio": 0.38,
+      "current_segment_id": "eff118ac-3834-51a8-b391-856a68b15f6d",
+      "segments": [
+        {
+          "id": "1a7127f3-c8e3-5b4d-b395-80560897f10d",
+          "point_id": "019a0203-0000-7000-8000-000000000001",
+          "point_name": "教育的本质与功能",
+          "start_seconds": 0,
+          "duration_seconds": 246,
+          "mastery_level": 3,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「教育的本质与功能」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "eff118ac-3834-51a8-b391-856a68b15f6d",
+          "point_id": "019a0203-0000-7000-8000-000000000002",
+          "point_name": "课程类型",
+          "start_seconds": 246,
+          "duration_seconds": 364,
+          "mastery_level": 1,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「课程类型」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "b865a378-8dcb-5352-abbf-aa6fb4ebb5d3",
+          "point_id": "019a0203-0000-7000-8000-000000000003",
+          "point_name": "教学原则",
+          "start_seconds": 610,
+          "duration_seconds": 290,
+          "mastery_level": 0,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「教学原则」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        }
+      ]
+    },
+    {
+      "id": "6199d1a5-dc3b-5e7e-8836-4419e236a494",
+      "title": "教师资格 · 教育的本质与功能精讲",
+      "source": "institution",
+      "duration_seconds": 900,
+      "progress_ratio": 0.38,
+      "current_segment_id": "eff118ac-3834-51a8-b391-856a68b15f6d",
+      "segments": [
+        {
+          "id": "1a7127f3-c8e3-5b4d-b395-80560897f10d",
+          "point_id": "019a0203-0000-7000-8000-000000000001",
+          "point_name": "教育的本质与功能",
+          "start_seconds": 0,
+          "duration_seconds": 246,
+          "mastery_level": 3,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「教育的本质与功能」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "eff118ac-3834-51a8-b391-856a68b15f6d",
+          "point_id": "019a0203-0000-7000-8000-000000000002",
+          "point_name": "课程类型",
+          "start_seconds": 246,
+          "duration_seconds": 364,
+          "mastery_level": 1,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「课程类型」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "b865a378-8dcb-5352-abbf-aa6fb4ebb5d3",
+          "point_id": "019a0203-0000-7000-8000-000000000003",
+          "point_name": "教学原则",
+          "start_seconds": 610,
+          "duration_seconds": 290,
+          "mastery_level": 0,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「教学原则」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        }
+      ]
+    },
+    {
+      "id": "bc8a6f12-afa5-56dc-b17b-39b2eb96da8c",
+      "title": "教师资格 · 教育的本质与功能精讲",
+      "source": "personal",
+      "duration_seconds": 900,
+      "progress_ratio": 0.38,
+      "current_segment_id": "eff118ac-3834-51a8-b391-856a68b15f6d",
+      "segments": [
+        {
+          "id": "1a7127f3-c8e3-5b4d-b395-80560897f10d",
+          "point_id": "019a0203-0000-7000-8000-000000000001",
+          "point_name": "教育的本质与功能",
+          "start_seconds": 0,
+          "duration_seconds": 246,
+          "mastery_level": 3,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「教育的本质与功能」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "eff118ac-3834-51a8-b391-856a68b15f6d",
+          "point_id": "019a0203-0000-7000-8000-000000000002",
+          "point_name": "课程类型",
+          "start_seconds": 246,
+          "duration_seconds": 364,
+          "mastery_level": 1,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「课程类型」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "b865a378-8dcb-5352-abbf-aa6fb4ebb5d3",
+          "point_id": "019a0203-0000-7000-8000-000000000003",
+          "point_name": "教学原则",
+          "start_seconds": 610,
+          "duration_seconds": 290,
+          "mastery_level": 0,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「教学原则」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "id": "61a736d5-ad9f-536a-9001-0888d34355e3",
+      "segment_id": "eff118ac-3834-51a8-b391-856a68b15f6d",
+      "at_seconds": 246,
+      "text": "先检查适用条件，再看例子；把容易混淆的边界写下来。",
+      "ai_generated": false
+    }
+  ],
+  "external_courses": [
+    {
+      "id": "1ca52cb8-359d-508e-addd-842a664a6743",
+      "title": "我的外部网课（示例）",
+      "platform_name": "中国大学慕课",
+      "url": "https://www.icourse163.org/",
+      "progress_label": "看到第二讲，尚未检测",
+      "point_id": "019a0203-0000-7000-8000-000000000001",
+      "point_name": "教育的本质与功能",
+      "mapped_time": "第二讲 · 04:06"
+    }
+  ],
+  "audio_available": true,
+  "data_source": "sample"
+}

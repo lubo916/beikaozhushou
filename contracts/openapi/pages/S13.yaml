@@ -1,0 +1,237 @@
+{
+  "paths": {
+    "/learner/classroom": {
+      "get": {
+        "operationId": "getClassroomHome",
+        "x-owner": "content",
+        "x-action": "content.material.read",
+        "summary": "视听课堂简版：课程片段、时间戳笔记、听单与外部课映射",
+        "responses": {
+          "200": {
+            "description": "示例数据；播放和检验不写学习证据，真实媒体和写入待后端接入",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/S13ClassroomHome"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "S13Segment": {
+        "type": "object",
+        "required": [
+          "id",
+          "point_id",
+          "point_name",
+          "start_seconds",
+          "duration_seconds",
+          "mastery_level",
+          "transcript_before",
+          "transcript",
+          "transcript_after",
+          "check_count"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "point_id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "point_name": {
+            "type": "string"
+          },
+          "start_seconds": {
+            "type": "number",
+            "minimum": 0
+          },
+          "duration_seconds": {
+            "type": "number",
+            "minimum": 0
+          },
+          "mastery_level": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5
+          },
+          "transcript_before": {
+            "type": "string"
+          },
+          "transcript": {
+            "type": "string"
+          },
+          "transcript_after": {
+            "type": "string"
+          },
+          "check_count": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "S13Course": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "source",
+          "duration_seconds",
+          "progress_ratio",
+          "current_segment_id",
+          "segments"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "title": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "platform",
+              "institution",
+              "personal"
+            ]
+          },
+          "duration_seconds": {
+            "type": "number",
+            "minimum": 0
+          },
+          "progress_ratio": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "current_segment_id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "segments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S13Segment"
+            }
+          }
+        }
+      },
+      "S13TimestampNote": {
+        "type": "object",
+        "required": [
+          "id",
+          "segment_id",
+          "at_seconds",
+          "text",
+          "ai_generated"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "segment_id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "at_seconds": {
+            "type": "number",
+            "minimum": 0
+          },
+          "text": {
+            "type": "string"
+          },
+          "ai_generated": {
+            "type": "boolean"
+          }
+        }
+      },
+      "S13ExternalCourse": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "platform_name",
+          "url",
+          "progress_label",
+          "point_id",
+          "point_name",
+          "mapped_time"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "title": {
+            "type": "string"
+          },
+          "platform_name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "progress_label": {
+            "type": "string"
+          },
+          "point_id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "point_name": {
+            "type": "string"
+          },
+          "mapped_time": {
+            "type": "string"
+          }
+        }
+      },
+      "S13ClassroomHome": {
+        "type": "object",
+        "required": [
+          "exam_title",
+          "courses",
+          "notes",
+          "external_courses",
+          "audio_available",
+          "data_source"
+        ],
+        "properties": {
+          "exam_title": {
+            "type": "string"
+          },
+          "courses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S13Course"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S13TimestampNote"
+            }
+          },
+          "external_courses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S13ExternalCourse"
+            }
+          },
+          "audio_available": {
+            "type": "boolean"
+          },
+          "data_source": {
+            "$ref": "#/components/schemas/DataSource"
+          }
+        }
+      }
+    }
+  }
+}

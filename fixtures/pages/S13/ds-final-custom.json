@@ -1,0 +1,166 @@
+{
+  "exam_title": "《数据结构》期末考",
+  "courses": [
+    {
+      "id": "a83ac15b-f1f6-58e3-942f-076b30527a20",
+      "title": "数据结构 · 时间复杂度分析精讲",
+      "source": "platform",
+      "duration_seconds": 900,
+      "progress_ratio": 0.38,
+      "current_segment_id": "e2e787b4-100e-51a7-8b38-3eaf333eae0d",
+      "segments": [
+        {
+          "id": "8b607b69-a95f-587e-b300-82c3787a660e",
+          "point_id": "019a0403-0000-7000-8000-000000000001",
+          "point_name": "时间复杂度分析",
+          "start_seconds": 0,
+          "duration_seconds": 246,
+          "mastery_level": 3,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「时间复杂度分析」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "e2e787b4-100e-51a7-8b38-3eaf333eae0d",
+          "point_id": "019a0403-0000-7000-8000-000000000002",
+          "point_name": "线性表的顺序存储",
+          "start_seconds": 246,
+          "duration_seconds": 364,
+          "mastery_level": 1,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「线性表的顺序存储」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "a3c33769-6ef7-5f62-adcd-18cc621b7458",
+          "point_id": "019a0403-0000-7000-8000-000000000003",
+          "point_name": "链表的插入与删除",
+          "start_seconds": 610,
+          "duration_seconds": 290,
+          "mastery_level": 0,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「链表的插入与删除」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        }
+      ]
+    },
+    {
+      "id": "bbcb5791-04ee-5e88-9c6f-bc9cd1fbda9d",
+      "title": "数据结构 · 时间复杂度分析精讲",
+      "source": "institution",
+      "duration_seconds": 900,
+      "progress_ratio": 0.38,
+      "current_segment_id": "e2e787b4-100e-51a7-8b38-3eaf333eae0d",
+      "segments": [
+        {
+          "id": "8b607b69-a95f-587e-b300-82c3787a660e",
+          "point_id": "019a0403-0000-7000-8000-000000000001",
+          "point_name": "时间复杂度分析",
+          "start_seconds": 0,
+          "duration_seconds": 246,
+          "mastery_level": 3,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「时间复杂度分析」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "e2e787b4-100e-51a7-8b38-3eaf333eae0d",
+          "point_id": "019a0403-0000-7000-8000-000000000002",
+          "point_name": "线性表的顺序存储",
+          "start_seconds": 246,
+          "duration_seconds": 364,
+          "mastery_level": 1,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「线性表的顺序存储」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "a3c33769-6ef7-5f62-adcd-18cc621b7458",
+          "point_id": "019a0403-0000-7000-8000-000000000003",
+          "point_name": "链表的插入与删除",
+          "start_seconds": 610,
+          "duration_seconds": 290,
+          "mastery_level": 0,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「链表的插入与删除」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        }
+      ]
+    },
+    {
+      "id": "2e5a3a01-8166-5a9f-b6c8-04da8c5ce6e6",
+      "title": "数据结构 · 时间复杂度分析精讲",
+      "source": "personal",
+      "duration_seconds": 900,
+      "progress_ratio": 0.38,
+      "current_segment_id": "e2e787b4-100e-51a7-8b38-3eaf333eae0d",
+      "segments": [
+        {
+          "id": "8b607b69-a95f-587e-b300-82c3787a660e",
+          "point_id": "019a0403-0000-7000-8000-000000000001",
+          "point_name": "时间复杂度分析",
+          "start_seconds": 0,
+          "duration_seconds": 246,
+          "mastery_level": 3,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「时间复杂度分析」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "e2e787b4-100e-51a7-8b38-3eaf333eae0d",
+          "point_id": "019a0403-0000-7000-8000-000000000002",
+          "point_name": "线性表的顺序存储",
+          "start_seconds": 246,
+          "duration_seconds": 364,
+          "mastery_level": 1,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「线性表的顺序存储」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        },
+        {
+          "id": "a3c33769-6ef7-5f62-adcd-18cc621b7458",
+          "point_id": "019a0403-0000-7000-8000-000000000003",
+          "point_name": "链表的插入与删除",
+          "start_seconds": 610,
+          "duration_seconds": 290,
+          "mastery_level": 0,
+          "transcript_before": "先把概念放回它适用的情境，再对照相邻知识点。",
+          "transcript": "理解「链表的插入与删除」时，先说清条件，再用一个例子验证；不要只记住结论。",
+          "transcript_after": "接下来用一道短题检查理解，检测通过才计为有效学习。",
+          "check_count": 3
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "id": "d38e0481-553a-502e-ac98-dca6b199cd26",
+      "segment_id": "e2e787b4-100e-51a7-8b38-3eaf333eae0d",
+      "at_seconds": 246,
+      "text": "先检查适用条件，再看例子；把容易混淆的边界写下来。",
+      "ai_generated": false
+    }
+  ],
+  "external_courses": [
+    {
+      "id": "04acd4d1-513f-5a6d-baa0-a7f7abd23f4e",
+      "title": "我的外部网课（示例）",
+      "platform_name": "中国大学慕课",
+      "url": "https://www.icourse163.org/",
+      "progress_label": "看到第二讲，尚未检测",
+      "point_id": "019a0403-0000-7000-8000-000000000001",
+      "point_name": "时间复杂度分析",
+      "mapped_time": "第二讲 · 04:06"
+    }
+  ],
+  "audio_available": true,
+  "data_source": "sample"
+}
