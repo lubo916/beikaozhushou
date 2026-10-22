@@ -16,7 +16,11 @@ export function classroomView(query: ClassroomQuery): { state: ClassroomState; d
   if (query.data !== undefined) return { state: query.data.courses.length === 0 ? "empty" : "normal", data: query.data, stale: offline };
   if (offline) return { state: "offline", data: undefined, stale: false };
   if (query.status === "pending") return { state: "loading", data: undefined, stale: false };
-  return { state: isApiError(query.error) && query.error.code === "COMMON_FORBIDDEN" ? "restricted" : "error", data: undefined, stale: false };
+  return {
+    state: isApiError(query.error) && query.error.code === "COMMON_FORBIDDEN" ? "restricted" : "error",
+    data: undefined,
+    stale: false,
+  };
 }
 export function useClassroom() {
   const query = useGetClassroomHome({ query: { queryKey: getGetClassroomHomeQueryKey(), retry: shouldRetry } });

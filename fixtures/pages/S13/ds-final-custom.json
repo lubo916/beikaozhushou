@@ -2,15 +2,15 @@
   "exam_title": "《数据结构》期末考",
   "courses": [
     {
-      "id": "a83ac15b-f1f6-58e3-942f-076b30527a20",
+      "id": "a83ac15b-f1f6-78e3-942f-076b30527a20",
       "title": "数据结构 · 时间复杂度分析精讲",
       "source": "platform",
       "duration_seconds": 900,
       "progress_ratio": 0.38,
-      "current_segment_id": "e2e787b4-100e-51a7-8b38-3eaf333eae0d",
+      "current_segment_id": "e2e787b4-100e-71a7-8b38-3eaf333eae0d",
       "segments": [
         {
-          "id": "8b607b69-a95f-587e-b300-82c3787a660e",
+          "id": "8b607b69-a95f-787e-b300-82c3787a660e",
           "point_id": "019a0403-0000-7000-8000-000000000001",
           "point_name": "时间复杂度分析",
           "start_seconds": 0,
@@ -22,7 +22,7 @@
           "check_count": 3
         },
         {
-          "id": "e2e787b4-100e-51a7-8b38-3eaf333eae0d",
+          "id": "e2e787b4-100e-71a7-8b38-3eaf333eae0d",
           "point_id": "019a0403-0000-7000-8000-000000000002",
           "point_name": "线性表的顺序存储",
           "start_seconds": 246,
@@ -34,7 +34,7 @@
           "check_count": 3
         },
         {
-          "id": "a3c33769-6ef7-5f62-adcd-18cc621b7458",
+          "id": "a3c33769-6ef7-7f62-adcd-18cc621b7458",
           "point_id": "019a0403-0000-7000-8000-000000000003",
           "point_name": "链表的插入与删除",
           "start_seconds": 610,
@@ -48,15 +48,15 @@
       ]
     },
     {
-      "id": "bbcb5791-04ee-5e88-9c6f-bc9cd1fbda9d",
+      "id": "bbcb5791-04ee-7e88-9c6f-bc9cd1fbda9d",
       "title": "数据结构 · 时间复杂度分析精讲",
       "source": "institution",
       "duration_seconds": 900,
       "progress_ratio": 0.38,
-      "current_segment_id": "e2e787b4-100e-51a7-8b38-3eaf333eae0d",
+      "current_segment_id": "e2e787b4-100e-71a7-8b38-3eaf333eae0d",
       "segments": [
         {
-          "id": "8b607b69-a95f-587e-b300-82c3787a660e",
+          "id": "8b607b69-a95f-787e-b300-82c3787a660e",
           "point_id": "019a0403-0000-7000-8000-000000000001",
           "point_name": "时间复杂度分析",
           "start_seconds": 0,
@@ -68,7 +68,7 @@
           "check_count": 3
         },
         {
-          "id": "e2e787b4-100e-51a7-8b38-3eaf333eae0d",
+          "id": "e2e787b4-100e-71a7-8b38-3eaf333eae0d",
           "point_id": "019a0403-0000-7000-8000-000000000002",
           "point_name": "线性表的顺序存储",
           "start_seconds": 246,
@@ -80,7 +80,7 @@
           "check_count": 3
         },
         {
-          "id": "a3c33769-6ef7-5f62-adcd-18cc621b7458",
+          "id": "a3c33769-6ef7-7f62-adcd-18cc621b7458",
           "point_id": "019a0403-0000-7000-8000-000000000003",
           "point_name": "链表的插入与删除",
           "start_seconds": 610,
@@ -94,15 +94,15 @@
       ]
     },
     {
-      "id": "2e5a3a01-8166-5a9f-b6c8-04da8c5ce6e6",
+      "id": "2e5a3a01-8166-7a9f-b6c8-04da8c5ce6e6",
       "title": "数据结构 · 时间复杂度分析精讲",
       "source": "personal",
       "duration_seconds": 900,
       "progress_ratio": 0.38,
-      "current_segment_id": "e2e787b4-100e-51a7-8b38-3eaf333eae0d",
+      "current_segment_id": "e2e787b4-100e-71a7-8b38-3eaf333eae0d",
       "segments": [
         {
-          "id": "8b607b69-a95f-587e-b300-82c3787a660e",
+          "id": "8b607b69-a95f-787e-b300-82c3787a660e",
           "point_id": "019a0403-0000-7000-8000-000000000001",
           "point_name": "时间复杂度分析",
           "start_seconds": 0,
@@ -114,7 +114,7 @@
           "check_count": 3
         },
         {
-          "id": "e2e787b4-100e-51a7-8b38-3eaf333eae0d",
+          "id": "e2e787b4-100e-71a7-8b38-3eaf333eae0d",
           "point_id": "019a0403-0000-7000-8000-000000000002",
           "point_name": "线性表的顺序存储",
           "start_seconds": 246,
@@ -126,7 +126,7 @@
           "check_count": 3
         },
         {
-          "id": "a3c33769-6ef7-5f62-adcd-18cc621b7458",
+          "id": "a3c33769-6ef7-7f62-adcd-18cc621b7458",
           "point_id": "019a0403-0000-7000-8000-000000000003",
           "point_name": "链表的插入与删除",
           "start_seconds": 610,
@@ -142,8 +142,8 @@
   ],
   "notes": [
     {
-      "id": "d38e0481-553a-502e-ac98-dca6b199cd26",
-      "segment_id": "e2e787b4-100e-51a7-8b38-3eaf333eae0d",
+      "id": "d38e0481-553a-702e-ac98-dca6b199cd26",
+      "segment_id": "e2e787b4-100e-71a7-8b38-3eaf333eae0d",
       "at_seconds": 246,
       "text": "先检查适用条件，再看例子；把容易混淆的边界写下来。",
       "ai_generated": false
@@ -151,7 +151,7 @@
   ],
   "external_courses": [
     {
-      "id": "04acd4d1-513f-5a6d-baa0-a7f7abd23f4e",
+      "id": "04acd4d1-513f-7a6d-baa0-a7f7abd23f4e",
       "title": "我的外部网课（示例）",
       "platform_name": "中国大学慕课",
       "url": "https://www.icourse163.org/",

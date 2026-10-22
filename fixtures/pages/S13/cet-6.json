@@ -2,15 +2,15 @@
   "exam_title": "大学英语六级",
   "courses": [
     {
-      "id": "0ac076aa-f7e1-5766-8867-b9093cac2275",
+      "id": "0ac076aa-f7e1-7766-8867-b9093cac2275",
       "title": "六级 · 高频学术词汇 A 组精讲",
       "source": "platform",
       "duration_seconds": 900,
       "progress_ratio": 0.38,
-      "current_segment_id": "4c994872-5acd-53d3-85d6-67a0d83fd42b",
+      "current_segment_id": "4c994872-5acd-73d3-85d6-67a0d83fd42b",
       "segments": [
         {
-          "id": "d733778b-22f9-52ab-9212-aad5e862e69b",
+          "id": "d733778b-22f9-72ab-9212-aad5e862e69b",
           "point_id": "019a0303-0000-7000-8000-000000000001",
           "point_name": "高频学术词汇 A 组",
           "start_seconds": 0,
@@ -22,7 +22,7 @@
           "check_count": 3
         },
         {
-          "id": "4c994872-5acd-53d3-85d6-67a0d83fd42b",
+          "id": "4c994872-5acd-73d3-85d6-67a0d83fd42b",
           "point_id": "019a0303-0000-7000-8000-000000000002",
           "point_name": "形近词辨析：mitigate 与 militate",
           "start_seconds": 246,
@@ -34,7 +34,7 @@
           "check_count": 3
         },
         {
-          "id": "8db79e8d-c6bb-5150-9df3-3f64e691af9e",
+          "id": "8db79e8d-c6bb-7150-9df3-3f64e691af9e",
           "point_id": "019a0303-0000-7000-8000-000000000003",
           "point_name": "长难句：非谓语结构",
           "start_seconds": 610,
@@ -48,15 +48,15 @@
       ]
     },
     {
-      "id": "1ca54ad7-274c-51a0-8cc9-516ab1a3b64b",
+      "id": "1ca54ad7-274c-71a0-8cc9-516ab1a3b64b",
       "title": "六级 · 高频学术词汇 A 组精讲",
       "source": "institution",
       "duration_seconds": 900,
       "progress_ratio": 0.38,
-      "current_segment_id": "4c994872-5acd-53d3-85d6-67a0d83fd42b",
+      "current_segment_id": "4c994872-5acd-73d3-85d6-67a0d83fd42b",
       "segments": [
         {
-          "id": "d733778b-22f9-52ab-9212-aad5e862e69b",
+          "id": "d733778b-22f9-72ab-9212-aad5e862e69b",
           "point_id": "019a0303-0000-7000-8000-000000000001",
           "point_name": "高频学术词汇 A 组",
           "start_seconds": 0,
@@ -68,7 +68,7 @@
           "check_count": 3
         },
         {
-          "id": "4c994872-5acd-53d3-85d6-67a0d83fd42b",
+          "id": "4c994872-5acd-73d3-85d6-67a0d83fd42b",
           "point_id": "019a0303-0000-7000-8000-000000000002",
           "point_name": "形近词辨析：mitigate 与 militate",
           "start_seconds": 246,
@@ -80,7 +80,7 @@
           "check_count": 3
         },
         {
-          "id": "8db79e8d-c6bb-5150-9df3-3f64e691af9e",
+          "id": "8db79e8d-c6bb-7150-9df3-3f64e691af9e",
           "point_id": "019a0303-0000-7000-8000-000000000003",
           "point_name": "长难句：非谓语结构",
           "start_seconds": 610,
@@ -94,15 +94,15 @@
       ]
     },
     {
-      "id": "22d9591a-ea04-5a23-9a3a-7cc596117b7d",
+      "id": "22d9591a-ea04-7a23-9a3a-7cc596117b7d",
       "title": "六级 · 高频学术词汇 A 组精讲",
       "source": "personal",
       "duration_seconds": 900,
       "progress_ratio": 0.38,
-      "current_segment_id": "4c994872-5acd-53d3-85d6-67a0d83fd42b",
+      "current_segment_id": "4c994872-5acd-73d3-85d6-67a0d83fd42b",
       "segments": [
         {
-          "id": "d733778b-22f9-52ab-9212-aad5e862e69b",
+          "id": "d733778b-22f9-72ab-9212-aad5e862e69b",
           "point_id": "019a0303-0000-7000-8000-000000000001",
           "point_name": "高频学术词汇 A 组",
           "start_seconds": 0,
@@ -114,7 +114,7 @@
           "check_count": 3
         },
         {
-          "id": "4c994872-5acd-53d3-85d6-67a0d83fd42b",
+          "id": "4c994872-5acd-73d3-85d6-67a0d83fd42b",
           "point_id": "019a0303-0000-7000-8000-000000000002",
           "point_name": "形近词辨析：mitigate 与 militate",
           "start_seconds": 246,
@@ -126,7 +126,7 @@
           "check_count": 3
         },
         {
-          "id": "8db79e8d-c6bb-5150-9df3-3f64e691af9e",
+          "id": "8db79e8d-c6bb-7150-9df3-3f64e691af9e",
           "point_id": "019a0303-0000-7000-8000-000000000003",
           "point_name": "长难句：非谓语结构",
           "start_seconds": 610,
@@ -142,8 +142,8 @@
   ],
   "notes": [
     {
-      "id": "70f9adb3-2000-5b07-af13-7a4153f6f4ea",
-      "segment_id": "4c994872-5acd-53d3-85d6-67a0d83fd42b",
+      "id": "70f9adb3-2000-7b07-af13-7a4153f6f4ea",
+      "segment_id": "4c994872-5acd-73d3-85d6-67a0d83fd42b",
       "at_seconds": 246,
       "text": "先检查适用条件，再看例子；把容易混淆的边界写下来。",
       "ai_generated": false
@@ -151,7 +151,7 @@
   ],
   "external_courses": [
     {
-      "id": "29cd1ee9-7def-532f-b67f-e6bdd313412b",
+      "id": "29cd1ee9-7def-732f-b67f-e6bdd313412b",
       "title": "我的外部网课（示例）",
       "platform_name": "中国大学慕课",
       "url": "https://www.icourse163.org/",

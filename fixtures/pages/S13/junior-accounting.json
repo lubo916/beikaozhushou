@@ -2,15 +2,15 @@
   "exam_title": "初级会计职称",
   "courses": [
     {
-      "id": "2aeee3c3-63e4-58a9-badd-306454623cf4",
+      "id": "2aeee3c3-63e4-78a9-badd-306454623cf4",
       "title": "初级会计 · 会计基本假设精讲",
       "source": "platform",
       "duration_seconds": 900,
       "progress_ratio": 0.38,
-      "current_segment_id": "143b8802-6390-5603-8986-50673572ddc5",
+      "current_segment_id": "143b8802-6390-7603-8986-50673572ddc5",
       "segments": [
         {
-          "id": "6328ef9e-5109-5ee0-b85c-fc27cefd54a9",
+          "id": "6328ef9e-5109-7ee0-b85c-fc27cefd54a9",
           "point_id": "019a0103-0000-7000-8000-000000000001",
           "point_name": "会计基本假设",
           "start_seconds": 0,
@@ -22,7 +22,7 @@
           "check_count": 3
         },
         {
-          "id": "143b8802-6390-5603-8986-50673572ddc5",
+          "id": "143b8802-6390-7603-8986-50673572ddc5",
           "point_id": "019a0103-0000-7000-8000-000000000002",
           "point_name": "会计信息质量要求",
           "start_seconds": 246,
@@ -34,7 +34,7 @@
           "check_count": 3
         },
         {
-          "id": "b5b19ecf-bc4b-5e6d-8c98-428d63268767",
+          "id": "b5b19ecf-bc4b-7e6d-8c98-428d63268767",
           "point_id": "019a0103-0000-7000-8000-000000000003",
           "point_name": "借贷记账法",
           "start_seconds": 610,
@@ -48,15 +48,15 @@
       ]
     },
     {
-      "id": "f9ffe12b-03d0-5242-a7a1-49a8cdf4cd4b",
+      "id": "f9ffe12b-03d0-7242-a7a1-49a8cdf4cd4b",
       "title": "初级会计 · 会计基本假设精讲",
       "source": "institution",
       "duration_seconds": 900,
       "progress_ratio": 0.38,
-      "current_segment_id": "143b8802-6390-5603-8986-50673572ddc5",
+      "current_segment_id": "143b8802-6390-7603-8986-50673572ddc5",
       "segments": [
         {
-          "id": "6328ef9e-5109-5ee0-b85c-fc27cefd54a9",
+          "id": "6328ef9e-5109-7ee0-b85c-fc27cefd54a9",
           "point_id": "019a0103-0000-7000-8000-000000000001",
           "point_name": "会计基本假设",
           "start_seconds": 0,
@@ -68,7 +68,7 @@
           "check_count": 3
         },
         {
-          "id": "143b8802-6390-5603-8986-50673572ddc5",
+          "id": "143b8802-6390-7603-8986-50673572ddc5",
           "point_id": "019a0103-0000-7000-8000-000000000002",
           "point_name": "会计信息质量要求",
           "start_seconds": 246,
@@ -80,7 +80,7 @@
           "check_count": 3
         },
         {
-          "id": "b5b19ecf-bc4b-5e6d-8c98-428d63268767",
+          "id": "b5b19ecf-bc4b-7e6d-8c98-428d63268767",
           "point_id": "019a0103-0000-7000-8000-000000000003",
           "point_name": "借贷记账法",
           "start_seconds": 610,
@@ -94,15 +94,15 @@
       ]
     },
     {
-      "id": "ed65288e-9ad3-5944-b2ca-bc667ab13efc",
+      "id": "ed65288e-9ad3-7944-b2ca-bc667ab13efc",
       "title": "初级会计 · 会计基本假设精讲",
       "source": "personal",
       "duration_seconds": 900,
       "progress_ratio": 0.38,
-      "current_segment_id": "143b8802-6390-5603-8986-50673572ddc5",
+      "current_segment_id": "143b8802-6390-7603-8986-50673572ddc5",
       "segments": [
         {
-          "id": "6328ef9e-5109-5ee0-b85c-fc27cefd54a9",
+          "id": "6328ef9e-5109-7ee0-b85c-fc27cefd54a9",
           "point_id": "019a0103-0000-7000-8000-000000000001",
           "point_name": "会计基本假设",
           "start_seconds": 0,
@@ -114,7 +114,7 @@
           "check_count": 3
         },
         {
-          "id": "143b8802-6390-5603-8986-50673572ddc5",
+          "id": "143b8802-6390-7603-8986-50673572ddc5",
           "point_id": "019a0103-0000-7000-8000-000000000002",
           "point_name": "会计信息质量要求",
           "start_seconds": 246,
@@ -126,7 +126,7 @@
           "check_count": 3
         },
         {
-          "id": "b5b19ecf-bc4b-5e6d-8c98-428d63268767",
+          "id": "b5b19ecf-bc4b-7e6d-8c98-428d63268767",
           "point_id": "019a0103-0000-7000-8000-000000000003",
           "point_name": "借贷记账法",
           "start_seconds": 610,
@@ -142,8 +142,8 @@
   ],
   "notes": [
     {
-      "id": "49431c42-a6f2-5808-9f4b-d0666f5c44e0",
-      "segment_id": "143b8802-6390-5603-8986-50673572ddc5",
+      "id": "49431c42-a6f2-7808-9f4b-d0666f5c44e0",
+      "segment_id": "143b8802-6390-7603-8986-50673572ddc5",
       "at_seconds": 246,
       "text": "先检查适用条件，再看例子；把容易混淆的边界写下来。",
       "ai_generated": false
@@ -151,7 +151,7 @@
   ],
   "external_courses": [
     {
-      "id": "5795c3b9-4bea-5a51-aaec-7493c5842985",
+      "id": "5795c3b9-4bea-7a51-aaec-7493c5842985",
       "title": "我的外部网课（示例）",
       "platform_name": "中国大学慕课",
       "url": "https://www.icourse163.org/",

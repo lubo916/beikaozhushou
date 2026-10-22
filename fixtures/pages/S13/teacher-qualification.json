@@ -2,15 +2,15 @@
   "exam_title": "中学教师资格（笔试）",
   "courses": [
     {
-      "id": "5185adcc-8427-52f6-a2ec-981438875e96",
+      "id": "5185adcc-8427-72f6-a2ec-981438875e96",
       "title": "教师资格 · 教育的本质与功能精讲",
       "source": "platform",
       "duration_seconds": 900,
       "progress_ratio": 0.38,
-      "current_segment_id": "eff118ac-3834-51a8-b391-856a68b15f6d",
+      "current_segment_id": "eff118ac-3834-71a8-b391-856a68b15f6d",
       "segments": [
         {
-          "id": "1a7127f3-c8e3-5b4d-b395-80560897f10d",
+          "id": "1a7127f3-c8e3-7b4d-b395-80560897f10d",
           "point_id": "019a0203-0000-7000-8000-000000000001",
           "point_name": "教育的本质与功能",
           "start_seconds": 0,
@@ -22,7 +22,7 @@
           "check_count": 3
         },
         {
-          "id": "eff118ac-3834-51a8-b391-856a68b15f6d",
+          "id": "eff118ac-3834-71a8-b391-856a68b15f6d",
           "point_id": "019a0203-0000-7000-8000-000000000002",
           "point_name": "课程类型",
           "start_seconds": 246,
@@ -34,7 +34,7 @@
           "check_count": 3
         },
         {
-          "id": "b865a378-8dcb-5352-abbf-aa6fb4ebb5d3",
+          "id": "b865a378-8dcb-7352-abbf-aa6fb4ebb5d3",
           "point_id": "019a0203-0000-7000-8000-000000000003",
           "point_name": "教学原则",
           "start_seconds": 610,
@@ -48,15 +48,15 @@
       ]
     },
     {
-      "id": "6199d1a5-dc3b-5e7e-8836-4419e236a494",
+      "id": "6199d1a5-dc3b-7e7e-8836-4419e236a494",
       "title": "教师资格 · 教育的本质与功能精讲",
       "source": "institution",
       "duration_seconds": 900,
       "progress_ratio": 0.38,
-      "current_segment_id": "eff118ac-3834-51a8-b391-856a68b15f6d",
+      "current_segment_id": "eff118ac-3834-71a8-b391-856a68b15f6d",
       "segments": [
         {
-          "id": "1a7127f3-c8e3-5b4d-b395-80560897f10d",
+          "id": "1a7127f3-c8e3-7b4d-b395-80560897f10d",
           "point_id": "019a0203-0000-7000-8000-000000000001",
           "point_name": "教育的本质与功能",
           "start_seconds": 0,
@@ -68,7 +68,7 @@
           "check_count": 3
         },
         {
-          "id": "eff118ac-3834-51a8-b391-856a68b15f6d",
+          "id": "eff118ac-3834-71a8-b391-856a68b15f6d",
           "point_id": "019a0203-0000-7000-8000-000000000002",
           "point_name": "课程类型",
           "start_seconds": 246,
@@ -80,7 +80,7 @@
           "check_count": 3
         },
         {
-          "id": "b865a378-8dcb-5352-abbf-aa6fb4ebb5d3",
+          "id": "b865a378-8dcb-7352-abbf-aa6fb4ebb5d3",
           "point_id": "019a0203-0000-7000-8000-000000000003",
           "point_name": "教学原则",
           "start_seconds": 610,
@@ -94,15 +94,15 @@
       ]
     },
     {
-      "id": "bc8a6f12-afa5-56dc-b17b-39b2eb96da8c",
+      "id": "bc8a6f12-afa5-76dc-b17b-39b2eb96da8c",
       "title": "教师资格 · 教育的本质与功能精讲",
       "source": "personal",
       "duration_seconds": 900,
       "progress_ratio": 0.38,
-      "current_segment_id": "eff118ac-3834-51a8-b391-856a68b15f6d",
+      "current_segment_id": "eff118ac-3834-71a8-b391-856a68b15f6d",
       "segments": [
         {
-          "id": "1a7127f3-c8e3-5b4d-b395-80560897f10d",
+          "id": "1a7127f3-c8e3-7b4d-b395-80560897f10d",
           "point_id": "019a0203-0000-7000-8000-000000000001",
           "point_name": "教育的本质与功能",
           "start_seconds": 0,
@@ -114,7 +114,7 @@
           "check_count": 3
         },
         {
-          "id": "eff118ac-3834-51a8-b391-856a68b15f6d",
+          "id": "eff118ac-3834-71a8-b391-856a68b15f6d",
           "point_id": "019a0203-0000-7000-8000-000000000002",
           "point_name": "课程类型",
           "start_seconds": 246,
@@ -126,7 +126,7 @@
           "check_count": 3
         },
         {
-          "id": "b865a378-8dcb-5352-abbf-aa6fb4ebb5d3",
+          "id": "b865a378-8dcb-7352-abbf-aa6fb4ebb5d3",
           "point_id": "019a0203-0000-7000-8000-000000000003",
           "point_name": "教学原则",
           "start_seconds": 610,
@@ -142,8 +142,8 @@
   ],
   "notes": [
     {
-      "id": "61a736d5-ad9f-536a-9001-0888d34355e3",
-      "segment_id": "eff118ac-3834-51a8-b391-856a68b15f6d",
+      "id": "61a736d5-ad9f-736a-9001-0888d34355e3",
+      "segment_id": "eff118ac-3834-71a8-b391-856a68b15f6d",
       "at_seconds": 246,
       "text": "先检查适用条件，再看例子；把容易混淆的边界写下来。",
       "ai_generated": false
@@ -151,7 +151,7 @@
   ],
   "external_courses": [
     {
-      "id": "1ca52cb8-359d-508e-addd-842a664a6743",
+      "id": "1ca52cb8-359d-708e-addd-842a664a6743",
       "title": "我的外部网课（示例）",
       "platform_name": "中国大学慕课",
       "url": "https://www.icourse163.org/",
