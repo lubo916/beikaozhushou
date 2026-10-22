@@ -226,7 +226,7 @@
       "duplicate": "核对后合并重复的点"
     },
     "fix_action": "去修复",
-    "issue_line": "{{issue}}{{count}}：{{fix}}"
+    "issue_line": "{{issue}}{{count_text}}：{{fix}}"
   },
   "state": {
     "empty": {

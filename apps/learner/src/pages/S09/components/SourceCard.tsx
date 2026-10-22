@@ -65,7 +65,7 @@ export function SourceCard({ map, sources, typing, health, className }: SourceCa
                 <span className="s09-note">
                   {t("source.issue_line", {
                     issue: t(`source.issue.${issue.kind}`),
-                    count: t("source.issue_count", { n: formatCount(issue.count) }),
+                    count_text: t("source.issue_count", { n: formatCount(issue.count) }),
                     fix: t(`source.fix.${issue.kind}`),
                   })}
                 </span>
