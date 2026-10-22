@@ -85,14 +85,18 @@ for (const width of [375, 834, 1280]) {
     await watch.open(urlOf(entry, { view: "week" }));
     await expectLoaded(page, entry);
     await expect(page.getByTestId("week-grid").locator(":scope > *")).toHaveCount(7);
-    const weekColumns = await page.getByTestId("week-grid").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
+    const weekColumns = await page
+      .getByTestId("week-grid")
+      .evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
     expect(weekColumns, "本周安排在手机、平板、桌面分别排成二、四、七列").toBe(width === 375 ? 2 : width === 834 ? 4 : 7);
     await expectNoOverflow(page);
     expectNoProblems(watch, "normal");
     await watch.open(urlOf(entry, { view: "calendar" }));
     await expectLoaded(page, entry);
     await expect(page.getByTestId("review-calendar-grid")).toBeVisible();
-    const columns = await page.getByTestId("review-calendar-grid").evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
+    const columns = await page
+      .getByTestId("review-calendar-grid")
+      .evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
     expect(columns, "复习日历在手机、平板、桌面分别排成二、四、七列").toBe(width === 375 ? 2 : width === 834 ? 4 : 7);
     await expectNoOverflow(page);
     expectNoProblems(watch, "normal");
@@ -108,7 +112,13 @@ test("S07 七态均可强制显示，局部限制保留学习计划，离线只�
       await expect(page.getByRole("heading", { level: 1, name: entry.name, exact: true })).toBeVisible();
       await expect(page.getByTestId("round-timeline")).toBeVisible();
     }
-    if (state === "offline") await expect(page.locator("main#main .ui-state--offline")).toContainText(copy("state.offline.body"));
+    if (state === "offline") {
+      await expect(page.locator("main#main .ui-state--offline")).toContainText(copy("state.offline.body"));
+      // 离线只读：重排与试算的入口不能点，页面不发写请求也不试算。
+      await expect(button(page, "header.sandbox")).toBeDisabled();
+      await expect(button(page, "header.leave")).toBeDisabled();
+      await expect(page.locator("dialog[open]")).toBeHidden();
+    }
     if (state === "empty") await expect(page.locator("main#main .ui-state--empty")).toContainText(copy("state.empty.body"));
     expectNoProblems(watch, state);
   }
@@ -151,7 +161,12 @@ test("S07 五个主要标签可切换，周任务写操作只提示，更多菜�
   await watch.open(urlOf(entry, { view: "week" }));
   await expectLoaded(page, entry);
   for (const path of ["week.lock", "week.move"]) {
-    await page.locator("main#main").getByRole("button", { name: copy(path), exact: true }).and(page.locator("button:enabled")).first().press("Enter");
+    await page
+      .locator("main#main")
+      .getByRole("button", { name: copy(path), exact: true })
+      .and(page.locator("button:enabled"))
+      .first()
+      .press("Enter");
     await expect(page.getByRole("status").filter({ hasText: copy("soon") }).first()).toBeVisible();
   }
   await button(page, "header.more").press("Enter");
@@ -197,7 +212,6 @@ test("S07 沙盘可填输入并试算，采用前保持待确认，关闭后不�
   await expect(dialog).toBeHidden();
   expectNoProblems(watch, "normal");
 });
-
 
 test("S07 自定考试地图未通过时仅锁定预测，沙盘提议与学习入口仍可用", async ({ page }) => {
   const fixture = fixtureOf("ds-final-custom");

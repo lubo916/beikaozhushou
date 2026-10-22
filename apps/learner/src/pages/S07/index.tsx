@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router";
 import { param } from "@exam-prep/params";
+import { formatDays } from "@exam-prep/shared/format";
 import { Button, ContainerScope, Dialog, PageHeader, PageState, Skeleton, Tabs, Tag, buttonClass } from "@exam-prep/ui";
 import { useToast } from "../../app/toast.tsx";
 import { pathTo } from "../../routes.ts";
@@ -137,16 +138,22 @@ export default function Page() {
               action={<Button onClick={soon}>{t("state.restricted.action")}</Button>}
             />
           )}
+          {/* feat:S07-17 健康度不足观察窗时只标注口径：正文交给公共 PageState（它本身就是一个 <p>），
+              实测天数走它现成的「原始计数」，还差什么走 missing，不在本页再套一层段落。
+              观察窗周数暂无登记参数，按红线 2 不写死数字，见交接单「风险与提醒」。 */}
           {data.health_estimated && (
             <PageState
               state="insufficient_data"
               title={t("state.insufficient_data.title")}
-              body={
-                <>
-                  {t("state.insufficient_data.body", { weeks: param("plan.calibrate.weeks") })}
-                  <p>{t("state.insufficient_data.observed", { days: data.observed_days })}</p>
-                </>
-              }
+              body={t("state.insufficient_data.body")}
+              counts={[
+                {
+                  key: "observed_days",
+                  label: t("state.insufficient_data.observed"),
+                  value: formatDays(data.observed_days),
+                },
+              ]}
+              missing={t("state.insufficient_data.missing")}
               action={
                 <Link to={pathTo("S06")} className={buttonClass("secondary")}>
                   {t("state.insufficient_data.action")}
@@ -155,8 +162,10 @@ export default function Page() {
             />
           )}
           <div className="flex flex-wrap gap-2">
-            <Button size="sm" onClick={() => selectView("week")}>{t("tabs.back")}</Button>
-              <Button size="sm" onClick={switchRounds}>
+            <Button size="sm" onClick={() => selectView("week")}>
+              {t("tabs.back")}
+            </Button>
+            <Button size="sm" onClick={switchRounds}>
               {t("tabs.rounds")}
             </Button>
             <Button size="sm" onClick={() => selectView("today")}>

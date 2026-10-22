@@ -92,9 +92,9 @@
   "week": {
     "start": "2026-10-19",
     "end": "2026-10-25",
-    "budget_minutes": 660,
-    "scheduled_minutes": 586,
-    "buffer_minutes": 74,
+    "budget_minutes": 540,
+    "scheduled_minutes": 486,
+    "buffer_minutes": 54,
     "days": [
       {
         "day": "2026-10-19",

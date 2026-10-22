@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ApiError } from "@exam-prep/contract/errors";
 import type { S07PlanOverview } from "@exam-prep/contract";
 import * as zodSchemas from "@exam-prep/contract/zod";
+import { formatDays } from "@exam-prep/shared/format";
 import { App } from "../../App.tsx";
 import { click, heading, linkByText, mountAt, settle } from "../../app/testing.tsx";
 import copy from "../../i18n/zh-CN/S07.json";
@@ -83,6 +84,38 @@ describe("S07 假数据与生成契约", () => {
     expect(() => planFixture("missing-exam")).toThrow("S07 缺少演示考试");
   });
 
+  // 回归：交接时四份样例的 scheduled_minutes 是 586，七天实际合计 486，预算与缓冲也随错误汇总而来。
+  // 原型写的是“本周预算 9 小时，已排 8 小时 6 分，留 1 成缓冲”，即 540 / 486 / 54。页面只显示接口数字，样例自身必须先自洽。
+  it("四个考试的本周预算样例自洽：已排等于七天合计，缓冲等于预算减已排", () => {
+    for (const exam of fixtures.exams) {
+      const { week } = planFixture(exam.examId);
+      const where = `${exam.examId} 的本周样例`;
+      expect(week.days, where).toHaveLength(7);
+      const dayTotal = week.days.reduce((sum, day) => sum + day.minutes, 0);
+      expect(week.scheduled_minutes, `${where}：已排应等于七天合计`).toBe(dayTotal);
+      expect(week.buffer_minutes, `${where}：缓冲应等于预算减已排`).toBe(week.budget_minutes - week.scheduled_minutes);
+      expect(week.scheduled_minutes, `${where}：已排不应超过预算`).toBeLessThanOrEqual(week.budget_minutes);
+      for (const day of week.days) {
+        const itemTotal = day.items.reduce((sum, item) => sum + item.minutes, 0);
+        expect(day.minutes, `${where}：${day.day} 当天合计应等于当天任务之和`).toBe(itemTotal);
+      }
+    }
+  });
+
+  it("四个考试的本周样例与原型一致：预算 540、已排 486、缓冲 54", () => {
+    for (const exam of fixtures.exams) {
+      const { week } = planFixture(exam.examId);
+      const where = `${exam.examId} 的本周样例`;
+      expect(week.budget_minutes, `${where}：预算 9 小时`).toBe(540);
+      expect(week.scheduled_minutes, `${where}：已排 8 小时 6 分`).toBe(486);
+      expect(week.buffer_minutes, `${where}：留 1 成缓冲`).toBe(54);
+      expect(
+        week.days.map((day) => day.minutes),
+        `${where}：每日分钟数`,
+      ).toEqual([46, 56, 20, 46, 53, 120, 145]);
+    }
+  });
+
   it("空态保留上下文；受限和数据不足只改标记，不清除计划或学习范围", async () => {
     const normal = await setup().overview();
     const empty = await setup("empty").overview();
@@ -148,6 +181,24 @@ describe("S07 视图参数", () => {
   });
 });
 
+describe("S07 文案", () => {
+  // 回归：交接时健康度提示借用了 plan.calibrate.weeks（登记语义是“声明与实测连续相差几周后提议校准”，来源 S03-05）。
+  // 参数登记表里没有“健康度最少观察窗”，在补登记之前，这句文案不写周数，也不留无参数兜底的插值。
+  it("健康度估算说明不写规则周数，也不留没有参数来源的插值", () => {
+    const insufficient: Record<string, string> = copy.state.insufficient_data;
+    for (const [key, value] of Object.entries(insufficient)) {
+      expect(value, `state.insufficient_data.${key} 不应带没有参数来源的插值`).not.toContain("{{");
+    }
+    expect(insufficient.body, "没有登记观察窗参数之前，正文不写死周数").not.toMatch(/[0-9一二两三四五六七八九十]\s*周/);
+  });
+
+  it("本页文案不出现禁用语", () => {
+    const banned = ["保过", "必过", "包过", "稳过", "押题", "知识图谱", "图谱", "入学诊断", "入学测评", "落后"];
+    const text = JSON.stringify(copy);
+    for (const word of banned) expect(text, `文案里不应出现“${word}”`).not.toContain(word);
+  });
+});
+
 /** 生成钩子的 GET 请求直接交给 MSW 使用的同一假数据接口。 */
 function stubFetch(api: MockApi): void {
   vi.stubGlobal("fetch", async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
@@ -210,6 +261,40 @@ describe("S07 页面挂载", () => {
       expect(error?.textContent).toContain(copy.state.error.title);
       expect(error?.getAttribute("role")).toBe("alert");
       expect([...(error?.querySelectorAll("button") ?? [])].map((button) => button.textContent)).toContain("重试");
+    } finally {
+      await unmount();
+    }
+  });
+
+  // 回归：交接时把一个含 <p> 的片段传给公共 PageState 的 body，而 PageState 内部本来就用 <p> 包 body，
+  // 形成 <p> 套 <p>，React 会报 DOM 嵌套错误。实测天数改走 PageState 现成的 counts 与 missing，不改公共组件。
+  it("数据不足提示不嵌套段落，实测天数走原始计数", async () => {
+    stubFetch(setup("insufficient_data").api);
+    const { host, unmount } = await mountAt(pathTo("S07"), <App />);
+    try {
+      await settle(() => host.querySelector(".ui-state--insufficient_data") !== null);
+      const panel = host.querySelector(".ui-state--insufficient_data");
+      const body = panel?.querySelector(".ui-state__body");
+      expect(body?.textContent).toBe(copy.state.insufficient_data.body);
+      expect(body?.querySelector("p"), "PageState 的 body 已经是 <p>，本页不能再往里塞 <p>").toBeNull();
+      expect(panel?.querySelectorAll("p p")).toHaveLength(0);
+      const counts = panel?.querySelector(".ui-kv");
+      expect(counts?.textContent).toContain(copy.state.insufficient_data.observed);
+      expect(counts?.textContent).toContain(formatDays(6));
+      expect(panel?.querySelector(".ui-state__missing")?.textContent).toBe(copy.state.insufficient_data.missing);
+    } finally {
+      await unmount();
+    }
+  });
+
+  it("数据不足只限制健康度口径，本周安排与轮次路线照常显示", async () => {
+    stubFetch(setup("insufficient_data").api);
+    const { host, unmount } = await mountAt(pathTo("S07"), <App />);
+    try {
+      await settle(() => host.querySelector('[data-testid="week-grid"]') !== null);
+      expect(host.querySelector('[data-testid="round-timeline"]')).not.toBeNull();
+      expect(host.querySelector('[data-testid="week-grid"]')?.children).toHaveLength(7);
+      expect(host.querySelector(".ui-state--insufficient_data")).not.toBeNull();
     } finally {
       await unmount();
     }

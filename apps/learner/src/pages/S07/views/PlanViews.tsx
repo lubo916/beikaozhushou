@@ -184,17 +184,19 @@ export function Scope({ data, soon, offline }: Props) {
         />
       </Card>
       {data.proposals.map((proposal) => (
-        <fieldset key={proposal.id} disabled={offline} className="min-w-0"><ProposalCard
-          title={t("scope.proposal")}
-          status={proposal.status}
-          what={proposal.change}
-          why={proposal.reason}
-          cost={proposal.cost}
-          ifNot={proposal.if_declined}
-          aiGenerated
-          onConfirm={soon}
-          onDecline={soon}
-        /></fieldset>
+        <fieldset key={proposal.id} disabled={offline} className="min-w-0">
+          <ProposalCard
+            title={t("scope.proposal")}
+            status={proposal.status}
+            what={proposal.change}
+            why={proposal.reason}
+            cost={proposal.cost}
+            ifNot={proposal.if_declined}
+            aiGenerated
+            onConfirm={soon}
+            onDecline={soon}
+          />
+        </fieldset>
       ))}
     </div>
   );
