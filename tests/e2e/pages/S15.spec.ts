@@ -40,6 +40,15 @@ for (const width of widths) {
       }
       expect(await main.evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
       await page.screenshot({ path: `.test-results/S15-${width}-${view.key}.png`, fullPage: true });
+      if (view.key === "session") {
+        await main.getByRole("button", { name: copy("session.flip"), exact: true }).press("Enter");
+        for (const key of ["again", "hard", "good", "easy"]) {
+          const rating = main.getByRole("button", { name: copy(`session.${key}`), exact: true });
+          await expect(rating).toBeVisible();
+          await expect(rating).toBeEnabled();
+        }
+        await page.screenshot({ path: `.test-results/S15-${width}-answer.png`, fullPage: true });
+      }
       expectNoProblems(watch, "normal");
     });
   }
