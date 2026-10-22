@@ -2,6 +2,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { formatDateTime } from "../../../packages/shared/src/format/index.ts";
 import { pathTo } from "../../../apps/learner/src/routes.ts";
 import { pageById, urlOf } from "../support/catalog.ts";
 import { ABNORMAL_STATES, expectNoProblems, expectOpened, expectState, watchPage } from "../support/checks.ts";
@@ -26,7 +27,7 @@ function main(page: Page) {
 for (const width of WIDTHS) {
   for (const view of entry.views) {
     test(`S01 ${view.key} 视图在 ${width} 宽独立显示，无横向溢出`, async ({ page }, testInfo) => {
-      await page.setViewportSize({ width, height: 900 });
+      await page.setViewportSize({ width, height: width === 375 ? 812 : 900 });
       const watch = await watchPage(page);
       await watch.open(urlOf(entry, { view: view.key }));
       await expectOpened(page, entry, view);
@@ -222,6 +223,14 @@ test("S01 账号异常分清原因，保留导出与设置出路", async ({ page
       );
     }
     if (issue === "cooling") {
+      const fixture = JSON.parse(readFileSync(join(ROOT, "fixtures/pages/S01/junior-accounting.json"), "utf8")) as {
+        time_zone: string;
+        account: { deletion_at: string };
+      };
+      const deletionTime = copy("account.cooling.deletionAt")
+        .replace("{{time}}", formatDateTime(fixture.account.deletion_at, fixture.time_zone, { year: true }))
+        .replace("{{timeZone}}", fixture.time_zone);
+      await expect(main(page).getByText(deletionTime, { exact: true })).toBeVisible();
       await toastAfter(
         page,
         main(page).getByRole("button", { name: copy("account.cooling.undo"), exact: true }),
@@ -239,4 +248,40 @@ test("S01 账号异常分清原因，保留导出与设置出路", async ({ page
       await expect(main(page).getByText(copy("account.logout.drafts"), { exact: true })).toBeVisible();
     expectNoProblems(watch, "normal");
   }
+});
+
+test("S01 受限状态的重设密码、设备取消与冷静期返回可进入独立登录", async ({ page }) => {
+  const watch = await watchPage(page);
+  const recoveries = [
+    { issue: "replaced", action: "account.logout.changePassword", heading: "login.resetTitle" },
+    { issue: "devices", action: "cancel", heading: "login.title" },
+    { issue: "cooling", action: "account.cooling.keep", heading: "login.title" },
+  ] as const;
+  for (const recovery of recoveries) {
+    await watch.open(urlOf(entry, { state: "restricted", issue: recovery.issue }));
+    await main(page)
+      .getByRole("button", { name: copy(recovery.action), exact: true })
+      .press("Enter");
+    await expect(main(page).getByRole("heading", { name: copy(recovery.heading), exact: true })).toBeVisible();
+    await expect(page.getByTestId("s01-page")).toHaveAttribute("data-view", "back");
+    // 强制受限仍使共用 /me/context 回 403，这是本场景预期的接口行为。
+    expectNoProblems(watch, "restricted");
+  }
+});
+
+test("S01 未成年先填写出生年月，再作为游客继续", async ({ page }) => {
+  const watch = await watchPage(page);
+  await watch.open(urlOf(entry));
+  await main(page)
+    .getByRole("radio", { name: named("age.minor.label") })
+    .check();
+  const guest = main(page).getByRole("button", { name: copy("welcome.guest"), exact: true });
+  await guest.press("Enter");
+  await expect(main(page).getByText(copy("age.birthMonthRequired"), { exact: true })).toBeVisible();
+  await main(page).getByLabel(copy("age.birthMonth"), { exact: true }).fill("2010-06");
+  await guest.press("Enter");
+  await expect(page).toHaveURL(new RegExp(`${pathTo("S02")}(?:[?#]|$)`));
+  const guestContext = await page.evaluate(() => (window.history.state as { usr?: unknown }).usr);
+  expect(guestContext).toMatchObject({ age_band: "minor", birth_month: "2010-06", minor_mode: true, guest: true });
+  expectNoProblems(watch, "normal");
 });
