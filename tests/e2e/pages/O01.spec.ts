@@ -35,6 +35,7 @@ test("O01 无多视图，四考试与七态可打开", async ({ page }) => {
     await page.goto(urlOf(entry, { state }));
     const shown = page.locator(`main#main .ui-state--${state}`).first();
     await expect(shown).toBeVisible();
+    if (state === "restricted" || state === "insufficient_data") await expect(page.locator("main#main .ui-ai")).toHaveCount(0);
     if (state === "empty")
       await expect(shown.getByRole("link", { name: copy("state.empty.action") })).toHaveAttribute("href", pathTo("O03"));
     if (["error", "offline", "restricted"].includes(state)) await expect(shown).toContainText(copy(`state.${state}.body`));

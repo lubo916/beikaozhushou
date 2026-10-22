@@ -70,5 +70,9 @@ export async function handleO01(request: MockRequest): Promise<MockOutcome> {
     data.classes = [];
     data.metrics = [];
   }
+  if (data.access === "restricted" || !data.sample_sufficient) {
+    data.saving = [];
+    data.weekly_summary = "";
+  }
   return { kind: "json", status: 200, body: data, headers: { "x-data-source": "sample" } };
 }

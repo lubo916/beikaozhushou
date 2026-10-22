@@ -1,3 +1,4 @@
+import "./aggregate.test.ts";
 import "./state.test.ts";
 import { describe, expect, it } from "vitest";
 import { ApiError } from "@exam-prep/contract/errors";

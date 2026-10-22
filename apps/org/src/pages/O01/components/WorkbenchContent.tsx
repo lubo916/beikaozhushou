@@ -21,6 +21,11 @@ export function WorkbenchContent({ data, offline }: { data: O01Workbench; offlin
   const soon = () => toast(t("soon"));
   const restricted = data.access === "restricted";
   const insufficient = !data.sample_sufficient;
+  const aggregateState = restricted ? (
+    <PageState state="restricted" body={t("state.restricted.body")} />
+  ) : insufficient ? (
+    <PageState state="insufficient_data" body={t("state.insufficient_data.body", { minimum: data.minimum_group_size })} />
+  ) : null;
   return (
     <>
       {/* feat:O01-03 业务指标只显示接口值，口径可查看。feat:O01-11 类型预设由接口响应切换。 */}
@@ -150,27 +155,31 @@ export function WorkbenchContent({ data, offline }: { data: O01Workbench; offlin
                 </Button>
               }
             >
-              <dl className="flex flex-col gap-2">
-                {data.saving.map((m) => (
-                  <div key={m.id} className="flex justify-between gap-2">
-                    <dt>{t(`metrics.${m.id}`)}</dt>
-                    <dd className="tabular-nums">{metricValue(m)}</dd>
-                  </div>
-                ))}
-              </dl>
+              {aggregateState ?? (
+                <dl className="flex flex-col gap-2">
+                  {data.saving.map((m) => (
+                    <div key={m.id} className="flex justify-between gap-2">
+                      <dt>{t(`metrics.${m.id}`)}</dt>
+                      <dd className="tabular-nums">{metricValue(m)}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
             </Card>
             {/* feat:O01-09 周报为 AI 生成示例，复制自带标识。 */}
             <Card
               title={t("weekly")}
               actions={
-                <Button size="sm" disabled={offline} onClick={soon}>
+                <Button size="sm" disabled={offline || restricted || insufficient} onClick={soon}>
                   {t("weeklyAction")}
                 </Button>
               }
             >
-              <AiContent>
-                <p>{data.weekly_summary}</p>
-              </AiContent>
+              {aggregateState ?? (
+                <AiContent>
+                  <p>{data.weekly_summary}</p>
+                </AiContent>
+              )}
             </Card>
             {/* feat:O01-10 相关考试节点提醒。 */}
             <Card title={t("nodes")}>
