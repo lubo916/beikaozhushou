@@ -1,0 +1,660 @@
+{
+  "has_plan": true,
+  "plan": {
+    "id": "019a0700-0000-7000-8000-000000000001",
+    "exam_id": "cet-6",
+    "version": 3,
+    "round_index": 1,
+    "round_count": 4,
+    "round_name": "打基础",
+    "mix_mode": "roi",
+    "daily_minutes": 90,
+    "scope_counts": {
+      "default": 126,
+      "added": 8,
+      "removed": 6
+    },
+    "target_date": "2027-05-16",
+    "updated_at": "2026-10-21T17:00:00Z",
+    "data_source": "sample"
+  },
+  "exam_name": "大学英语六级",
+  "rounds": [
+    {
+      "id": "round-0",
+      "name": "打基础",
+      "start": "2026-08-17",
+      "end": "2026-12-20",
+      "depth": "已熟悉",
+      "mix": "学 5 / 记 2 / 练 3 / 考 0",
+      "status": "active",
+      "coverage": 0.64,
+      "condition": "到达阶段结束日且完成本轮覆盖；切换前展示待确认提议。",
+      "summary": {
+        "minutes": 420,
+        "achieved_count": 18,
+        "review_count": 32,
+        "weakest_chapter": "词汇与语法"
+      }
+    },
+    {
+      "id": "round-1",
+      "name": "攻重点",
+      "start": "2026-12-21",
+      "end": "2027-03-28",
+      "depth": "已掌握",
+      "mix": "学 3 / 记 2 / 练 4 / 考 1",
+      "status": "pending",
+      "coverage": 0,
+      "condition": "到达阶段结束日且完成本轮覆盖；切换前展示待确认提议。",
+      "summary": {
+        "minutes": 420,
+        "achieved_count": 18,
+        "review_count": 32,
+        "weakest_chapter": "词汇与语法"
+      }
+    },
+    {
+      "id": "round-2",
+      "name": "刷题冲刺",
+      "start": "2027-03-29",
+      "end": "2027-05-08",
+      "depth": "能应用",
+      "mix": "学 1 / 记 2 / 练 4 / 考 3",
+      "status": "future",
+      "coverage": 0,
+      "condition": "到达阶段结束日且完成本轮覆盖；切换前展示待确认提议。",
+      "summary": {
+        "minutes": 420,
+        "achieved_count": 18,
+        "review_count": 32,
+        "weakest_chapter": "词汇与语法"
+      }
+    },
+    {
+      "id": "round-3",
+      "name": "考前七天",
+      "start": "2027-05-09",
+      "end": "2027-05-16",
+      "depth": "巩固目标档",
+      "mix": "学 0 / 记 4 / 练 3 / 考 3",
+      "status": "future",
+      "coverage": 0,
+      "condition": "到达阶段结束日且完成本轮覆盖；切换前展示待确认提议。",
+      "summary": {
+        "minutes": 420,
+        "achieved_count": 18,
+        "review_count": 32,
+        "weakest_chapter": "词汇与语法"
+      }
+    }
+  ],
+  "week": {
+    "start": "2026-10-19",
+    "end": "2026-10-25",
+    "budget_minutes": 660,
+    "scheduled_minutes": 586,
+    "buffer_minutes": 74,
+    "days": [
+      {
+        "day": "2026-10-19",
+        "minutes": 46,
+        "today": false,
+        "leave": false,
+        "items": [
+          {
+            "id": "0-review",
+            "title": "到期复习",
+            "detail": "高频学术词汇 A 组",
+            "minutes": 20,
+            "segment": "consolidate",
+            "locked": false,
+            "institution": false
+          },
+          {
+            "id": "0-learn",
+            "title": "高频学术词汇 A 组",
+            "detail": "讲义精读 → 读后即测",
+            "minutes": 20,
+            "segment": "advance",
+            "locked": false,
+            "institution": false
+          },
+          {
+            "id": "0-closing",
+            "title": "睡前回顾",
+            "detail": "回忆今日要点",
+            "minutes": 6,
+            "segment": "closing",
+            "locked": false,
+            "institution": false
+          }
+        ]
+      },
+      {
+        "day": "2026-10-20",
+        "minutes": 56,
+        "today": false,
+        "leave": false,
+        "items": [
+          {
+            "id": "1-review",
+            "title": "到期复习",
+            "detail": "高频学术词汇 A 组",
+            "minutes": 20,
+            "segment": "consolidate",
+            "locked": false,
+            "institution": false
+          },
+          {
+            "id": "1-learn",
+            "title": "形近词辨析：mitigate 与 militate",
+            "detail": "讲义精读 → 读后即测",
+            "minutes": 20,
+            "segment": "advance",
+            "locked": false,
+            "institution": false
+          },
+          {
+            "id": "1-closing",
+            "title": "睡前回顾",
+            "detail": "回忆今日要点",
+            "minutes": 6,
+            "segment": "closing",
+            "locked": false,
+            "institution": false
+          },
+          {
+            "id": "1-course",
+            "title": "外部课程",
+            "detail": "第 4 讲 · 前置知识讲解，20:00 开始；看完回来做题确认",
+            "minutes": 10,
+            "segment": "advance",
+            "locked": true,
+            "institution": true
+          }
+        ]
+      },
+      {
+        "day": "2026-10-21",
+        "minutes": 20,
+        "today": false,
+        "leave": true,
+        "items": [
+          {
+            "id": "2-review",
+            "title": "到期复习",
+            "detail": "高频学术词汇 A 组",
+            "minutes": 20,
+            "segment": "consolidate",
+            "locked": false,
+            "institution": false
+          }
+        ]
+      },
+      {
+        "day": "2026-10-22",
+        "minutes": 46,
+        "today": true,
+        "leave": false,
+        "items": [
+          {
+            "id": "3-review",
+            "title": "到期复习",
+            "detail": "高频学术词汇 A 组",
+            "minutes": 20,
+            "segment": "consolidate",
+            "locked": false,
+            "institution": false
+          },
+          {
+            "id": "3-learn",
+            "title": "让步状语从句",
+            "detail": "讲义精读 → 读后即测",
+            "minutes": 20,
+            "segment": "advance",
+            "locked": false,
+            "institution": false
+          },
+          {
+            "id": "3-closing",
+            "title": "睡前回顾",
+            "detail": "回忆今日要点",
+            "minutes": 6,
+            "segment": "closing",
+            "locked": false,
+            "institution": false
+          }
+        ]
+      },
+      {
+        "day": "2026-10-23",
+        "minutes": 53,
+        "today": false,
+        "leave": false,
+        "items": [
+          {
+            "id": "4-review",
+            "title": "到期复习",
+            "detail": "高频学术词汇 A 组",
+            "minutes": 20,
+            "segment": "consolidate",
+            "locked": false,
+            "institution": false
+          },
+          {
+            "id": "4-learn",
+            "title": "高频学术词汇 A 组",
+            "detail": "讲义精读 → 读后即测",
+            "minutes": 25,
+            "segment": "advance",
+            "locked": false,
+            "institution": false
+          },
+          {
+            "id": "4-closing",
+            "title": "睡前回顾",
+            "detail": "回忆今日要点",
+            "minutes": 8,
+            "segment": "closing",
+            "locked": false,
+            "institution": false
+          }
+        ]
+      },
+      {
+        "day": "2026-10-24",
+        "minutes": 120,
+        "today": false,
+        "leave": false,
+        "items": [
+          {
+            "id": "5-review",
+            "title": "到期复习",
+            "detail": "高频学术词汇 A 组",
+            "minutes": 30,
+            "segment": "consolidate",
+            "locked": false,
+            "institution": false
+          },
+          {
+            "id": "5-learn",
+            "title": "形近词辨析：mitigate 与 militate",
+            "detail": "讲义精读 → 读后即测",
+            "minutes": 50,
+            "segment": "advance",
+            "locked": false,
+            "institution": false
+          },
+          {
+            "id": "5-closing",
+            "title": "睡前回顾",
+            "detail": "回忆今日要点",
+            "minutes": 10,
+            "segment": "closing",
+            "locked": false,
+            "institution": false
+          },
+          {
+            "id": "5-course",
+            "title": "外部课程",
+            "detail": "第 4 讲 · 前置知识讲解，20:00 开始；看完回来做题确认",
+            "minutes": 30,
+            "segment": "advance",
+            "locked": true,
+            "institution": true
+          }
+        ]
+      },
+      {
+        "day": "2026-10-25",
+        "minutes": 145,
+        "today": false,
+        "leave": false,
+        "items": [
+          {
+            "id": "6-review",
+            "title": "到期复习",
+            "detail": "高频学术词汇 A 组",
+            "minutes": 40,
+            "segment": "consolidate",
+            "locked": false,
+            "institution": false
+          },
+          {
+            "id": "6-learn",
+            "title": "长难句：非谓语结构",
+            "detail": "讲义精读 → 读后即测",
+            "minutes": 90,
+            "segment": "advance",
+            "locked": false,
+            "institution": false
+          },
+          {
+            "id": "6-closing",
+            "title": "睡前回顾",
+            "detail": "回忆今日要点",
+            "minutes": 15,
+            "segment": "closing",
+            "locked": false,
+            "institution": false
+          }
+        ]
+      }
+    ]
+  },
+  "scope": [
+    {
+      "id": "019a0303-0000-7000-8000-000000000001",
+      "name": "高频学术词汇 A 组",
+      "chapter": "词汇与语法",
+      "state": "default",
+      "target": "已掌握",
+      "gap": 2,
+      "minutes": 40,
+      "cost_score": 2
+    },
+    {
+      "id": "019a0303-0000-7000-8000-000000000002",
+      "name": "形近词辨析：mitigate 与 militate",
+      "chapter": "词汇与语法",
+      "state": "added",
+      "target": "能应用",
+      "gap": 1,
+      "minutes": 25,
+      "cost_score": 3
+    },
+    {
+      "id": "019a0303-0000-7000-8000-000000000003",
+      "name": "长难句：非谓语结构",
+      "chapter": "词汇与语法",
+      "state": "removed",
+      "target": "已熟悉",
+      "gap": 0,
+      "minutes": 30,
+      "cost_score": 1
+    },
+    {
+      "id": "019a0303-0000-7000-8000-000000000004",
+      "name": "让步状语从句",
+      "chapter": "词汇与语法",
+      "state": "default",
+      "target": "已掌握",
+      "gap": 1,
+      "minutes": 20,
+      "cost_score": 2
+    }
+  ],
+  "priorities": [
+    {
+      "id": "019a0303-0000-7000-8000-000000000001",
+      "name": "高频学术词汇 A 组",
+      "rank": 1,
+      "score": 5,
+      "frequency": "高频",
+      "gap": 2,
+      "prerequisite": "已具备",
+      "minutes": 40,
+      "starred": false
+    },
+    {
+      "id": "019a0303-0000-7000-8000-000000000002",
+      "name": "形近词辨析：mitigate 与 militate",
+      "rank": 2,
+      "score": 4,
+      "frequency": "较高",
+      "gap": 1,
+      "prerequisite": "先补基础概念",
+      "minutes": 25,
+      "starred": true
+    },
+    {
+      "id": "019a0303-0000-7000-8000-000000000003",
+      "name": "长难句：非谓语结构",
+      "rank": 3,
+      "score": 3,
+      "frequency": "待积累",
+      "gap": 1,
+      "prerequisite": "已具备",
+      "minutes": 30,
+      "starred": false
+    },
+    {
+      "id": "019a0303-0000-7000-8000-000000000004",
+      "name": "让步状语从句",
+      "rank": 4,
+      "score": 2,
+      "frequency": "中等",
+      "gap": 0,
+      "prerequisite": "不涉及",
+      "minutes": 20,
+      "starred": false
+    }
+  ],
+  "records": [
+    {
+      "id": "record-1",
+      "at": "2026-10-21T17:00:00Z",
+      "source": "engine",
+      "change": "把未完成的推进安排顺延到周末缓冲区。",
+      "reason": "优先保留到期复习，不覆盖手动锁定的课程。",
+      "cost": "示例：周末增加 20 分钟；范围和目标档未变。",
+      "undoable": true,
+      "ai_generated": false
+    },
+    {
+      "id": "record-2",
+      "at": "2026-10-21T06:00:00Z",
+      "source": "institution",
+      "change": "个人新学任务避让班级课程。",
+      "reason": "外部课程与个人任务共用一份时间预算。",
+      "cost": "示例：新学顺延到次日，不重复占用时间。",
+      "undoable": true,
+      "ai_generated": true
+    },
+    {
+      "id": "record-3",
+      "at": "2026-10-18T03:00:00Z",
+      "source": "user",
+      "change": "你锁定了周末的学习安排。",
+      "reason": "固定时段便于提前准备。",
+      "cost": "自动顺延会避开该时段。",
+      "undoable": false,
+      "ai_generated": false
+    }
+  ],
+  "reviews": [
+    {
+      "day": "2026-10-19",
+      "count": 12,
+      "minutes": 15,
+      "today": false
+    },
+    {
+      "day": "2026-10-20",
+      "count": 16,
+      "minutes": 20,
+      "today": false
+    },
+    {
+      "day": "2026-10-21",
+      "count": 8,
+      "minutes": 10,
+      "today": false
+    },
+    {
+      "day": "2026-10-22",
+      "count": 14,
+      "minutes": 20,
+      "today": true
+    },
+    {
+      "day": "2026-10-23",
+      "count": 10,
+      "minutes": 15,
+      "today": false
+    },
+    {
+      "day": "2026-10-24",
+      "count": 22,
+      "minutes": 25,
+      "today": false
+    },
+    {
+      "day": "2026-10-25",
+      "count": 18,
+      "minutes": 20,
+      "today": false
+    }
+  ],
+  "today": {
+    "day": "2026-10-22",
+    "exam_id": "cet-6",
+    "segments": [
+      {
+        "segment": "consolidate",
+        "tasks": [
+          {
+            "id": "019a0303-0000-7000-8000-000000000001",
+            "segment": "consolidate",
+            "source": "due_review",
+            "title": "高频学术词汇 A 组",
+            "minutes": 20,
+            "status": "todo",
+            "question_ids": [],
+            "card_ids": [],
+            "knowledge_point_ids": [
+              "019a0303-0000-7000-8000-000000000001"
+            ],
+            "question_count": 0,
+            "answered_count": 0
+          }
+        ]
+      },
+      {
+        "segment": "advance",
+        "tasks": [
+          {
+            "id": "019a0303-0000-7000-8000-000000000002",
+            "segment": "advance",
+            "source": "new_learning",
+            "title": "形近词辨析：mitigate 与 militate",
+            "minutes": 30,
+            "status": "todo",
+            "question_ids": [],
+            "card_ids": [],
+            "knowledge_point_ids": [
+              "019a0303-0000-7000-8000-000000000002"
+            ],
+            "question_count": 0,
+            "answered_count": 0
+          }
+        ]
+      },
+      {
+        "segment": "closing",
+        "tasks": [
+          {
+            "id": "019a0303-0000-7000-8000-000000000003",
+            "segment": "closing",
+            "source": "bedtime_review",
+            "title": "长难句：非谓语结构",
+            "minutes": 10,
+            "status": "todo",
+            "question_ids": [],
+            "card_ids": [],
+            "knowledge_point_ids": [
+              "019a0303-0000-7000-8000-000000000003"
+            ],
+            "question_count": 0,
+            "answered_count": 0
+          }
+        ]
+      }
+    ],
+    "data_source": "sample"
+  },
+  "proposals": [
+    {
+      "id": "019a0700-0000-7000-8000-000000000002",
+      "exam_id": "cet-6",
+      "status": "pending",
+      "source": "planner",
+      "change": "建议暂时移出低优先级的拓展知识点。",
+      "reason": "把有限时间留给前置知识点和到期复习。",
+      "cost": "示例代价：释放 40 分钟，预测区间可能降低 1–2 分。",
+      "if_declined": "保留当前范围，继续使用现有时间预算。",
+      "created_at": "2026-10-22T01:00:00Z"
+    }
+  ],
+  "sandbox": [
+    {
+      "id": "scenario-0",
+      "name": "增加周末投入",
+      "description": "把周末的缓冲时间用于重点巩固。",
+      "forecast_low": 61,
+      "forecast_high": 69,
+      "completion": 0.82,
+      "cost": "周末需要额外投入 40 分钟。",
+      "proposal": {
+        "id": "019a0700-0000-7000-8000-000000000010",
+        "exam_id": "cet-6",
+        "status": "pending",
+        "source": "planner",
+        "change": "把周末的缓冲时间用于重点巩固。",
+        "reason": "把有限时间留给前置知识点和到期复习。",
+        "cost": "周末需要额外投入 40 分钟。",
+        "if_declined": "保留当前范围，继续使用现有时间预算。",
+        "created_at": "2026-10-22T01:00:00Z"
+      }
+    },
+    {
+      "id": "scenario-1",
+      "name": "压缩学习范围",
+      "description": "暂时移出低优先级拓展章节。",
+      "forecast_low": 57,
+      "forecast_high": 65,
+      "completion": 0.88,
+      "cost": "保留的数据仍可学习，预测区间可能降低 1–2 分。",
+      "proposal": {
+        "id": "019a0700-0000-7000-8000-000000000011",
+        "exam_id": "cet-6",
+        "status": "pending",
+        "source": "planner",
+        "change": "暂时移出低优先级拓展章节。",
+        "reason": "把有限时间留给前置知识点和到期复习。",
+        "cost": "保留的数据仍可学习，预测区间可能降低 1–2 分。",
+        "if_declined": "保留当前范围，继续使用现有时间预算。",
+        "created_at": "2026-10-22T01:00:00Z"
+      }
+    },
+    {
+      "id": "scenario-2",
+      "name": "过线情景",
+      "description": "优先巩固接近目标档的知识点。",
+      "forecast_low": 60,
+      "forecast_high": 66,
+      "completion": 0.79,
+      "cost": "新学速度会放缓，需要持续完成到期复习。",
+      "proposal": {
+        "id": "019a0700-0000-7000-8000-000000000012",
+        "exam_id": "cet-6",
+        "status": "pending",
+        "source": "planner",
+        "change": "优先巩固接近目标档的知识点。",
+        "reason": "把有限时间留给前置知识点和到期复习。",
+        "cost": "新学速度会放缓，需要持续完成到期复习。",
+        "if_declined": "保留当前范围，继续使用现有时间预算。",
+        "created_at": "2026-10-22T01:00:00Z"
+      }
+    }
+  ],
+  "completion": 0.64,
+  "health": 0.92,
+  "health_estimated": false,
+  "observed_days": 18,
+  "institution_locked": false,
+  "forecast_available": true,
+  "data_source": "sample",
+  "time_zone": "Asia/Shanghai"
+}
