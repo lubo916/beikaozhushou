@@ -87,7 +87,7 @@ test("S33 账号安全、引导与离线主要按钮可点击，跨页出口正�
   await page.goto("/settings?view=account&exam=ds");
   await expect(main).toContainText(copy.hint.bind);
   await main.getByRole("button", { name: copy.actions.bind, exact: true }).click();
-  await expect(page.getByRole("dialog").getByLabel(copy.security.new_phone)).toBeVisible();
+  await expect(page.getByRole("dialog").getByLabel(copy.security.new_phone, { exact: true })).toBeVisible();
 });
 
 test("S33 无缓存离线给出重试动作，不误标保存", async ({ page }) => {
