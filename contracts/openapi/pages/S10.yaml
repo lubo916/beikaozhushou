@@ -1,0 +1,380 @@
+# S10 知识点主页的接口（F08 样板页，api-rules 第 2、3 节）：一次取齐整页要显示的数据；业务数字由服务端算好，页面只显示（红线 5）。
+# 公共形状引用 schemas/；本页私有的形状用 S10 作前缀。规则还没实现时，假数据层返回演示数据并标 data_source 为 sample。
+# 加入今日、范围开关、星标、改重要度、改目标档、自评与检验这些写操作还没有登记权限动作（contracts/permissions.yaml），F08 先在界面上做成“即将上线”。
+paths:
+  /learner/points/{pointId}/home:
+    get:
+      operationId: getKnowledgePointHome
+      x-owner: learner
+      x-action: learner.mastery.read
+      summary: 知识点主页：掌握阶梯、建议学法、错误模式、关联题目、证据、资料位置、考点档案、知识关系与卡片笔记计数
+      parameters:
+        - {name: pointId, in: path, required: true, schema: {type: string}}
+      responses:
+        "200":
+          description: 知识点主页的数据（开发时路由里的 demo 由假数据层换成当前演示考试的示范知识点）
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S10KnowledgePointHome"}
+        "403": {$ref: "#/components/responses/Error"}
+        "404": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S10KnowledgePointHome:
+      type: object
+      description: 知识点主页一次要显示的全部数据
+      required: [point, ladder, methods, mistakes, questions, evidence, materials, exam_profile, relations, cards, notes, add_today, attack_pack, data_source]
+      properties:
+        point: {$ref: "#/components/schemas/S10Point"}
+        ladder: {$ref: "#/components/schemas/S10Ladder"}
+        methods: {$ref: "#/components/schemas/S10Methods"}
+        mistakes: {$ref: "#/components/schemas/S10Mistakes"}
+        questions:
+          type: array
+          description: 关联题目与变式，已按“我做错的、我没做过的、高频的”排好序；变式只取审定题池或个人题库
+          items: {$ref: "#/components/schemas/S10RelatedQuestion"}
+        evidence: {$ref: "#/components/schemas/S10Evidence"}
+        materials:
+          type: array
+          description: 在哪里学：各份资料里讲这个知识点的位置
+          items: {$ref: "#/components/schemas/S10MaterialSpot"}
+        exam_profile: {$ref: "#/components/schemas/S10ExamProfile"}
+        relations:
+          type: array
+          description: 知识关系，按八类分组，强度高的在前
+          items: {$ref: "#/components/schemas/S10RelationGroup"}
+        cards: {$ref: "#/components/schemas/S10CardCount"}
+        notes: {$ref: "#/components/schemas/S10NoteCount"}
+        add_today: {$ref: "#/components/schemas/S10AddToday"}
+        attack_pack: {$ref: "#/components/schemas/S10AttackPack"}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+    S10Point:
+      type: object
+      description: 页头：名称、所属、地图来源、知识类型、学习范围、重要度、考情级、我的星标与三层难度
+      required: [id, name, chapter_no, chapter_name, map_source, knowledge_types, scope_state, importance, exam_level, starred, difficulty]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        chapter_no: {type: integer, minimum: 1}
+        chapter_name: {type: string}
+        section_name:
+          type: string
+          description: 章下面的节名；没有就不给
+        map_source: {$ref: "#/components/schemas/MapSource"}
+        knowledge_types:
+          type: array
+          minItems: 1
+          maxItems: 2
+          items: {$ref: "#/components/schemas/KnowledgeType"}
+        scope_state: {$ref: "#/components/schemas/S10ScopeState"}
+        importance: {$ref: "#/components/schemas/S10Importance"}
+        exam_level: {$ref: "#/components/schemas/S10ExamLevel"}
+        starred:
+          type: boolean
+          description: 我的星标，只是个人收藏，不改重要度，不影响今日推荐
+        difficulty: {$ref: "#/components/schemas/S10Difficulty"}
+    S10ScopeState:
+      type: string
+      description: 学习范围三态：跟随默认、我加入、我移出（术语表 scope_state）
+      enum: [default, added, removed]
+    S10Importance:
+      type: object
+      description: 双层重要度（1–4 级，4 最重要）：官方或模板给默认值，学员可覆盖
+      required: [level, default_level, overridden]
+      properties:
+        level: {type: integer, minimum: 1, maximum: 4}
+        default_level: {type: integer, minimum: 1, maximum: 4}
+        overridden: {type: boolean}
+    S10ExamLevel:
+      type: object
+      description: 考情级（1–4 级，由真题统计）；考情数据不足时按重要度估算（estimated 为真）；冷启动时不给 level
+      required: [estimated]
+      properties:
+        level: {type: integer, minimum: 1, maximum: 4}
+        estimated: {type: boolean}
+    S10DifficultyLevel:
+      type: string
+      description: 难度三档：偏易、适中、偏难
+      enum: [easier, typical, harder]
+    S10Difficulty:
+      type: object
+      description: 三层难度；学员没同意个性化分析时只给客观难度
+      required: [objective, personalized]
+      properties:
+        objective: {$ref: "#/components/schemas/S10DifficultyLevel"}
+        peer: {$ref: "#/components/schemas/S10DifficultyLevel"}
+        personal: {$ref: "#/components/schemas/S10DifficultyLevel"}
+        personalized: {type: boolean}
+    S10Ladder:
+      type: object
+      description: 掌握阶梯：系统判定、自评与目标档（0 未学至 5 能迁移）；档位差由服务端算
+      required: [system, target, target_is_default, gap, self_pending, evidence_sufficient]
+      properties:
+        system: {type: integer, minimum: 0, maximum: 5}
+        target: {type: integer, minimum: 0, maximum: 5}
+        target_is_default: {type: boolean}
+        gap:
+          type: integer
+          description: 目标档减系统判定；不大于 0 时显示已达标
+        self: {type: integer, minimum: 0, maximum: 5}
+        self_vs_system:
+          type: integer
+          description: 自评比系统判定高（正数）或低（负数）几档；没有自评时不给
+        self_pending:
+          type: boolean
+          description: 自评的档位还在等检验题，检验通过才作为证据生效
+        evidence_sufficient: {type: boolean}
+    S10Methods:
+      type: object
+      description: 建议学法（学、记、练、测四格）按哪个知识类型给；学的那一格能直接打开的资料
+      required: [knowledge_type]
+      properties:
+        knowledge_type: {$ref: "#/components/schemas/KnowledgeType"}
+        reader_doc_id: {$ref: "#/components/schemas/Id"}
+    S10Mistakes:
+      type: object
+      description: 我在这里怎么错：错误模式归纳与做错过的选项
+      required: [rows]
+      properties:
+        pattern: {$ref: "#/components/schemas/S10ErrorPattern"}
+        rows:
+          type: array
+          items: {$ref: "#/components/schemas/S10MistakeRow"}
+    S10ErrorPattern:
+      type: object
+      description: 把反复犯的错总结成一句话；ai_generated 为真时界面带 AI 生成标识
+      required: [text, ai_generated]
+      properties:
+        text: {type: string}
+        ai_generated: {type: boolean}
+    S10MistakeRow:
+      type: object
+      required: [question_id, chosen, reason]
+      properties:
+        question_id: {$ref: "#/components/schemas/Id"}
+        chosen:
+          type: string
+          description: 你选的（选项原文）
+        reason:
+          type: string
+          description: 为什么错（题目的选项点评）
+        trap: {$ref: "#/components/schemas/S10TrapType"}
+        error_cause: {$ref: "#/components/schemas/S10ErrorCause"}
+    S10TrapType:
+      type: string
+      description: 陷阱十二类（术语表 trap_type）
+      enum: [concept_swap, scope_widen, scope_narrow, absolutize, time_confusion, subject_confusion, cause_reversal, partially_true, true_but_irrelevant, over_inference, boundary_break, ignore_exception]
+    S10ErrorCause:
+      type: string
+      description: 错因七类（术语表 error_cause）
+      enum: [not_learned, forgot, concept_unclear, method_unknown, misread, slip, time_short]
+    S10RelatedQuestion:
+      type: object
+      description: 一道关联题，或一组变式题、往年真题
+      required: [id, kind, title, credibility, status, times]
+      properties:
+        id: {type: string}
+        kind: {$ref: "#/components/schemas/S10QuestionKind"}
+        title:
+          type: string
+          description: 题干开头；题组为空串
+        count:
+          type: integer
+          minimum: 1
+          description: 题组里有几道
+        credibility: {$ref: "#/components/schemas/Credibility"}
+        status: {$ref: "#/components/schemas/S10QuestionStatus"}
+        times:
+          type: integer
+          minimum: 0
+          description: 做错或做对过几次；没做过为 0
+    S10QuestionKind:
+      type: string
+      enum: [question, variant_group, past_group]
+    S10QuestionStatus:
+      type: string
+      description: 我的状态：做错过、没做过、做对过
+      enum: [wrong, untried, correct]
+    S10Evidence:
+      type: object
+      description: 我的掌握证据：最近几条（新的在前）与总条数
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items: {$ref: "#/components/schemas/S10EvidenceItem"}
+        total: {type: integer, minimum: 0}
+    S10EvidenceItem:
+      type: object
+      required: [id, day, kind, subject, result, strength]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        day: {$ref: "#/components/schemas/LearningDay"}
+        kind: {$ref: "#/components/schemas/S10EvidenceKind"}
+        subject:
+          type: string
+          description: 做了什么（题目或卡片的开头）
+        result: {$ref: "#/components/schemas/S10EvidenceResult"}
+        confidence: {$ref: "#/components/schemas/Confidence"}
+        duration_seconds: {type: integer, minimum: 0}
+        interval_days:
+          type: integer
+          minimum: 1
+          description: 距上次学这个知识点隔了几天
+        strength: {$ref: "#/components/schemas/EvidenceStrength"}
+        credibility: {$ref: "#/components/schemas/Credibility"}
+        in_mistakes:
+          type: boolean
+          description: 这次做错已进错题本
+    S10EvidenceKind:
+      type: string
+      description: 证据来自哪里：作答、卡片回忆、检验题
+      enum: [answer, recall, check]
+    S10EvidenceResult:
+      type: string
+      enum: [correct, wrong, partial]
+    S10MaterialSpot:
+      type: object
+      description: 一份资料里讲这个知识点的位置；可解析的能在阅读器里打开
+      required: [id, title, access, licensed]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        title: {type: string}
+        access: {$ref: "#/components/schemas/MaterialAccess"}
+        licensed:
+          type: boolean
+          description: 来源标签“平台授权”（平台已获授权、可全文阅读）
+        location: {$ref: "#/components/schemas/S10Location"}
+    S10Location:
+      type: object
+      description: 位置：教材的节、纸书页码、外部课讲次、视频时刻；按 kind 取对应字段
+      required: [kind]
+      properties:
+        kind: {$ref: "#/components/schemas/S10LocationKind"}
+        section: {type: string}
+        minutes: {type: integer, minimum: 1}
+        page_from: {type: integer, minimum: 1}
+        page_to: {type: integer, minimum: 1}
+        lecture: {type: integer, minimum: 1}
+        start_seconds: {type: integer, minimum: 0}
+    S10LocationKind:
+      type: string
+      enum: [section, pages, lecture, video]
+    S10ExamProfile:
+      type: object
+      description: 考点档案，按数据成熟度逐项显示：冷启动不展示，成熟中只给原始次数
+      required: [maturity]
+      properties:
+        maturity: {$ref: "#/components/schemas/S10DataMaturity"}
+        syllabus:
+          type: string
+          description: 考纲要求（考试大纲原话，不是掌握档）
+        frequency: {$ref: "#/components/schemas/S10Frequency"}
+        average_score: {type: number, minimum: 0}
+        question_types:
+          type: array
+          items: {$ref: "#/components/schemas/S10QuestionTypeCount"}
+        angles:
+          type: array
+          items: {type: string}
+        traps:
+          type: array
+          items: {$ref: "#/components/schemas/S10TrapType"}
+        trend: {$ref: "#/components/schemas/S10Trend"}
+        updated: {$ref: "#/components/schemas/S10YearMonth"}
+        raw: {$ref: "#/components/schemas/S10RawCounts"}
+    S10DataMaturity:
+      type: string
+      description: 数据成熟度：冷启动、成熟中、可参考、成熟（术语表 data_maturity）
+      enum: [cold, maturing, usable, mature]
+    S10Frequency:
+      type: object
+      description: 近几年考了几次
+      required: [years, times]
+      properties:
+        years: {type: integer, minimum: 1}
+        times: {type: integer, minimum: 0}
+    S10QuestionTypeCount:
+      type: object
+      required: [name, count]
+      properties:
+        name:
+          type: string
+          description: 题型的界面叫法（考试画像映射到术语表的题型）
+        count: {type: integer, minimum: 0}
+    S10Trend:
+      type: string
+      enum: [rising, steady, falling]
+    S10YearMonth:
+      type: object
+      description: 考情更新到哪一年哪一月
+      required: [year, month]
+      properties:
+        year: {type: integer, minimum: 2000}
+        month: {type: integer, minimum: 1, maximum: 12}
+    S10RawCounts:
+      type: object
+      description: 成熟中只显示的原始次数，以及还差几年真题才出完整的考点档案
+      required: [appearances, years_covered]
+      properties:
+        appearances: {type: integer, minimum: 0}
+        years_covered: {type: integer, minimum: 0}
+        years_missing: {type: integer, minimum: 0}
+    S10RelationGroup:
+      type: object
+      required: [type, items]
+      properties:
+        type: {$ref: "#/components/schemas/S10RelationType"}
+        items:
+          type: array
+          minItems: 1
+          items: {$ref: "#/components/schemas/S10RelatedPoint"}
+    S10RelationType:
+      type: string
+      description: 知识点关系八类：前置、易混、上下位、并列、因果、案例、边界、例外
+      enum: [prerequisite, confusable, hierarchy, parallel, causal, case, boundary, exception]
+    S10RelatedPoint:
+      type: object
+      required: [name, origin, pending]
+      properties:
+        point_id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        origin: {$ref: "#/components/schemas/S10RelationOrigin"}
+        pending:
+          type: boolean
+          description: 导师建议的关系，等学员采纳
+        gap:
+          type: integer
+          description: 前置知识点的档位差；不大于 0 时为已达标
+    S10RelationOrigin:
+      type: string
+      description: 关系从哪来：官方、模板、自建，或导师建议
+      enum: [official, template, custom, tutor]
+    S10CardCount:
+      type: object
+      required: [total, due_tomorrow]
+      properties:
+        total: {type: integer, minimum: 0}
+        due_tomorrow: {type: integer, minimum: 0}
+    S10NoteCount:
+      type: object
+      required: [total, from_tutor]
+      properties:
+        total: {type: integer, minimum: 0}
+        from_tutor: {type: integer, minimum: 0}
+    S10AddToday:
+      type: object
+      description: 加入今日的估算：要多少分钟、会挤掉今天哪一项
+      required: [minutes, in_today]
+      properties:
+        minutes: {type: integer, minimum: 1}
+        in_today: {type: boolean}
+        displaces:
+          type: string
+          description: 会挤掉的今日任务；放得下就不给
+    S10AttackPack:
+      type: object
+      description: 攻坚包时长（上限参数还没登记，见勘误表第 11 条，先由接口给）
+      required: [minutes]
+      properties:
+        minutes: {type: integer, minimum: 1}
