@@ -6,16 +6,25 @@ paths:
       x-owner: content
       x-action: content.material.read
       summary: 搜索知识点与个人内容，并取得相关速查表（示例数据）
+      # 字符串参数写 explode: false（对字符串不改变序列化结果）：Orval 7.11 在一个接口的查询参数全是默认 explode 时
+      # 只拼数组、丢掉普通参数，导致搜索词、类型、速查表都发不出去（U29 回归测试锁定，生成器问题见交接单风险提醒）。
       parameters:
-        - {name: q, in: query, schema: {type: string}}
-        - {name: kind, in: query, schema: {type: string, enum: [all, point, material, question, note, mistake, tutor]}}
-        - {name: table, in: query, schema: {type: string}}
+        - {name: q, in: query, explode: false, schema: {type: string}}
+        - {name: kind, in: query, explode: false, schema: {type: string, enum: [all, point, material, question, note, mistake, tutor]}}
+        - {name: table, in: query, explode: false, schema: {type: string}}
+        - name: exam_id
+          in: query
+          explode: false
+          description: 当前目标考试（MeContext.goal.exam_id）；查询键随之按考试分开，同页切换考试不沿用上一考试的结果
+          schema: {type: string}
       responses:
         "200":
           description: 已分组、已计数的结果；只读自己的资料与笔记
           content:
             application/json:
               schema: {$ref: "#/components/schemas/S29SearchPage"}
+        "403": {$ref: "#/components/responses/Error"}
+        "404": {$ref: "#/components/responses/Error"}
 components:
   schemas:
     S29SearchPage:

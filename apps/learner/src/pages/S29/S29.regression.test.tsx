@@ -121,7 +121,12 @@ function stubFetch(api: MockApi, mode: Harness["mode"]): void {
       if (mode.deny) return json(403, new ApiError("COMMON_FORBIDDEN").toBody());
       if (mode.hold) return new Promise<Response>(() => undefined);
     }
-    const outcome = await api.handle({ method: init?.method ?? "GET", url: url.href, headers: new Headers(init?.headers), body: undefined });
+    const outcome = await api.handle({
+      method: init?.method ?? "GET",
+      url: url.href,
+      headers: new Headers(init?.headers),
+      body: undefined,
+    });
     if (outcome.kind === "hang") return new Promise<Response>(() => undefined);
     if (outcome.kind !== "json") throw new TypeError("network");
     return json(outcome.status, outcome.body);
@@ -184,7 +189,10 @@ describe("S29 示例引用与考试地图一致（回归：示例查询曾指向
         expect(items.find((item) => item.kind === "point")?.target_id, `别名「${alias}」`).toBe(fixture.point_id);
         expect(items.find((item) => item.kind === "material")?.target_id, `别名「${alias}」`).toBe(fixture.material_id);
         const shown = data.quick_tables.find((table) => table.id === data.selected_table);
-        expect(shown?.rows.some((row) => row.point_id === fixture.point_id), `别名「${alias}」右栏速查表`).toBe(true);
+        expect(
+          shown?.rows.some((row) => row.point_id === fixture.point_id),
+          `别名「${alias}」右栏速查表`,
+        ).toBe(true);
       }
     });
   }

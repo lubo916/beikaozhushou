@@ -1,6 +1,4 @@
 {
-  "page_state": "normal",
-  "minor_mode": false,
   "group_size": 6,
   "rooms": [
     {
@@ -21,7 +19,6 @@
   "focus": {
     "minutes": 25,
     "today_minutes": 50,
-    "task": "教育观：知识点回顾"
-  },
-  "data_source": "sample"
+    "task_id": "019a0206-0000-7000-8000-000000000002"
+  }
 }

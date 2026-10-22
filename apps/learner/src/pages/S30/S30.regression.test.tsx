@@ -45,12 +45,21 @@ function firstRoom(examId: string): string {
   return name;
 }
 function setupApi() {
-  const control = new DevControl({ examKeys: fixtures.exams.map((exam) => exam.key), defaultExamKey: fixtures.defaultKey, clock: () => NOW });
+  const control = new DevControl({
+    examKeys: fixtures.exams.map((exam) => exam.key),
+    defaultExamKey: fixtures.defaultKey,
+    clock: () => NOW,
+  });
   const api = createMockApi({ db: new MockDb(fixtures), control, routes });
   return { api, control };
 }
 async function fetchRoom(api: MockApi, query = ""): Promise<{ status: number; body: unknown }> {
-  const outcome = await api.handle({ method: "GET", url: `http://localhost/api/v1${ROOM_PATH}${query}`, headers: new Headers(), body: undefined });
+  const outcome = await api.handle({
+    method: "GET",
+    url: `http://localhost/api/v1${ROOM_PATH}${query}`,
+    headers: new Headers(),
+    body: undefined,
+  });
   if (outcome.kind !== "json") throw new Error(`S30 没有返回 JSON：${outcome.kind}`);
   return { status: outcome.status, body: outcome.body };
 }
@@ -73,7 +82,12 @@ function harness(context: MeContext = DEMO_CONTEXT): Harness {
       if (mode.deny) return json(403, new ApiError("COMMON_FORBIDDEN").toBody());
       if (mode.hold) return new Promise<Response>(() => undefined);
     }
-    const outcome = await api.handle({ method: init?.method ?? "GET", url: url.href, headers: new Headers(init?.headers), body: undefined });
+    const outcome = await api.handle({
+      method: init?.method ?? "GET",
+      url: url.href,
+      headers: new Headers(init?.headers),
+      body: undefined,
+    });
     if (outcome.kind === "hang") return new Promise<Response>(() => undefined);
     if (outcome.kind !== "json") throw new TypeError("network");
     return json(outcome.status, outcome.body);

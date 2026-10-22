@@ -1,6 +1,4 @@
 {
-  "page_state": "normal",
-  "minor_mode": false,
   "group_size": 6,
   "rooms": [
     {
@@ -21,7 +19,6 @@
   "focus": {
     "minutes": 25,
     "today_minutes": 50,
-    "task": "会计等式：读后即测"
-  },
-  "data_source": "sample"
+    "task_id": "019a0106-0000-7000-8000-000000000002"
+  }
 }

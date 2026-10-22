@@ -1,3 +1,6 @@
+// S29 搜索与速查：页面只管显示；数据经 data.ts 里生成的钩子拿，七态在 data.ts 判断（照 S10 样板，ui-rules 第 13 节）。
+// 视图：?view=results|recent|quick（搜索结果、最近访问、速查表）。受限分两种：接口拒绝（整页说明账号受限，不显示任何个人内容）
+// 与拍照额度受限（只停拍照，文本搜索照常）。断网时保留已缓存的结果并标明离线，拍照搜题要联网所以停用。
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router";
@@ -7,6 +10,7 @@ import { formatNumber } from "@exam-prep/shared/format";
 import {
   Banner,
   Button,
+  COPY,
   Card,
   Columns,
   ContainerScope,
@@ -70,6 +74,7 @@ export default function Page() {
   function soon(action: string) {
     toast(t("soon.action", { action }));
   }
+  const online = home.state !== "offline" && !home.stale;
   // feat:S29-03 最近访问保留知识点与资料的直接入口。
   const recent = (
     <Card title={t("recent.title")}>
@@ -84,6 +89,25 @@ export default function Page() {
       </ul>
     </Card>
   );
+  // 接口拒绝访问（403）：不显示搜索框、结果与最近访问等个人内容，只说明原因与出路（不是拍照额度受限）。
+  if (home.state === "restricted" && data === undefined) {
+    return (
+      <ContainerScope className="s29-page mx-auto flex w-full max-w-content-lg flex-col gap-4">
+        <PageHeader title={t("title")} description={t("description")} />
+        <PageState
+          state="restricted"
+          pageName={t("title")}
+          title={t("state.forbidden.title")}
+          body={t("state.forbidden.body")}
+          action={
+            <Link to={pathTo("S33")} className={buttonClass("secondary")}>
+              {t("state.forbidden.action")}
+            </Link>
+          }
+        />
+      </ContainerScope>
+    );
+  }
   return (
     <ContainerScope className="s29-page mx-auto flex w-full max-w-content-lg flex-col gap-4">
       <PageHeader title={t("title")} description={t("description")} meta={<Tag>{t("sample")}</Tag>} />
@@ -104,6 +128,7 @@ export default function Page() {
             {t("search.submit")}
           </Button>
           <Button
+            disabled={!online}
             onClick={() => {
               setIntent("");
               setPhotoOpen(true);
@@ -154,7 +179,17 @@ export default function Page() {
       ) : (
         <>
           {home.stale && (
-            <Banner tone="warning" title={t("state.offline.body")} action={<Button onClick={home.retry}>{t("search.submit")}</Button>} />
+            <Banner
+              tone="warning"
+              title={t("state.offline.title")}
+              action={
+                <Button size="sm" onClick={home.retry}>
+                  {COPY.action.retry}
+                </Button>
+              }
+            >
+              {t("state.offline.body")}
+            </Banner>
           )}
           {/* 受限仅限制拍照，文本搜索与已取到的内容仍可用。 */}
           {home.state === "restricted" && (
@@ -235,7 +270,7 @@ export default function Page() {
             <Button onClick={() => setPhotoOpen(false)}>{t("photo.cancel")}</Button>
             <Button
               variant="primary"
-              disabled={intent === "" || home.state === "restricted" || data?.photo_available === false}
+              disabled={intent === "" || !online || home.state === "restricted" || data?.photo_available === false}
               onClick={() => {
                 setPhotoOpen(false);
                 toast(t("soon.photo"));

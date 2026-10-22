@@ -6,6 +6,12 @@ paths:
       x-owner: engagement
       x-action: account.context.read
       summary: 自习室与小组的演示主视图
+      parameters:
+        - name: exam_id
+          in: query
+          explode: false
+          description: 当前目标考试（MeContext.goal.exam_id）；查询键随之按考试分开，同页切换考试不沿用上一考试的房间
+          schema: {type: string}
       responses:
         "200":
           description: 自习室、番茄钟示例与社区规则；未成年人只保留自习室与番茄钟
@@ -13,6 +19,7 @@ paths:
             application/json:
               schema: {$ref: "#/components/schemas/S30StudyRoom"}
         "403": {$ref: "#/components/responses/Error"}
+        "404": {$ref: "#/components/responses/Error"}
 components:
   schemas:
     S30StudyRoom:

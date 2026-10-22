@@ -85,3 +85,6 @@
   gap: var(--size-space-2);
   align-items: center;
 }
+.s29-ai {
+  margin-block: var(--size-space-2);
+}

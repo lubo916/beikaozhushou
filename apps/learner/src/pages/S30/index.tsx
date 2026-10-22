@@ -1,10 +1,27 @@
 // S30 简版：主视图＋七态＋P0 内容治理。P1 房间与番茄钟保留入口，写操作等待后端登记。
+// 受限分两种：接口拒绝（整页说明账号受限，不显示房间与专注记录）与未成年人模式（只留自习室与番茄钟）。
+// 断网时只保留能离线用的番茄钟：在线房间和小组需要联网，收起并说明。
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 import { param } from "@exam-prep/params";
 import { formatCount, formatDuration } from "@exam-prep/shared/format";
-import { Banner, Button, Card, Columns, ContainerScope, Dialog, PageHeader, PageState, Skeleton, Tag } from "@exam-prep/ui";
+import {
+  Banner,
+  Button,
+  COPY,
+  Card,
+  Columns,
+  ContainerScope,
+  Dialog,
+  PageHeader,
+  PageState,
+  Skeleton,
+  Tag,
+  buttonClass,
+} from "@exam-prep/ui";
 import { useToast } from "../../app/toast.tsx";
+import { pathTo } from "../../routes.ts";
 import { useStudyRoom } from "./data.ts";
 
 type Reason = "spam" | "anxiety" | "harassment" | "privacy";
@@ -16,7 +33,12 @@ export default function Page() {
   const toast = useToast();
   const [report, setReport] = useState<string | null>(null);
   const [blocked, setBlocked] = useState<string | null>(null);
-  const [reason, setReason] = useState<Reason>("spam");
+  // 举报原因不预选：没选原因不能提交，每次打开都重新选（明确操作）。
+  const [reason, setReason] = useState<Reason | null>(null);
+  const openReport = (title: string) => {
+    setReason(null);
+    setReport(title);
+  };
   const data = room.data;
   const soon = (action: string) => toast(t(`soon.${action}`));
 
@@ -75,11 +97,22 @@ export default function Page() {
         />
       </ContainerScope>
     );
+  // 接口拒绝访问（403）：不显示房间与专注记录，只说明原因与出路（不是未成年人模式）。
   if (data === undefined)
     return (
       <ContainerScope className="mx-auto flex w-full max-w-content-lg flex-col gap-4">
         {header}
-        <PageState state="restricted" pageName={t("title")} title={t("state.restricted.title")} body={t("state.restricted.body")} />
+        <PageState
+          state="restricted"
+          pageName={t("title")}
+          title={t("state.forbidden.title")}
+          body={t("state.forbidden.body")}
+          action={
+            <Link to={pathTo("S33")} className={buttonClass("secondary")}>
+              {t("state.forbidden.action")}
+            </Link>
+          }
+        />
       </ContainerScope>
     );
 
@@ -93,7 +126,7 @@ export default function Page() {
             <li key={rule}>{rule}</li>
           ))}
         </ul>
-        <Button onClick={() => setReport(t("report.title"))}>{t("governance.report")}</Button>
+        <Button onClick={() => openReport(t("report.title"))}>{t("governance.report")}</Button>
         <Button variant="ghost" onClick={() => soon("settings")}>
           {t("governance.blocked")}
         </Button>
@@ -107,10 +140,10 @@ export default function Page() {
       {room.stale && (
         <Banner
           tone="warning"
-          title={t("state.offline.stale")}
+          title={t("state.offline.title")}
           action={
             <Button size="sm" onClick={room.retry}>
-              {t("focus.offline")}
+              {COPY.action.retry}
             </Button>
           }
         >
@@ -133,43 +166,45 @@ export default function Page() {
             {/* feat:S30-02 简版保留自习室主体和可点入口，进入计时等待后端。 */}
             <Card title={t("room.title")} meta={t("room.description")}>
               <div className="flex flex-col gap-3">
-                {data.rooms.map((item) => (
-                  <Card
-                    key={item.id}
-                    as="article"
-                    title={item.name}
-                    headingLevel={3}
-                    tone="sunk"
-                    meta={<Tag>{t(`room.kind.${item.kind}`)}</Tag>}
-                  >
-                    <div className="flex flex-col gap-3">
-                      <p className="text-small text-ink-secondary">
-                        {t("room.people", { participants: formatCount(item.participants), capacity: formatCount(item.capacity) })}
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        <Button variant="primary" onClick={() => soon("room")}>
-                          {t("room.enter")}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          aria-label={t("room.report_room", { name: item.name })}
-                          onClick={() => setReport(t("room.report_room", { name: item.name }))}
-                        >
-                          {t("room.report")}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          aria-label={t("room.block_room", { name: item.name })}
-                          onClick={() => setBlocked(item.name)}
-                        >
-                          {t("room.block")}
-                        </Button>
+                {room.stale && <p className="text-ink-secondary">{t("room.offline")}</p>}
+                {!room.stale &&
+                  data.rooms.map((item) => (
+                    <Card
+                      key={item.id}
+                      as="article"
+                      title={item.name}
+                      headingLevel={3}
+                      tone="sunk"
+                      meta={<Tag>{t(`room.kind.${item.kind}`)}</Tag>}
+                    >
+                      <div className="flex flex-col gap-3">
+                        <p className="text-small text-ink-secondary">
+                          {t("room.people", { participants: formatCount(item.participants), capacity: formatCount(item.capacity) })}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          <Button variant="primary" onClick={() => soon("room")}>
+                            {t("room.enter")}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            aria-label={t("room.report_room", { name: item.name })}
+                            onClick={() => openReport(t("room.report_room", { name: item.name }))}
+                          >
+                            {t("room.report")}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            aria-label={t("room.block_room", { name: item.name })}
+                            onClick={() => setBlocked(item.name)}
+                          >
+                            {t("room.block")}
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  </Card>
-                ))}
+                    </Card>
+                  ))}
                 {room.state === "empty" && (
                   <PageState
                     state="empty"
@@ -201,7 +236,7 @@ export default function Page() {
                 </div>
               </div>
             </Card>
-            {!data.minor_mode && room.state !== "empty" && (
+            {!data.minor_mode && room.state !== "empty" && !room.stale && (
               <Card title={t("group.title")}>
                 <div className="flex flex-col gap-3">
                   <p className="text-ink-secondary">{t("group.description")}</p>
@@ -225,6 +260,7 @@ export default function Page() {
             <Button onClick={() => setReport(null)}>{t("report.cancel")}</Button>
             <Button
               variant="primary"
+              disabled={reason === null}
               onClick={() => {
                 setReport(null);
                 soon("report");
