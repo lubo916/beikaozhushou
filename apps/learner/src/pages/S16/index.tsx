@@ -46,7 +46,7 @@ export default function Page() {
           body={
             <>
               {t("state.offline.body")}
-              <p>{t("state.offline.uncached")}</p>
+              <span className="block">{t("state.offline.uncached")}</span>
             </>
           }
           action={<Button onClick={home.retry}>{t("state.offline.retry")}</Button>}

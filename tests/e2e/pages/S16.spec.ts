@@ -191,11 +191,12 @@ test("S16 主要动作说明即将上线，检查不会改写上次结果或请�
   });
   await open(page);
   const main = page.locator("main#main");
+  // 前后统一比较可见文本，避免 innerText 与 textContent 的换行口径不同造成误报。
   const before = await page.getByTestId("s16-result").innerText();
   await pressToast(page, main.getByRole("button", { name: copy("morning"), exact: true }), copy("soon.morning"));
   await workspace(page).getByLabel(copy("draft"), { exact: true }).fill("回忆内容");
   await pressToast(page, workspace(page).getByRole("button", { name: copy("check"), exact: true }), copy("soon.check"));
-  await expect(page.getByTestId("s16-result")).toHaveText(before);
+  await expect(page.getByTestId("s16-result")).toHaveText(before, { useInnerText: true });
   await pressToast(page, main.getByRole("button", { name: copy("queue"), exact: true }), copy("soon.queue"));
   await choose(page, copy("compare.label"), copy("compare.profile.strict"));
   const strict = KJ.match_profiles.find((profile) => profile.id === "strict");
@@ -210,5 +211,5 @@ test("S16 主要动作说明即将上线，检查不会改写上次结果或请�
   await pressToast(page, workspace(page).getByRole("button", { name: copy("check"), exact: true }), copy("soon.check"));
   await expect(main.getByRole("link", { name: copy("privacy.link"), exact: true })).toHaveAttribute("href", pathTo("S32"));
   expect(await page.evaluate(() => (window as unknown as { s16MicrophoneRequests: number }).s16MicrophoneRequests)).toBe(0);
-  await expect(page.getByTestId("s16-result")).toHaveText(before);
+  await expect(page.getByTestId("s16-result")).toHaveText(before, { useInnerText: true });
 });
