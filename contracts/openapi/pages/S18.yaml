@@ -1,0 +1,312 @@
+# S18 做题与解析的接口（U18a 上半，api-rules 第 2、3 节）：一组题一次取齐——题目（揭晓前不含答案）、我的作答与揭晓结果、本组进度、断点续做的位置、小结与限制。
+# 写操作三个：在题组里提交一题、生成题核对（先做后核）、测评态交卷。作答只追加，揭晓后不能改（INV-24）。对错、证据、进度、小结都由服务端算好，页面只显示（红线 5）。
+# 公共形状引用 schemas/；本页私有的形状用 S18 作前缀。规则还没实现时，假数据层返回演示数据并标 data_source 为 sample。
+# 生成题核对与测评态交卷暂挂在 practice.answer.submit 动作下（U18a-Q2＝A，见决定卡 D-2026-10-23-U18a-r1）；要不要单列动作由整合任务定。
+# 开始一组、再来一组属于练习中心 S17，这里不写。
+paths:
+  /practice/sessions/{sessionId}:
+    get:
+      operationId: getQuizSession
+      x-owner: practice
+      x-action: content.question.read
+      summary: 一组题：题目、我的作答与揭晓结果、本组进度、断点续做的位置、小结与限制
+      parameters:
+        - {name: sessionId, in: path, required: true, schema: {type: string}}
+      responses:
+        "200":
+          description: 一组题的数据（开发时路由里的 demo 由假数据层换成当前演示考试的示范题组，demo-gen 换成导师出题的示范题组）
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S18QuizSession"}
+        "403": {$ref: "#/components/responses/Error"}
+        "404": {$ref: "#/components/responses/Error"}
+  /practice/sessions/{sessionId}/answers:
+    post:
+      operationId: submitQuizAnswer
+      x-owner: practice
+      x-action: practice.answer.submit
+      x-errors: [PRAC_REVEAL_LOCKED, PRAC_CONFIDENCE_REQUIRED, COMMON_VALIDATION]
+      x-invalidates: [getQuizSession, listMistakes, getTodayList, getMasteryGrid, getQuestionSolution]
+      summary: 在题组里提交一题（作答、把握度、用时、提示用量）；随堂、快刷、限时当场揭晓，测评态交卷后一起揭晓；同一幂等键重复提交返回第一次的结果
+      parameters:
+        - {name: sessionId, in: path, required: true, schema: {type: string}}
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/S18AnswerInput"}
+      responses:
+        "200":
+          description: 这一题提交后的样子（当场揭晓的带揭晓结果）
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S18QuizItem"}
+        "404": {$ref: "#/components/responses/Error"}
+        "409": {$ref: "#/components/responses/Error"}
+        "422": {$ref: "#/components/responses/Error"}
+  /practice/sessions/{sessionId}/checks:
+    post:
+      operationId: checkGeneratedQuestion
+      x-owner: practice
+      x-action: practice.answer.submit
+      x-errors: [PRAC_REVEAL_LOCKED, COMMON_VALIDATION]
+      x-invalidates: [getQuizSession, getMasteryGrid]
+      summary: 生成题先做后核：揭晓后确认“题目没问题”（才计证据）或“有问题”（不计证据并进入报错）；每题只确认一次
+      parameters:
+        - {name: sessionId, in: path, required: true, schema: {type: string}}
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/S18CheckInput"}
+      responses:
+        "200":
+          description: 核对后的这一题
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S18QuizItem"}
+        "404": {$ref: "#/components/responses/Error"}
+        "409": {$ref: "#/components/responses/Error"}
+        "422": {$ref: "#/components/responses/Error"}
+  /practice/sessions/{sessionId}/finish:
+    post:
+      operationId: finishQuizSession
+      x-owner: practice
+      x-action: practice.answer.submit
+      x-errors: [COMMON_VALIDATION]
+      x-invalidates: [getQuizSession, listMistakes, getTodayList, getMasteryGrid, getQuestionSolution]
+      summary: 测评态交卷：交卷后一起揭晓，揭晓后不能改答案
+      parameters:
+        - {name: sessionId, in: path, required: true, schema: {type: string}}
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      responses:
+        "200":
+          description: 交卷后的这组题
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S18QuizSession"}
+        "404": {$ref: "#/components/responses/Error"}
+        "422": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S18QuizSession:
+      type: object
+      description: 一组题（练习场次）一次要显示的全部数据
+      required: [id, title, kind, mode, confidence_enabled, items, progress, resume_index, time, restrictions, other_device, finished, data_source]
+      properties:
+        id: {type: string}
+        title:
+          type: string
+          description: 题组名
+        kind: {$ref: "#/components/schemas/S18SessionKind"}
+        mode: {$ref: "#/components/schemas/S18PracticeMode"}
+        confidence_enabled:
+          type: boolean
+          description: 把握度开着；学员关闭后不再要求选，正确作答最高只记中证据（S18-04）
+        items:
+          type: array
+          items: {$ref: "#/components/schemas/S18QuizItem"}
+        progress: {$ref: "#/components/schemas/S18Progress"}
+        resume_index:
+          type: integer
+          minimum: 0
+          description: 断点续做：打开时停在第几题（从 0 数，S18-21）
+        time: {$ref: "#/components/schemas/S18Time"}
+        restrictions: {$ref: "#/components/schemas/S18Restrictions"}
+        other_device:
+          type: boolean
+          description: 这一组正在另一台设备上作答（同一场练习不能在两台设备同时作答，S18-28）
+        finished:
+          type: boolean
+          description: 这一组题做完了（测评态交卷后才算）
+        summary: {$ref: "#/components/schemas/S18Summary"}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+    S18SessionKind:
+      type: string
+      description: 题组来源：objective 题库里的题（客观题视图 obj）；generated 导师出的生成题（先做后核视图 gen）
+      enum: [objective, generated]
+    S18PracticeMode:
+      type: string
+      description: 练习模式四种：随堂（逐题揭晓）、快刷（答对自动下一题）、限时、测评态（交卷后揭晓）（术语表 practice_mode）
+      enum: [in_class, quick, timed, assessment]
+    S18QuizItem:
+      type: object
+      description: 题组里的一题：题目、我的作答、揭晓结果与生成题核对
+      required: [id, index, question, knowledge_point_name, suggested_seconds, status, flagged, check]
+      properties:
+        id: {type: string}
+        index: {type: integer, minimum: 0}
+        question: {$ref: "#/components/schemas/Question"}
+        knowledge_point_name:
+          type: string
+          description: 题目所属知识点的名称（第一个）
+        material:
+          type: string
+          description: 材料组合题的材料原文
+        parts:
+          type: array
+          description: 各部分的名称：填空的每个空、分步的每一步、排序的位置、实操自评的核对项
+          items: {type: string}
+        suggested_seconds:
+          type: integer
+          minimum: 1
+          description: 建议用时（秒）；超时不打断，只在小结里提示（S18-22）
+        status: {$ref: "#/components/schemas/S18ItemStatus"}
+        flagged:
+          type: boolean
+          description: 我标记了这一题（纸笔动作“标记”）
+        answer: {$ref: "#/components/schemas/S18MyAnswer"}
+        result: {$ref: "#/components/schemas/S18ItemResult"}
+        check: {$ref: "#/components/schemas/S18CheckState"}
+        revised:
+          type: boolean
+          description: 题目事后改了答案：由它产生的证据已撤回并重算（S18-26）
+    S18ItemStatus:
+      type: string
+      description: unanswered 还没做；answered 已作答、交卷后才揭晓（测评态）；revealed 已揭晓（不能再改答案）
+      enum: [unanswered, answered, revealed]
+    S18MyAnswer:
+      type: object
+      description: 我交的作答
+      required: [response, confidence, duration_ms, hint_level]
+      properties:
+        response: {$ref: "#/components/schemas/AnswerResponse"}
+        confidence: {$ref: "#/components/schemas/Confidence"}
+        duration_ms: {type: integer, minimum: 0}
+        hint_level: {type: integer, minimum: 0}
+    S18ItemResult:
+      type: object
+      description: 揭晓结果：判分、这次记了什么证据与原因、答案与解析
+      required: [graded, correct, evidence_strength, evidence_reason, evidence_counted, mistake_id, solution]
+      properties:
+        graded:
+          type: boolean
+          description: 是否已自动判分；主观题要等批改或自评
+        correct: {type: [boolean, "null"]}
+        evidence_strength: {$ref: "#/components/schemas/EvidenceStrength"}
+        evidence_reason: {$ref: "#/components/schemas/S18EvidenceReason"}
+        evidence_counted:
+          type: boolean
+          description: 这次作答计不计证据（生成题确认前、报了有问题、主观题待批改时不计）
+        mistake_id:
+          type: [string, "null"]
+          description: 这次作答进了错题本时为错题 ID
+        solution: {$ref: "#/components/schemas/QuestionSolution"}
+    S18EvidenceReason:
+      type: string
+      description: >-
+        这次为什么记这个证据：sure_correct 标确定且做对；vague_correct 标模糊做对；guess_correct 蒙对（待验证，稍后换问法再考）；
+        too_fast 用时过短（待验证）；hint_used 用过提示（弱证据）；confidence_off 把握度已关闭（做对最高记中）；wrong 做错；
+        awaiting_check 生成题还没确认（确认前不计）；question_problem 报了题目有问题（不计）；ungraded 主观题等批改或自评
+      enum: [sure_correct, vague_correct, guess_correct, too_fast, hint_used, confidence_off, wrong, awaiting_check, question_problem, ungraded]
+    S18CheckState:
+      type: string
+      description: 生成题核对（先做后核）：not_needed 不是生成题；pending 待你确认；ok 你确认题目没问题；problem 你报了有问题（不计证据并进入报错）
+      enum: [not_needed, pending, ok, problem]
+    S18CheckVerdict:
+      type: string
+      enum: [ok, problem]
+    S18Progress:
+      type: object
+      description: 本组进度（服务端算）：做对、做错、已作答还没判对错（测评态等交卷、主观题等批改）、未做的题数
+      required: [total, correct, wrong, waiting, unanswered]
+      properties:
+        total: {type: integer, minimum: 0}
+        correct: {type: integer, minimum: 0}
+        wrong: {type: integer, minimum: 0}
+        waiting: {type: integer, minimum: 0}
+        unanswered: {type: integer, minimum: 0}
+    S18Time:
+      type: object
+      description: 计时：本组已用时（断点续做时接着算）；限时模式另给总时限，超时不打断
+      required: [elapsed_seconds]
+      properties:
+        elapsed_seconds: {type: integer, minimum: 0}
+        limit_seconds: {type: integer, minimum: 1}
+    S18Restrictions:
+      type: object
+      description: 本组的限制：测评态不能切换模式、不能看提示
+      required: [mode_locked, hints_locked]
+      properties:
+        mode_locked: {type: boolean}
+        hints_locked: {type: boolean}
+    S18Summary:
+      type: object
+      description: 练习小结（S18-15）：对了多少、慢在哪、错因分布、下一步练什么；超时只在这里提示（S18-22）
+      required: [total, correct, overtime, error_causes, uncategorized, mistakes_added, pending, next_steps]
+      properties:
+        total: {type: integer, minimum: 0}
+        correct: {type: integer, minimum: 0}
+        overtime:
+          type: array
+          description: 慢在哪：用时超过建议用时的题
+          items: {$ref: "#/components/schemas/S18Overtime"}
+        error_causes:
+          type: array
+          description: 错因分布（只算选了错因的错题）
+          items: {$ref: "#/components/schemas/S18CauseCount"}
+        uncategorized:
+          type: integer
+          minimum: 0
+          description: 还没选错因的错题数
+        mistakes_added:
+          type: integer
+          minimum: 0
+          description: 这组里进了错题本的题数
+        pending:
+          type: integer
+          minimum: 0
+          description: 记为待验证的题数（稍后换问法再考）
+        next_steps:
+          type: array
+          description: 下一步练什么（服务端排好序）
+          items: {$ref: "#/components/schemas/S18NextStep"}
+    S18Overtime:
+      type: object
+      required: [index, seconds, suggested_seconds]
+      properties:
+        index: {type: integer, minimum: 0}
+        seconds: {type: integer, minimum: 0}
+        suggested_seconds: {type: integer, minimum: 1}
+    S18CauseCount:
+      type: object
+      required: [cause, count]
+      properties:
+        cause: {$ref: "#/components/schemas/S18ErrorCause"}
+        count: {type: integer, minimum: 1}
+    S18ErrorCause:
+      type: string
+      description: 错因七类（术语表 error_cause）
+      enum: [not_learned, forgot, concept_unclear, method_unknown, misread, slip, time_short]
+    S18NextStep:
+      type: object
+      required: [point_id, point_name, reason]
+      properties:
+        point_id: {$ref: "#/components/schemas/Id"}
+        point_name: {type: string}
+        reason: {$ref: "#/components/schemas/S18NextReason"}
+    S18NextReason:
+      type: string
+      description: 为什么排进下一步：wrong 这组里做错了；pending 记为待验证；slow 用时超过建议
+      enum: [wrong, pending, slow]
+    S18AnswerInput:
+      type: object
+      description: 在题组里提交一题（作答只追加；揭晓后再交回 PRAC_REVEAL_LOCKED；把握度关闭时填 off）
+      required: [item_id, question_id, question_version, response, confidence, duration_ms, hint_level]
+      properties:
+        item_id: {type: string}
+        question_id: {$ref: "#/components/schemas/Id"}
+        question_version: {type: integer, minimum: 1}
+        response: {$ref: "#/components/schemas/AnswerResponse"}
+        confidence: {$ref: "#/components/schemas/Confidence"}
+        duration_ms: {type: integer, minimum: 0}
+        hint_level: {type: integer, minimum: 0}
+    S18CheckInput:
+      type: object
+      description: 生成题核对：题目没问题（ok）或有问题（problem）
+      required: [item_id, verdict]
+      properties:
+        item_id: {type: string}
+        verdict: {$ref: "#/components/schemas/S18CheckVerdict"}
