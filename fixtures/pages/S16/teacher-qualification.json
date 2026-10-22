@@ -1,0 +1,264 @@
+{
+  "exam_id": "teacher-qualification",
+  "data_source": "sample",
+  "default_method": "points",
+  "default_level": "keywords",
+  "default_source": "user",
+  "default_segment": "part-1",
+  "default_profile": "balanced",
+  "oral_available": true,
+  "order_min_samples": 3,
+  "items": [
+    {
+      "id": "019a0b00-0000-7000-8000-000000000116",
+      "title": "教学过程的基本规律",
+      "knowledge_type": "concept",
+      "origin": "《教育知识与能力》标注段落",
+      "reference": "教学过程是学生在教师引导下掌握知识、发展能力的过程。\n应处理间接经验与直接经验、掌握知识与发展能力、教师主导与学生主体的关系。",
+      "outline": [
+        "间接经验与直接经验相结合",
+        "掌握知识与发展能力相统一",
+        "教师主导与学生主体相结合"
+      ],
+      "segments": [
+        {
+          "id": "part-1",
+          "label": "第一段",
+          "reference": "教学过程是学生在教师引导下掌握知识、发展能力的过程。"
+        },
+        {
+          "id": "part-2",
+          "label": "第二段",
+          "reference": "应处理间接经验与直接经验、掌握知识与发展能力、教师主导与学生主体的关系。"
+        },
+        {
+          "id": "all",
+          "label": "合并背诵",
+          "reference": "教学过程是学生在教师引导下掌握知识、发展能力的过程。\n应处理间接经验与直接经验、掌握知识与发展能力、教师主导与学生主体的关系。"
+        }
+      ],
+      "variants": [
+        {
+          "id": "019a0b00-0000-7000-8000-000000000116-user-keywords-part-1",
+          "level": "keywords",
+          "source": "user",
+          "segment_id": "part-1",
+          "prompt": "教学过程是＿＿在教师引导下＿＿、发展能力的过程。",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000116-user-keywords-part-2",
+          "level": "keywords",
+          "source": "user",
+          "segment_id": "part-2",
+          "prompt": "应处理＿＿与直接经验、＿＿与发展能力、＿＿与学生主体的关系。",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000116-user-keywords-all",
+          "level": "keywords",
+          "source": "user",
+          "segment_id": "all",
+          "prompt": "教学过程是＿＿在教师引导下＿＿、发展能力的过程。\n应处理＿＿与直接经验、＿＿与发展能力、＿＿与学生主体的关系。",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000116-user-initials-part-1",
+          "level": "initials",
+          "source": "user",
+          "segment_id": "part-1",
+          "prompt": "教学过程是学生在教＿＿引导下掌＿＿、发＿＿的过程。",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000116-user-initials-part-2",
+          "level": "initials",
+          "source": "user",
+          "segment_id": "part-2",
+          "prompt": "应处理间＿＿与直＿＿、掌＿＿与发＿＿、教＿＿与学＿＿的关系。",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000116-user-initials-all",
+          "level": "initials",
+          "source": "user",
+          "segment_id": "all",
+          "prompt": "教学过程是学生在教＿＿引导下掌＿＿、发＿＿的过程。\n应处理间＿＿与直＿＿、掌＿＿与发＿＿、教＿＿与学＿＿的关系。",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000116-user-full-part-1",
+          "level": "full",
+          "source": "user",
+          "segment_id": "part-1",
+          "prompt": "",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000116-user-full-part-2",
+          "level": "full",
+          "source": "user",
+          "segment_id": "part-2",
+          "prompt": "",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000116-user-full-all",
+          "level": "full",
+          "source": "user",
+          "segment_id": "all",
+          "prompt": "\n",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000116-tutor-keywords-part-1",
+          "level": "keywords",
+          "source": "tutor",
+          "segment_id": "part-1",
+          "prompt": "教学过程是学生在＿＿引导下掌握知识、＿＿的过程。",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000116-tutor-keywords-part-2",
+          "level": "keywords",
+          "source": "tutor",
+          "segment_id": "part-2",
+          "prompt": "应处理间接经验与＿＿、掌握知识与＿＿、教师主导与＿＿的关系。",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000116-tutor-keywords-all",
+          "level": "keywords",
+          "source": "tutor",
+          "segment_id": "all",
+          "prompt": "教学过程是学生在＿＿引导下掌握知识、＿＿的过程。\n应处理间接经验与＿＿、掌握知识与＿＿、教师主导与＿＿的关系。",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000116-tutor-initials-part-1",
+          "level": "initials",
+          "source": "tutor",
+          "segment_id": "part-1",
+          "prompt": "教学过程是学生在教＿＿引导下掌＿＿、发＿＿的过程。",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000116-tutor-initials-part-2",
+          "level": "initials",
+          "source": "tutor",
+          "segment_id": "part-2",
+          "prompt": "应处理间＿＿与直＿＿、掌＿＿与发＿＿、教＿＿与学＿＿的关系。",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000116-tutor-initials-all",
+          "level": "initials",
+          "source": "tutor",
+          "segment_id": "all",
+          "prompt": "教学过程是学生在教＿＿引导下掌＿＿、发＿＿的过程。\n应处理间＿＿与直＿＿、掌＿＿与发＿＿、教＿＿与学＿＿的关系。",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000116-tutor-full-part-1",
+          "level": "full",
+          "source": "tutor",
+          "segment_id": "part-1",
+          "prompt": "",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000116-tutor-full-part-2",
+          "level": "full",
+          "source": "tutor",
+          "segment_id": "part-2",
+          "prompt": "",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000116-tutor-full-all",
+          "level": "full",
+          "source": "tutor",
+          "segment_id": "all",
+          "prompt": "\n",
+          "ai_generated": true
+        }
+      ]
+    }
+  ],
+  "last_result": {
+    "coverage": 0.8,
+    "accuracy": 0.92,
+    "order": 0.75,
+    "grade": "basic",
+    "missing": [
+      "教师主导与学生主体的关系"
+    ],
+    "oral_samples": 5,
+    "ai_generated": true
+  },
+  "match_profiles": [
+    {
+      "id": "lenient",
+      "bands": [
+        {
+          "grade": "exact",
+          "minimum_match": 1
+        },
+        {
+          "grade": "basic",
+          "minimum_match": 0.8
+        },
+        {
+          "grade": "partial",
+          "minimum_match": 0.5
+        },
+        {
+          "grade": "wrong",
+          "minimum_match": 0
+        }
+      ]
+    },
+    {
+      "id": "balanced",
+      "bands": [
+        {
+          "grade": "exact",
+          "minimum_match": 1
+        },
+        {
+          "grade": "basic",
+          "minimum_match": 0.9
+        },
+        {
+          "grade": "partial",
+          "minimum_match": 0.7
+        },
+        {
+          "grade": "wrong",
+          "minimum_match": 0
+        }
+      ]
+    },
+    {
+      "id": "strict",
+      "bands": [
+        {
+          "grade": "exact",
+          "minimum_match": 1
+        },
+        {
+          "grade": "basic",
+          "minimum_match": 0.95
+        },
+        {
+          "grade": "partial",
+          "minimum_match": 0.8
+        },
+        {
+          "grade": "wrong",
+          "minimum_match": 0
+        }
+      ]
+    }
+  ]
+}
