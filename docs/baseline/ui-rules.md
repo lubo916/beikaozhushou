@@ -117,6 +117,8 @@ apps/learner/src/pages/S06/
 
 ## 13 样板页（照 S10 知识点主页写）
 
+- 机构端样板页：`apps/org/src/pages/O01/`（工作台，契约、假数据与七态；运行层与权限登记待整合，见 V01 交接单）。
+
 页面任务照 apps/learner/src/pages/S10/ 写；下面每一条在 S10 里都有对应的代码可抄。
 
 - 目录：index.tsx 只管显示（取路由参数，按 data.ts 给的状态选一态显示）；data.ts 放本页数据钩子与七态判断；components/ 一张卡片一个文件；单元测试 <页ID>.test.tsx 放在页面目录里。S10 没有多视图，所以没有 views/。

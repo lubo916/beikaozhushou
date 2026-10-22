@@ -1,0 +1,86 @@
+{
+  "exam_name": "中学教师资格笔试",
+  "data_source": "sample",
+  "access": "authorized",
+  "sample_sufficient": true,
+  "minimum_group_size": 10,
+  "sample_count": 48,
+  "summary": {
+    "new_leads": 48,
+    "followup_due": 8,
+    "trial_booked": 16,
+    "enrolled": 6,
+    "conversion_ratio": 0.125
+  },
+  "leads": [
+    {
+      "id": "0199a001-7000-7000-8000-000000000001",
+      "name": "林同学",
+      "phone_masked": "138****2046",
+      "source": "品牌摸底诊断",
+      "intent": "希望系统梳理重点",
+      "level": "已了解 · 需补基础",
+      "status": "待首次联系",
+      "priority": "high",
+      "followup_label": "今日联系",
+      "communication": "先说明摸底报告中的基础概念差距，询问每周可用时间，再介绍适合的体验安排。"
+    },
+    {
+      "id": "0199a001-7000-7000-8000-000000000002",
+      "name": "周同学",
+      "phone_masked": "156****3178",
+      "source": "公开体验课",
+      "intent": "了解晚间班",
+      "level": "已熟悉 · 练习待巩固",
+      "status": "已预约试听",
+      "priority": "medium",
+      "followup_label": "确认试听",
+      "communication": "确认晚间学习时间，围绕报告里的练习差距介绍体验课，并由顾问解答报名与协议问题。"
+    },
+    {
+      "id": "0199a001-7000-7000-8000-000000000003",
+      "name": "陈同学",
+      "phone_masked": "139****8521",
+      "source": "学员转介绍",
+      "intent": "比较学习安排",
+      "level": "待摸底诊断",
+      "status": "已联系",
+      "priority": "low",
+      "followup_label": "安排摸底",
+      "communication": "先了解目标与资料准备情况，邀请完成摸底诊断，不在没有依据时判断学习结果。"
+    }
+  ],
+  "channels": [
+    {
+      "id": "diagnosis",
+      "name": "品牌摸底诊断",
+      "leads": 28,
+      "trial": 10,
+      "enrolled": 4
+    },
+    {
+      "id": "trial",
+      "name": "公开体验课",
+      "leads": 14,
+      "trial": 5,
+      "enrolled": 2
+    },
+    {
+      "id": "referral",
+      "name": "学员转介绍",
+      "leads": 6,
+      "trial": 1,
+      "enrolled": 0
+    }
+  ],
+  "campaign": {
+    "brand": "启程学习中心",
+    "title": "先了解起点，再安排学习",
+    "description": "用摸底报告看清当前基础与目标差距，选择适合自己的学习安排。"
+  },
+  "compliance": {
+    "sample_text": "完成摸底诊断，了解学习起点，预约体验课程。",
+    "result": "示例草稿未发现承诺性表述",
+    "advice": "介绍服务范围与学习支持；展示统计时标明来源、时间范围和样本口径。"
+  }
+}

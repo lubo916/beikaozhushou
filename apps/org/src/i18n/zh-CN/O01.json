@@ -1,1 +1,95 @@
-{}
+{
+  "title": "机构工作台",
+  "description": "先处理今天需要关注的事，再看本机构的教学与运营概况。",
+  "sample": "示例数据",
+  "organization": "组织类型",
+  "role": "当前角色",
+  "scope": "查看范围",
+  "customize": "自定卡片",
+  "publish": "发布通知",
+  "method": "查看口径",
+  "soon": "即将上线",
+  "todo": "今日待办",
+  "health": "班级健康度",
+  "notices": "通知公告",
+  "students": "学员",
+  "staff": "员工",
+  "read": "已读 {{formatted_count}} 人",
+  "class": "班级",
+  "active": "周有效学习率",
+  "completion": "计划完成率",
+  "risk": "风险学员",
+  "count": "人数",
+  "person": "人",
+  "process": "去处理",
+  "overview": "查看数据中心",
+  "weekly": "运营周报",
+  "weeklyAction": "生成周报",
+  "saving": "AI 节省工时",
+  "nodes": "节点提醒",
+  "cardScope": "当前角色与范围的示例首页；仅展示授权数据。",
+  "orgTypes": {
+    "training": "培训机构",
+    "school": "学校",
+    "enterprise": "企业内训"
+  },
+  "roles": {
+    "org_owner": "负责人",
+    "campus_manager": "校区主管",
+    "academic_admin": "教务",
+    "head_teacher": "班主任",
+    "lecturer": "讲师",
+    "researcher": "教研",
+    "advisor": "顾问"
+  },
+  "scopes": {
+    "all": "全部校区汇总",
+    "east": "东城校区",
+    "department": "教学部门"
+  },
+  "metrics": {
+    "students": "在读学员",
+    "learning": "周有效学习率",
+    "completion": "计划完成率",
+    "ai_minutes": "AI 节省工时",
+    "courses": "在学课程",
+    "required": "必修完成率",
+    "certifications": "认证到期",
+    "renewals": "待续报学员",
+    "pregrading": "预批改",
+    "answers": "首答",
+    "supervision": "督学整理"
+  },
+  "todos": {
+    "grading": "待批改",
+    "qa": "待答疑",
+    "contact": "待联系",
+    "review": "待审核",
+    "schedule": "待排课"
+  },
+  "methodBody": "仅统计当前查看范围内已授权的数据。学习率与完成率由接口返回；AI 节省工时为预批改、首答与督学整理的估算用时，供参考。",
+  "state": {
+    "loading": "正在读取工作台",
+    "empty": {
+      "title": "机构工作台暂无数据",
+      "body": "还没有班级或学员数据时，先导入学员或建班",
+      "action": "导入学员"
+    },
+    "error": {
+      "title": "机构工作台没能加载",
+      "body": "机构工作台没能加载：服务暂时异常，已保存的内容不受影响；重试或稍后再来。"
+    },
+    "offline": {
+      "body": "离线时只能查看已缓存的待办与联系清单，提交与发布需要联网"
+    },
+    "restricted": {
+      "title": "授权范围提醒",
+      "body": "学员数据只显示已授权项；未授权的不显示、不参与统计"
+    },
+    "insufficient_data": {
+      "title": "班级统计暂不展示",
+      "body": "不足 {{minimum}} 人的班级不显示汇总统计",
+      "raw": "当前班级 {{count}} 人"
+    }
+  }
+}
