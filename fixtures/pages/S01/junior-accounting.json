@@ -1,0 +1,76 @@
+{
+  "availability": "ready",
+  "age_options": [
+    {
+      "id": "adult",
+      "label_key": "age.adult.label",
+      "description_key": "age.adult.description",
+      "eligibility": "allowed"
+    },
+    {
+      "id": "minor",
+      "label_key": "age.minor.label",
+      "description_key": "age.minor.description",
+      "eligibility": "minor"
+    },
+    {
+      "id": "under_minimum",
+      "label_key": "age.under_minimum.label",
+      "description_key": "age.under_minimum.description",
+      "eligibility": "blocked"
+    }
+  ],
+  "minor_notice_key": "age.minorNotice",
+  "sms": {
+    "code_length": 6,
+    "resend_seconds": 60
+  },
+  "guest_merge": {
+    "goals": 1,
+    "diagnoses": 1,
+    "learning_records": 3
+  },
+  "resume": {
+    "has_target": true,
+    "target_name": "初级会计职称"
+  },
+  "account": {
+    "restriction_reason_key": "account.restricted.reason",
+    "restricted_until": "2026-10-25T10:00:00.000Z",
+    "appeal_reference": "S01-DEMO",
+    "device_limit": 2,
+    "devices": [
+      {
+        "id": "0199f010-0100-7000-8000-000000000001",
+        "label_key": "account.devices.phone",
+        "last_seen_at": "2026-10-22T09:00:00.000Z",
+        "current": false
+      },
+      {
+        "id": "0199f010-0100-7000-8000-000000000002",
+        "label_key": "account.devices.tablet",
+        "last_seen_at": "2026-10-21T12:30:00.000Z",
+        "current": false
+      }
+    ],
+    "cooling_days_remaining": 5,
+    "deletion_scope_keys": [
+      "account.cooling.scope.account",
+      "account.cooling.scope.learning",
+      "account.cooling.scope.inference"
+    ],
+    "logout_reason": "other_device",
+    "drafts_available": true
+  },
+  "invitation": {
+    "institution_key": "invite.institution",
+    "class_key": "invite.class",
+    "visibility_keys": [
+      "invite.visibility.institution",
+      "invite.visibility.personal",
+      "invite.visibility.sensitive",
+      "invite.visibility.inferred"
+    ]
+  },
+  "data_source": "sample"
+}
