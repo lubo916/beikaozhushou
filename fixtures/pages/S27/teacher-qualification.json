@@ -1,0 +1,121 @@
+{
+  "data_source": "sample",
+  "availability": "ready",
+  "sprint_window_days": 10,
+  "days_to_exam": 8,
+  "exam_day": "2026-10-30",
+  "exam_start": "2026-10-30T01:00:00Z",
+  "time_zone": "Asia/Shanghai",
+  "timeline": [
+    {
+      "key": "overview",
+      "days": 10,
+      "active": false
+    },
+    {
+      "key": "warm",
+      "days": 7,
+      "active": true
+    },
+    {
+      "key": "rest",
+      "days": 1,
+      "active": false
+    },
+    {
+      "key": "exam",
+      "days": 0,
+      "active": false
+    }
+  ],
+  "proposal": {
+    "status": "pending",
+    "consolidate_ratio": 0.6,
+    "reminder_key": "proposal.reminder"
+  },
+  "today": [
+    {
+      "key": "overview",
+      "minutes": 15
+    },
+    {
+      "key": "warm",
+      "minutes": 20
+    },
+    {
+      "key": "mistakes",
+      "minutes": 10
+    }
+  ],
+  "warmth": {
+    "scanned": 86,
+    "total": 120,
+    "ratio": 0.72
+  },
+  "checklist": [
+    {
+      "key": "identity",
+      "checked": true
+    },
+    {
+      "key": "route",
+      "checked": true
+    },
+    {
+      "key": "stationery",
+      "checked": false
+    },
+    {
+      "key": "prohibited",
+      "checked": false
+    }
+  ],
+  "sheet": {
+    "point_count": 18,
+    "ai_generated": true,
+    "item_keys": [
+      "boundary",
+      "formula",
+      "mistake"
+    ]
+  },
+  "estimates": [
+    {
+      "subject_key": "comprehensive",
+      "objective": 48,
+      "subjective_low": 28,
+      "subjective_high": 40,
+      "total_low": 76,
+      "total_high": 88
+    },
+    {
+      "subject_key": "education",
+      "objective": 48,
+      "subjective_low": 32,
+      "subjective_high": 46,
+      "total_low": 80,
+      "total_high": 94
+    }
+  ],
+  "grades": [
+    {
+      "subject_key": "comprehensive",
+      "forecast_low": 76,
+      "forecast_high": 88,
+      "actual": 78
+    },
+    {
+      "subject_key": "education",
+      "forecast_low": 80,
+      "forecast_high": 94,
+      "actual": 82
+    }
+  ],
+  "calibration_ready": true,
+  "archive": {
+    "study_minutes": 2580,
+    "sessions": 42,
+    "cards": 186,
+    "mistakes": 68
+  }
+}
