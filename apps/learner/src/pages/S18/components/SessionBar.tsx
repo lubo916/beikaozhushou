@@ -51,7 +51,7 @@ export function SessionBar({ session, current, onSelect, elapsed, flags }: Sessi
         </button>
       )}
       {/* feat:S18-05 题号导航 */}
-      <QuestionNav className="hidden max-w-80 @tablet:block" items={items} current={current} onSelect={onSelect} />
+      <QuestionNav className="hidden @tablet:block" items={items} current={current} onSelect={onSelect} />
       <span className="shrink-0 tabular-nums">{t("bar.position", { n: current + 1, total: session.items.length })}</span>
       <span className="hidden shrink-0 tabular-nums @tablet:inline">{clock}</span>
       {/* feat:S18-19 收藏、标签与标记易错 */}

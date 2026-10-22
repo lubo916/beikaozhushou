@@ -33,7 +33,7 @@ export function SubmitBar({
   return (
     <div
       className={cx(
-        "sticky bottom-0 z-10 flex flex-wrap items-center gap-3 border-t border-line-soft bg-bg-surface py-3 @tablet:static @tablet:border-t-0 @tablet:py-0",
+        "sticky bottom-[0] z-10 flex flex-wrap items-center gap-3 border-t border-line-soft bg-bg-surface py-3 @tablet:static @tablet:border-t-0 @tablet:py-[0]",
         className,
       )}
     >

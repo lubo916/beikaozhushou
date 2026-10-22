@@ -215,7 +215,7 @@ function Written(props: {
         readOnly={locked}
         placeholder={placeholder}
         onChange={(event) => onChange(setText(value, 0, event.target.value))}
-        className="min-h-40 w-full rounded-md border border-line-strong bg-bg-surface px-3 py-2 text-ink-primary"
+        className="w-full rounded-md border border-line-strong bg-bg-surface px-3 py-2 text-ink-primary"
       />
       <p className="text-right text-small text-ink-tertiary">{fill(copy.written.count, { n: text.length })}</p>
     </div>
