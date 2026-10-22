@@ -1,0 +1,120 @@
+{
+  "note": "S10 知识点主页的页面专用演示数据（F08）：知识点、掌握档、题目、卡片、笔记与学员资料仍取 fixtures/exams/cet-6/，这里只放页面要用、考试数据里还没有的部分。数字都是演示值，不是规则数字。",
+  "demo_point_id": "019a0303-0000-7000-8000-000000000002",
+  "defaults": {
+    "importance_level": 2,
+    "difficulty": {
+      "objective": "typical",
+      "personalized": false
+    },
+    "add_today_minutes": 15,
+    "attack_pack_minutes": 30,
+    "exam_profile": {
+      "maturity": "maturing",
+      "raw": {
+        "appearances": 1,
+        "years_covered": 2,
+        "years_missing": 3
+      }
+    }
+  },
+  "points": {
+    "019a0303-0000-7000-8000-000000000002": {
+      "section_name": "形近词",
+      "importance": {
+        "default_level": 3
+      },
+      "exam_level": 2,
+      "starred": false,
+      "difficulty": {
+        "objective": "easier",
+        "peer": "typical",
+        "personal": "typical",
+        "personalized": true
+      },
+      "question_history": {
+        "019a0304-0000-7000-8000-000000000001": {
+          "wrong": 1,
+          "correct": 1
+        }
+      },
+      "mistakes": [
+        {
+          "question_id": "019a0304-0000-7000-8000-000000000001",
+          "option": 1,
+          "error_cause": "concept_unclear"
+        }
+      ],
+      "evidence": {
+        "total": 3,
+        "items": [
+          {
+            "id": "019a0311-0000-7000-8000-000000000001",
+            "day": "2026-10-14",
+            "kind": "answer",
+            "subject": "The new subsidy is intended to……",
+            "result": "correct",
+            "confidence": "sure",
+            "duration_seconds": 22,
+            "interval_days": 3,
+            "strength": "strong",
+            "credibility": "reviewed"
+          },
+          {
+            "id": "019a0311-0000-7000-8000-000000000002",
+            "day": "2026-10-11",
+            "kind": "answer",
+            "subject": "The new subsidy is intended to……",
+            "result": "wrong",
+            "confidence": "vague",
+            "duration_seconds": 30,
+            "strength": "negative",
+            "credibility": "reviewed",
+            "in_mistakes": true
+          }
+        ]
+      },
+      "exam_profile": {
+        "maturity": "mature",
+        "syllabus": "熟悉：能在语境中辨析",
+        "frequency": {
+          "years": 5,
+          "times": 2
+        },
+        "average_score": 1.4,
+        "question_types": [
+          {
+            "name": "阅读",
+            "count": 4
+          }
+        ],
+        "angles": [
+          "语境中的词义辨析"
+        ],
+        "trend": "steady",
+        "updated": {
+          "year": 2026,
+          "month": 6
+        }
+      },
+      "relations": [
+        {
+          "type": "confusable",
+          "items": [
+            {
+              "name": "mitigate vs militate（against 的搭配）",
+              "origin": "official",
+              "pending": false
+            }
+          ]
+        }
+      ],
+      "cards_due_tomorrow": 0,
+      "add_today": {
+        "minutes": 10,
+        "displaces": "听力：态度与转折"
+      },
+      "attack_pack_minutes": 30
+    }
+  }
+}

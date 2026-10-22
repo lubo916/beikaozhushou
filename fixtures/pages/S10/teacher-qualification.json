@@ -1,0 +1,133 @@
+{
+  "note": "S10 知识点主页的页面专用演示数据（F08）：知识点、掌握档、题目、卡片、笔记与学员资料仍取 fixtures/exams/teacher-qualification/，这里只放页面要用、考试数据里还没有的部分。数字都是演示值，不是规则数字。",
+  "demo_point_id": "019a0203-0000-7000-8000-000000000006",
+  "defaults": {
+    "importance_level": 2,
+    "difficulty": {
+      "objective": "typical",
+      "personalized": false
+    },
+    "add_today_minutes": 15,
+    "attack_pack_minutes": 30,
+    "exam_profile": {
+      "maturity": "maturing",
+      "raw": {
+        "appearances": 1,
+        "years_covered": 2,
+        "years_missing": 3
+      }
+    }
+  },
+  "points": {
+    "019a0203-0000-7000-8000-000000000006": {
+      "importance": {
+        "default_level": 4
+      },
+      "exam_level": 4,
+      "starred": true,
+      "difficulty": {
+        "objective": "typical",
+        "personalized": false
+      },
+      "question_history": {
+        "019a0204-0000-7000-8000-000000000001": {
+          "wrong": 1,
+          "correct": 0
+        }
+      },
+      "pattern": {
+        "text": "把“最近发展区”和“先行组织者”混在一起：前者说的是能力的潜在区间，后者是先于学习任务呈现的引导材料。",
+        "ai_generated": true
+      },
+      "mistakes": [
+        {
+          "question_id": "019a0204-0000-7000-8000-000000000001",
+          "option": 1,
+          "trap": "concept_swap"
+        }
+      ],
+      "evidence": {
+        "total": 2,
+        "items": [
+          {
+            "id": "019a0211-0000-7000-8000-000000000001",
+            "day": "2026-10-12",
+            "kind": "recall",
+            "subject": "最近发展区的含义",
+            "result": "correct",
+            "confidence": "vague",
+            "strength": "medium",
+            "credibility": "own"
+          },
+          {
+            "id": "019a0211-0000-7000-8000-000000000002",
+            "day": "2026-10-08",
+            "kind": "answer",
+            "subject": "教师在教学中常说“跳一跳，摘桃子”……",
+            "result": "wrong",
+            "confidence": "sure",
+            "duration_seconds": 41,
+            "strength": "negative",
+            "credibility": "own",
+            "in_mistakes": true
+          }
+        ]
+      },
+      "exam_profile": {
+        "maturity": "usable",
+        "syllabus": "理解：能举例说明",
+        "frequency": {
+          "years": 5,
+          "times": 3
+        },
+        "average_score": 2.5,
+        "question_types": [
+          {
+            "name": "单选",
+            "count": 6
+          },
+          {
+            "name": "辨析",
+            "count": 2
+          }
+        ],
+        "traps": [
+          "concept_swap"
+        ],
+        "trend": "rising",
+        "updated": {
+          "year": 2026,
+          "month": 8
+        }
+      },
+      "relations": [
+        {
+          "type": "prerequisite",
+          "items": [
+            {
+              "point_id": "019a0203-0000-7000-8000-000000000007",
+              "name": "学习动机理论",
+              "origin": "template",
+              "pending": false
+            }
+          ]
+        },
+        {
+          "type": "confusable",
+          "items": [
+            {
+              "name": "最近发展区 vs 先行组织者",
+              "origin": "template",
+              "pending": false
+            }
+          ]
+        }
+      ],
+      "cards_due_tomorrow": 1,
+      "add_today": {
+        "minutes": 12
+      },
+      "attack_pack_minutes": 30
+    }
+  }
+}

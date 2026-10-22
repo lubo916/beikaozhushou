@@ -1,0 +1,234 @@
+{
+  "note": "S10 知识点主页的页面专用演示数据（F08）：知识点、掌握档、题目、卡片、笔记与学员资料仍取 fixtures/exams/junior-accounting/，这里只放页面要用、考试数据里还没有的部分。数字都是演示值，不是规则数字。",
+  "demo_point_id": "019a0103-0000-7000-8000-000000000005",
+  "defaults": {
+    "importance_level": 2,
+    "difficulty": {
+      "objective": "typical",
+      "personalized": false
+    },
+    "add_today_minutes": 15,
+    "attack_pack_minutes": 30,
+    "exam_profile": {
+      "maturity": "maturing",
+      "raw": {
+        "appearances": 1,
+        "years_covered": 2,
+        "years_missing": 3
+      }
+    }
+  },
+  "points": {
+    "019a0103-0000-7000-8000-000000000005": {
+      "section_name": "金融资产",
+      "importance": {
+        "default_level": 3
+      },
+      "exam_level": 3,
+      "starred": false,
+      "difficulty": {
+        "objective": "typical",
+        "peer": "typical",
+        "personal": "harder",
+        "personalized": true
+      },
+      "self": 5,
+      "self_pending": true,
+      "question_history": {
+        "019a0104-0000-7000-8000-000000000001": {
+          "wrong": 1,
+          "correct": 0
+        }
+      },
+      "question_groups": [
+        {
+          "id": "019a0112-0000-7000-8000-000000000001",
+          "kind": "variant_group",
+          "count": 3,
+          "credibility": "reviewed",
+          "status": "untried",
+          "times": 0
+        },
+        {
+          "id": "019a0112-0000-7000-8000-000000000002",
+          "kind": "past_group",
+          "count": 2,
+          "credibility": "reviewed",
+          "status": "correct",
+          "times": 1
+        }
+      ],
+      "pattern": {
+        "text": "你把交易费用也算进了成本。那是“债权投资、其他权益工具投资”的做法；交易性金融资产的交易费用不进成本。",
+        "ai_generated": true
+      },
+      "mistakes": [
+        {
+          "question_id": "019a0104-0000-7000-8000-000000000001",
+          "option": 1,
+          "trap": "concept_swap"
+        },
+        {
+          "question_id": "019a0104-0000-7000-8000-000000000001",
+          "option": 2,
+          "reason": "把条件看反了：已宣告但尚未发放的现金股利也算进了成本",
+          "error_cause": "misread"
+        }
+      ],
+      "evidence": {
+        "total": 5,
+        "items": [
+          {
+            "id": "019a0111-0000-7000-8000-000000000001",
+            "day": "2026-10-09",
+            "kind": "answer",
+            "subject": "甲公司购入一项交易性金融资产，支付价款 206 万元……",
+            "result": "correct",
+            "confidence": "sure",
+            "duration_seconds": 74,
+            "interval_days": 4,
+            "strength": "strong",
+            "credibility": "reviewed"
+          },
+          {
+            "id": "019a0111-0000-7000-8000-000000000002",
+            "day": "2026-10-10",
+            "kind": "answer",
+            "subject": "同类变式：取得交易性金融资产时的交易费用计入哪里",
+            "result": "correct",
+            "confidence": "guess",
+            "duration_seconds": 9,
+            "strength": "pending",
+            "credibility": "reviewed"
+          },
+          {
+            "id": "019a0111-0000-7000-8000-000000000003",
+            "day": "2026-10-06",
+            "kind": "answer",
+            "subject": "甲公司购入一项交易性金融资产，支付价款 206 万元……",
+            "result": "wrong",
+            "confidence": "vague",
+            "duration_seconds": 95,
+            "strength": "negative",
+            "credibility": "reviewed",
+            "in_mistakes": true
+          }
+        ]
+      },
+      "materials": [
+        {
+          "id": "019a0110-0000-7000-8000-000000000001",
+          "title": "《初级会计实务》官方教材（电子版）",
+          "access": "parsable",
+          "licensed": true,
+          "location": {
+            "kind": "section",
+            "section": "3.2",
+            "minutes": 6
+          }
+        },
+        {
+          "id": "019a0110-0000-7000-8000-000000000002",
+          "title": "《初级会计实务》应试指南（纸质）",
+          "access": "mapped_only",
+          "licensed": false,
+          "location": {
+            "kind": "pages",
+            "page_from": 112,
+            "page_to": 115
+          }
+        },
+        {
+          "id": "019a0110-0000-7000-8000-000000000003",
+          "title": "某网校基础精讲班",
+          "access": "link_only",
+          "licensed": false,
+          "location": {
+            "kind": "lecture",
+            "lecture": 23,
+            "start_seconds": 760
+          }
+        }
+      ],
+      "material_locations": {
+        "019a010b-0000-7000-8000-000000000002": {
+          "kind": "pages",
+          "page_from": 18,
+          "page_to": 21
+        }
+      },
+      "exam_profile": {
+        "maturity": "mature",
+        "syllabus": "掌握：能结合情境运用",
+        "frequency": {
+          "years": 5,
+          "times": 4
+        },
+        "average_score": 3.8,
+        "question_types": [
+          {
+            "name": "单选",
+            "count": 20
+          },
+          {
+            "name": "多选",
+            "count": 10
+          }
+        ],
+        "angles": [
+          "取得时的入账金额",
+          "持有期间的公允价值变动",
+          "出售时的投资收益"
+        ],
+        "traps": [
+          "concept_swap"
+        ],
+        "trend": "steady",
+        "updated": {
+          "year": 2026,
+          "month": 9
+        }
+      },
+      "relations": [
+        {
+          "type": "prerequisite",
+          "items": [
+            {
+              "point_id": "019a0103-0000-7000-8000-000000000001",
+              "name": "会计基本假设",
+              "origin": "official",
+              "pending": false
+            }
+          ]
+        },
+        {
+          "type": "confusable",
+          "items": [
+            {
+              "name": "交易性金融资产 vs 债权投资（交易费用的去向）",
+              "origin": "official",
+              "pending": false
+            }
+          ]
+        },
+        {
+          "type": "causal",
+          "items": [
+            {
+              "point_id": "019a0103-0000-7000-8000-000000000007",
+              "name": "应付职工薪酬",
+              "origin": "tutor",
+              "pending": true
+            }
+          ]
+        }
+      ],
+      "cards_due_tomorrow": 2,
+      "add_today": {
+        "minutes": 18,
+        "displaces": "固定资产折旧方法：新学"
+      },
+      "attack_pack_minutes": 30
+    }
+  }
+}
