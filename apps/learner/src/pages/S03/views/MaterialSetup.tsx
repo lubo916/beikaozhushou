@@ -70,7 +70,7 @@ export function MaterialSetup({ data }: { readonly data: S03SetupProfile }) {
                         <Tag tone="brand">{t(`res.${item.source}`)}</Tag>
                         {item.source === "draft" && <AiBadge />}
                         {item.extension && <Tag>{t("res.extension")}</Tag>}
-                        <Tag tone={item.enabled ? "success" : "outline"}>{item.enabled ? t("res.enabled") : t("res.draft")}</Tag>
+                        <Tag tone={item.enabled ? "success" : "outline"}>{item.enabled ? t("res.enabled") : t("res.pending")}</Tag>
                       </div>
                     </div>
                     <Button

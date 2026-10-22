@@ -361,7 +361,7 @@
       "title": "数据结构课程录像",
       "kind_key": "kind.course",
       "access": "link_only",
-      "status": "queued"
+      "status": "ready"
     },
     {
       "id": "019a0300-0004-7000-8000-000000000004",
@@ -372,13 +372,6 @@
     }
   ],
   "maps": [
-    {
-      "id": "019a0300-0004-7000-8000-000000000005",
-      "target_name": "《数据结构》期末考",
-      "source": "official",
-      "enabled": true,
-      "extension": false
-    },
     {
       "id": "019a0300-0004-7000-8000-000000000006",
       "target_name": "《数据结构》期末考",

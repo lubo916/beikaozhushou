@@ -21,6 +21,9 @@ function profile(ctx: MockContext, mode: Mode): S03SetupProfile {
     data.maps = [];
     data.unavailable_days = [];
   }
+  if (mode === "restricted") {
+    data.materials = data.materials.map((material) => (material.access === "parsable" ? { ...material, status: "queued" } : material));
+  }
   if (mode === "insufficient_data") {
     data.calibration = { ...data.calibration, status: "collecting", observed_minutes: 0, sample_minutes: 0 };
   }

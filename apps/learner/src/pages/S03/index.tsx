@@ -9,11 +9,11 @@ import { MaterialSetup } from "./views/MaterialSetup.tsx";
 import { TimeSetup } from "./views/TimeSetup.tsx";
 import { useSetupProfile } from "./data.ts";
 
-function readOfflineDraft(): string {
+function readOfflineDraft(key: string): string | undefined {
   try {
-    return localStorage.getItem("S03.offline-draft") ?? "";
+    return localStorage.getItem(key) ?? undefined;
   } catch {
-    return "";
+    return undefined;
   }
 }
 
@@ -24,6 +24,9 @@ export default function Page() {
   const view = search.get("view") === "res" ? "res" : "time";
   const home = useSetupProfile();
   const data = home.data;
+  const offline = home.state === "offline" || home.stale;
+  const draftKey = `S03.offline-draft.${search.get("exam") ?? "default"}`;
+  const [dailyDrafts, setDailyDrafts] = useState<Record<string, string>>({});
   const [daily, setDaily] = useState(false);
   const [minutes, setMinutes] = useState("");
   const [skip, setSkip] = useState(false);
@@ -35,16 +38,18 @@ export default function Page() {
       return next;
     });
   const showDaily = () => {
-    setMinutes(data === undefined ? readOfflineDraft() : String(data.daily_minutes));
+    setMinutes(dailyDrafts[draftKey] ?? (offline ? readOfflineDraft(draftKey) : undefined) ?? String(data?.daily_minutes ?? ""));
     setDaily(true);
   };
   return (
     <ContainerScope className="mx-auto flex w-full max-w-content-lg flex-col gap-4">
-      <PageHeader
-        title={t(view === "time" ? "time.title" : "res.title")}
-        eyebrow={t("eyebrow")}
-        meta={<Tag tone="warning">{t("sample")}</Tag>}
-      />
+      <header>
+        <PageHeader
+          title={t(view === "time" ? "time.title" : "res.title")}
+          eyebrow={t("title")}
+          meta={<Tag tone="warning">{t("sample")}</Tag>}
+        />
+      </header>
       <p className="text-ink-secondary">{t(view === "time" ? "time.description" : "res.description")}</p>
       {/* feat:S03-11 时间与资料拆成两屏，开发 query 切换保留其他参数。 */}
       <Tabs
@@ -119,9 +124,16 @@ export default function Page() {
           body={t("state.insufficient_data.parameter_body", { days: data?.summary.calibration_days })}
         />
       )}
-      {data !== undefined &&
-        home.state !== "empty" &&
-        (view === "time" ? <TimeSetup key={data.exam_name} data={data} onDaily={showDaily} /> : <MaterialSetup data={data} />)}
+      {data !== undefined && home.state !== "empty" && (
+        <>
+          <div hidden={view !== "time"}>
+            <TimeSetup key={data.exam_name} data={data} onDaily={showDaily} />
+          </div>
+          <div hidden={view !== "res"}>
+            <MaterialSetup key={data.exam_name} data={data} />
+          </div>
+        </>
+      )}
       {/* feat:S03-08 跳过时明确说明使用典型值，实际档案写入留给后端。 */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line-soft pt-4">
         {view === "time" ? (
@@ -159,9 +171,10 @@ export default function Page() {
               variant="primary"
               disabled={minutes === "" || !Number.isFinite(Number(minutes)) || Number(minutes) < 0}
               onClick={() => {
-                if (home.state === "offline") {
+                setDailyDrafts((old) => ({ ...old, [draftKey]: minutes }));
+                if (offline) {
                   try {
-                    localStorage.setItem("S03.offline-draft", minutes);
+                    localStorage.setItem(draftKey, minutes);
                     toast(t("time.saved"));
                   } catch {
                     toast(t("soon.save"));
@@ -170,7 +183,7 @@ export default function Page() {
                 setDaily(false);
               }}
             >
-              {t(home.state === "offline" ? "time.offline_save" : "action.save")}
+              {t(offline ? "time.offline_save" : "action.save")}
             </Button>
           </>
         }

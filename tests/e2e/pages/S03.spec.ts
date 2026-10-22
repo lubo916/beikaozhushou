@@ -46,8 +46,8 @@ for (const width of [375, 834, 1280]) {
           await expect(main.getByTestId("mobile-time")).toBeHidden();
         }
       }
-      const content = await main.locator(".ui-cols__main").boundingBox();
-      const aside = await main.locator(".ui-cols__aside").boundingBox();
+      const content = await main.locator(".ui-cols__main:visible").boundingBox();
+      const aside = await main.locator(".ui-cols__aside:visible").boundingBox();
       expect(content).not.toBeNull();
       expect(aside).not.toBeNull();
       if (content !== null && aside !== null) {
@@ -190,15 +190,121 @@ test("S03 下一步切换资料，跳过先说明典型值，再进入摸底", a
   await expect(page).toHaveURL(new RegExp(`${pageById("S04").path}$`));
 });
 
-test("S03 离线仍可保存每日时长草稿", async ({ page }) => {
+test("S03 离线仍可保存每日时长草稿，重开恢复并按考试隔离", async ({ page }) => {
+  test.setTimeout(60_000);
   const watch = await watchPage(page);
+  const main = page.locator("main#main");
+  const daily = page.getByRole("dialog", { name: copy("time.daily"), exact: true });
+  const minutes = daily.getByLabel(copy("time.daily_label"), { exact: true });
   await watch.open(urlOf(entry, { view: "time", state: "offline" }));
   await expectState(page, entry, "offline");
-  await press(page.locator("main#main").getByRole("button", { name: copy("time.daily"), exact: true }));
-  const daily = page.getByRole("dialog", { name: copy("time.daily"), exact: true });
-  await daily.getByLabel(copy("time.daily_label"), { exact: true }).fill("75");
+  await press(main.getByRole("button", { name: copy("time.daily"), exact: true }));
+  await minutes.fill("75");
   await press(daily.getByRole("button", { name: copy("time.offline_save"), exact: true }));
   await toast(page, copy("time.saved"));
-  expect(await page.evaluate(() => localStorage.getItem("S03.offline-draft"))).toBe("75");
+  expect(await page.evaluate(() => localStorage.getItem("S03.offline-draft.default"))).toBe("75");
+  await press(main.getByRole("button", { name: copy("time.daily"), exact: true }));
+  await expect(minutes).toHaveValue("75");
+  await press(daily.getByRole("button", { name: copy("action.cancel"), exact: true }));
   expectNoProblems(watch, "offline");
+
+  // 重新打开页面，必须读回浏览器保存的草稿，而不是只依赖组件内存。
+  await watch.open(urlOf(entry, { view: "time", state: "offline" }));
+  await expectState(page, entry, "offline");
+  await press(main.getByRole("button", { name: copy("time.daily"), exact: true }));
+  await expect(minutes).toHaveValue("75");
+  await press(daily.getByRole("button", { name: copy("action.cancel"), exact: true }));
+  expectNoProblems(watch, "offline");
+
+  await watch.open(urlOf(entry, { view: "time", state: "offline", exam: "en" }));
+  await expectState(page, entry, "offline");
+  await press(main.getByRole("button", { name: copy("time.daily"), exact: true }));
+  await expect(minutes).not.toHaveValue("75");
+  await expect(minutes).toHaveValue("");
+  expect(await page.evaluate(() => localStorage.getItem("S03.offline-draft.en"))).toBeNull();
+  expect(await page.evaluate(() => localStorage.getItem("S03.offline-draft.default"))).toBe("75");
+  await press(daily.getByRole("button", { name: copy("action.cancel"), exact: true }));
+  expectNoProblems(watch, "offline");
+});
+
+// 回归：本页草稿不能被原始 fixture 回填覆盖，也不能在进入资料后丢失。
+test("S03 草稿：重开时段和双屏往返保留身份、时段及不可学日", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const watch = await watchPage(page);
+  await watch.open(urlOf(entry, { view: "time" }));
+  await expectLoaded(page, entry);
+  const main = page.locator("main#main");
+  const identity = main.getByRole("radio", { name: copy("identity.student"), exact: true });
+  await press(identity);
+  await expect(identity).toHaveAttribute("aria-checked", "true");
+
+  const slotName = copy("time.edit", { day: copy("day.mon"), period: copy("period.morning") });
+  const slot = main.getByRole("button", { name: slotName, exact: true });
+  await press(slot);
+  const editor = page.getByRole("dialog", { name: copy("time.edit_day", { day: copy("day.mon") }), exact: true });
+  await editor.getByLabel(copy("time.duration"), { exact: true }).fill("45");
+  await editor.getByLabel(copy("time.scenario"), { exact: true }).selectOption("deep");
+  await press(editor.getByRole("button", { name: copy("action.save"), exact: true }));
+  await expect(editor).toBeHidden();
+  await press(slot);
+  await expect(editor.getByLabel(copy("time.duration"), { exact: true })).toHaveValue("45");
+  await expect(editor.getByLabel(copy("time.scenario"), { exact: true })).toHaveValue("deep");
+  await press(editor.getByRole("button", { name: copy("action.cancel"), exact: true }));
+
+  const reason = copy("res.access");
+  await press(main.getByRole("button", { name: copy("time.add_unavailable"), exact: true }));
+  const unavailable = page.getByRole("dialog", { name: copy("time.add_unavailable"), exact: true });
+  await unavailable.getByLabel(copy("time.date"), { exact: true }).fill("2026-10-27");
+  await unavailable.getByLabel(copy("time.reason"), { exact: true }).fill(reason);
+  await press(unavailable.getByRole("button", { name: copy("action.save"), exact: true }));
+  await expect(main.getByRole("region", { name: copy("time.unavailable"), exact: true }).getByText(reason, { exact: true })).toBeVisible();
+
+  await press(main.getByRole("button", { name: copy("action.next"), exact: true }));
+  await expect(main.getByRole("heading", { name: copy("res.title"), exact: true })).toBeVisible();
+  await press(main.getByRole("button", { name: copy("action.back"), exact: true }));
+  await expect(identity).toHaveAttribute("aria-checked", "true");
+  await expect(main.getByRole("region", { name: copy("time.unavailable"), exact: true }).getByText(reason, { exact: true })).toBeVisible();
+  await press(slot);
+  await expect(editor.getByLabel(copy("time.duration"), { exact: true })).toHaveValue("45");
+  await expect(editor.getByLabel(copy("time.scenario"), { exact: true })).toHaveValue("deep");
+  await press(editor.getByRole("button", { name: copy("action.cancel"), exact: true }));
+  expectNoProblems(watch, "normal");
+});
+
+// 回归：手机细调只改所选时段，不能把同一天的其他时段一起覆盖。
+test("S03 手机细调单时段：重开保留草稿且晚间仍为原始示例", async ({ page }) => {
+  const fixture = readJson("fixtures/pages/S03/junior-accounting.json") as {
+    days: { id: string; slots: { id: string; period_key: string; minutes: number; kind: string }[] }[];
+  };
+  const monday = fixture.days.find((day) => day.id === "mon");
+  const morning = monday?.slots.find((slot) => slot.id === "mon-morning");
+  const evening = monday?.slots.find((slot) => slot.id === "mon-evening");
+  if (morning === undefined || evening === undefined) throw new Error("S03 周一缺少早间或晚间示例");
+  await page.setViewportSize({ width: 375, height: 900 });
+  const watch = await watchPage(page);
+  await watch.open(urlOf(entry, { view: "time", exam: "kj" }));
+  await expectLoaded(page, entry);
+  const mobile = page.locator("main#main").getByTestId("mobile-time");
+  await expect(mobile).toBeVisible();
+  await expect(page.locator("main#main").getByTestId("weekly-grid")).toBeHidden();
+  const editDay = mobile.getByRole("button", { name: copy("time.edit_day", { day: copy("day.mon") }), exact: true });
+  const editor = page.getByRole("dialog", { name: copy("time.edit_day", { day: copy("day.mon") }), exact: true });
+  const period = editor.getByLabel(copy("time.period"), { exact: true });
+  const duration = editor.getByLabel(copy("time.duration"), { exact: true });
+  const scenario = editor.getByLabel(copy("time.scenario"), { exact: true });
+  await press(editDay);
+  await period.selectOption(morning.id);
+  await duration.fill("45");
+  await scenario.selectOption("deep");
+  await press(editor.getByRole("button", { name: copy("action.save"), exact: true }));
+  await expect(editor).toBeHidden();
+  await press(editDay);
+  await period.selectOption(morning.id);
+  await expect(duration).toHaveValue("45");
+  await expect(scenario).toHaveValue("deep");
+  await period.selectOption(evening.id);
+  await expect(duration).toHaveValue(String(evening.minutes));
+  await expect(scenario).toHaveValue(evening.kind);
+  await press(editor.getByRole("button", { name: copy("action.cancel"), exact: true }));
+  expectNoProblems(watch, "normal");
 });

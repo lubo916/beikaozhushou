@@ -18,7 +18,7 @@ export function TimeSetup({ data, onDaily }: Props) {
   const { t } = useTranslation("S03");
   const toast = useToast();
   const [identity, setIdentity] = useState(data.identity);
-  const [editing, setEditing] = useState<{ day: Day; slot?: Slot }>();
+  const [editing, setEditing] = useState<{ day: Day; slot: Slot }>();
   const [minutes, setMinutes] = useState("");
   const [kind, setKind] = useState<string>("deep");
   const [unavailable, setUnavailable] = useState(false);
@@ -28,13 +28,15 @@ export function TimeSetup({ data, onDaily }: Props) {
   const [drafts, setDrafts] = useState<Record<string, { minutes: number; kind: string }>>({});
   const edit = (day: Day, slot?: Slot) => {
     const selected = slot ?? day.slots[0];
-    setEditing({ day, ...(slot === undefined ? {} : { slot }) });
-    setMinutes(String(selected?.minutes ?? data.daily_minutes));
-    setKind(selected?.kind ?? "deep");
+    if (selected === undefined) return;
+    const draft = drafts[selected.id] ?? selected;
+    setEditing({ day, slot: selected });
+    setMinutes(String(draft.minutes));
+    setKind(draft.kind);
   };
   const save = () => {
     if (editing === undefined) return;
-    const key = editing.slot?.id ?? editing.day.id;
+    const key = editing.slot.id;
     setDrafts((old) => ({ ...old, [key]: { minutes: Number(minutes), kind } }));
     setEditing(undefined);
     toast(t("soon.save"));
@@ -106,7 +108,7 @@ export function TimeSetup({ data, onDaily }: Props) {
                     {data.days.map((day) => {
                       const slot = day.slots.find((item) => item.period_key === period.period_key);
                       if (slot === undefined) return <span key={day.id} />;
-                      const draft = drafts[slot.id] ?? drafts[day.id] ?? slot;
+                      const draft = drafts[slot.id] ?? slot;
                       const tones: Readonly<Record<string, string>> = {
                         deep: "border-brand-primary bg-brand-primary-soft text-brand-primary-ink",
                         audio: "border-status-success bg-status-success-soft text-ink-primary",
@@ -200,12 +202,30 @@ export function TimeSetup({ data, onDaily }: Props) {
         }
       >
         <label className="mb-3 flex flex-col gap-2">
+          {t("time.period")}
+          <select
+            aria-label={t("time.period")}
+            className={field}
+            value={editing?.slot.id ?? ""}
+            onChange={(event) => {
+              const slot = editing?.day.slots.find((item) => item.id === event.target.value);
+              if (editing !== undefined && slot !== undefined) edit(editing.day, slot);
+            }}
+          >
+            {editing?.day.slots.map((slot) => (
+              <option key={slot.id} value={slot.id}>
+                {t(slot.period_key)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="mb-3 flex flex-col gap-2">
           {t("time.duration")}
           <input className={field} type="number" min="0" value={minutes} onChange={(e) => setMinutes(e.target.value)} />
         </label>
         <label className="flex flex-col gap-2">
           {t("time.scenario")}
-          <select className={field} value={kind} onChange={(e) => setKind(e.target.value)}>
+          <select aria-label={t("time.scenario")} className={field} value={kind} onChange={(e) => setKind(e.target.value)}>
             {kinds.map((value) => (
               <option key={value} value={value}>
                 {t(`scenario.${value}`)}
