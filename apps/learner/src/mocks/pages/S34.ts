@@ -12,8 +12,13 @@ function profile(ctx: MockContext): S34GrowthProfile {
 
 function empty(ctx: MockContext): S34GrowthProfile {
   return {
-    ...profile(ctx), stats: { goals: 0, effective_weeks: 0, graduated_mistakes: 0, mastered_points: 0 },
-    goals: [], milestones: [], abilities: [], packages: [], history: [],
+    ...profile(ctx),
+    stats: { goals: 0, effective_weeks: 0, graduated_mistakes: 0, mastered_points: 0 },
+    goals: [],
+    milestones: [],
+    abilities: [],
+    packages: [],
+    history: [],
     comparison: { available: false, attempts: 0, items: [] },
   };
 }
