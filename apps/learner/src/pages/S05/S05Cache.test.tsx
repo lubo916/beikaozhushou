@@ -66,16 +66,20 @@ describe("S05 离线刷新缓存", () => {
   });
 });
 
-
 async function cachedFixture(view: "normal" | "quick" = "normal") {
   const fixture = network();
   async function body(path: string) {
-    const result = await fixture.api.handle({ method: "GET", url: `http://localhost/api/v1/${path}`, headers: new Headers(), body: undefined });
+    const result = await fixture.api.handle({
+      method: "GET",
+      url: `http://localhost/api/v1/${path}`,
+      headers: new Headers(),
+      body: undefined,
+    });
     if (result.kind !== "json" || result.status !== 200) throw new Error("S05 缓存测试数据加载失败");
     return result.body;
   }
-  const report = await body(`learner/start-report/${view}`) as S05StartReport;
-  const context = await body("me/context") as MeContext;
+  const report = (await body(`learner/start-report/${view}`)) as S05StartReport;
+  const context = (await body("me/context")) as MeContext;
   return { report, context };
 }
 describe("S05 缓存数据边界", () => {

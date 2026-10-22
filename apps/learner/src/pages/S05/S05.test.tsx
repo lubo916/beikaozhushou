@@ -152,4 +152,29 @@ describe("S05 页面", () => {
     expect(linkByText(host, copy.state.empty.action)?.getAttribute("href")).toBe("/diagnosis");
     await unmount();
   });
+  it("体检不通过只锁预测，修复清单、方案与生成计划照常", async () => {
+    const { control, api } = setup();
+    control.setExam("ds");
+    stubFetch(api);
+    const { host, unmount } = await mountAt("/start-report", <App />);
+    await settle(() => host.querySelector('input[name="s05-scheme"]') !== null);
+    expect(host.querySelector(".ui-state--locked")?.textContent).toContain(copy.locked.title);
+    expect(host.querySelectorAll("#s05-repairs li").length).toBeGreaterThan(0);
+    expect(host.querySelectorAll('input[name="s05-scheme"]')).toHaveLength(3);
+    expect(host.textContent).not.toContain(copy.hero.forecast);
+    expect(host.textContent).not.toContain(copy.schemes.expected);
+    expect(host.textContent).toContain(copy.time.title);
+    expect(host.textContent).toContain(copy.gap.locked_hint);
+    expect(linkByText(host, copy.locked.fix)?.getAttribute("href")).toBe("/map");
+    await unmount();
+  });
+  it("强制锁定时修复清单逐项列出", async () => {
+    stubFetch(setup("locked").api);
+    const { host, unmount } = await mountAt("/start-report", <App />);
+    await settle(() => host.querySelector("#s05-repairs li") !== null);
+    const items = [...host.querySelectorAll("#s05-repairs li")].map((item) => item.textContent ?? "");
+    expect(items.length).toBeGreaterThan(0);
+    expect(items.every((text) => text.includes(copy.locked.fix))).toBe(true);
+    await unmount();
+  });
 });

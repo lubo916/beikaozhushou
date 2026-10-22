@@ -24,6 +24,7 @@ const COPY = read("apps/learner/src/i18n/zh-CN/S05.json");
 const UI = read("packages/ui/src/copy.zh-CN.json") as { action: { confirm: string; decline: string } };
 const entry = pageById("S05");
 const fixture = read("fixtures/pages/S05/junior-accounting.json") as Fixture;
+const BLOCKED = read("fixtures/pages/S05/ds-final-custom.json") as { report: { repairs: readonly unknown[] } };
 function copy(path: string, values: Readonly<Record<string, string>> = {}): string {
   let value: unknown = COPY;
   for (const key of path.split("."))
@@ -89,7 +90,7 @@ test("S05 seven states and specified actions", async ({ page }) => {
     expectNoProblems(watch, state);
   }
 });
-test("S05 four demos; blocked map hides predictions and schemes", async ({ page }) => {
+test("S05 four demos; blocked map locks predictions only", async ({ page }) => {
   const watch = await watchPage(page);
   for (const exam of ["kj", "js", "en", "ds"]) {
     await watch.open(urlOf(entry, { exam }));
@@ -97,8 +98,12 @@ test("S05 four demos; blocked map hides predictions and schemes", async ({ page 
     if (exam === "ds") {
       await expect(page.locator("main#main .ui-state--locked")).toContainText(copy("locked.title"));
       await expect(page.getByText(copy("hero.forecast"), { exact: true })).toHaveCount(0);
-      await expect(page.getByRole("heading", { name: copy("schemes.title"), exact: true })).toHaveCount(0);
-      await expect(page.getByRole("button", { name: copy("plan.generate"), exact: true })).toHaveCount(0);
+      // 决定 U05-Q1＝A：体检不通过只锁预测类数字；方案与生成计划照常，方案卡不显示预期区间与区间上移。
+      await expect(page.getByText(copy("schemes.expected"))).toHaveCount(0);
+      await expect(page.getByText(copy("gap.locked_hint"))).toBeVisible();
+      await expect(page.locator("main#main #s05-repairs li")).toHaveCount(BLOCKED.report.repairs.length);
+      await expect(page.getByRole("heading", { name: copy("schemes.title"), exact: true })).toBeVisible();
+      await expect(page.getByRole("button", { name: copy("plan.generate"), exact: true })).toBeVisible();
       await expect(page.getByRole("link", { name: copy("locked.fix"), exact: true }).first()).toHaveAttribute("href", pathTo("S09"));
     } else await expectLoaded(page, entry);
     expectNoProblems(watch, "normal");
