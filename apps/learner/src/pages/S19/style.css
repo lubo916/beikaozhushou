@@ -56,3 +56,9 @@
   outline: var(--size-stroke-thick) solid var(--color-brand-primary);
   outline-offset: var(--size-space-1);
 }
+
+@container /* style-exempt: 容器查询条件不能用 CSS 变量，860 为 size.breakpoint.content-md 令牌 */ (width >= 860px) {
+  .s19-notebook-cols.ui-cols--split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  }
+}

@@ -268,5 +268,11 @@
       ]
     }
   },
-  "insufficient_sample_count": 6
+  "insufficient_sample_count": 6,
+  "insufficient_stats": {
+    "total": 6,
+    "today": 3,
+    "stubborn": 1,
+    "graduated": 1
+  }
 }

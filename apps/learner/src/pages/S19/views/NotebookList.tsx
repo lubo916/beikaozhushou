@@ -120,6 +120,7 @@ export function NotebookList({ data, todayOnly, onAnalyze }: { data: S19Notebook
         </Card>
       )}
       <Columns
+        className="s19-notebook-cols"
         main={
           <Card
             title={t(todayOnly ? "list.today_title" : "list.all_title")}

@@ -7,6 +7,7 @@ import { defineRoute, type MockContext } from "../route.ts";
 interface S19Fixture {
   readonly normal: S19Notebook;
   readonly insufficient_sample_count: number;
+  readonly insufficient_stats: S19Notebook["stats"];
 }
 
 type Mode = "normal" | "empty" | "restricted" | "insufficient_data";
@@ -33,6 +34,7 @@ function notebook(ctx: MockContext, mode: Mode): S19Notebook {
     data.insights = { ...data.insights, restricted: true, clusters: [], root_points: [], traps: [], causes: [] };
   }
   if (mode === "insufficient_data") {
+    data.stats = fixture.insufficient_stats;
     data.insights = {
       ...data.insights,
       available: false,

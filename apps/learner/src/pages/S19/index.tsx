@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router";
 import { param } from "@exam-prep/params";
 import { formatNumber } from "@exam-prep/shared/format";
-import { Banner, Button, ContainerScope, PageHeader, PageState, Stat, StatGroup, Tabs, Tag, buttonClass } from "@exam-prep/ui";
+import { Banner, Button, Card, ContainerScope, PageHeader, PageState, Stat, StatGroup, Tabs, Tag, buttonClass } from "@exam-prep/ui";
 import { useToast } from "../../app/toast.tsx";
 import { pathTo } from "../../routes.ts";
 import { useNotebook } from "./data.ts";
@@ -66,13 +66,14 @@ export default function Page() {
           )}
           <StatGroup>
             {(["total", "today", "stubborn", "graduated"] as const).map((key) => (
-              <Stat
-                key={key}
-                label={t(`stats.${key}`)}
-                value={formatNumber(data.stats[key], 0)}
-                hint={t(`stats.${key}_hint`)}
-                tone={key === "stubborn" ? "warning" : key === "graduated" ? "success" : "default"}
-              />
+              <Card key={key} as="div">
+                <Stat
+                  label={t(`stats.${key}`)}
+                  value={formatNumber(data.stats[key], 0)}
+                  hint={t(`stats.${key}_hint`)}
+                  tone={key === "stubborn" ? "warning" : key === "graduated" ? "success" : "default"}
+                />
+              </Card>
             ))}
           </StatGroup>
           <Tabs
