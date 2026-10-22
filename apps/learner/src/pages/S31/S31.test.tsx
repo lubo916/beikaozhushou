@@ -20,6 +20,12 @@ interface Parser {
 
 const fixtures = loadDemoFixtures();
 const routes = collectRoutes(loadRouteModules());
+const pageFixtures = import.meta.glob<S31Membership>("../../../../../fixtures/pages/S31/*.json", { eager: true, import: "default" });
+function fixtureFor(examId: string): S31Membership {
+  const fixture = Object.entries(pageFixtures).find(([path]) => path.endsWith(`/${examId}.json`))?.[1];
+  if (fixture === undefined) throw new Error(`S31 缺少演示考试数据：${examId}`);
+  return fixture;
+}
 const parser = (zodSchemas as Record<string, unknown>)["getS31MembershipResponse"] as Parser | undefined;
 const NOW = Date.parse("2026-10-22T10:00:00Z");
 const MODES = ["", "empty", "restricted", "insufficient_data"] as const;
@@ -79,8 +85,21 @@ describe("S31 假数据契约", () => {
         control.setExam(exam.key);
         const data = await home();
         expect(data["data_source"]).toBe("sample");
-        expect(data["view_state"]).toBe(mode === "" ? "normal" : mode);
+        expect(data["view_state"]).toBe(mode === "" ? fixtureFor(exam.examId).view_state : mode);
         if (mode === "empty") expect(data["orders"]).toEqual([]);
+      }
+    }
+  });
+  it("自然无订单为空态，非自动续费没有扣款提醒，可申请但未提交的退款尚无完成进度", async () => {
+    const { control, home } = setup();
+    for (const exam of fixtures.exams) {
+      control.setExam(exam.key);
+      const data = (await home()) as unknown as S31Membership;
+      if (data.orders.length === 0) expect(data.view_state).toBe("empty");
+      if (!data.current.auto_renew) expect(data.reminders.some((item) => item.kind === "renewal")).toBe(false);
+      if (data.refund.status === "available") {
+        expect(data.refund.progress.length).toBeGreaterThan(0);
+        expect(data.refund.progress.every((item) => !item.completed)).toBe(true);
       }
     }
   });
@@ -179,4 +198,44 @@ describe("S31 页面通过生成的接口钩子显示数据", () => {
       await unmount();
     });
   }
+});
+
+describe("S31 档位与订单复查回归", () => {
+  for (const key of ["en", "ds"]) {
+    it(`${key} 未开启自动续费时不显示“将自动续期”与关闭续费入口`, async () => {
+      const { control, api } = setup();
+      control.setExam(key);
+      stubFetch(api);
+      const { host, unmount } = await mountAt("/membership", <App />);
+      await settle(() => host.textContent?.includes(copy.current.manual) === true);
+      expect(host.textContent).toContain(copy.current.manual);
+      expect(host.textContent).not.toContain(copy.current.renewing);
+      const closeRenewal = [...host.querySelectorAll("button")].find((button) => button.textContent?.trim() === copy.current.close_renewal);
+      expect(closeRenewal).toBeUndefined();
+      expect(heading(host)).toBe(copy.title);
+      await unmount();
+    });
+  }
+
+  it("免费权益的两个到期栏显示长期有效，自然空订单保留权益与档位入口", async () => {
+    const { control, api } = setup();
+    control.setExam("ds");
+    stubFetch(api);
+    const { host, unmount } = await mountAt("/membership", <App />);
+    await settle(() => host.querySelector(".ui-state--empty") !== null);
+    const current = [...host.querySelectorAll<HTMLElement>(".ui-card")].find(
+      (card) => card.querySelector("h2")?.textContent === copy.current.title,
+    );
+    expect(current).toBeDefined();
+    for (const label of [copy.current.valid, copy.current.final]) {
+      const row = [...(current?.querySelectorAll(".ui-kv__row") ?? [])].find((item) => item.querySelector("dt")?.textContent === label);
+      expect(row?.querySelector("dd")?.textContent).toBe(copy.current.lifetime);
+    }
+    const state = host.querySelector(".ui-state--empty");
+    expect(state?.textContent).toContain(copy.state.empty.title);
+    expect(state?.textContent).toContain(copy.state.empty.body);
+    expect(state?.textContent).toContain(copy.state.empty.action);
+    expect(heading(host)).toBe(copy.title);
+    await unmount();
+  });
 });
