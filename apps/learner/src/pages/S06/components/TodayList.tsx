@@ -65,7 +65,12 @@ export function TodayList({ data }: { data: S06TodayHome }) {
       <div className="flex flex-col gap-4">
         {/* 数据不足：前两周按同类考生的典型节奏排（bk spec 七态），清单照常 */}
         {data.pace === "typical" && (
-          <PageState state="insufficient_data" compact title={t("state.insufficient_data.title")} body={t("state.insufficient_data.body")} />
+          <PageState
+            state="insufficient_data"
+            compact
+            title={t("state.insufficient_data.title")}
+            body={t("state.insufficient_data.body")}
+          />
         )}
         {data.segments.map((group) => (
           <TaskGroup key={group.segment} segment={group.segment} meta={<SegmentMeta group={group} data={data} />}>

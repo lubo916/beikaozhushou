@@ -40,7 +40,9 @@ export function TaskItem({ item }: { item: S06Task }) {
   const { task, polished } = item;
   const path = goPath(item.go);
   const reasons =
-    polished === undefined ? item.reasons.map((reason, index) => <ReasonText key={`${reason.kind}-${index}`} reason={reason} />) : [polished];
+    polished === undefined
+      ? item.reasons.map((reason, index) => <ReasonText key={`${reason.kind}-${index}`} reason={reason} />)
+      : [polished];
   return (
     <TaskStrip
       source={task.source}

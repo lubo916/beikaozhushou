@@ -43,7 +43,12 @@ function setup(state = "") {
   /** 取今日页的数据（view 不传时由数据定），并用生成的 Zod 结构校验。 */
   const today = async (view = ""): Promise<S06TodayHome> => {
     const query = view === "" ? "" : `?view=${view}`;
-    const outcome = await api.handle({ method: "GET", url: `http://localhost/api/v1/plan/today/home${query}`, headers: new Headers(), body: undefined });
+    const outcome = await api.handle({
+      method: "GET",
+      url: `http://localhost/api/v1/plan/today/home${query}`,
+      headers: new Headers(),
+      body: undefined,
+    });
     if (outcome.kind !== "json") throw new Error(`今日页的接口没有回 JSON：${outcome.kind}`);
     expect(outcome.status, JSON.stringify(outcome.body)).toBe(200);
     const result = parser?.safeParse(outcome.body);
