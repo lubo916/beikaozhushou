@@ -12,17 +12,7 @@ const MASTERY = ["bg-mastery-0", "bg-mastery-1", "bg-mastery-2", "bg-mastery-3",
 const FIELD = "w-full rounded-sm border border-line-strong bg-bg-surface p-3 text-ink-primary";
 type DraftNote = S13TimestampNote & { draft?: boolean };
 
-export function Lesson({
-  course,
-  notes,
-  audio = false,
-  audioAvailable = true,
-}: {
-  course: S13Course;
-  notes: S13TimestampNote[];
-  audio?: boolean;
-  audioAvailable?: boolean;
-}) {
+export function Lesson({ course, notes }: { course: S13Course; notes: S13TimestampNote[] }) {
   const { t } = useTranslation("S13");
   const toast = useToast();
   const [selectedId, setSelectedId] = useState(course.current_segment_id);
@@ -60,8 +50,7 @@ export function Lesson({
     setDialog(null);
     toast(t("note.saved"));
   }
-  const allNotes: DraftNote[] = [...notes, ...drafts];
-  const playable = !audio || audioAvailable;
+  const allNotes: DraftNote[] = [...notes, ...drafts].filter((note) => course.segments.some((item) => item.id === note.segment_id));
   const chooseSegment = (item: S13Segment) => (
     <button
       key={item.id}
@@ -84,17 +73,17 @@ export function Lesson({
       <Columns
         main={
           <div className="flex min-w-0 flex-col gap-4">
-            <Card title={audio ? t("audio.title") : course.title} meta={<Tag>{t(`sources.${course.source}`)}</Tag>}>
+            <Card title={course.title} meta={<Tag>{t(`sources.${course.source}`)}</Tag>}>
               <div className="flex flex-col gap-4">
                 <div
-                  className="flex aspect-video flex-col items-center justify-center gap-3 rounded-md bg-brand-primary p-4 text-center text-bg-surface"
+                  className="flex aspect-video flex-col items-center justify-center gap-3 rounded-md bg-ink-primary p-4 text-center text-bg-surface"
                   role="region"
                   aria-label={t("player.title")}
                 >
                   <span className="text-small">{t("player.current")}</span>
                   <h2 className="font-serif text-title">{segment.point_name}</h2>
                   <p>{t("player.chalk")}</p>
-                  <Button variant="secondary" disabled={!playable} onClick={() => setPlaying(!playing)}>
+                  <Button variant="secondary" onClick={() => setPlaying(!playing)}>
                     {playing ? t("player.pause") : t("player.play")}
                   </Button>
                   <p className="text-small" role="status">
@@ -102,7 +91,7 @@ export function Lesson({
                   </p>
                   <p className="text-small">{t("player.position", { time: formatSeconds(segment.start_seconds) })}</p>
                 </div>
-                <p className="text-small text-ink-secondary">{audio ? t("audio.demo") : t("player.demo")}</p>
+                <p className="text-small text-ink-secondary">{t("player.demo")}</p>
                 <ProgressBar label={t("player.progress")} value={course.progress_ratio} />
                 <p className="text-small text-ink-tertiary">{t("player.duration", { duration: formatSeconds(course.duration_seconds) })}</p>
                 {/* feat:S13-02 时间轴按知识点分段着色，文字同时显示掌握档。 */}
@@ -127,6 +116,9 @@ export function Lesson({
                   <Button variant="secondary" onClick={() => pauseAndOpen("note")}>
                     {t("actions.note")}
                   </Button>
+                  <Button variant="secondary" onClick={() => toast(t("player.calibrateSoon"))}>
+                    {t("player.calibrate")}
+                  </Button>
                 </div>
               </div>
             </Card>
@@ -136,7 +128,7 @@ export function Lesson({
                 <p>{t("check.body", { n: formatCount(segment.check_count) })}</p>
                 <p className="text-small text-ink-tertiary">{t("check.sample")}</p>
                 <Link className={buttonClass("primary")} to={pathTo("S18")}>
-                  {audio ? t("audio.check") : t("check.start")}
+                  {t("check.start")}
                 </Link>
               </div>
             </Card>
@@ -158,7 +150,7 @@ export function Lesson({
         }
         aside={
           <div className="flex min-w-0 flex-col gap-4">
-            <Card title={audio ? t("audio.queue") : t("player.timeline")}>
+            <Card title={t("player.timeline")}>
               <div className="flex flex-col gap-2">{course.segments.map(chooseSegment)}</div>
             </Card>
             <Card title={t("note.list")}>
@@ -176,7 +168,13 @@ export function Lesson({
                     >
                       {t("note.at", { time: formatSeconds(note.at_seconds) })}
                     </button>
-                    <p className="mt-1 whitespace-pre-wrap break-words">{note.text}</p>
+                    {note.ai_generated ? (
+                      <AiContent>
+                        <p className="mt-1 whitespace-pre-wrap break-words">{note.text}</p>
+                      </AiContent>
+                    ) : (
+                      <p className="mt-1 whitespace-pre-wrap break-words">{note.text}</p>
+                    )}
                     {note.draft && <Tag tone="warning">{t("note.draft")}</Tag>}
                   </article>
                 ))}

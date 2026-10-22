@@ -13,7 +13,12 @@ export interface ClassroomQuery {
 export type ClassroomState = "normal" | "loading" | "empty" | "error" | "offline" | "restricted";
 export function classroomView(query: ClassroomQuery): { state: ClassroomState; data: S13ClassroomHome | undefined; stale: boolean } {
   const offline = query.fetchStatus === "paused" || (query.status === "error" && !isApiError(query.error));
-  if (query.data !== undefined) return { state: query.data.courses.length === 0 ? "empty" : "normal", data: query.data, stale: offline };
+  if (query.data !== undefined)
+    return {
+      state: query.data.courses.length === 0 && query.data.external_courses.length === 0 ? "empty" : "normal",
+      data: query.data,
+      stale: offline,
+    };
   if (offline) return { state: "offline", data: undefined, stale: false };
   if (query.status === "pending") return { state: "loading", data: undefined, stale: false };
   return {

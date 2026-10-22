@@ -32,7 +32,7 @@ const EXAMS = (readJson("fixtures/exams/index.json") as { readonly exams: readon
 const entry = pageById("S13");
 for (const width of [375, 834, 1280]) {
   for (const view of entry.views) {
-    test(`S13 ${view.key}：${width} 宽能打开且正文不溢出`, async ({ page }) => {
+    test(`S13 ${view.key}：${width} 宽能打开且正文不溢出`, async ({ page }, testInfo) => {
       await page.setViewportSize({ width, height: 900 });
       const watch = await watchPage(page);
       await watch.open(urlOf(entry, { view: view.key }));
@@ -43,10 +43,12 @@ for (const width of [375, 834, 1280]) {
       await expect(body.getByRole("tab", { name: copy(`tabs.${view.key}`), exact: true })).toHaveAttribute("aria-selected", "true");
       expect(await body.evaluate((element) => element.scrollWidth - element.clientWidth), "正文区不应横向溢出").toBeLessThanOrEqual(1);
       expectNoProblems(watch, "normal");
+      await page.screenshot({ path: testInfo.outputPath("classroom.png"), fullPage: true });
     });
   }
 }
 test("S13 七态，空态保留页头，数据不足只限制音频", async ({ page }) => {
+  test.setTimeout(90_000);
   const watch = await watchPage(page);
   for (const state of ABNORMAL_STATES) {
     await watch.open(urlOf(entry, { state, view: state === "insufficient_data" ? "audio" : "video" }));
@@ -114,7 +116,15 @@ test("S13 主要操作：来源、播放、上下文提问、打点草稿及检�
   await body.locator("article").filter({ hasText: "先判断适用条件" }).getByRole("button").press("Enter");
   await expect(player.getByRole("heading", { name: segment.point_name, exact: true })).toBeVisible();
   await expect(body.getByRole("link", { name: copy("check.start"), exact: true })).toHaveAttribute("href", "/quiz/demo");
+  await body.getByRole("button", { name: copy("player.calibrate"), exact: true }).press("Enter");
+  await expect(page.getByRole("status").filter({ hasText: copy("player.calibrateSoon") })).toBeVisible();
   await body.getByRole("tab", { name: copy("tabs.audio"), exact: true }).press("Enter");
+  const audioPlay = body.getByRole("button", {
+    name: copy("audio.play_segment").replace("{{name}}", firstSegment.point_name),
+    exact: true,
+  });
+  await audioPlay.press("Enter");
+  await expect(audioPlay).toHaveAttribute("aria-pressed", "true");
   await expect(body.getByRole("link", { name: copy("audio.check"), exact: true })).toHaveAttribute("href", "/quiz/demo");
   await body.getByRole("tab", { name: copy("tabs.ext"), exact: true }).press("Enter");
   const external = KJ.external_courses[0];

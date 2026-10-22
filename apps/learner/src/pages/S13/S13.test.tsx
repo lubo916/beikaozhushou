@@ -1,5 +1,6 @@
 // U13：假数据契约、请求状态映射及整页接通。
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { act } from "react";
 import { ApiError } from "@exam-prep/contract/errors";
 import * as zodSchemas from "@exam-prep/contract/zod";
 import type { S13ClassroomHome } from "@exam-prep/contract";
@@ -96,7 +97,7 @@ describe("S13 请求状态判断", () => {
     expect(shouldRetry(0, new ApiError("COMMON_FORBIDDEN"))).toBe(false);
   });
 });
-function stubFetch(api: MockApi): void {
+function stubFetch(api: MockApi, transform?: (data: S13ClassroomHome) => S13ClassroomHome): void {
   vi.stubGlobal("fetch", async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
     const result = await api.handle({
@@ -107,7 +108,11 @@ function stubFetch(api: MockApi): void {
     });
     if (result.kind === "hang") return new Promise<Response>(() => undefined);
     if (result.kind !== "json") throw new TypeError("Failed to fetch");
-    return new Response(JSON.stringify(result.body), { status: result.status, headers: { "content-type": "application/json" } });
+    const body =
+      transform !== undefined && result.status === 200 && new URL(url, "http://localhost").pathname === "/api/v1/learner/classroom"
+        ? transform(result.body as S13ClassroomHome)
+        : result.body;
+    return new Response(JSON.stringify(body), { status: result.status, headers: { "content-type": "application/json" } });
   });
 }
 afterEach(() => vi.unstubAllGlobals());
@@ -135,5 +140,89 @@ describe("S13 整页接通生成钩子与假数据", () => {
     await settle(() => host.querySelector(".ui-state--error") !== null, 250);
     expect(host.querySelector(".ui-state--error")?.textContent).toContain(`${text("title")}没能加载`);
     await unmount();
+  });
+});
+
+describe("S13 课堂边界回归", () => {
+  it("仅登记外部课程时仍显示正常课堂", async () => {
+    const data = await setup().home();
+    expect(data.external_courses.length).toBeGreaterThan(0);
+    const query: ClassroomQuery = {
+      data: { ...data, courses: [], notes: [] },
+      error: null,
+      status: "success",
+      fetchStatus: "idle",
+    };
+    expect(classroomView(query).state).toBe("normal");
+    stubFetch(setup().api, (response) => ({ ...response, courses: [], notes: [] }));
+    const { host, unmount } = await mountAt("/classroom", <App />);
+    try {
+      await settle(() => linkByText(host, text("external.open")) !== undefined);
+      expect(linkByText(host, text("external.open"))?.getAttribute("href")).toBe(data.external_courses[0]?.url);
+    } finally {
+      await unmount();
+    }
+  });
+
+  it("接口返回的 AI 笔记在笔记条目内显示 AI 生成标识", async () => {
+    const context = setup();
+    const data = await context.home();
+    const firstNote = data.notes[0];
+    if (firstNote === undefined) throw new Error("示例缺少时间戳笔记");
+    stubFetch(context.api, (response) => ({ ...response, notes: [{ ...firstNote, ai_generated: true }] }));
+    const { host, unmount } = await mountAt("/classroom", <App />);
+    try {
+      await settle(() => [...host.querySelectorAll("article")].some((article) => article.textContent?.includes(firstNote.text)));
+      const article = [...host.querySelectorAll("article")].find((item) => item.textContent?.includes(firstNote.text));
+      expect(article, "AI 笔记应显示在时间戳笔记列表").toBeDefined();
+      expect(article?.querySelector(".ui-ai"), "AI 笔记应使用带复制标记的公共 AiContent").toBeTruthy();
+    } finally {
+      await unmount();
+    }
+  });
+
+  it("切换课程后只显示当前课程片段关联的时间戳笔记", async () => {
+    const context = setup();
+    const data = await context.home();
+    const firstCourse = data.courses[0];
+    const secondCourse = data.courses[1];
+    const firstSegment = firstCourse?.segments[0];
+    if (firstCourse === undefined || secondCourse === undefined || firstSegment === undefined) throw new Error("示例缺少两门课程");
+    // 真实不同课程的片段具有独立 ID；避免演示 fixture 复用片段 ID 掩盖跨课笔记混入。
+    const secondSegments = secondCourse.segments.map((segment) => ({ ...segment, id: crypto.randomUUID() }));
+    const secondSegment = secondSegments[0];
+    if (secondSegment === undefined) throw new Error("第二门课程缺少片段");
+    const second = { ...secondCourse, segments: secondSegments, current_segment_id: secondSegment.id };
+    const firstNote = {
+      id: crypto.randomUUID(),
+      segment_id: firstSegment.id,
+      at_seconds: firstSegment.start_seconds,
+      text: "第一门课的专属笔记",
+      ai_generated: false,
+    };
+    const secondNote = {
+      id: crypto.randomUUID(),
+      segment_id: secondSegment.id,
+      at_seconds: secondSegment.start_seconds,
+      text: "第二门课的专属笔记",
+      ai_generated: false,
+    };
+    stubFetch(context.api, (response) => ({ ...response, courses: [firstCourse, second], notes: [firstNote, secondNote] }));
+    const { host, unmount } = await mountAt("/classroom", <App />);
+    try {
+      await settle(() => host.querySelector("main#main select") !== null);
+      const select = host.querySelector<HTMLSelectElement>("main#main select");
+      if (select === null) throw new Error("缺少课程选择器");
+      await act(async () => {
+        select.value = second.id;
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+      await settle(() => [...host.querySelectorAll("article")].some((article) => article.textContent?.includes(secondNote.text)));
+      const notes = [...host.querySelectorAll("main#main article")].map((article) => article.textContent).join("\n");
+      expect(notes).toContain(secondNote.text);
+      expect(notes, "别的课程笔记不应混进当前课程").not.toContain(firstNote.text);
+    } finally {
+      await unmount();
+    }
   });
 });

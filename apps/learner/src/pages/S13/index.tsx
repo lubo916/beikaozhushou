@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { param } from "@exam-prep/params";
@@ -7,6 +7,7 @@ import { useToast } from "../../app/toast.tsx";
 import { useShellPage } from "../../app/page-context.tsx";
 import { pathTo } from "../../routes.ts";
 import { Lesson } from "./components/Lesson.tsx";
+import { AudioView } from "./views/AudioView.tsx";
 import { useClassroom } from "./data.ts";
 
 const VIEWS = ["video", "audio", "ext"] as const;
@@ -21,6 +22,11 @@ export default function Page() {
   const data = home.data;
   const [courseId, setCourseId] = useState("");
   const course = data?.courses.find((item) => item.id === courseId) ?? data?.courses[0];
+  const setShellView = shell.setView;
+  useEffect(() => {
+    if (data !== undefined && data.courses.length === 0 && data.external_courses.length > 0) setShellView("ext");
+  }, [data, setShellView]);
+
   function changeView(key: View) {
     shell.setView(key);
     if (import.meta.env.DEV && query.has("view")) {
@@ -64,8 +70,8 @@ export default function Page() {
         title={t("state.offline.title")}
         body={
           <>
-            <p>{t("state.offline.body")}</p>
-            <p>{t("state.offline.note")}</p>
+            <span className="block">{t("state.offline.body")}</span>
+            <span className="block">{t("state.offline.note")}</span>
           </>
         }
         action={<Button onClick={home.retry}>{t("state.offline.action")}</Button>}
@@ -114,8 +120,8 @@ export default function Page() {
             title={t("state.insufficient_data.title")}
             body={
               <>
-                <p>{t("state.insufficient_data.body")}</p>
-                <p>{t("state.insufficient_data.reason")}</p>
+                <span className="block">{t("state.insufficient_data.body")}</span>
+                <span className="block">{t("state.insufficient_data.reason")}</span>
               </>
             }
           />
@@ -186,32 +192,36 @@ export default function Page() {
                   <p className="mt-3 text-small text-ink-tertiary">{t("external.sample")}</p>
                 </Card>
               </>
+            ) : course !== undefined ? (
+              <>
+                <label className="flex flex-col gap-1 text-small font-medium">
+                  {t("player.source")}
+                  <select
+                    aria-label={t("player.source")}
+                    className="w-full rounded-sm border border-line-strong bg-bg-surface p-3 text-body"
+                    value={course.id}
+                    onChange={(event) => setCourseId(event.target.value)}
+                  >
+                    {data.courses.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {t(`sources.${item.source}`)} · {item.title}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {active === "audio" ? (
+                  <AudioView key={course.id} course={course} available={data.audio_available} />
+                ) : (
+                  <Lesson key={course.id} course={course} notes={data.notes} />
+                )}
+              </>
             ) : (
-              course !== undefined && (
-                <>
-                  <label className="flex flex-col gap-1 text-small font-medium">
-                    {t("player.source")}
-                    <select
-                      className="w-full rounded-sm border border-line-strong bg-bg-surface p-3 text-body"
-                      value={course.id}
-                      onChange={(event) => setCourseId(event.target.value)}
-                    >
-                      {data.courses.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {t(`sources.${item.source}`)} · {item.title}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <Lesson
-                    key={`${active}-${course.id}`}
-                    course={course}
-                    notes={data.notes}
-                    audio={active === "audio"}
-                    audioAvailable={data.audio_available}
-                  />
-                </>
-              )
+              <PageState
+                state="empty"
+                title={t("state.media_empty.title")}
+                body={t("state.media_empty.body")}
+                action={<Button onClick={() => changeView("ext")}>{t("state.media_empty.action")}</Button>}
+              />
             )}
             <p className="text-small text-ink-tertiary">{t(`copyright.${active}`)}</p>
           </div>
