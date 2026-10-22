@@ -13,6 +13,9 @@ paths:
         - name: view
           in: query
           required: false
+          # 写明不展开（explode: false）。按 OpenAPI，单个取值的参数展不展开，发出去都是 ?view=first；但 Orval 7.11.0 的 fetch 客户端
+          # 把“展开”的查询参数只当数组拼进地址，单个值会被丢掉，接口就收不到 view（证据见交接单 U06a-r2，根治交给整合任务）。
+          explode: false
           description: 只在开发与测试时生效的强制视图（页面地址里的 ?view=，ui-rules 第 5 节）；正式环境由数据决定视图，忽略这个参数
           schema: {$ref: "#/components/schemas/S06View"}
       responses:
