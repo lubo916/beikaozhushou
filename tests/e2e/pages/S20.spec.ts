@@ -48,9 +48,13 @@ for (const size of [
     expect(overflow).toBeLessThanOrEqual(1);
     await expect(page.getByRole("heading", { name: copy("annotation.title"), exact: true })).toBeVisible();
     expectNoProblems(watch, "normal");
-    await page.screenshot({ path: join(ROOT, ".test-results/S20", `page-${size.width}.png`), fullPage: true });
+    await page.screenshot({ path: join(ROOT, ".test-results/S20", `page-${size.width}.png`), fullPage: true, animations: "disabled" });
     await page.locator("main#main").evaluate((element) => element.scrollTo(0, element.scrollHeight));
-    await page.screenshot({ path: join(ROOT, ".test-results/S20", `page-${size.width}-bottom.png`), fullPage: true });
+    await page.screenshot({
+      path: join(ROOT, ".test-results/S20", `page-${size.width}-bottom.png`),
+      fullPage: true,
+      animations: "disabled",
+    });
   });
 }
 
@@ -140,7 +144,7 @@ test("S20 提交弹窗包含七题型三种输入，草稿保留，未接能力�
   await expect(dialog).toBeHidden();
   await open.press("Enter");
   await expect(dialog.getByRole("textbox", { name: copy("draft.answer"), exact: true })).toHaveValue("这是我自己写的练习答案。");
-  await page.screenshot({ path: join(ROOT, ".test-results/S20", "answer-dialog.png"), fullPage: true });
+  await page.screenshot({ path: join(ROOT, ".test-results/S20", "answer-dialog.png"), fullPage: true, animations: "disabled" });
   await dialog.press("Escape");
   for (const input of ["keyboard", "photo", "voice"]) {
     await page
