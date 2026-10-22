@@ -1,0 +1,117 @@
+# S17 练习中心：业务数字和练习配置全部由接口提供；当前返回演示数据。
+# 新建、导入、生成、组卷、设置等写动作尚未登记，页面暂以“即将上线”反馈。
+paths:
+  /practice/center:
+    get:
+      operationId: getPracticeCenter
+      x-owner: practice
+      x-action: content.question.read
+      summary: 当前目标的练习推荐、题库与试卷、题目与练习记录
+      responses:
+        "200":
+          description: 练习中心的全部展示数据
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/S17PracticeCenter" }
+        "403": { $ref: "#/components/responses/Error" }
+components:
+  schemas:
+    S17PracticeCenter:
+      type: object
+      required: [data_source, exam_name, availability, recommendation, daily, banks, questions, records, presets, notice, ai]
+      properties:
+        data_source: { $ref: "#/components/schemas/DataSource" }
+        exam_name: { type: string }
+        availability: { type: string, enum: [normal, empty, restricted, insufficient_data] }
+        recommendation: { $ref: "#/components/schemas/S17Recommendation" }
+        daily: { $ref: "#/components/schemas/S17Daily" }
+        banks: { type: array, items: { $ref: "#/components/schemas/S17Bank" } }
+        questions: { type: array, items: { $ref: "#/components/schemas/S17Question" } }
+        records: { type: array, items: { $ref: "#/components/schemas/S17Record" } }
+        presets: { type: array, items: { $ref: "#/components/schemas/S17Preset" } }
+        notice: { $ref: "#/components/schemas/S17Notice" }
+        ai: { $ref: "#/components/schemas/S17Ai" }
+    S17Recommendation:
+      type: object
+      required: [title, reason, question_count, minutes, accuracy_label, session_id, point_id, point_name]
+      properties:
+        title: { type: string }
+        reason: { type: string }
+        question_count: { type: integer, minimum: 0 }
+        minutes: { type: integer, minimum: 0 }
+        accuracy_label:
+          type: string
+          description: 接口给出的适中正确率区间展示文案，页面不计算
+        session_id: { $ref: "#/components/schemas/Id" }
+        point_id: { $ref: "#/components/schemas/Id" }
+        point_name: { type: string }
+    S17Daily:
+      type: object
+      required: [title, question_count, minutes, session_id]
+      properties:
+        title: { type: string }
+        question_count: { type: integer, minimum: 0 }
+        minutes: { type: integer, minimum: 0 }
+        session_id: { $ref: "#/components/schemas/Id" }
+    S17Bank:
+      type: object
+      required: [id, title, source, credibility, question_count, done_count, accuracy_label]
+      properties:
+        id: { $ref: "#/components/schemas/Id" }
+        title: { type: string }
+        source: { type: string }
+        credibility: { $ref: "#/components/schemas/Credibility" }
+        question_count: { type: integer, minimum: 0 }
+        done_count: { type: integer, minimum: 0 }
+        accuracy_label:
+          type: string
+          description: 接口已格式化的正确率；尚无作答时返回中文说明
+    S17Question:
+      type: object
+      required: [id, title, type_label, credibility, point_name, point_id, tag, peer_accuracy_label]
+      properties:
+        id: { $ref: "#/components/schemas/Id" }
+        title: { type: string }
+        type_label: { type: string }
+        credibility: { $ref: "#/components/schemas/Credibility" }
+        point_name: { type: string }
+        point_id: { $ref: "#/components/schemas/Id" }
+        tag: { type: string }
+        peer_accuracy_label:
+          type: string
+          description: 审定题可给群体正确率，其他可信度给空串
+    S17Record:
+      type: object
+      required: [id, title, day, progress_label, accuracy_label, mastery_snapshot, status, session_id]
+      properties:
+        id: { $ref: "#/components/schemas/Id" }
+        title: { type: string }
+        day: { $ref: "#/components/schemas/LearningDay" }
+        progress_label: { type: string }
+        accuracy_label: { type: string }
+        mastery_snapshot:
+          type: string
+          description: 此次练习当时保留的档位快照，回看不重新计算
+        status: { type: string, enum: [completed, in_progress] }
+        session_id: { $ref: "#/components/schemas/Id" }
+    S17Preset:
+      type: object
+      required: [id, title, description, question_count, minutes]
+      properties:
+        id: { $ref: "#/components/schemas/Id" }
+        title: { type: string }
+        description: { type: string }
+        question_count: { type: integer, minimum: 0 }
+        minutes: { type: integer, minimum: 0 }
+    S17Notice:
+      type: object
+      required: [prerequisite, illusion]
+      properties:
+        prerequisite: { type: string }
+        illusion: { type: string }
+    S17Ai:
+      type: object
+      required: [cost_label, available]
+      properties:
+        cost_label: { type: string }
+        available: { type: boolean }
