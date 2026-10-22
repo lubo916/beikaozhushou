@@ -60,6 +60,9 @@ function firstOption(examId: string, kind: "objective" | "generated", index: num
   return option;
 }
 
+/** 揭晓后选项的名称会带上“你选的”等标记：按开头匹配。 */
+const startsWith = (text: string): RegExp => new RegExp(`^${text.replace(/[.*+?^$()|[\]\\{}]/g, "\\$&")}`);
+
 const entry = pageById("S18");
 const EXAMS = (readJson("fixtures/exams/index.json") as IndexJson).exams;
 const KJ = pageOf("junior-accounting");
@@ -172,7 +175,7 @@ test("S18 主要按钮都能点：作答、选把握度、提交后揭晓并锁�
   await submit.press("Enter");
   await expect(main.getByRole("heading", { name: copy("reveal.title"), exact: true })).toBeVisible();
   await expect(main).toContainText(quiz("submit.locked"));
-  await expect(main.getByRole("radio", { name: option, exact: true })).toBeDisabled();
+  await expect(main.getByRole("radio", { name: startsWith(option) })).toBeDisabled();
   await pressFor(main.getByRole("button", { name: copy("reveal.explain"), exact: true }), copy("soon.explain"));
   await pressFor(main.getByRole("button", { name: copy("reveal.steps"), exact: true }), copy("soon.steps"));
   await main.getByRole("button", { name: copy("question.next"), exact: true }).press("Enter");
