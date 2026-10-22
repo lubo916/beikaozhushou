@@ -45,6 +45,10 @@ for (const size of WIDTHS) {
     expect(await page.locator("main#main").evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
     expectNoProblems(watch, "normal");
     await page.screenshot({ path: testInfo.outputPath("S21.png"), fullPage: true });
+    await page.locator("main#main").evaluate((element) => {
+      element.scrollTop = element.scrollHeight;
+    });
+    await page.screenshot({ path: testInfo.outputPath("S21-bottom.png"), fullPage: true });
   });
 }
 
