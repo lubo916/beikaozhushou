@@ -1,0 +1,43 @@
+# S26 报考决策简版：只读信息，不写入目标、地图或计划。
+paths:
+  /learner/enrollment-decision:
+    get:
+      operationId: getEnrollmentDecision
+      x-owner: exam
+      x-action: exam.profile.read
+      summary: 当前考试已挂载的报考决策示例信息
+      responses:
+        "200":
+          description: 只读决策数据，没有平台数据时 available 为 false
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S26DecisionView"}
+        "403": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S26DecisionView:
+      type: object
+      required: [available, exam_name, data_year, source_name, source_url, updated_day, profile_complete, access_limited, items, data_source]
+      properties:
+        available: {type: boolean, description: 平台是否已为当前考试挂载决策数据}
+        exam_name: {type: string}
+        data_year: {type: string, description: 数据所属年份，由接口返回}
+        source_name: {type: string}
+        source_url: {type: string, format: uri}
+        updated_day: {$ref: "#/components/schemas/LearningDay"}
+        profile_complete: {type: boolean}
+        access_limited: {type: boolean}
+        items:
+          type: array
+          items: {$ref: "#/components/schemas/S26DecisionOption"}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+    S26DecisionOption:
+      type: object
+      required: [id, name, category, region, requirements, note]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        category: {type: string}
+        region: {type: string}
+        requirements: {type: string}
+        note: {type: string}
