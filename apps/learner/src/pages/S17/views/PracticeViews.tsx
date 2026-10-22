@@ -273,7 +273,7 @@ export function BanksView({ data, open }: ViewProps) {
           <div className="s17-row">
             <label className="s17-field">
               {t("banks.tag")}
-              <select className="s17-input" value={tag} onChange={(e) => setTag(e.target.value)}>
+              <select aria-label={t("banks.tag")} className="s17-input" value={tag} onChange={(e) => setTag(e.target.value)}>
                 <option value="">{t("banks.tagAll")}</option>
                 {[...new Set(data.questions.map((q) => q.tag))].map((item) => (
                   <option key={item}>{item}</option>
@@ -282,7 +282,7 @@ export function BanksView({ data, open }: ViewProps) {
             </label>
             <label className="s17-field">
               {t("banks.sort")}
-              <select className="s17-input" value={sort} onChange={(e) => setSort(e.target.value)}>
+              <select aria-label={t("banks.sort")} className="s17-input" value={sort} onChange={(e) => setSort(e.target.value)}>
                 <option value="recent">{t("banks.sortRecent")}</option>
                 <option value="title">{t("banks.sortTitle")}</option>
               </select>

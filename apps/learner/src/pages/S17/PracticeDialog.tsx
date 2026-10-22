@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { cloneElement, useId, useState, type ReactElement } from "react";
 import { Link } from "react-router";
 import { pathTo } from "../../routes.ts";
 import { useTranslation } from "react-i18next";
@@ -6,12 +6,14 @@ import type { S17PracticeCenter } from "@exam-prep/contract";
 import { AiContent, Button, Dialog, Segmented, Tag, buttonClass } from "@exam-prep/ui";
 import { useToast } from "../../app/toast.tsx";
 import type { DialogKind } from "./views/PracticeViews.tsx";
-function Field({ label, children }: { label: string; children?: ReactNode }) {
+function Field({ label, children }: { label: string; children?: ReactElement<{ id?: string }> }) {
+  // 显式关联标签与控件，避免选择项文字混入字段名称（冒烟测试保留精确标签断言）。
+  const id = useId();
   return (
-    <label className="s17-field">
-      <span>{label}</span>
-      {children ?? <input className="s17-input" />}
-    </label>
+    <div className="s17-field">
+      <label htmlFor={id}>{label}</label>
+      {children === undefined ? <input id={id} className="s17-input" /> : cloneElement(children, { id })}
+    </div>
   );
 }
 export function PracticeDialog({ kind, data, close }: { kind: DialogKind | null; data: S17PracticeCenter | undefined; close: () => void }) {

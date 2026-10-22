@@ -119,6 +119,8 @@ test("S17 主要按钮可操作：添加、设置、组卷、卷面与记录续�
 
   await main.getByRole("tab", { name: copy("tabs.banks"), exact: true }).click();
   await expect(main.getByRole("heading", { name: copy("banks.title"), exact: true })).toBeVisible();
+  await expect(main.getByLabel(copy("banks.tag"), { exact: true })).toBeVisible();
+  await expect(main.getByLabel(copy("banks.sort"), { exact: true })).toBeVisible();
   await clickButton(copy("banks.auto"));
   const auto = page.getByRole("dialog", { name: copy("dialog.auto.title"), exact: true });
   await expect(auto).toBeVisible();
@@ -186,8 +188,8 @@ test("S17 窄屏真题、限时、拍照、导入和导师入口可预览", asyn
 
 test("S17 题库和记录视图的局部受限或缺题仍保留正文", async ({ page }) => {
   const watch = await watchPage(page);
-  for (const view of ["banks", "records"]) {
-    for (const state of ["restricted", "insufficient_data"]) {
+  for (const view of ["banks", "records"] as const) {
+    for (const state of ["restricted", "insufficient_data"] as const) {
       await watch.open(urlOf(entry, { view, state }));
       await expectState(page, entry, state);
       await expect(page.locator("main#main").getByRole("tab", { name: copy("tabs." + view), exact: true })).toHaveAttribute(
