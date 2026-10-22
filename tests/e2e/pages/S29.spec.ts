@@ -11,7 +11,7 @@ interface PageFixture {
   aliases: string[];
   point_id: string;
   material_id: string;
-  quick_tables: { id: string; title: string; rows: { value: string }[] }[];
+  quick_tables: { id: string; title: string; rows: { label: string; value: string; point_id: string }[] }[];
 }
 const readJson = (path: string): unknown => JSON.parse(readFileSync(join(ROOT, path), "utf8")) as unknown;
 const COPY = readJson("apps/learner/src/i18n/zh-CN/S29.json");
@@ -141,7 +141,13 @@ test("S29 可搜索、筛选、查表、回到资料，并在拍照前选择用�
     await expect(page.getByRole("heading", { name: table.title, exact: true })).toBeVisible();
     await expect(page.getByRole("table")).toContainText(table.rows[0]?.value ?? "");
   }
-  await expect(main.getByRole("link", { name: copy("quick.point"), exact: true })).toHaveAttribute(
+  // 速查表由对应类型的知识点汇成，一张表有多行；每行“查看知识点”的链接名带上条目名（读屏能分清）。
+  // 回到和关键词相关的那张表（第一张），示例知识点那一行能回到它的知识点主页。
+  const related = fixture.quick_tables[0];
+  const sampleRow = related?.rows.find((row) => row.point_id === fixture.point_id);
+  if (related === undefined || sampleRow === undefined) throw new Error("S29 相关速查表里没有示例知识点");
+  await page.getByRole("combobox", { name: copy("quick.choose") }).selectOption(related.id);
+  await expect(main.getByRole("link", { name: copy("quick.point_named", { name: sampleRow.label }), exact: true })).toHaveAttribute(
     "href",
     pathTo("S10", { kpId: fixture.point_id }),
   );

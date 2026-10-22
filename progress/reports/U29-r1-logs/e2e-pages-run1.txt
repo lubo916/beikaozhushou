@@ -1,0 +1,59 @@
+Scope: all 31 workspace projects
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+Done in 1.8s using pnpm v11.0.0
+
+Running 13 tests using 1 worker
+
+  ✓   1 [chromium] › tests/e2e/pages/S29.spec.ts:29:3 › S29 375：布局按容器切换，正文不横向溢出 (5.4s)
+  ✓   2 [chromium] › tests/e2e/pages/S29.spec.ts:29:3 › S29 834：布局按容器切换，正文不横向溢出 (4.1s)
+  ✓   3 [chromium] › tests/e2e/pages/S29.spec.ts:29:3 › S29 1280：布局按容器切换，正文不横向溢出 (4.1s)
+  ✓   4 [chromium] › tests/e2e/pages/S29.spec.ts:52:1 › S29 七态都有原型文案与可行的出口 (19.9s)
+  ✓   5 [chromium] › tests/e2e/pages/S29.spec.ts:104:1 › S29 搜索结果、最近访问和速查表都可直接用 view 打开 (9.1s)
+  ✓   6 [chromium] › tests/e2e/pages/S29.spec.ts:133:1 › S29 四个演示考试各有自己的检索结果和速查表 (12.2s)
+  ✘   7 [chromium] › tests/e2e/pages/S29.spec.ts:158:1 › S29 可搜索、筛选、查表、回到资料，并在拍照前选择用途 (12.6s)
+  ✓   8 [chromium] › tests/e2e/pages/S30.spec.ts:18:3 › S30 375 宽主视图与正文无横向溢出 (4.6s)
+  ✓   9 [chromium] › tests/e2e/pages/S30.spec.ts:18:3 › S30 834 宽主视图与正文无横向溢出 (4.3s)
+  ✓  10 [chromium] › tests/e2e/pages/S30.spec.ts:18:3 › S30 1280 宽主视图与正文无横向溢出 (3.9s)
+  ✓  11 [chromium] › tests/e2e/pages/S30.spec.ts:53:1 › S30 只有主视图，七态按原型显示；未成年人只留自习室和番茄钟 (19.0s)
+  ✓  12 [chromium] › tests/e2e/pages/S30.spec.ts:89:1 › S30 四考试分别显示对应的自习室 (12.4s)
+  ✓  13 [chromium] › tests/e2e/pages/S30.spec.ts:105:1 › S30 举报和屏蔽需明确操作，主要入口提示即将上线 (5.3s)
+
+
+  1) [chromium] › tests/e2e/pages/S29.spec.ts:158:1 › S29 可搜索、筛选、查表、回到资料，并在拍照前选择用途 ─────────────────
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator: locator('main#main').getByRole('link', { name: '查看知识点', exact: true })
+    Expected: "/kp/019a0103-0000-7000-8000-000000000005"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveAttribute" with timeout 5000ms
+      - waiting for locator('main#main').getByRole('link', { name: '查看知识点', exact: true })
+
+
+      142 |     await expect(page.getByRole("table")).toContainText(table.rows[0]?.value ?? "");
+      143 |   }
+    > 144 |   await expect(main.getByRole("link", { name: copy("quick.point"), exact: true })).toHaveAttribute(
+          |                                                                                    ^
+      145 |     "href",
+      146 |     pathTo("S10", { kpId: fixture.point_id }),
+      147 |   );
+        at /home/claude/work/repo/tests/e2e/pages/S29.spec.ts:144:84
+
+    Error Context: ../../../../tmp/u29/e2e-1/pages-S29-S29-可搜索、筛选、查表、回到资料，并在拍照前选择用途-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../tmp/u29/e2e-1/pages-S29-S29-可搜索、筛选、查表、回到资料，并在拍照前选择用途-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../../../tmp/u29/e2e-1/pages-S29-S29-可搜索、筛选、查表、回到资料，并在拍照前选择用途-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests/e2e/pages/S29.spec.ts:158:1 › S29 可搜索、筛选、查表、回到资料，并在拍照前选择用途 ──────────────────
+  12 passed (2.0m)
