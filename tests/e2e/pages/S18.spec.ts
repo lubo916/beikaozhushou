@@ -73,10 +73,19 @@ function title(page: Page, name: string): Locator {
   return page.getByRole("heading", { level: 1, name, exact: true });
 }
 
-async function boxOf(locator: Locator): Promise<{ x: number; y: number; width: number; height: number }> {
-  const box = await locator.first().boundingBox();
-  if (box === null) throw new Error("元素没有显示出来，量不到位置");
-  return box;
+/** 同一次布局读取里测两栏，避免分别 await 时页面重排导致使用两个时刻的位置。 */
+async function questionLayout(page: Page) {
+  return page.locator("main#main").evaluate((element) => {
+    const main = element.querySelector(".ui-cols__main");
+    const aside = element.querySelector(".ui-cols__aside");
+    if (main === null || aside === null) throw new Error("题目或本组进度没有显示出来，量不到位置");
+    const box = (node: Element) => {
+      const { x, y, width, height } = node.getBoundingClientRect();
+      if (width <= 0 || height <= 0 || getComputedStyle(node).visibility === "hidden") throw new Error("元素没有显示出来，量不到位置");
+      return { x, y, width, height };
+    };
+    return { main: box(main), aside: box(aside) };
+  });
 }
 
 const WIDTHS = [
@@ -93,8 +102,7 @@ for (const size of WIDTHS) {
     await expectOpened(page, entry, entry.views[0]);
     await expectLoaded(page, entry);
     await expect(title(page, KJ.sessions.objective.title)).toBeVisible();
-    const main = await boxOf(page.locator("main#main .ui-cols__main"));
-    const aside = await boxOf(page.locator("main#main .ui-cols__aside"));
+    const { main, aside } = await questionLayout(page);
     if (size.split) expect(aside.x, "右栏应在题目右边").toBeGreaterThanOrEqual(main.x + main.width - 1);
     else expect(aside.y, "本组进度应排在题目下面").toBeGreaterThanOrEqual(main.y + main.height - 1);
     const overflow = await page.locator("main#main").evaluate((element) => element.scrollWidth - element.clientWidth);
