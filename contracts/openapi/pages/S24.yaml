@@ -1,0 +1,409 @@
+# S24 只读展示契约。预测与完成度均由接口提供；本页不计算业务规则。
+paths:
+  /learner/progress:
+    get:
+      operationId: getS24Progress
+      x-owner: learner
+      x-action: learner.mastery.read
+      summary: 进度与预测；业务数字已算好，开发返回示例数据
+      responses:
+        '200':
+          description: 四个视图与地图体检结果；阻断时不下发预测、分值和阶梯
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/S24Progress'
+        '403':
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    S24Metric:
+      type: object
+      required:
+      - workload
+      - weighted
+      - recent_daily
+      - required_daily
+      - health
+      - verdict
+      properties:
+        workload:
+          type: number
+        weighted:
+          type: number
+        recent_daily:
+          type: number
+        required_daily:
+          type: number
+        health:
+          type: number
+        verdict:
+          type: string
+          enum:
+          - steady
+          - adjust
+    S24Forecast:
+      type: object
+      required:
+      - conservative
+      - likely
+      - optimistic
+      - target_line
+      - gap
+      - pass_probability
+      - low_confidence
+      properties:
+        conservative:
+          type: number
+        likely:
+          type: number
+        optimistic:
+          type: number
+        target_line:
+          type: number
+        gap:
+          type: number
+        pass_probability:
+          type: number
+        low_confidence:
+          type: boolean
+    S24Forecasts:
+      type: object
+      properties:
+        today:
+          $ref: '#/components/schemas/S24Forecast'
+        target:
+          $ref: '#/components/schemas/S24Forecast'
+    S24Trend:
+      type: object
+      required:
+      - day
+      - conservative
+      - likely
+      - optimistic
+      properties:
+        day:
+          $ref: '#/components/schemas/LearningDay'
+        conservative:
+          type: number
+        likely:
+          type: number
+        optimistic:
+          type: number
+    S24Subject:
+      type: object
+      required:
+      - id
+      - name
+      - completion
+      - passed
+      - actual_minutes
+      - suggested_minutes
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+        completion:
+          type: number
+        passed:
+          type: boolean
+        actual_minutes:
+          type: number
+        suggested_minutes:
+          type: number
+    S24Time:
+      type: object
+      required:
+      - effective_minutes
+      - present_minutes
+      - pending_minutes
+      properties:
+        effective_minutes:
+          type: number
+        present_minutes:
+          type: number
+        pending_minutes:
+          type: number
+    S24ScoreBand:
+      type: object
+      required:
+      - kind
+      - score
+      properties:
+        kind:
+          type: string
+          enum:
+          - secured
+          - potential
+          - recoverable
+          - outside
+        score:
+          type: number
+    S24Point:
+      type: object
+      required:
+      - id
+      - name
+      - expected_score
+      - exam_probability
+      - current_level
+      - personal_difficulty
+      - minutes
+      - roi_grade
+      - roi_score
+      - rank
+      - reason
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+        expected_score:
+          type: number
+        exam_probability:
+          type: number
+        current_level:
+          type: number
+        personal_difficulty:
+          type: string
+          enum:
+          - easier
+          - typical
+          - harder
+        minutes:
+          type: number
+        roi_grade:
+          type: string
+          enum:
+          - S
+          - A
+          - B
+          - C
+          - D
+        roi_score:
+          type: number
+        rank:
+          type: number
+        reason:
+          type: string
+    S24Gap:
+      type: object
+      required:
+      - source
+      - score
+      - action
+      properties:
+        source:
+          type: string
+          enum:
+          - not_learned
+          - forgot
+          - slip
+          - time_short
+        score:
+          type: number
+        action:
+          type: string
+    S24Weak:
+      type: object
+      required:
+      - dimension
+      - name
+      - ratio
+      - action
+      properties:
+        dimension:
+          type: string
+          enum:
+          - chapter
+          - question_type
+          - error_pattern
+        name:
+          type: string
+        ratio:
+          type: number
+        action:
+          type: string
+    S24Layer:
+      type: object
+      required:
+      - kind
+      - ratio
+      - note
+      properties:
+        kind:
+          type: string
+          enum:
+          - investment
+          - mastery
+          - memory
+          - application
+        ratio:
+          type: number
+        note:
+          type: string
+    S24Efficiency:
+      type: object
+      required:
+      - name
+      - ratio
+      properties:
+        name:
+          type: string
+        ratio:
+          type: number
+    S24Confidence:
+      type: object
+      required:
+      - overconfident
+      - underconfident
+      - note
+      properties:
+        overconfident:
+          type: number
+        underconfident:
+          type: number
+        note:
+          type: string
+    S24CalibrationHistory:
+      type: object
+      required:
+      - day
+      - label
+      - low
+      - high
+      - actual
+      properties:
+        day:
+          $ref: '#/components/schemas/LearningDay'
+        label:
+          type: string
+        low:
+          type: number
+        high:
+          type: number
+        actual:
+          type: number
+    S24Calibration:
+      type: object
+      required:
+      - samples
+      - mean_error
+      - interval_coverage
+      - history
+      properties:
+        samples:
+          type: number
+        mean_error:
+          type: number
+        interval_coverage:
+          type: number
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24CalibrationHistory'
+    S24Progress:
+      type: object
+      required:
+      - exam_id
+      - exam_name
+      - computed_at
+      - time_zone
+      - data_source
+      - has_progress
+      - map_check
+      - blocked_reasons
+      - importance_estimated
+      - evidence_count
+      - metrics
+      - forecasts
+      - trend
+      - subjects
+      - time
+      - score_bands
+      - points
+      - path
+      - gaps
+      - weaknesses
+      - layers
+      - methods
+      - periods
+      - confidence
+      - calibration
+      properties:
+        exam_id:
+          $ref: '#/components/schemas/Id'
+        exam_name:
+          type: string
+        computed_at:
+          $ref: '#/components/schemas/Timestamp'
+        time_zone:
+          type: string
+        data_source:
+          $ref: '#/components/schemas/DataSource'
+        has_progress:
+          type: boolean
+        map_check:
+          type: string
+          enum:
+          - passed
+          - blocked
+        blocked_reasons:
+          type: array
+          items:
+            type: string
+        importance_estimated:
+          type: boolean
+        evidence_count:
+          type: number
+        metrics:
+          $ref: '#/components/schemas/S24Metric'
+        forecasts:
+          $ref: '#/components/schemas/S24Forecasts'
+        trend:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24Trend'
+        subjects:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24Subject'
+        time:
+          $ref: '#/components/schemas/S24Time'
+        score_bands:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24ScoreBand'
+        points:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24Point'
+        path:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24Point'
+        gaps:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24Gap'
+        weaknesses:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24Weak'
+        layers:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24Layer'
+        methods:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24Efficiency'
+        periods:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24Efficiency'
+        confidence:
+          $ref: '#/components/schemas/S24Confidence'
+        calibration:
+          $ref: '#/components/schemas/S24Calibration'
