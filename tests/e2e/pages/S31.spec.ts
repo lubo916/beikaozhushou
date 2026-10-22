@@ -115,7 +115,16 @@ for (const size of [
     else expect(aside.y).toBeGreaterThanOrEqual(main.y + main.height - 1);
     expect(await page.locator("main#main").evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
     expectNoProblems(watch, "normal");
-    await page.screenshot({ path: testInfo.outputPath(`S31-${size.width}.png`), fullPage: true });
+    await page.screenshot({ path: testInfo.outputPath(`S31-${size.width}.png`), fullPage: false });
+    for (const section of ["compare", "purchase"]) {
+      const heading = page.getByRole("heading", { name: copy(`${section}.title`), exact: true });
+      await heading.scrollIntoViewIfNeeded();
+      await heading.evaluate((element) => element.scrollIntoView({ block: "start", inline: "nearest" }));
+      await page.screenshot({ path: testInfo.outputPath(`S31-${size.width}-${section}.png`), fullPage: false });
+    }
+    await page.locator("main#main").evaluate((element) => {
+      element.scrollTop = 0;
+    });
   });
 }
 
@@ -209,11 +218,17 @@ test("S31 购买选择不预选；续费关闭、互转与升级均可查看后�
   await button(page, "purchase.transfer").press("Enter");
   const transfer = page.getByRole("dialog", { name: copy("purchase.transfer"), exact: true });
   await expect(transfer).toContainText(copy("purchase.transfer_body", { amount: KJ.purchase.transfer_credit_text }));
-  await transfer.getByRole("button", { name: copy("close"), exact: true }).press("Enter");
+  await transfer
+    .locator(".ui-dialog__actions")
+    .getByRole("button", { name: copy("close"), exact: true })
+    .press("Enter");
   await button(page, "upgrade.rules").press("Enter");
   const upgrade = page.getByRole("dialog", { name: copy("upgrade.rules"), exact: true });
   await expect(upgrade).toContainText(KJ.upgrade.calculation_text);
-  await upgrade.getByRole("button", { name: copy("close"), exact: true }).press("Enter");
+  await upgrade
+    .locator(".ui-dialog__actions")
+    .getByRole("button", { name: copy("close"), exact: true })
+    .press("Enter");
   await pressSoon(page, button(page, "upgrade.action"));
   expectNoProblems(watch, "normal");
 });
@@ -229,7 +244,10 @@ test("S31 额度明细、加量包、订单发票、退款与兑换入口均可�
     const detail = page.getByRole("dialog", { name, exact: true });
     await expect(detail).toBeVisible();
     for (const row of item.details) await expect(detail).toContainText(row.label);
-    await detail.getByRole("button", { name: copy("close"), exact: true }).press("Enter");
+    await detail
+      .locator(".ui-dialog__actions")
+      .getByRole("button", { name: copy("close"), exact: true })
+      .press("Enter");
   }
   await pressSoon(page, button(page, "addons.buy"));
   await pressSoon(page, button(page, "orders.invoice"));
@@ -238,7 +256,10 @@ test("S31 额度明细、加量包、订单发票、退款与兑换入口均可�
   await button(page, "orders.all").press("Enter");
   const all = page.getByRole("dialog", { name: copy("orders.all"), exact: true });
   for (const order of KJ.orders) await expect(all).toContainText(order.order_number);
-  await all.getByRole("button", { name: copy("close"), exact: true }).press("Enter");
+  await all
+    .locator(".ui-dialog__actions")
+    .getByRole("button", { name: copy("close"), exact: true })
+    .press("Enter");
   await expect(main.getByRole("link", { name: copy("orders.support"), exact: true }).first()).toHaveAttribute(
     "href",
     `/messages?order=${KJ.orders[0]?.order_number}`,
@@ -258,7 +279,10 @@ test("S31 额度明细、加量包、订单发票、退款与兑换入口均可�
   const confirmNote = copy("refund.confirm_note", { amount: KJ.refund.estimated_text });
   await expect(refund.getByRole("status")).toHaveText(confirmNote);
   await expect(refund.getByRole("button", { name: copy("refund.confirm"), exact: true })).toBeEnabled();
-  await refund.getByRole("button", { name: copy("close"), exact: true }).press("Enter");
+  await refund
+    .locator(".ui-dialog__actions")
+    .getByRole("button", { name: copy("close"), exact: true })
+    .press("Enter");
   await expect(refund).toBeHidden();
   await button(page, "orders.refund").press("Enter");
   await expect(refund.getByRole("status")).toHaveCount(0);
@@ -270,7 +294,10 @@ test("S31 额度明细、加量包、订单发票、退款与兑换入口均可�
   await button(page, "orders.refund_progress").press("Enter");
   await expect(refund).toContainText(copy("refund.status"));
   await expect(refund).toContainText(copy("refund.review"));
-  await refund.getByRole("button", { name: copy("close"), exact: true }).press("Enter");
+  await refund
+    .locator(".ui-dialog__actions")
+    .getByRole("button", { name: copy("close"), exact: true })
+    .press("Enter");
 
   await button(page, "redemption.action").press("Enter");
   await expect(page.getByRole("status").filter({ hasText: copy("redemption.empty") })).toBeVisible();
@@ -342,7 +369,10 @@ test("S31 通行证与免费权益不显示自动续期，免费权益长期有�
       await button(page, "orders.all").press("Enter");
       const all = page.getByRole("dialog", { name: copy("orders.all"), exact: true });
       await expect(all).toContainText(copy("orders.empty"));
-      await all.getByRole("button", { name: copy("close"), exact: true }).press("Enter");
+      await all
+        .locator(".ui-dialog__actions")
+        .getByRole("button", { name: copy("close"), exact: true })
+        .press("Enter");
     }
     expectNoProblems(watch, fixture.view_state, `${key}：`);
   }
