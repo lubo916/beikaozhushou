@@ -123,9 +123,10 @@ test("S18 两个视图都能用 ?view= 打开：obj 客观题、gen 生成题（
   }
 });
 
-test("S18 七态都能用 ?state= 强制显示，文案按 bk spec", async ({ page }) => {
-  const watch = await watchPage(page);
-  for (const state of ABNORMAL_STATES) {
+// 每个状态、考试各有自己的默认测试预算；保留原断言，避免多个独立场景累计耗尽同一条测试的时间。
+for (const state of ABNORMAL_STATES) {
+  test(`S18 七态 ${state} 能用 ?state= 强制显示，文案按 bk spec`, async ({ page }) => {
+    const watch = await watchPage(page);
     await watch.open(urlOf(entry, { state }));
     await expectState(page, entry, state);
     expectNoProblems(watch, state);
@@ -143,12 +144,12 @@ test("S18 七态都能用 ?state= 强制显示，文案按 bk spec", async ({ pa
       await expect(title(page, KJ.sessions.objective.title), "受限只落在题目卡里，其余照常").toBeVisible();
     }
     if (state === "insufficient_data") await expect(shown).toContainText(copy("state.insufficient.body"));
-  }
-});
+  });
+}
 
-test("S18 四个演示考试切过去，两个示范题组都能打开", async ({ page }) => {
-  const watch = await watchPage(page);
-  for (const exam of EXAMS) {
+for (const exam of EXAMS) {
+  test(`S18 演示考试 ${exam.key} 的两个示范题组都能打开`, async ({ page }) => {
+    const watch = await watchPage(page);
     const sessions = pageOf(exam.exam_id).sessions;
     await watch.open(urlOf(entry, { exam: exam.key }));
     await expectLoaded(page, entry);
@@ -157,8 +158,8 @@ test("S18 四个演示考试切过去，两个示范题组都能打开", async (
     await expectLoaded(page, entry);
     await expect(title(page, sessions.generated.title), `${exam.key} 的导师出题`).toBeVisible();
     expectNoProblems(watch, "normal", `${exam.key}：`);
-  }
-});
+  });
+}
 
 test("S18 主要按钮都能点：作答、选把握度、提交后揭晓并锁定、下一题；还没有后端的按钮提示“即将上线”", async ({ page }) => {
   const watch = await watchPage(page);
