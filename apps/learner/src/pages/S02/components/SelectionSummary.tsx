@@ -46,7 +46,7 @@ export function SelectionSummary({ choice, onChoose, offline }: { choice: S02Exa
               },
               {
                 key: "duration",
-                label: t("profile.duration"),
+                label: t("summary.duration"),
                 value: choice.profile.duration_minutes ? formatDuration(choice.profile.duration_minutes) : choice.form,
               },
               {

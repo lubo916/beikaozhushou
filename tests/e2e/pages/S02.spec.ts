@@ -161,7 +161,7 @@ test("S02 官方库搜索、三条来路、确认画像和下一步可用", asyn
   await subjectName.fill("调整后的备考科目");
   await expect(subjectName).toHaveValue("调整后的备考科目");
   await expect(dialog.getByLabel(copy("profile.date"), { exact: true })).toBeVisible();
-  const rule = dialog.getByLabel(copy("profile.rule"), { exact: true });
+  const rule = dialog.getByRole("combobox", { name: copy("profile.rule"), exact: true });
   await expect(rule.locator("option")).toHaveCount(4);
   await expect(dialog.getByLabel(copy("profile.score"), { exact: true })).toBeVisible();
   await dialog.getByRole("button", { name: copy("profile.cancel"), exact: true }).press("Enter");
