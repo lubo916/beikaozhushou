@@ -1,3 +1,5 @@
+import { mountAt, settle } from "../../app/testing.tsx";
+import copy from "../../i18n/zh-CN/O01.json";
 import "./aggregate.test.ts";
 import "./state.test.ts";
 import { describe, expect, it } from "vitest";
@@ -53,4 +55,20 @@ describe("O01 机构工作台", () => {
     expect(shouldRetry(1, new TypeError("offline"))).toBe(false);
     expect(shouldRetry(0, new ApiError("COMMON_FORBIDDEN"))).toBe(false);
   });
+});
+
+describe("O01 真实页面组件", () => {
+  for (const state of ["normal", "empty", "error"]) {
+    it(`${state} 经生成钩子与 MSW 挂载`, async () => {
+      const mounted = await mountAt("/workbench?state=" + state);
+      try {
+        const selector = state === "normal" ? ".ui-cols" : `.ui-state--${state}`;
+        await settle(() => mounted.host.querySelector(selector) !== null);
+        expect(mounted.host.querySelector(selector), mounted.host.textContent ?? "").not.toBeNull();
+        expect(mounted.host.querySelector("h1")?.textContent).toBe(copy.title);
+        if (state === "empty") expect(mounted.host.textContent).toContain(copy.state.empty.body);
+        if (state === "error") expect(mounted.host.textContent).toContain(copy.state.error.body);
+      } finally { await mounted.unmount(); }
+    });
+  }
 });

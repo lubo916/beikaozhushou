@@ -1,3 +1,5 @@
+import { mountAt, settle } from "../../app/testing.tsx";
+import copy from "../../i18n/zh-CN/O02.json";
 import "./state.test.ts";
 import { describe, expect, it } from "vitest";
 import { ApiError } from "@exam-prep/contract/errors";
@@ -81,4 +83,20 @@ describe("O02 七态与重试", () => {
     expect(shouldRetry(0, new ApiError("COMMON_INTERNAL"))).toBe(true);
     expect(shouldRetry(0, new ApiError("COMMON_FORBIDDEN"))).toBe(false);
   });
+});
+
+describe("O02 真实页面组件", () => {
+  for (const state of ["normal", "empty", "error"]) {
+    it(`${state} 经生成钩子与 MSW 挂载`, async () => {
+      const mounted = await mountAt("/leads?state=" + state);
+      try {
+        const selector = state === "normal" ? ".ui-cols" : `.ui-state--${state}`;
+        await settle(() => mounted.host.querySelector(selector) !== null);
+        expect(mounted.host.querySelector(selector), mounted.host.textContent ?? "").not.toBeNull();
+        expect(mounted.host.querySelector("h1")?.textContent).toBe(copy.title);
+        if (state === "empty") expect(mounted.host.textContent).toContain(copy.state.empty.body);
+        if (state === "error") expect(mounted.host.textContent).toContain(copy.state.error.body);
+      } finally { await mounted.unmount(); }
+    });
+  }
 });

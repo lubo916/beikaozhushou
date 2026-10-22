@@ -24,6 +24,7 @@ for (const width of [375, 834, 1280])
     if (width === 1280) expect(b.x).toBeGreaterThanOrEqual(a.x + a.width - 1);
     else expect(b.y).toBeGreaterThanOrEqual(a.y + a.height - 1);
     expect(await main.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(1);
+    await page.screenshot({ path: test.info().outputPath(`O01-${width}.png`), fullPage: true });
   });
 test("O01 无多视图，四考试与七态可打开", async ({ page }) => {
   expect(entry.views).toEqual([]);

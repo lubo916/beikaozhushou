@@ -22,12 +22,14 @@ export function o02Fixture(exam = "kj"): O02Leads {
 export async function handleO02(request: MockRequest): Promise<MockOutcome> {
   const url = new URL(request.url);
   if (request.method !== "GET" || url.pathname !== "/api/v1/org/leads/overview") return { kind: "passthrough" };
-  const state = url.searchParams.get("state");
+  // 同时接受契约 query 与当前阶段 1 生成请求缺口的开发模拟条件。
+  const query = new URLSearchParams(request.headers.get("X-O02-Demo-Query") ?? url.search);
+  const state = query.get("state");
   if (state === "loading") return { kind: "hang" };
   if (state === "offline") return { kind: "network_error" };
   if (state === "error")
     return { kind: "json", status: 500, headers: {}, body: { code: "COMMON_INTERNAL", message_key: "error.COMMON_INTERNAL", details: {} } };
-  const data = o02Fixture(url.searchParams.get("exam") ?? "kj");
+  const data = o02Fixture(query.get("exam") ?? "kj");
   if (state === "empty") {
     data.leads = [];
     data.channels = [];

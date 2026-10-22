@@ -24,15 +24,17 @@ export function o01Fixture(exam = "kj"): O01Workbench {
 export async function handleO01(request: MockRequest): Promise<MockOutcome> {
   const url = new URL(request.url);
   if (request.method !== "GET" || url.pathname !== "/api/v1/org/workbench") return { kind: "passthrough" };
-  const state = url.searchParams.get("state");
+  // 同时接受契约 query 与当前阶段 1 生成请求缺口的开发模拟条件。
+  const query = new URLSearchParams(request.headers.get("X-O01-Demo-Query") ?? url.search);
+  const state = query.get("state");
   if (state === "loading") return { kind: "hang" };
   if (state === "offline") return { kind: "network_error" };
   if (state === "error")
     return { kind: "json", status: 500, body: { code: "COMMON_INTERNAL", message_key: "error.COMMON_INTERNAL", details: {} }, headers: {} };
-  const data = o01Fixture(url.searchParams.get("exam") ?? "kj");
-  const role = url.searchParams.get("role") ?? "org_owner";
-  const scope = role === "org_owner" ? (url.searchParams.get("scope") ?? "all") : "east";
-  const type = url.searchParams.get("organization_type");
+  const data = o01Fixture(query.get("exam") ?? "kj");
+  const role = query.get("role") ?? "org_owner";
+  const scope = role === "org_owner" ? (query.get("scope") ?? "all") : "east";
+  const type = query.get("organization_type");
   if (type === "school")
     data.metrics = [
       { id: "students", value: 420, format: "count" },

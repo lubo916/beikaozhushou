@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import copy from "../../../apps/org/src/i18n/zh-CN/O02.json";
+import copy from "../../../apps/org/src/i18n/zh-CN/O02.json" with { type: "json" };
 import { pathTo } from "../../../apps/org/src/routes.ts";
 import { pageById, urlOf } from "../support/catalog.ts";
 import { ABNORMAL_STATES, expectLoaded, expectNoProblems, expectState, watchPage } from "../support/checks.ts";
@@ -24,6 +24,7 @@ for (const width of [375, 834, 1280]) {
       else expect(aside.y).toBeGreaterThanOrEqual(first.y + first.height - 1);
     }
     expectNoProblems(watch, "normal");
+    await page.screenshot({ path: test.info().outputPath(`O02-${width}.png`), fullPage: true });
   });
 }
 test("O02 主视图与七态均可打开，受限不展示联系资料，小样本不展示比例", async ({ page }) => {
