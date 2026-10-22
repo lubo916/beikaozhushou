@@ -225,7 +225,7 @@
     "progress": [
       {
         "step": "application",
-        "completed": true
+        "completed": false
       },
       {
         "step": "review",

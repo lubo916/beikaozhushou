@@ -10,11 +10,11 @@ type Mode = S31Membership["view_state"];
 const FILES = import.meta.glob("../../../../../fixtures/pages/S31/*.json", { eager: true, import: "default" });
 
 /** 每个演示考试有一份完整的会员页接口示例；返回副本，避免演示操作修改 fixture。 */
-export function membershipFixture(examId: string, mode: Mode = "normal"): S31Membership {
+export function membershipFixture(examId: string, mode?: Mode): S31Membership {
   const hit = Object.entries(FILES).find(([path]) => path.endsWith(`/${examId}.json`));
   if (hit === undefined) throw new Error(`S31 缺少演示考试数据：${examId}`);
   const data = structuredClone(hit[1]) as S31Membership;
-  data.view_state = mode;
+  if (mode !== undefined) data.view_state = mode;
   if (mode === "empty") data.orders = [];
   return data;
 }

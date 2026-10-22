@@ -1,5 +1,5 @@
 {
-  "view_state": "normal",
+  "view_state": "empty",
   "data_source": "sample",
   "exam_name": "自建《数据结构》期末",
   "current": {
@@ -167,7 +167,7 @@
     "progress": [
       {
         "step": "application",
-        "completed": true
+        "completed": false
       },
       {
         "step": "review",
@@ -284,12 +284,12 @@
   },
   "reminders": [
     {
-      "kind": "renewal",
+      "kind": "expiry",
       "at": "2027-02-15T01:00:00Z",
       "days_before": 7
     },
     {
-      "kind": "renewal",
+      "kind": "expiry",
       "at": "2027-02-18T01:00:00Z",
       "days_before": 4
     },

@@ -225,7 +225,7 @@
     "progress": [
       {
         "step": "application",
-        "completed": true
+        "completed": false
       },
       {
         "step": "review",
@@ -342,12 +342,12 @@
   },
   "reminders": [
     {
-      "kind": "renewal",
+      "kind": "expiry",
       "at": "2027-02-15T01:00:00Z",
       "days_before": 7
     },
     {
-      "kind": "renewal",
+      "kind": "expiry",
       "at": "2027-02-18T01:00:00Z",
       "days_before": 4
     },
