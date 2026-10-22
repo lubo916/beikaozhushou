@@ -1,0 +1,157 @@
+{
+  "note": "S18 做题与解析的页面演示数据（U18a）：两个示范题组（objective 题库、generated 导师出题）与页面专用的演示题；prefill 是断点续做前已经做过的题；sample_rules 是规则还没实现时假数据层用的示例做法。",
+  "sample_rules": {
+    "fast_answer_ms": 3000,
+    "credibility_caps": {
+      "reviewed": "strong",
+      "own": "strong",
+      "generated_confirmed": "medium",
+      "generated_instant": "weak"
+    },
+    "next_steps_limit": 3
+  },
+  "sessions": {
+    "objective": {
+      "title": "期末复习：二叉树 4 题",
+      "mode": "timed",
+      "confidence_enabled": true,
+      "elapsed_seconds": 60,
+      "limit_seconds": 900,
+      "items": [
+        {
+          "question_id": "019a0418-0000-7000-8000-000000000001",
+          "suggested_seconds": 60,
+          "prefill": {
+            "selected": [
+              1,
+              0,
+              2
+            ],
+            "confidence": "sure",
+            "duration_ms": 40000
+          }
+        },
+        {
+          "question_id": "019a0404-0000-7000-8000-000000000001",
+          "suggested_seconds": 90
+        },
+        {
+          "question_id": "019a0418-0000-7000-8000-000000000002",
+          "suggested_seconds": 600
+        },
+        {
+          "question_id": "019a0404-0000-7000-8000-000000000002",
+          "suggested_seconds": 300
+        }
+      ]
+    },
+    "generated": {
+      "title": "导师出题：二叉树 2 道",
+      "mode": "in_class",
+      "confidence_enabled": true,
+      "elapsed_seconds": 0,
+      "items": [
+        {
+          "question_id": "019a0418-0000-7000-8000-000000000011",
+          "suggested_seconds": 45
+        },
+        {
+          "question_id": "019a0418-0000-7000-8000-000000000012",
+          "suggested_seconds": 30
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "id": "019a0418-0000-7000-8000-000000000001",
+      "version": 1,
+      "question_type": "choice",
+      "response_form": "match_order",
+      "credibility": "own",
+      "knowledge_point_ids": [
+        "019a0403-0000-7000-8000-000000000006"
+      ],
+      "stem": "把由先序和中序还原二叉树的步骤按先后排好。",
+      "label": "排序题",
+      "options": [
+        "在中序里找到根，分出左右子树",
+        "取先序的第一个结点作根",
+        "对左右子树递归用同样的做法"
+      ],
+      "answer": [
+        1,
+        0,
+        2
+      ],
+      "group_miss_rate": null,
+      "explanation": {
+        "conclusion": "先由先序定根，再用中序分左右，最后对左右子树递归。"
+      }
+    },
+    {
+      "id": "019a0418-0000-7000-8000-000000000002",
+      "version": 1,
+      "question_type": "practical",
+      "response_form": "practical_self",
+      "credibility": "own",
+      "knowledge_point_ids": [
+        "019a0403-0000-7000-8000-000000000006"
+      ],
+      "stem": "上机实操：写出二叉树后序遍历的递归函数，用先序 ABDEC、中序 DBEAC 的树自测，完成后逐项自评。",
+      "parts": [
+        "空树时直接返回",
+        "先左子树、再右子树、最后访问根",
+        "自测输出为 DEBCA"
+      ],
+      "sample_answer": "void post(T t){ if(!t) return; post(t->l); post(t->r); visit(t); }",
+      "group_miss_rate": null
+    },
+    {
+      "id": "019a0418-0000-7000-8000-000000000011",
+      "version": 1,
+      "question_type": "single_choice",
+      "response_form": "choice",
+      "credibility": "generated_instant",
+      "knowledge_point_ids": [
+        "019a0403-0000-7000-8000-000000000006"
+      ],
+      "stem": "具有 n 个结点的二叉链表中，空指针域有（　）个。",
+      "options": [
+        "n + 1",
+        "n",
+        "n − 1",
+        "2n"
+      ],
+      "answer": [
+        0
+      ],
+      "group_miss_rate": null,
+      "explanation": {
+        "conclusion": "共 2n 个指针域，非空的 n − 1 个，空的 n + 1 个。"
+      }
+    },
+    {
+      "id": "019a0418-0000-7000-8000-000000000012",
+      "version": 1,
+      "question_type": "true_false",
+      "response_form": "choice",
+      "credibility": "generated_instant",
+      "knowledge_point_ids": [
+        "019a0403-0000-7000-8000-000000000006"
+      ],
+      "stem": "完全二叉树一定是满二叉树。",
+      "options": [
+        "正确",
+        "错误"
+      ],
+      "answer": [
+        1
+      ],
+      "group_miss_rate": null,
+      "explanation": {
+        "conclusion": "满二叉树一定是完全二叉树，反过来不成立。"
+      }
+    }
+  ]
+}

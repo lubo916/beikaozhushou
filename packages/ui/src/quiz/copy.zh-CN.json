@@ -1,0 +1,60 @@
+{
+  "stem": { "point": "知识点：{{name}}" },
+  "material": { "title": "材料" },
+  "choice": {
+    "label": "作答",
+    "multiple": "可以选多个",
+    "strike": "划掉",
+    "unstrike": "恢复",
+    "strike_named": "划掉选项 {{letter}}",
+    "unstrike_named": "恢复选项 {{letter}}",
+    "correct": "正确答案",
+    "mine": "你选的",
+    "mine_right": "你选的，正确"
+  },
+  "fill": { "blank": "第 {{n}} 空", "blank_named": "第 {{n}} 空（{{name}}）" },
+  "stepwise": { "step": "第 {{n}} 步", "step_named": "第 {{n}} 步：{{name}}" },
+  "order": {
+    "position": "第 {{n}} 位",
+    "up": "上移",
+    "down": "下移",
+    "up_named": "把“{{name}}”上移",
+    "down_named": "把“{{name}}”下移"
+  },
+  "written": { "placeholder": "在这里作答", "count": "已写 {{n}} 字" },
+  "listening": { "play": "播放听力" },
+  "oral": { "record": "开始录音", "notes": "要点（可以先列要点再录音）" },
+  "practical": { "title": "做到的项打勾（如实自评）" },
+  "confidence": {
+    "title": "你有多大把握",
+    "required": "必选",
+    "hint": { "sure": "有依据", "vague": "大概是", "guess": "排除后猜" },
+    "off": "把握度已关闭：不用选，做对最高记中证据。"
+  },
+  "submit": {
+    "action": "提交",
+    "blocker": { "answer": "先作答，再选把握度", "confidence": "选了把握度才能提交" },
+    "locked": "已揭晓，答案不能再改"
+  },
+  "tools": {
+    "label": "纸笔工具",
+    "draft": "草稿",
+    "draft_title": "草稿",
+    "draft_placeholder": "算式、思路随手记；讲解与追问时会一起带上。",
+    "strike": "划掉选项",
+    "strike_on": "划掉选项：开",
+    "calculator": "计算器",
+    "calc_title": "计算器",
+    "calc_clear": "清零",
+    "calc_error": "无法计算",
+    "flag": "标记",
+    "flagged": "已标记"
+  },
+  "calc": { "plus": "加", "minus": "减", "times": "乘", "divide": "除以", "equals": "等于", "point": "小数点" },
+  "nav": {
+    "label": "题号",
+    "item": "第 {{n}} 题，{{status}}",
+    "item_flagged": "第 {{n}} 题，{{status}}，已标记",
+    "status": { "unanswered": "未做", "answered": "已作答", "correct": "做对", "wrong": "做错", "ungraded": "待批改" }
+  }
+}
