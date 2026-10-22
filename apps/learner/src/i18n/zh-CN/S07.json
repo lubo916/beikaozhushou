@@ -1,1 +1,194 @@
-{}
+{
+  "header": {
+    "title": "学习计划",
+    "description": "看得见全局，随现实重排；每一次变动，都讲得出理由。",
+    "leave": "请假或忙季",
+    "sandbox": "计划沙盘",
+    "more": "更多操作",
+    "sync": "同步日历",
+    "sample": "示例数据",
+    "today": "查看今日",
+    "exam": "当前目标：{{name}}"
+  },
+  "tabs": {
+    "label": "学习计划视图",
+    "week": "本周",
+    "scope": "学习范围",
+    "ranking": "排序依据",
+    "log": "重排记录",
+    "calendar": "复习日历",
+    "rounds": "轮次路线",
+    "today": "今日",
+    "sandbox": "计划沙盘",
+    "back": "返回本周"
+  },
+  "timeline": {
+    "title": "轮次路线",
+    "edit": "编辑轮次",
+    "summary": "轮次总结",
+    "active": "当前位置",
+    "pending": "待确认的切换",
+    "future": "待开始",
+    "completed": "已结束",
+    "coverage": "本轮覆盖进度",
+    "keep": "换轮不清零：掌握档与学习证据保留，本轮覆盖进度单独记录。",
+    "condition": "切换条件",
+    "depth": "目标深度",
+    "mix": "学 / 记 / 练 / 考",
+    "add": "新增轮次",
+    "delete": "删除轮次",
+    "sprint": "生成逐日冲刺计划",
+    "elapsed": "本轮用时",
+    "achieved": "达标知识点",
+    "reviews": "复习次数",
+    "weakest": "最薄弱章节"
+  },
+  "week": {
+    "title": "本周安排",
+    "budget": "本周预算",
+    "scheduled": "已排入",
+    "buffer": "预留缓冲",
+    "range": "{{start}} — {{end}}",
+    "today": "今天",
+    "leave": "请假 · 仅保留到期复习",
+    "lock": "锁定安排",
+    "unlock": "解除锁定",
+    "locked": "已锁定",
+    "move": "移动安排",
+    "institution": "机构任务",
+    "teacher": "请老师调整",
+    "rule": "锁定的安排不会被自动重排覆盖；移动前会先展示影响。",
+    "bufferHint": "缓冲用于顺延和分摊；排不下时只生成待确认提议。",
+    "mix": "配比模式",
+    "roi": "按性价比",
+    "review_first": "复习优先",
+    "new_first": "新学优先",
+    "mixHint": "配比变更先形成提议，确认后生效；巩固段的保底时间不会被新学挤占。",
+    "institutionHint": "班级课程与个人学习合并，共用时间预算；看完外部课程后回来做题确认。",
+    "addCourse": "安排外部课程"
+  },
+  "scope": {
+    "title": "学习范围明细",
+    "description": "移出不删数据，仍可学习；不再计入工作量与今日推荐。",
+    "completion": "完成度",
+    "health": "健康度",
+    "completionQuestion": "走了多远",
+    "healthQuestion": "来不来得及",
+    "default": "跟随默认",
+    "added": "我加入",
+    "removed": "我移出",
+    "name": "知识点 / 章节",
+    "state": "范围状态",
+    "target": "目标档",
+    "gap": "掌握缺口",
+    "minutes": "所需时间",
+    "action": "调整范围",
+    "remove": "移出范围",
+    "restore": "恢复默认",
+    "add": "加入范围",
+    "proposal": "压缩与战略放弃提议",
+    "count": "{{count}} 个知识点",
+    "defaultCount": "跟随默认 {{count}} 个",
+    "addedCount": "我加入 {{count}} 个",
+    "removedCount": "我移出 {{count}} 个",
+    "estimated": "声明时间估算"
+  },
+  "ranking": {
+    "title": "为什么先学这些",
+    "description": "排序由接口给出；我的星标只作收藏展示，不改变推荐顺序。",
+    "rank": "顺序",
+    "name": "知识点",
+    "score": "关联分值",
+    "frequency": "考频",
+    "gap": "掌握缺口",
+    "prerequisite": "前置条件",
+    "minutes": "所需时间",
+    "star": "我的星标",
+    "yes": "已星标",
+    "no": "未星标"
+  },
+  "log": {
+    "title": "每一次变动都可追溯",
+    "description": "夜间只顺延与分摊；白天响应你的操作及机构任务避让。",
+    "engine": "计划引擎 · 夜间顺延",
+    "user": "本人操作 · 白天调整",
+    "institution": "机构任务 · 时间避让",
+    "reason": "为什么",
+    "cost": "代价",
+    "undo": "撤销这次变动",
+    "expired": "已过撤销期",
+    "detail": "查看变动详情"
+  },
+  "calendar": {
+    "title": "复习日历",
+    "description": "到期复习优先保留，请假与忙季也可以做短时巩固。",
+    "count": "到期 {{count}} 张",
+    "start": "去复习",
+    "unit": "张"
+  },
+  "today": {
+    "title": "今日清单",
+    "open": "去今日页",
+    "start": "开始任务"
+  },
+  "sandbox": {
+    "title": "计划沙盘",
+    "description": "先试算，再决定。选择方案或描述想法，只会产生待确认的提议。",
+    "preset": "预设方案",
+    "input": "一句话调整",
+    "placeholder": "例如：工作日少学一点，把新学移到周末",
+    "calculate": "试算变化",
+    "preview": "试算结果 · 尚未采用",
+    "forecast": "预测分区间",
+    "completion": "预计完成度",
+    "cost": "需要付出的代价",
+    "adopt": "采用这个方案",
+    "hint": "示例试算：输入文字会留在草稿中；当前按所选预设展示结果，尚未接入对话式排程。",
+    "locked": "地图体检未通过，预测暂不可用；学习安排与复习照常。",
+    "repair": "去查看地图",
+    "noChange": "尚未改变当前计划"
+  },
+  "leave": {
+    "title": "请假或忙季",
+    "body": "请假期间只保留到期复习；其他安排先生成顺延提议。",
+    "start": "开始日期",
+    "end": "结束日期",
+    "reason": "说明",
+    "placeholder": "例如：出差或工作忙季",
+    "preview": "生成请假提议"
+  },
+  "state": {
+    "empty": {
+      "title": "还没有计划",
+      "body": "在起点报告里选一个方案生成",
+      "action": "去选方案"
+    },
+    "offline": {
+      "title": "当前离线",
+      "body": "可查看计划；重排与沙盘需要联网",
+      "retry": "重新连接"
+    },
+    "restricted": {
+      "title": "机构安排已锁定",
+      "body": "机构锁定的课表与作业不能拖动，只能请老师调整",
+      "action": "请老师调整"
+    },
+    "insufficient_data": {
+      "title": "健康度暂为估算",
+      "body": "实测不足 {{weeks}} 周时，健康度用声明时间估算并标注",
+      "observed": "已有 {{days}} 天实测记录",
+      "action": "继续积累学习记录"
+    },
+    "error": {
+      "title": "学习计划没能加载",
+      "body": "学习计划的数据暂时没取到：网络或服务异常。已保存的内容不受影响，点“重试”即可；连续失败会自动上报。"
+    }
+  },
+  "soon": "即将上线",
+  "loading": "正在加载学习计划",
+  "confirm": "确认",
+  "decline": "不改",
+  "pointUnit": "个",
+  "timesUnit": "次",
+  "scoreUnit": "分"
+}

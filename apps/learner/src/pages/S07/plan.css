@@ -1,0 +1,131 @@
+/* 页内样式只引用设计令牌；周表在三档验收宽度分别排两、四、七列。 */
+.s07-page {
+  min-width: 0;
+}
+.s07-timeline {
+  display: flex;
+  gap: var(--size-space-1);
+  overflow-x: auto;
+  padding-bottom: var(--size-space-2);
+}
+.s07-round {
+  flex: 1;
+  min-width: calc(var(--size-space-12) * 3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-space-1);
+  border-radius: var(--radius-sm);
+  padding: var(--size-space-3);
+  background: var(--color-brand-primary-soft);
+  font-size: var(--font-size-small);
+}
+.s07-round--active {
+  background: var(--color-brand-primary);
+  color: var(--color-bg-surface);
+}
+.s07-round--pending {
+  border: var(--size-stroke-thin) solid var(--color-status-warning-line);
+}
+.s07-week {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--size-space-2);
+}
+.s07-day {
+  min-width: 0;
+  border: var(--size-stroke-thin) solid var(--color-line-soft);
+  border-radius: var(--radius-sm);
+  padding: var(--size-space-2);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--size-space-2);
+  font-size: var(--font-size-small);
+}
+.s07-day--today {
+  border-color: var(--color-brand-primary);
+  box-shadow: inset 0 0 0 var(--size-stroke-thin) var(--color-brand-primary);
+}
+.s07-day--leave {
+  background: var(--color-bg-sunk);
+}
+.s07-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-space-2);
+}
+.s07-task {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-space-1);
+  padding: var(--size-space-2);
+  border-radius: var(--radius-sm);
+  overflow-wrap: anywhere;
+}
+.s07-task--consolidate {
+  background: var(--color-status-success-soft);
+}
+.s07-task--advance {
+  background: var(--color-brand-primary-soft);
+}
+.s07-task--closing {
+  background: var(--color-status-ai-soft);
+}
+.s07-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-space-2);
+  font-weight: var(--font-weight-medium);
+}
+.s07-field input,
+.s07-field textarea,
+.s07-field select {
+  width: 100%;
+  min-width: 0;
+  padding: var(--size-space-3);
+  border: var(--size-stroke-thin) solid var(--color-line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  color: var(--color-ink-primary);
+  font: inherit;
+}
+.s07-field textarea {
+  min-height: calc(var(--size-space-12) * 3);
+  resize: vertical;
+}
+.s07-field :focus-visible,
+.s07-menu button:focus-visible {
+  outline: var(--size-stroke-thick) solid var(--color-brand-primary);
+  outline-offset: var(--size-stroke-thick);
+}
+.s07-menu {
+  position: absolute;
+  right: 0;
+  z-index: 1;
+  min-width: max-content;
+  padding: var(--size-space-2);
+  background: var(--color-bg-surface);
+  border: var(--size-stroke-thin) solid var(--color-line-strong);
+  border-radius: var(--radius-sm);
+}
+.s07-menu button {
+  padding: var(--size-space-2) var(--size-space-3);
+  border-radius: var(--radius-sm);
+}
+@container /* style-exempt: 容器查询条件不能用 CSS 变量，700 对应 size.breakpoint.tablet */ (width >= 700px) {
+  .s07-week {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@container /* style-exempt: 容器查询条件不能用 CSS 变量，860 对应 size.breakpoint.content-md */ (width >= 860px) {
+  .s07-week {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+}
+
+.s07-task .ui-btn {
+  max-inline-size: 100%;
+  white-space: normal;
+  padding-inline: var(--size-space-1);
+  font-size: var(--font-size-small);
+}

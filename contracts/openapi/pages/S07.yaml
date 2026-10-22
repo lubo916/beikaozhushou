@@ -1,0 +1,151 @@
+# S07 页级展示契约：业务数字来自接口；页面不执行排程、预测和范围计算。
+# 尚未登记权限的写操作按 F08-Q4 提示即将上线，不发送写请求。
+paths:
+  /learner/plan/overview:
+    get:
+      operationId: getS07PlanOverview
+      x-owner: plan
+      x-action: plan.plan.read
+      summary: 学习计划的轮次、本周、范围、排序、记录与复习日历
+      responses:
+        "200":
+          description: 页面展示数据；未接后端时为四个演示考试的示例数据
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S07PlanOverview"}
+        "403": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S07PlanOverview:
+      type: object
+      required: [time_zone, has_plan, plan, exam_name, rounds, week, scope, priorities, records, reviews, today, proposals, sandbox, completion, health, health_estimated, observed_days, institution_locked, forecast_available, data_source]
+      properties:
+        time_zone: {type: string, description: 学员时区，用于显示 UTC 重排记录}
+        has_plan: {type: boolean}
+        plan: {$ref: "#/components/schemas/Plan"}
+        exam_name: {type: string}
+        rounds: {type: array, items: {$ref: "#/components/schemas/S07Round"}}
+        week: {$ref: "#/components/schemas/S07Week"}
+        scope: {type: array, items: {$ref: "#/components/schemas/S07ScopeItem"}}
+        priorities: {type: array, items: {$ref: "#/components/schemas/S07Priority"}}
+        records: {type: array, items: {$ref: "#/components/schemas/S07Record"}}
+        reviews: {type: array, items: {$ref: "#/components/schemas/S07ReviewDay"}}
+        today: {$ref: "#/components/schemas/TodayList"}
+        proposals: {type: array, items: {$ref: "#/components/schemas/Proposal"}}
+        sandbox: {type: array, items: {$ref: "#/components/schemas/S07Scenario"}}
+        completion: {type: number, minimum: 0, maximum: 1}
+        health: {type: number, minimum: 0}
+        health_estimated: {type: boolean}
+        observed_days: {type: integer, minimum: 0}
+        institution_locked: {type: boolean}
+        forecast_available: {type: boolean, description: 地图体检不通过时不展示预测}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+    S07Round:
+      type: object
+      required: [id, name, start, end, status, depth, mix, condition, coverage, summary]
+      properties:
+        id: {type: string}
+        name: {type: string}
+        start: {$ref: "#/components/schemas/LearningDay"}
+        end: {$ref: "#/components/schemas/LearningDay"}
+        status: {type: string, enum: [completed, active, pending, future]}
+        depth: {type: string}
+        mix: {type: string}
+        condition: {type: string}
+        coverage: {type: number, minimum: 0, maximum: 1}
+        summary: {$ref: "#/components/schemas/S07RoundSummary"}
+    S07RoundSummary:
+      type: object
+      required: [minutes, achieved_count, review_count, weakest_chapter]
+      properties:
+        minutes: {type: integer, minimum: 0}
+        achieved_count: {type: integer, minimum: 0}
+        review_count: {type: integer, minimum: 0}
+        weakest_chapter: {type: string}
+    S07Week:
+      type: object
+      required: [start, end, budget_minutes, scheduled_minutes, buffer_minutes, days]
+      properties:
+        start: {$ref: "#/components/schemas/LearningDay"}
+        end: {$ref: "#/components/schemas/LearningDay"}
+        budget_minutes: {type: integer, minimum: 0}
+        scheduled_minutes: {type: integer, minimum: 0}
+        buffer_minutes: {type: integer, minimum: 0}
+        days: {type: array, items: {$ref: "#/components/schemas/S07ScheduleDay"}}
+    S07ScheduleDay:
+      type: object
+      required: [day, minutes, today, leave, items]
+      properties:
+        day: {$ref: "#/components/schemas/LearningDay"}
+        minutes: {type: integer, minimum: 0}
+        today: {type: boolean}
+        leave: {type: boolean}
+        items: {type: array, items: {$ref: "#/components/schemas/S07ScheduleItem"}}
+    S07ScheduleItem:
+      type: object
+      required: [id, title, detail, minutes, segment, locked, institution]
+      properties:
+        id: {type: string}
+        title: {type: string}
+        detail: {type: string}
+        minutes: {type: integer, minimum: 0}
+        segment: {$ref: "#/components/schemas/TodaySegment"}
+        locked: {type: boolean}
+        institution: {type: boolean}
+    S07ScopeItem:
+      type: object
+      required: [id, name, chapter, state, target, gap, minutes, cost_score]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        chapter: {type: string}
+        state: {type: string, enum: [default, added, removed]}
+        target: {type: string}
+        gap: {type: integer}
+        minutes: {type: integer, minimum: 0}
+        cost_score: {type: number, minimum: 0}
+    S07Priority:
+      type: object
+      required: [id, name, rank, score, frequency, gap, prerequisite, minutes, starred]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        rank: {type: integer, minimum: 1}
+        score: {type: number, minimum: 0}
+        frequency: {type: string}
+        gap: {type: integer}
+        prerequisite: {type: string}
+        minutes: {type: integer, minimum: 0}
+        starred: {type: boolean}
+    S07Record:
+      type: object
+      required: [id, at, source, change, reason, cost, undoable, ai_generated]
+      properties:
+        id: {type: string}
+        at: {$ref: "#/components/schemas/Timestamp"}
+        source: {type: string, enum: [engine, user, institution]}
+        change: {type: string}
+        reason: {type: string}
+        cost: {type: string}
+        undoable: {type: boolean}
+        ai_generated: {type: boolean}
+    S07ReviewDay:
+      type: object
+      required: [day, count, minutes, today]
+      properties:
+        day: {$ref: "#/components/schemas/LearningDay"}
+        count: {type: integer, minimum: 0}
+        minutes: {type: integer, minimum: 0}
+        today: {type: boolean}
+    S07Scenario:
+      type: object
+      required: [id, name, description, forecast_low, forecast_high, completion, cost, proposal]
+      properties:
+        id: {type: string}
+        name: {type: string}
+        description: {type: string}
+        forecast_low: {type: number}
+        forecast_high: {type: number}
+        completion: {type: number, minimum: 0, maximum: 1}
+        cost: {type: string}
+        proposal: {$ref: "#/components/schemas/Proposal"}
