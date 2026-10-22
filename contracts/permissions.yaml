@@ -76,3 +76,9 @@ actions:
   - id: engagement.notification.read
     roles: [guest, learner]
     data_scope: self
+  - id: org.workbench.read
+    roles: []
+    note: 阶段 1 仅登记 MSW 只读示例契约，未授予任何真实角色；真实服务接入前须另行登记机构及学员授权范围
+  - id: org.lead.read
+    roles: []
+    note: 阶段 1 仅登记 MSW 只读示例契约，未授予任何真实角色；真实服务接入前须另行登记机构及学员授权范围
