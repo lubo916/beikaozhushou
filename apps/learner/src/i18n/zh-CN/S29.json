@@ -1,1 +1,98 @@
-{}
+{
+  "title": "搜索与速查",
+  "description": "一个入口，找到知识点、资料与自己的学习记录。",
+  "sample": "示例数据",
+  "search": {
+    "label": "搜索内容",
+    "placeholder": "搜知识点、资料原文，或直接说出你的问题",
+    "submit": "搜索",
+    "photo": "拍照搜题",
+    "shortcut": "快捷键 Ctrl / ⌘ + K 聚焦搜索",
+    "hint": "支持拼音、模糊和自然语言；当前展示演示考试的示例结果。",
+    "clear": "清空搜索"
+  },
+  "views": {
+    "label": "搜索视图",
+    "results": "搜索结果",
+    "recent": "最近访问",
+    "quick": "速查表"
+  },
+  "kind": {
+    "all": "全部",
+    "point": "知识点",
+    "material": "我的资料原文",
+    "question": "题目",
+    "note": "笔记",
+    "mistake": "错题",
+    "tutor": "导师答过的"
+  },
+  "results": {
+    "title": "找到的内容",
+    "count": "共 {{total}} 条结果",
+    "group_count": "{{kind}} · {{total}} 条",
+    "source": "来源：{{source}}",
+    "open": "打开：{{title}}",
+    "add": "加入今日",
+    "card": "制卡",
+    "note": "记笔记"
+  },
+  "recent": {
+    "title": "最近访问",
+    "body": "回到最近看过的知识点与资料。"
+  },
+  "quick": {
+    "title": "相关速查表",
+    "body": "按知识类型汇集，查完可以回到知识点继续学。",
+    "choose": "选择速查表",
+    "label": "项目",
+    "value": "速查要点",
+    "point": "查看知识点",
+    "values": "数值与时限",
+    "formulas": "公式",
+    "clauses": "条文",
+    "terms": "术语",
+    "compare": "易混对照",
+    "empty": "暂无相关速查表"
+  },
+  "photo": {
+    "title": "拍照后，你想做什么？",
+    "description": "先选择用途，再进入拍照或选图。识别结果需要你确认。",
+    "intent": "选择搜题用途",
+    "practice": "自己先做",
+    "explain": "查看讲解",
+    "save": "存入学习收件箱",
+    "continue": "继续拍照或选图",
+    "cancel": "取消",
+    "quota": "拍照搜题按次计额度，执行前会显示本次消耗。"
+  },
+  "state": {
+    "empty": {
+      "title": "输入关键词开始搜索",
+      "body": "可以搜知识点、资料原文、题目、笔记与错题",
+      "action": "聚焦搜索框"
+    },
+    "error": {
+      "body": "搜索与速查的数据暂时没取到：网络或服务异常。已保存的内容不受影响，点“重试”即可；连续失败会自动上报。"
+    },
+    "offline": {
+      "body": "离线只能搜已缓存的内容",
+      "action": "查看已缓存笔记"
+    },
+    "restricted": {
+      "title": "拍照搜题受限",
+      "body": "拍照搜题按次计额度",
+      "action": "查看会员与权益"
+    },
+    "insufficient_data": {
+      "title": "暂时没找到相关内容",
+      "body": "没找到时可以反馈，并提示去问导师",
+      "action": "去问导师",
+      "feedback": "反馈问题"
+    }
+  },
+  "soon": {
+    "action": "即将上线：{{action}}",
+    "photo": "即将上线：拍照或选图识别",
+    "feedback": "即将上线：反馈问题"
+  }
+}

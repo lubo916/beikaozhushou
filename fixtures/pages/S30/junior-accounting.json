@@ -1,0 +1,27 @@
+{
+  "page_state": "normal",
+  "minor_mode": false,
+  "group_size": 6,
+  "rooms": [
+    {
+      "id": "01900000-0030-7000-8000-000000000001",
+      "name": "会计晚间自习室",
+      "kind": "quiet",
+      "participants": 18,
+      "capacity": 30
+    },
+    {
+      "id": "01900000-0030-7000-8000-000000000002",
+      "name": "会计冲刺自习室",
+      "kind": "sprint",
+      "participants": 8,
+      "capacity": 20
+    }
+  ],
+  "focus": {
+    "minutes": 25,
+    "today_minutes": 50,
+    "task": "会计等式：读后即测"
+  },
+  "data_source": "sample"
+}

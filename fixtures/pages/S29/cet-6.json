@@ -1,0 +1,86 @@
+{
+  "sample_query": "虚拟语气",
+  "aliases": [
+    "虚拟语气",
+    "xuniyuqi",
+    "虚拟语气",
+    "怎么理解虚拟语气",
+    "如何学习虚拟语气"
+  ],
+  "point_id": "019a0303-0000-7000-8000-000000000001",
+  "excerpt": "通过条件与主句形式判断假设的时间。",
+  "quick_tables": [
+    {
+      "id": "values",
+      "title": "虚拟语气 · 数值与时限",
+      "category": "values",
+      "rows": [
+        {
+          "id": "values",
+          "label": "虚拟语气",
+          "value": "先辨认假设发生在现在、过去还是将来",
+          "point_id": "019a0303-0000-7000-8000-000000000001"
+        }
+      ],
+      "ai_generated": false
+    },
+    {
+      "id": "formulas",
+      "title": "虚拟语气 · 公式",
+      "category": "formulas",
+      "rows": [
+        {
+          "id": "formulas",
+          "label": "虚拟语气",
+          "value": "与过去事实相反：从句 had done，主句 would have done",
+          "point_id": "019a0303-0000-7000-8000-000000000001"
+        }
+      ],
+      "ai_generated": false
+    },
+    {
+      "id": "clauses",
+      "title": "虚拟语气 · 条文",
+      "category": "clauses",
+      "rows": [
+        {
+          "id": "clauses",
+          "label": "虚拟语气",
+          "value": "注意条件省略与倒装的常见结构",
+          "point_id": "019a0303-0000-7000-8000-000000000001"
+        }
+      ],
+      "ai_generated": false
+    },
+    {
+      "id": "terms",
+      "title": "虚拟语气 · 术语",
+      "category": "terms",
+      "rows": [
+        {
+          "id": "terms",
+          "label": "虚拟语气",
+          "value": "虚拟语气表达假设或非真实情境",
+          "point_id": "019a0303-0000-7000-8000-000000000001"
+        }
+      ],
+      "ai_generated": false
+    },
+    {
+      "id": "compare",
+      "title": "虚拟语气 · 易混对照",
+      "category": "compare",
+      "rows": [
+        {
+          "id": "compare",
+          "label": "虚拟语气",
+          "value": "混合条件句分别判断从句和主句的时间",
+          "point_id": "019a0303-0000-7000-8000-000000000001"
+        }
+      ],
+      "ai_generated": false
+    }
+  ],
+  "material_id": "019a030b-0000-7000-8000-000000000001",
+  "question_id": "019a0304-0000-7000-8000-000000000001"
+}

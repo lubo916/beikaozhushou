@@ -1,0 +1,72 @@
+# S29 搜索只读聚合接口；写操作未登记权限，在页面提示即将上线。
+paths:
+  /learner/search:
+    get:
+      operationId: getSearchPage
+      x-owner: content
+      x-action: content.material.read
+      summary: 搜索知识点与个人内容，并取得相关速查表（示例数据）
+      parameters:
+        - {name: q, in: query, schema: {type: string}}
+        - {name: kind, in: query, schema: {type: string, enum: [all, point, material, question, note, mistake, tutor]}}
+        - {name: table, in: query, schema: {type: string}}
+      responses:
+        "200":
+          description: 已分组、已计数的结果；只读自己的资料与笔记
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S29SearchPage"}
+components:
+  schemas:
+    S29SearchPage:
+      type: object
+      required: [query, state_hint, result_count, groups, recent, quick_tables, selected_table, photo_available, data_source]
+      properties:
+        query: {type: string}
+        state_hint: {type: string, enum: [normal, empty, restricted, insufficient_data]}
+        result_count: {type: integer, minimum: 0}
+        groups: {type: array, items: {$ref: "#/components/schemas/S29ResultGroup"}}
+        recent: {type: array, items: {$ref: "#/components/schemas/S29Result"}}
+        quick_tables: {type: array, items: {$ref: "#/components/schemas/S29QuickTable"}}
+        selected_table: {type: string}
+        photo_available: {type: boolean}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+    S29ResultGroup:
+      type: object
+      required: [kind, count, items]
+      properties:
+        kind: {$ref: "#/components/schemas/S29ResultKind"}
+        count: {type: integer, minimum: 0}
+        items: {type: array, items: {$ref: "#/components/schemas/S29Result"}}
+    S29ResultKind:
+      type: string
+      enum: [point, material, question, note, mistake, tutor]
+    S29Result:
+      type: object
+      required: [id, kind, title, excerpt, source, target, target_id, ai_generated]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        kind: {$ref: "#/components/schemas/S29ResultKind"}
+        title: {type: string}
+        excerpt: {type: string}
+        source: {type: string}
+        target: {type: string, enum: [S10, S12, S13, S14, S18, S28]}
+        target_id: {type: string}
+        ai_generated: {type: boolean}
+    S29QuickTable:
+      type: object
+      required: [id, title, category, rows, ai_generated]
+      properties:
+        id: {type: string}
+        title: {type: string}
+        category: {type: string, enum: [values, formulas, clauses, terms, compare]}
+        rows: {type: array, items: {$ref: "#/components/schemas/S29QuickRow"}}
+        ai_generated: {type: boolean}
+    S29QuickRow:
+      type: object
+      required: [id, label, value, point_id]
+      properties:
+        id: {type: string}
+        label: {type: string}
+        value: {type: string}
+        point_id: {$ref: "#/components/schemas/Id"}

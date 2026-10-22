@@ -1,0 +1,86 @@
+{
+  "sample_query": "折旧",
+  "aliases": [
+    "折旧",
+    "zhejiu",
+    "固定资产折旧方法",
+    "怎么理解折旧",
+    "如何学习折旧"
+  ],
+  "point_id": "019a0103-0000-7000-8000-000000000006",
+  "excerpt": "年限平均法、双倍余额递减法与年数总和法的适用差异。",
+  "quick_tables": [
+    {
+      "id": "values",
+      "title": "固定资产折旧方法 · 数值与时限",
+      "category": "values",
+      "rows": [
+        {
+          "id": "values",
+          "label": "固定资产折旧方法",
+          "value": "预计净残值率用于计算应计折旧额",
+          "point_id": "019a0103-0000-7000-8000-000000000006"
+        }
+      ],
+      "ai_generated": false
+    },
+    {
+      "id": "formulas",
+      "title": "固定资产折旧方法 · 公式",
+      "category": "formulas",
+      "rows": [
+        {
+          "id": "formulas",
+          "label": "固定资产折旧方法",
+          "value": "年折旧额＝应计折旧额 ÷ 预计使用年限",
+          "point_id": "019a0103-0000-7000-8000-000000000006"
+        }
+      ],
+      "ai_generated": false
+    },
+    {
+      "id": "clauses",
+      "title": "固定资产折旧方法 · 条文",
+      "category": "clauses",
+      "rows": [
+        {
+          "id": "clauses",
+          "label": "固定资产折旧方法",
+          "value": "固定资产按月计提折旧，留意开始与停止的边界",
+          "point_id": "019a0103-0000-7000-8000-000000000006"
+        }
+      ],
+      "ai_generated": false
+    },
+    {
+      "id": "terms",
+      "title": "固定资产折旧方法 · 术语",
+      "category": "terms",
+      "rows": [
+        {
+          "id": "terms",
+          "label": "固定资产折旧方法",
+          "value": "应计折旧额：原价减预计净残值",
+          "point_id": "019a0103-0000-7000-8000-000000000006"
+        }
+      ],
+      "ai_generated": false
+    },
+    {
+      "id": "compare",
+      "title": "固定资产折旧方法 · 易混对照",
+      "category": "compare",
+      "rows": [
+        {
+          "id": "compare",
+          "label": "固定资产折旧方法",
+          "value": "加速折旧与年限平均法的计算基础不同",
+          "point_id": "019a0103-0000-7000-8000-000000000006"
+        }
+      ],
+      "ai_generated": false
+    }
+  ],
+  "material_id": "019a010b-0000-7000-8000-000000000001",
+  "question_id": "019a0104-0000-7000-8000-000000000001"
+}
