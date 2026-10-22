@@ -19,6 +19,7 @@ export const WHOLE_PAGE_STATES = ["error", "offline", "restricted", "empty", "in
 type WholePageState = (typeof WHOLE_PAGE_STATES)[number];
 
 const OK = 200;
+const NO_CONTENT = 204;
 const NOT_MODIFIED = 304;
 const NOT_FOUND = 404;
 /** 接口请求居然到了服务器（Service Worker 没接住）时回的状态：测试据此看出场景没搭起来。 */
@@ -170,6 +171,8 @@ function respond(request: IncomingMessage, response: ServerResponse, name: strin
     response.end(body);
   };
   const html = (body: string, status = OK): void => send(status, "text/html", htmlPage(name, body));
+  // 浏览器会自动请求站点图标；测试小网站明确提供空图标，其余未知资源仍返回 404。
+  if (pathname === "/favicon.ico") return send(NO_CONTENT, "image/x-icon", "");
   if (pathname === CACHED_PATH) {
     // 每次用缓存前都要先问（no-cache），带版本标记：浏览器再次打开时带 If-None-Match 来问，缓存仍然有效就回 304
     const cache = { etag: CACHED_TAG, "cache-control": "no-cache" };

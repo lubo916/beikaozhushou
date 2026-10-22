@@ -105,6 +105,13 @@ function reply(status: number, statusText: string): NavigationResponse {
 }
 
 test.describe("自测：打开页面（复核问题 1：合法的缓存响应被误报）", () => {
+  test("测试小网站的图标请求正常返回，其他未知资源照常失败", async ({ request }) => {
+    const icon = await request.get(site.url("/favicon.ico"));
+    expect(icon.status()).toBe(204);
+    const missing = await request.get(site.url("/missing-resource.svg"));
+    expect(missing.status()).toBe(404);
+  });
+
   test("打开成功的判定：2xx 与缓存仍然有效的 304 算成功，没有回应、4xx、5xx 不算", () => {
     expect(navigationProblem(reply(200, "OK"), "/today")).toBeNull();
     expect(navigationProblem(reply(204, "No Content"), "/today")).toBeNull();
