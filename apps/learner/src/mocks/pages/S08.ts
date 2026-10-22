@@ -3,7 +3,7 @@ import type { S08Report } from "@exam-prep/contract";
 import { defineRoute, type MockContext } from "../route.ts";
 const files = import.meta.glob("../../../../../fixtures/pages/S08/*.json", { eager: true, import: "default" });
 function report(ctx: MockContext, availability: S08Report["availability"] = "ready"): S08Report {
-  const view = ctx.query.get("view");
+  const view = ctx.params["period"];
   const period = view === "month" || view === "round" ? view : "week";
   const fixture = files[`../../../../../fixtures/pages/S08/${ctx.exam.profile.exam_id}.json`] as { views: Record<string, S08Report> };
   const value = structuredClone(fixture.views[period]);

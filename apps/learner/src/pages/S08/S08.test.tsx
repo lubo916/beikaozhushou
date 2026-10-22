@@ -1,8 +1,11 @@
 // S08：四考试、三周期、四数据变体的契约校验；状态映射与离线保护；页面正常、空与数据不足展示。
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { act } from "react";
+import { onlineManager } from "@tanstack/react-query";
 import { ApiError } from "@exam-prep/contract/errors";
 import type { S08Period, S08Report } from "@exam-prep/contract";
 import * as zodSchemas from "@exam-prep/contract/zod";
+import { formatScore } from "@exam-prep/shared/format";
 import { App } from "../../App.tsx";
 import { heading, linkByText, mountAt, settle } from "../../app/testing.tsx";
 import copy from "../../i18n/zh-CN/S08.json";
@@ -37,7 +40,7 @@ function setup(state = "") {
   const report = async (period: S08Period): Promise<S08Report> => {
     const outcome = await api.handle({
       method: "GET",
-      url: `http://localhost/api/v1/plan/recap?view=${period}`,
+      url: `http://localhost/api/v1/plan/recap/${period}`,
       headers: new Headers(),
       body: undefined,
     });
@@ -196,6 +199,33 @@ afterEach(() => {
 });
 
 describe("S08 页面与离线写入保护", () => {
+  it("负预测变化在统计数和提分来源中保留负号，不显示正负号拼接", async () => {
+    const data = structuredClone(await setup().report("week"));
+    data.metrics.forecast_delta = -2.5;
+    const source = data.score_sources[0];
+    expect(source).toBeDefined();
+    if (source === undefined) throw new Error("正常报告没有提分来源");
+    source.delta = -2.5;
+    const expected = formatScore(-2.5);
+    const { host, unmount } = await mountAt("/recap", <ReportData data={data} />);
+    try {
+      expect(host.textContent).toContain(expected);
+      expect(host.textContent).not.toContain("+-2.5");
+      const forecastStat = [...host.querySelectorAll(".ui-stat")].find(
+        (stat) => stat.querySelector(".ui-stat__label")?.textContent === copy.metrics.forecast_delta,
+      );
+      expect(forecastStat?.querySelector(".ui-stat__value")?.textContent?.trim()).toBe(expected);
+      const sourceValue = [...host.querySelectorAll("li strong")].find((node) => node.closest("li")?.textContent?.includes(source.module));
+      expect(sourceValue?.textContent?.trim()).toBe(expected);
+      const negativeValues = [...host.querySelectorAll(".ui-stat__value, li strong")].filter(
+        (node) => node.textContent?.trim() === expected,
+      );
+      expect(negativeValues.length).toBeGreaterThanOrEqual(2);
+    } finally {
+      await unmount();
+    }
+  });
+
   it("正常报告标题、数据区、教练与唯一决定区都能显示", async () => {
     stubFetch(setup().api);
     const { host, unmount } = await mountAt("/recap", <App />);
@@ -249,6 +279,40 @@ describe("S08 页面与离线写入保护", () => {
       expect(host.querySelectorAll('input[name="s08-change"]')).toHaveLength(0);
       expect(host.querySelector(".ui-proposal")).toBeNull();
     } finally {
+      await unmount();
+    }
+  });
+
+  it("已加载报告后直接断网，报告保留且写入与单选立即禁用", async () => {
+    onlineManager.setOnline(true);
+    stubFetch(setup().api);
+    const { host, unmount } = await mountAt("/recap", <App />);
+    try {
+      await settle(() => host.querySelector('[data-testid="s08-data"]') !== null);
+      const reportBefore = host.querySelector('[data-testid="s08-data"]')?.textContent;
+      expect(reportBefore).toBeDefined();
+      expect(reportBefore).toContain(copy.metrics.effective_minutes);
+      const radioBefore = host.querySelector<HTMLInputElement>('input[name="s08-change"]');
+      expect(radioBefore?.matches(":disabled")).toBe(false);
+      await act(async () => {
+        onlineManager.setOnline(false);
+      });
+      await settle(() => host.querySelector('input[name="s08-change"]')?.matches(":disabled") === true);
+      expect(host.querySelector('[data-testid="s08-data"]')?.textContent).toBe(reportBefore);
+      expect(host.textContent).toContain(copy.decision.offline);
+      const radios = [...host.querySelectorAll<HTMLInputElement>('input[name="s08-change"]')];
+      expect(radios.length).toBeGreaterThan(0);
+      expect(radios.every((input) => input.matches(":disabled"))).toBe(true);
+      const buttons = [...host.querySelectorAll<HTMLButtonElement>("button")];
+      for (const label of [copy.decision.confirm, copy.questions.save, copy.feedback.yes, copy.feedback.no]) {
+        const button = buttons.find((item) => item.textContent?.trim() === label);
+        expect(button, label).toBeDefined();
+        expect(button?.disabled, label).toBe(true);
+      }
+    } finally {
+      await act(async () => {
+        onlineManager.setOnline(true);
+      });
       await unmount();
     }
   });

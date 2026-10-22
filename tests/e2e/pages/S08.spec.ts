@@ -59,6 +59,13 @@ for (const size of WIDTHS) {
     const overflow = await main.evaluate((element) => element.scrollWidth - element.clientWidth);
     expect(overflow, "正文不应横向溢出").toBeLessThanOrEqual(1);
     expectNoProblems(watch, "normal");
+    // 外壳正文独立滚动；截图时展开滚动容器，避免整页图片下方只留下空白。
+    await main.evaluate((element) => {
+      element.style.height = "auto";
+      element.style.overflow = "visible";
+      const shell = element.closest<HTMLElement>("[data-mode]");
+      if (shell !== null) shell.style.height = "auto";
+    });
     await page.screenshot({ path: `.test-results/S08-${size.width}.png`, fullPage: true });
   });
 }
@@ -179,4 +186,32 @@ test("S08 报告不准也可一键反馈", async ({ page }) => {
     .press("Enter");
   await expect(page.getByRole("status").filter({ hasText: copy("feedback_soon") })).toBeVisible();
   expectNoProblems(watch, "normal");
+});
+
+test("S08 已加载报告后浏览器断网：保留报告并禁用全部写入入口", async ({ page, context }) => {
+  const watch = await watchPage(page);
+  await watch.open(urlOf(entry));
+  await expectLoaded(page, entry);
+  const main = page.locator("main#main");
+  const report = main.locator('[data-testid="s08-data"]');
+  const before = await report.textContent();
+  expect(before).toContain(copy("metrics.effective_minutes"));
+  const radios = main.locator('input[name="s08-change"]');
+  expect(await radios.count()).toBeGreaterThan(1);
+  await radios.first().check();
+  const proposalButton = main.getByRole("button", { name: copy("decision.confirm"), exact: true });
+  await expect(proposalButton).toBeEnabled();
+  try {
+    await context.setOffline(true);
+    await expect(report).toBeVisible();
+    await expect(report).toHaveText(before ?? "");
+    await expect(main).toContainText(copy("decision.offline"));
+    for (const radio of await radios.all()) await expect(radio).toBeDisabled();
+    for (const key of ["decision.confirm", "questions.save", "feedback.yes", "feedback.no"]) {
+      await expect(main.getByRole("button", { name: copy(key), exact: true })).toBeDisabled();
+    }
+    expectNoProblems(watch, "offline");
+  } finally {
+    await context.setOffline(false);
+  }
 });

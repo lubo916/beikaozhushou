@@ -41,7 +41,7 @@
   "highlight": "三个亮点",
   "improvement": "一个待改进",
   "input_output": "{{duration}} 的有效学习，带来 {{gains}} 档位提升。",
-  "forecast_change": "预测变化 +{{score}}",
+  "forecast_change": "+{{score}}",
   "forecast_locked": "地图体检通过后，再查看预测变化。",
   "before": "期初",
   "after": "期末",

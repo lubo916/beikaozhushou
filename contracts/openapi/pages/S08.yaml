@@ -1,6 +1,6 @@
 {
   "paths": {
-    "/plan/recap": {
+    "/plan/recap/{period}": {
       "get": {
         "operationId": "getS08Recap",
         "x-owner": "plan",
@@ -8,8 +8,9 @@
         "summary": "复盘与报告：周期指标、原始计数与待确认建议；未登记写权限前不写回计划",
         "parameters": [
           {
-            "name": "view",
-            "in": "query",
+            "name": "period",
+            "in": "path",
+            "required": true,
             "schema": {
               "$ref": "#/components/schemas/S08Period"
             }
