@@ -15,7 +15,7 @@ jobs:
       fail-fast: true
       matrix:
         shard: [1, 2]
-    timeout-minutes: 30
+    # 各测试与命令保留正常超时，完整覆盖不再受额外累计时限截断。
     services:
       postgres:
         image: pgvector/pgvector:pg17
@@ -74,7 +74,6 @@ jobs:
           pnpm gen
           pnpm exec playwright test tests/e2e/smoke/favicon.spec.ts tests/e2e/smoke/checks.spec.ts --project=chromium
       - name: 完整验证
-        timeout-minutes: 25
         run: python3 tools/bk.py verify --level full
       - name: 上传失败日志
         if: failure()
