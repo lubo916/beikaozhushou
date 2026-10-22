@@ -1,0 +1,294 @@
+{
+  "note": "S09 知识地图的页面示例（U09）：每章的示例知识点取 fixtures/exams/，其余格子在 chapters 里逐格写好（cells：0–5 为档位，a–e 为 1–5 档且有待验证的作答，x 为证据不足，/ 为范围外；其余各串同样逐格对应，代号见 apps/learner/src/mocks/pages/S09.ts）。规则还没实现，都是演示值。",
+  "org_name": "启明教育",
+  "typing_ratio": 1,
+  "health": {
+    "passed": true,
+    "default_pass": true,
+    "issues": []
+  },
+  "named": {
+    "019a0103-0000-7000-8000-000000000001": {
+      "importance": 2,
+      "exam_level": 1,
+      "forgetting_risk": "medium",
+      "roi_tier": "b",
+      "material": "mapped",
+      "flags": [
+        "due_review",
+        "has_mistakes"
+      ]
+    },
+    "019a0103-0000-7000-8000-000000000002": {
+      "importance": 3,
+      "exam_level": 2,
+      "forgetting_risk": "high",
+      "roi_tier": "s",
+      "material": "mapped",
+      "flags": [
+        "weak",
+        "has_mistakes"
+      ],
+      "self_level": 2
+    },
+    "019a0103-0000-7000-8000-000000000003": {
+      "importance": 4,
+      "exam_level": 3,
+      "forgetting_risk": "medium",
+      "roi_tier": "s",
+      "material": "mapped",
+      "flags": [
+        "high_frequency",
+        "due_review"
+      ],
+      "self_level": 4
+    },
+    "019a0103-0000-7000-8000-000000000004": {
+      "importance": 3,
+      "exam_level": 4,
+      "forgetting_risk": "high",
+      "roi_tier": "s",
+      "material": "mapped",
+      "flags": [
+        "weak",
+        "high_frequency"
+      ]
+    },
+    "019a0103-0000-7000-8000-000000000005": {
+      "importance": 3,
+      "exam_level": 2,
+      "forgetting_risk": "low",
+      "roi_tier": "c",
+      "material": "readable",
+      "flags": [],
+      "self_level": 5
+    },
+    "019a0103-0000-7000-8000-000000000006": {
+      "importance": 3,
+      "exam_level": 4,
+      "forgetting_risk": "medium",
+      "roi_tier": "s",
+      "material": "mapped",
+      "flags": [
+        "high_frequency",
+        "has_mistakes"
+      ]
+    },
+    "019a0103-0000-7000-8000-000000000007": {
+      "importance": 2,
+      "exam_level": 2,
+      "forgetting_risk": "high",
+      "roi_tier": "b",
+      "material": "mapped",
+      "flags": [
+        "weak",
+        "has_mistakes"
+      ]
+    },
+    "019a0103-0000-7000-8000-000000000008": {
+      "importance": 4,
+      "exam_level": 4,
+      "forgetting_risk": "medium",
+      "roi_tier": "s",
+      "material": "mapped",
+      "flags": [
+        "high_frequency"
+      ],
+      "self_level": 4
+    },
+    "019a0103-0000-7000-8000-000000000009": {
+      "importance": 2,
+      "exam_level": 2,
+      "forgetting_risk": "high",
+      "roi_tier": "b",
+      "material": "mapped",
+      "flags": [
+        "weak"
+      ]
+    },
+    "019a0103-0000-7000-8000-00000000000a": {
+      "importance": 3,
+      "exam_level": 2,
+      "forgetting_risk": "medium",
+      "roi_tier": "s",
+      "material": "mapped",
+      "flags": [
+        "due_review",
+        "has_mistakes"
+      ]
+    },
+    "019a0103-0000-7000-8000-00000000000b": {
+      "importance": 4,
+      "exam_level": 3,
+      "forgetting_risk": "low",
+      "roi_tier": "c",
+      "material": "mapped",
+      "flags": [
+        "high_frequency",
+        "due_review"
+      ]
+    },
+    "019a0103-0000-7000-8000-00000000000c": {
+      "importance": 3,
+      "exam_level": 3,
+      "forgetting_risk": "high",
+      "roi_tier": null,
+      "material": "mapped",
+      "flags": [
+        "weak",
+        "high_frequency",
+        "has_mistakes"
+      ]
+    }
+  },
+  "chapters": {
+    "019a0102-0000-7000-8000-000000000001": {
+      "cells": "//03053/135431x4",
+      "target": "3333333333333333",
+      "types": "cccccccccccccccc",
+      "importance": "3143123234213132",
+      "exam_level": "4133133224323122",
+      "forgetting": "---m-lm-hllmmmml",
+      "roi": "--sdcdc-acddccsd",
+      "material": "rrnrmrrmrrrrrrrr",
+      "flags": "20220a201620a110",
+      "layers": "bbbbbbbbbbbbbbpp",
+      "collapsed": false
+    },
+    "019a0102-0000-7000-8000-000000000002": {
+      "cells": "4x54454533443140455230404x404",
+      "target": "43443444433433333333344443434",
+      "types": "pcppcppppccpcccccccccppppcpcp",
+      "importance": "23112342412232141132122213442",
+      "exam_level": "12113332421333141121222114332",
+      "forgetting": "mhlllllmmmmlmml-lmlml-l-lhm-m",
+      "roi": "csddccccaddddccsddcbdcccdsdac",
+      "material": "mrmrrrmrrrrrrrrmrrrrrrmmrrrrr",
+      "flags": "41802664a006a3020004000007620",
+      "layers": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "collapsed": false
+    },
+    "019a0102-0000-7000-8000-000000000003": {
+      "cells": "0x3515000440//440440504400400004x005440202/",
+      "target": "4444444444444444444444444444444444444444444",
+      "types": "ppppppppppppppppppppppppppppppppppppppppppp",
+      "importance": "2324242143313322332431121333212224342121343",
+      "exam_level": "3224332232412312341421121344111224342221243",
+      "forgetting": "-hlmml---ll---ml-ll-m-ml--l----lm--lll-m-m-",
+      "roi": "cacdcdcbadcb--ddaccacbddcacsbbcdcaacddbcaa-",
+      "material": "rnrrrmrnrrrrrmrrrrmmmrmmrrrrrrmrrmmrrrrrrrr",
+      "flags": "2102320020a00200220200000222000412220000022",
+      "layers": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbboooo",
+      "collapsed": false
+    },
+    "019a0102-0000-7000-8000-000000000004": {
+      "cells": "4040040/00244x424044300300",
+      "target": "43433433343443434443333343",
+      "types": "pspsspssspsppspspppsssssps",
+      "importance": "42123444323412312232333323",
+      "exam_level": "42122444333413311131334223",
+      "forgetting": "m-m--m----mllmllm-lmm--l--",
+      "roi": "dbcbaca-sbaddbcbdbddcsadba",
+      "material": "rrrrrrrmrrrmmrrrrrrrrrrrrm",
+      "flags": "20000222222e83e00068222002",
+      "layers": "bbbbbbbbbbbbbbbbbbbbbbbppp",
+      "collapsed": false
+    },
+    "019a0102-0000-7000-8000-000000000005": {
+      "cells": "2200002410342",
+      "target": "2222222222222",
+      "types": "fffffffffffff",
+      "importance": "2242432443342",
+      "exam_level": "2141432333331",
+      "forgetting": "lm----mlm-lmm",
+      "roi": "dcscssccasccc",
+      "material": "rmrrmrrrrmmrm",
+      "flags": "00202202b2620",
+      "layers": "bbbbbbbbbbbbb",
+      "collapsed": false
+    },
+    "019a0102-0000-7000-8000-000000000006": {
+      "cells": "x04444440/510x504c040400440454/",
+      "target": "4444444444444444444444444444444",
+      "types": "ppppppppppppppppppppppppppppppp",
+      "importance": "2123134322334324414431131234314",
+      "exam_level": "3222134412233413424431122334224",
+      "forgetting": "h-mllmml--mm-hl-lm-m-l--ll-mmm-",
+      "roi": "bbcddddcc-dssscaccadacbaddaddc-",
+      "material": "mmmrmmrmrrrnrmmrrrmrrmrrrmrmmrr",
+      "flags": "7040022200072302202620000222002",
+      "layers": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbooo",
+      "collapsed": false
+    },
+    "019a0102-0000-7000-8000-000000000007": {
+      "cells": "400/3x304350003000230",
+      "target": "433334333344343444433",
+      "types": "pccccpccccppcpcppppcc",
+      "importance": "131342232322211213233",
+      "exam_level": "141343122321211214334",
+      "forgetting": "l---mmm-lll---l---mm-",
+      "roi": "dac-ccdscccccbdbcscda",
+      "material": "rmmrmmrrrrmrrmrmrrmrr",
+      "flags": "8202670002800000022a2",
+      "layers": "bbbbbbbbbbbbbbbbbbboo",
+      "collapsed": false
+    },
+    "019a0102-0000-7000-8000-000000000008": {
+      "cells": "303/40050/005405//032",
+      "target": "333333333333333333333",
+      "types": "ccccccccccccccccccccc",
+      "importance": "341223222232212112242",
+      "exam_level": "242113212331213112142",
+      "forgetting": "m-m-l--l----lm-m---ml",
+      "roi": "dsc-cscdc-sccccc--cdc",
+      "material": "mrmmrnmmrrrmrrrrmrrmm",
+      "flags": "0200020002208820000a0",
+      "layers": "bbbbbbbbbbbbbbbbbbbbb",
+      "collapsed": false
+    }
+  },
+  "relations": {
+    "center_id": "019a0103-0000-7000-8000-000000000005",
+    "edges": [
+      {
+        "from": "019a0103-0000-7000-8000-000000000001",
+        "to": "019a0103-0000-7000-8000-000000000005",
+        "type": "prerequisite",
+        "strength": "strong",
+        "origin": "map"
+      },
+      {
+        "from": "019a0103-0000-7000-8000-000000000005",
+        "to": "019a0103-0000-7000-8000-000000000002",
+        "type": "confusable",
+        "strength": "medium",
+        "origin": "map"
+      },
+      {
+        "from": "019a0103-0000-7000-8000-000000000005",
+        "to": "019a0103-0000-7000-8000-000000000003",
+        "type": "hierarchy",
+        "strength": "medium",
+        "origin": "map"
+      },
+      {
+        "from": "019a0103-0000-7000-8000-000000000005",
+        "to": "019a0103-0000-7000-8000-000000000004",
+        "type": "causal",
+        "strength": "weak",
+        "origin": "tutor",
+        "confidence": 0.82,
+        "high_confidence": false
+      },
+      {
+        "from": "019a0103-0000-7000-8000-000000000005",
+        "to": "019a0103-0000-7000-8000-000000000006",
+        "type": "case",
+        "strength": "medium",
+        "origin": "tutor",
+        "confidence": 0.93,
+        "high_confidence": true
+      }
+    ]
+  }
+}

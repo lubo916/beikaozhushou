@@ -1,1 +1,267 @@
-{}
+{
+  "sample": "示例数据",
+  "header": {
+    "description": "灰色是还没学，虚线是证据不足，两者不一样。点格子看知识点。",
+    "diagnose": "补充诊断",
+    "new_point": "新建知识点",
+    "more": "更多操作",
+    "more_symbol": "···"
+  },
+  "more": {
+    "title": "管理这张地图",
+    "generate": "从大纲或教材生成",
+    "generate_hint": "上传大纲得到骨架，或按教材标题层级提取，规则可调、实时预览",
+    "manage": "管理知识点",
+    "manage_hint": "新建、改名、合并、拆分、移动、划线成点；合并与拆分保留学习记录",
+    "types": "标注知识类型",
+    "types_hint": "每个知识点标一至两个类型，决定默认学法、卡型、题型与目标档",
+    "relations": "编辑关系",
+    "relations_hint": "前置、易混、上下位、并列、因果、案例、边界、例外八类，带强度与来源",
+    "scope": "批量调整学习范围",
+    "scope_hint": "框选或按筛选结果，批量加入、移出学习范围",
+    "versions": "底图版本与迁移",
+    "versions_hint": "底图更新时掌握记录按映射迁移，被拆分的点标“证据不足”，不清零",
+    "readonly": "官方节点只读，这些改动只落在你的个人扩展层"
+  },
+  "views": {
+    "label": "视图",
+    "grid": "方格",
+    "tree": "大纲树",
+    "graph": "关系图",
+    "list": "列表"
+  },
+  "coloring": {
+    "label": "着色",
+    "mastery": "掌握档",
+    "target": "目标达成",
+    "frequency": "考频",
+    "forgetting": "遗忘风险",
+    "roi": "性价比阶梯",
+    "material": "资料覆盖"
+  },
+  "legend": {
+    "label": "图例",
+    "uncertain": "证据不足",
+    "out": "范围外",
+    "target_gap": "还差几档（格里是档数）",
+    "target_none": "不设目标档",
+    "frequency_level": "考情级 {{level}}",
+    "frequency_none": "考情数据还不够",
+    "forgetting_high": "遗忘风险高",
+    "forgetting_medium": "遗忘风险中",
+    "forgetting_low": "遗忘风险低",
+    "forgetting_none": "还没学或没有记忆数据",
+    "roi_tier": "{{tier}} 级",
+    "roi_none": "范围外或暂不评级",
+    "roi_locked": "已锁定（体检未通过）",
+    "material_readable": "能在阅读器里读",
+    "material_mapped": "只有页码或链接",
+    "material_none": "没有资料"
+  },
+  "marker": {
+    "met": "✓",
+    "high": "高",
+    "medium": "中",
+    "low": "低",
+    "readable": "读",
+    "mapped": "页",
+    "none": "无"
+  },
+  "filter": {
+    "label": "筛选",
+    "unreached": "未达标",
+    "weak": "薄弱",
+    "has_mistakes": "有错题",
+    "insufficient": "证据不足",
+    "high_frequency": "高频",
+    "more": "更多筛选",
+    "less": "收起筛选",
+    "importance": "重要度",
+    "importance_level": "重要度 {{level}}",
+    "mastery": "掌握档",
+    "reach": "是否达标",
+    "reached": "已达标",
+    "other": "其他",
+    "due_review": "待复习",
+    "no_material": "无资料",
+    "out_of_scope": "范围外",
+    "result": "符合筛选的有 {{n}} 个，其余变淡",
+    "clear": "清除筛选",
+    "scope_add": "把这些加入学习范围",
+    "scope_remove": "把这些移出学习范围"
+  },
+  "grid": {
+    "label": "{{chapter}}：{{reached}}/{{total}} 达标",
+    "count": "{{reached}}/{{total}}",
+    "fold": "收起本章的格子",
+    "unfold": "展开本章的格子",
+    "cell_uncertain": "证据不足，不等于不会",
+    "cell_out": "范围外",
+    "cell_pending": "有待验证的作答",
+    "cell_dim": "不符合筛选",
+    "locked": "“性价比阶梯”着色已置灰：地图体检未通过，性价比阶梯锁定。",
+    "fix": "去修复",
+    "cell": "{{name}}：{{text}}",
+    "and": "{{a}}；{{b}}"
+  },
+  "tree": {
+    "label": "按章达标进度",
+    "row": "{{reached}}/{{total}} 达标",
+    "uncertain": "证据不足",
+    "out": "范围外",
+    "status": "{{level}} · {{gap}}"
+  },
+  "graph": {
+    "title": "以“{{name}}”为中心的关系",
+    "label": "知识点关系图",
+    "note": "共八类关系。虚线是导师建议的关联，采纳后才生效。",
+    "path": "学习路径：先学 {{before}}，再学“{{name}}”",
+    "list": "关系列表",
+    "edge": "{{type}}：{{from}} → {{to}}",
+    "strength": {
+      "strong": "强",
+      "medium": "中",
+      "weak": "弱"
+    },
+    "origin": {
+      "map": "地图自带",
+      "mine": "我加的",
+      "tutor": "导师建议"
+    },
+    "confidence": "置信度 {{value}}",
+    "adopt": "采纳",
+    "ignore": "忽略",
+    "adopt_high": "一键采纳高置信（{{n}} 条）",
+    "edit": "编辑关系",
+    "empty": "这个知识点还没有关系，可以在“更多操作”里添加。"
+  },
+  "relation": {
+    "prerequisite": "前置",
+    "confusable": "易混",
+    "hierarchy": "上下位",
+    "parallel": "并列",
+    "causal": "因果",
+    "case": "案例",
+    "boundary": "边界",
+    "exception": "例外"
+  },
+  "list": {
+    "caption": "知识点列表",
+    "name": "知识点",
+    "chapter": "所在章",
+    "type": "类型",
+    "current": "当前",
+    "target": "目标",
+    "roi": "性价比",
+    "no_target": "不设",
+    "locked": "已锁定"
+  },
+  "stats": {
+    "learned": "已学",
+    "learned_hint": "有过任一证据",
+    "reached": "已达标",
+    "reached_hint": "档位不低于目标档",
+    "value": "{{n}} / {{total}}",
+    "scope": "范围内 {{in_scope}} 个 · 地图共 {{total}} 个"
+  },
+  "focus": {
+    "title": "选中的知识点",
+    "default": "默认选中今日推荐的第一个",
+    "picked": "你刚点选的知识点",
+    "none": "点方格里的格子，看这个知识点的情况。",
+    "open": "去主页",
+    "practice": "练一练",
+    "review": "背一背",
+    "add_today": "加入今日",
+    "self": "自评：{{level}}",
+    "target_none": "这个知识点不设目标档，当前：{{level}}"
+  },
+  "attention": {
+    "title": "需要你注意",
+    "insufficient": "证据不足 {{n}} 个",
+    "insufficient_hint": "作答太少，档位不可信",
+    "insufficient_action": "补充诊断",
+    "pending": "待验证 {{n}} 个",
+    "pending_hint": "答对但标了“蒙的”",
+    "pending_action": "去复核",
+    "no_material": "没有资料 {{n}} 个",
+    "no_material_hint": "还没挂上任何段落",
+    "no_material_action": "挂资料",
+    "none": "暂时没有要注意的。"
+  },
+  "source": {
+    "title": "地图来源与体检",
+    "official": "官方",
+    "org": "机构",
+    "template": "模板",
+    "mine": "我的",
+    "count": "{{n}} 个",
+    "org_count": "{{n}} 个（{{name}}扩展）",
+    "mine_extension": "{{n}} 个（个人扩展层）",
+    "mine_custom": "{{n}} 个（自建）",
+    "typing": "类型标注率 {{ratio}}；{{types}}为主。",
+    "readonly": "官方节点只读；可在个人扩展层增加知识点，底图升级不丢个人内容。",
+    "version": "底图第 {{version}} 版：升级时掌握记录按映射迁移，被拆分的点标“证据不足”，不清零。",
+    "health_passed": "体检通过",
+    "health_default": "官方地图默认通过",
+    "health_failed": "体检未通过",
+    "health_failed_hint": "有阻断项：预测类区块与“性价比阶梯”着色锁定，学习照常。",
+    "severity": {
+      "blocking": "阻断",
+      "hint": "提示"
+    },
+    "issue": {
+      "granularity": "粒度不合适",
+      "question_coverage": "题量覆盖不足",
+      "missing_target": "缺目标档",
+      "isolated": "孤立点",
+      "duplicate": "疑似重复"
+    },
+    "issue_count": "{{n}} 处",
+    "fix": {
+      "granularity": "把太粗的点拆开、太细的点合并",
+      "question_coverage": "给这些知识点补题或挂上题库",
+      "missing_target": "给这些知识点设目标档",
+      "isolated": "给孤立点补上前置或上下位关系",
+      "duplicate": "核对后合并重复的点"
+    },
+    "fix_action": "去修复",
+    "issue_line": "{{issue}}{{count_text}}：{{fix}}"
+  },
+  "state": {
+    "empty": {
+      "title": "还没有知识地图",
+      "body": "选一个考试启用官方地图，或由资料生成",
+      "action": "由资料生成"
+    },
+    "offline": {
+      "title": "离线中",
+      "body": "方格与大纲树可离线查看；编辑需要联网"
+    },
+    "restricted": {
+      "title": "受限",
+      "body": "官方节点只读；可在个人扩展层增加知识点"
+    },
+    "insufficient_data": {
+      "title": "数据不足",
+      "body": "证据不足的格子画成虚线，与“未学”分开显示"
+    }
+  },
+  "soon": {
+    "new_point": "新建知识点即将上线：新建的点放在你的个人扩展层。",
+    "manage": "知识点管理即将上线：合并、拆分都保留学习记录。",
+    "types": "类型标注即将上线。",
+    "relations": "编辑关系即将上线。",
+    "scope": "批量调整学习范围即将上线：移出不删数据、仍可学。",
+    "versions": "底图版本记录即将上线。",
+    "add_today": "加入今日即将上线：确认后会排进今天的清单。",
+    "practice": "按这个知识点出题即将上线。",
+    "recheck": "复核待验证的作答即将上线：换个问法再考，通过才计入证据。",
+    "adopt": "采纳关联即将上线：你确认后才生效。",
+    "ignore": "忽略这条建议即将上线。",
+    "adopt_high": "一键采纳高置信即将上线：你确认后才生效。",
+    "fix": "按体检建议修复即将上线。",
+    "report": "反馈问题即将上线；连续失败会自动上报。"
+  },
+  "joiner": "、"
+}

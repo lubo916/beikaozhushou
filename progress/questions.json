@@ -1700,6 +1700,66 @@
       "asked": "v0028",
       "answer": "A",
       "answered": "v0028"
+    },
+    {
+      "id": "U09-Q1",
+      "task": "U09",
+      "q": "五种着色（目标达成、考频、遗忘风险、性价比阶梯、资料覆盖）原型没画格子的样子，怎么画？",
+      "options": [
+        "A 每种一套深浅色，格里写档数、级别或一个字，图例跟着换",
+        "B 先只做掌握档着色，其余五种提示即将上线"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0030",
+      "answer": "A",
+      "answered": "v0030"
+    },
+    {
+      "id": "U09-Q2",
+      "task": "U09",
+      "q": "四个视图切换时，地址栏要不要跟着变？",
+      "options": [
+        "A 跟着变（?view=grid|tree|graph|list），能收藏和转发",
+        "B 只在开发测试时用 ?view=，平时不变"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0030",
+      "answer": "A",
+      "answered": "v0030"
+    },
+    {
+      "id": "U09-Q3",
+      "task": "U09",
+      "q": "手机上要不要显示方格？",
+      "options": [
+        "A 照原型截图，默认大纲树，点“方格”标签再看",
+        "B 大纲树下面再放一块缩小的方格"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0030",
+      "answer": "A",
+      "answered": "v0030"
+    },
+    {
+      "id": "U09-Q4",
+      "task": "U09",
+      "q": "演示数据里每章只有一两个知识点有详情页，其余格子是占位：点这些格子再点“去主页”，知识点主页会显示没能加载。要不要让知识点主页的假数据也认这些占位点？",
+      "options": [
+        "A 先这样，接上后端后自然就好",
+        "B 由整合任务给知识点主页的假数据补上占位点，演示时每格都能点进去"
+      ],
+      "recommend": "B",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0030",
+      "answer": "B",
+      "answered": "v0030"
     }
   ]
 }

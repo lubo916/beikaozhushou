@@ -1,0 +1,167 @@
+{
+  "note": "S18 做题与解析的页面演示数据（U18a）：两个示范题组（objective 题库、generated 导师出题）与页面专用的演示题；prefill 是断点续做前已经做过的题；sample_rules 是规则还没实现时假数据层用的示例做法。",
+  "sample_rules": {
+    "fast_answer_ms": 3000,
+    "credibility_caps": {
+      "reviewed": "strong",
+      "own": "strong",
+      "generated_confirmed": "medium",
+      "generated_instant": "weak"
+    },
+    "next_steps_limit": 3
+  },
+  "sessions": {
+    "objective": {
+      "title": "智能练习：教育心理学 4 题",
+      "mode": "in_class",
+      "confidence_enabled": true,
+      "elapsed_seconds": 120,
+      "items": [
+        {
+          "question_id": "019a0218-0000-7000-8000-000000000001",
+          "suggested_seconds": 60,
+          "prefill": {
+            "selected": [
+              0
+            ],
+            "confidence": "sure",
+            "duration_ms": 26000,
+            "error_cause": "concept_unclear"
+          }
+        },
+        {
+          "question_id": "019a0204-0000-7000-8000-000000000001",
+          "suggested_seconds": 60
+        },
+        {
+          "question_id": "019a0204-0000-7000-8000-000000000002",
+          "suggested_seconds": 300
+        },
+        {
+          "question_id": "019a0218-0000-7000-8000-000000000002",
+          "suggested_seconds": 180,
+          "flagged": true
+        }
+      ]
+    },
+    "generated": {
+      "title": "导师出题：教育心理学 2 道",
+      "mode": "in_class",
+      "confidence_enabled": true,
+      "elapsed_seconds": 0,
+      "items": [
+        {
+          "question_id": "019a0218-0000-7000-8000-000000000011",
+          "suggested_seconds": 45
+        },
+        {
+          "question_id": "019a0218-0000-7000-8000-000000000012",
+          "suggested_seconds": 45
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "id": "019a0218-0000-7000-8000-000000000001",
+      "version": 1,
+      "question_type": "single_choice",
+      "response_form": "choice",
+      "credibility": "own",
+      "knowledge_point_ids": [
+        "019a0203-0000-7000-8000-000000000006"
+      ],
+      "stem": "“学而不思则罔，思而不学则殆”体现的教学原则是（　）。",
+      "options": [
+        "理论联系实际原则",
+        "启发性原则",
+        "循序渐进原则",
+        "巩固性原则"
+      ],
+      "answer": [
+        1
+      ],
+      "common_wrong_option": 0,
+      "group_miss_rate": null,
+      "explanation": {
+        "conclusion": "学与思结合，强调调动学生思考，对应启发性原则。"
+      },
+      "option_notes": {
+        "0": {
+          "note": "理论联系实际讲的是知识与生活、实践的结合，不是学与思的关系。",
+          "trap": "偷换概念"
+        }
+      }
+    },
+    {
+      "id": "019a0218-0000-7000-8000-000000000002",
+      "version": 1,
+      "question_type": "oral",
+      "response_form": "oral",
+      "credibility": "own",
+      "knowledge_point_ids": [
+        "019a0203-0000-7000-8000-000000000006"
+      ],
+      "stem": "结构化面试：有学生在课堂上总是跟不上，你会怎么帮他？请口头作答。",
+      "sample_answer": "先了解原因（基础、方法还是状态），再分层布置任务、课后个别辅导，并和家长沟通、及时肯定进步。",
+      "scoring_points": [
+        {
+          "point": "先了解原因"
+        },
+        {
+          "point": "分层教学与个别辅导"
+        },
+        {
+          "point": "家校沟通与正向激励"
+        }
+      ],
+      "group_miss_rate": null
+    },
+    {
+      "id": "019a0218-0000-7000-8000-000000000011",
+      "version": 1,
+      "question_type": "single_choice",
+      "response_form": "choice",
+      "credibility": "generated_instant",
+      "knowledge_point_ids": [
+        "019a0203-0000-7000-8000-000000000006"
+      ],
+      "stem": "维果茨基认为，教学应当走在发展的（　）。",
+      "options": [
+        "前面",
+        "后面",
+        "同时",
+        "之外"
+      ],
+      "answer": [
+        0
+      ],
+      "group_miss_rate": null,
+      "explanation": {
+        "conclusion": "教学要走在发展前面，创造最近发展区。"
+      }
+    },
+    {
+      "id": "019a0218-0000-7000-8000-000000000012",
+      "version": 1,
+      "question_type": "true_false",
+      "response_form": "choice",
+      "credibility": "generated_instant",
+      "knowledge_point_ids": [
+        "019a0203-0000-7000-8000-000000000006"
+      ],
+      "stem": "先行组织者通常在学习任务之后呈现。",
+      "options": [
+        "正确",
+        "错误"
+      ],
+      "answer": [
+        1
+      ],
+      "group_miss_rate": null,
+      "explanation": {
+        "conclusion": "先行组织者在学习任务之前呈现，所以叫“先行”。"
+      }
+    }
+  ]
+}
