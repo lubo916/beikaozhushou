@@ -1,0 +1,549 @@
+{
+  "report": {
+    "available": true,
+    "view": "normal",
+    "guest": true,
+    "map_health": "passed",
+    "exam_name": "",
+    "evidence_count": 24,
+    "forecast": {
+      "low": 68,
+      "high": 82,
+      "target": 78,
+      "gap": 3,
+      "pass_line": 70,
+      "confidence": "moderate"
+    },
+    "time": {
+      "available_minutes": 7200,
+      "required_minutes": 8400,
+      "buffer_minutes": 720,
+      "unavailable_days": 6,
+      "coverage_ratio": 0.86,
+      "shortfall_minutes": 1200
+    },
+    "grid": [
+      {
+        "knowledge_point_id": "019a0203-0000-7000-8000-000000000001",
+        "name": "教育的本质与功能",
+        "level": 2,
+        "target_level": 3,
+        "evidence_sufficient": true,
+        "pending_verification": false,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0203-0000-7000-8000-000000000002",
+        "name": "课程类型",
+        "level": 1,
+        "target_level": 2,
+        "evidence_sufficient": true,
+        "pending_verification": false,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0203-0000-7000-8000-000000000003",
+        "name": "教学原则",
+        "level": 3,
+        "target_level": 4,
+        "evidence_sufficient": true,
+        "pending_verification": true,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0203-0000-7000-8000-000000000004",
+        "name": "教学评价类型",
+        "level": 0,
+        "target_level": 3,
+        "evidence_sufficient": false,
+        "pending_verification": false,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0203-0000-7000-8000-000000000005",
+        "name": "材料分析：教学原则的运用",
+        "level": 4,
+        "target_level": 4,
+        "evidence_sufficient": true,
+        "pending_verification": false,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0203-0000-7000-8000-000000000006",
+        "name": "最近发展区",
+        "level": 2,
+        "target_level": 4,
+        "evidence_sufficient": true,
+        "pending_verification": false,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0203-0000-7000-8000-000000000007",
+        "name": "学习动机理论",
+        "level": 1,
+        "target_level": 3,
+        "evidence_sufficient": true,
+        "pending_verification": false,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0203-0000-7000-8000-000000000008",
+        "name": "知识的迁移",
+        "level": 3,
+        "target_level": 3,
+        "evidence_sufficient": false,
+        "pending_verification": true,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0203-0000-7000-8000-000000000009",
+        "name": "皮亚杰认知发展阶段",
+        "level": 0,
+        "target_level": 2,
+        "evidence_sufficient": false,
+        "pending_verification": false,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0203-0000-7000-8000-00000000000a",
+        "name": "心理健康教育",
+        "level": 2,
+        "target_level": 2,
+        "evidence_sufficient": true,
+        "pending_verification": false,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0203-0000-7000-8000-00000000000b",
+        "name": "德育原则与方法",
+        "level": 5,
+        "target_level": 3,
+        "evidence_sufficient": true,
+        "pending_verification": false,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0203-0000-7000-8000-00000000000c",
+        "name": "班级管理模式",
+        "level": 1,
+        "target_level": 2,
+        "evidence_sufficient": false,
+        "pending_verification": false,
+        "in_scope": false
+      }
+    ],
+    "chapters": [
+      {
+        "id": "019a0202-0000-7000-8000-000000000001",
+        "name": "教育基础知识和基本原理",
+        "met_ratio": 0.12,
+        "unlearned_count": 0,
+        "high_frequency": true,
+        "priority_order": 1
+      },
+      {
+        "id": "019a0202-0000-7000-8000-000000000002",
+        "name": "中学课程",
+        "met_ratio": 0.2,
+        "unlearned_count": 0,
+        "high_frequency": true,
+        "priority_order": 2
+      },
+      {
+        "id": "019a0202-0000-7000-8000-000000000003",
+        "name": "中学教学",
+        "met_ratio": 0.3,
+        "unlearned_count": 1,
+        "high_frequency": true,
+        "priority_order": 3
+      },
+      {
+        "id": "019a0202-0000-7000-8000-000000000004",
+        "name": "中学生学习心理",
+        "met_ratio": 0.42,
+        "unlearned_count": 0,
+        "high_frequency": true,
+        "priority_order": 4
+      },
+      {
+        "id": "019a0202-0000-7000-8000-000000000005",
+        "name": "中学生发展心理",
+        "met_ratio": 0.5,
+        "unlearned_count": 1,
+        "high_frequency": true,
+        "priority_order": 5
+      },
+      {
+        "id": "019a0202-0000-7000-8000-000000000006",
+        "name": "中学生心理辅导",
+        "met_ratio": 0.62,
+        "unlearned_count": 0,
+        "high_frequency": true,
+        "priority_order": 6
+      },
+      {
+        "id": "019a0202-0000-7000-8000-000000000007",
+        "name": "中学德育",
+        "met_ratio": 0.75,
+        "unlearned_count": 0,
+        "high_frequency": false,
+        "priority_order": 7
+      },
+      {
+        "id": "019a0202-0000-7000-8000-000000000008",
+        "name": "中学班级管理与教师心理",
+        "met_ratio": 0.88,
+        "unlearned_count": 0,
+        "high_frequency": false,
+        "priority_order": 8
+      }
+    ],
+    "gaps": [
+      {
+        "kind": "unlearned",
+        "points_gain": 14,
+        "minutes": 1800,
+        "roi": "S"
+      },
+      {
+        "kind": "forgotten",
+        "points_gain": 8,
+        "minutes": 720,
+        "roi": "A"
+      },
+      {
+        "kind": "unstable",
+        "points_gain": 5,
+        "minutes": 540,
+        "roi": "A"
+      },
+      {
+        "kind": "low_frequency",
+        "points_gain": 2,
+        "minutes": 1200,
+        "roi": "D"
+      }
+    ],
+    "scope": {
+      "total_count": 12,
+      "removed_count": 2,
+      "saved_minutes": 180,
+      "score_cost": 2,
+      "removals": [
+        {
+          "id": "019a0203-0000-7000-8000-00000000000b",
+          "name": "德育原则与方法",
+          "roi": "D",
+          "minutes": 90,
+          "score_cost": 1
+        },
+        {
+          "id": "019a0203-0000-7000-8000-00000000000c",
+          "name": "班级管理模式",
+          "roi": "D",
+          "minutes": 90,
+          "score_cost": 1
+        }
+      ]
+    },
+    "schemes": [
+      {
+        "id": "steady",
+        "recommended": false,
+        "daily_minutes": 60,
+        "weekly_minutes": 420,
+        "low": 76,
+        "high": 83,
+        "extra_weekly_minutes": 0,
+        "uplift_low": 0,
+        "uplift_high": 0,
+        "first_week_minutes": 420,
+        "first_week_tasks": 14,
+        "day_plan": [
+          {
+            "day": "2026-10-22",
+            "minutes": 60,
+            "tasks": [
+              "review",
+              "priority"
+            ]
+          },
+          {
+            "day": "2026-10-23",
+            "minutes": 60,
+            "tasks": [
+              "review",
+              "priority"
+            ]
+          },
+          {
+            "day": "2026-10-24",
+            "minutes": 60,
+            "tasks": [
+              "review",
+              "priority"
+            ]
+          },
+          {
+            "day": "2026-10-25",
+            "minutes": 60,
+            "tasks": [
+              "review",
+              "priority"
+            ]
+          },
+          {
+            "day": "2026-10-26",
+            "minutes": 60,
+            "tasks": [
+              "review",
+              "priority"
+            ]
+          },
+          {
+            "day": "2026-10-27",
+            "minutes": 60,
+            "tasks": [
+              "review",
+              "priority"
+            ]
+          },
+          {
+            "day": "2026-10-28",
+            "minutes": 60,
+            "tasks": [
+              "review",
+              "priority"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "standard",
+        "recommended": true,
+        "daily_minutes": 90,
+        "weekly_minutes": 630,
+        "low": 80,
+        "high": 90,
+        "extra_weekly_minutes": 210,
+        "uplift_low": 4,
+        "uplift_high": 7,
+        "first_week_minutes": 630,
+        "first_week_tasks": 21,
+        "day_plan": [
+          {
+            "day": "2026-10-22",
+            "minutes": 90,
+            "tasks": [
+              "review",
+              "priority",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-23",
+            "minutes": 90,
+            "tasks": [
+              "review",
+              "priority",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-24",
+            "minutes": 90,
+            "tasks": [
+              "review",
+              "priority",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-25",
+            "minutes": 90,
+            "tasks": [
+              "review",
+              "priority",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-26",
+            "minutes": 90,
+            "tasks": [
+              "review",
+              "priority",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-27",
+            "minutes": 90,
+            "tasks": [
+              "review",
+              "priority",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-28",
+            "minutes": 90,
+            "tasks": [
+              "review",
+              "priority",
+              "recap"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "sprint",
+        "recommended": false,
+        "daily_minutes": 120,
+        "weekly_minutes": 840,
+        "low": 86,
+        "high": 97,
+        "extra_weekly_minutes": 420,
+        "uplift_low": 10,
+        "uplift_high": 14,
+        "first_week_minutes": 840,
+        "first_week_tasks": 28,
+        "day_plan": [
+          {
+            "day": "2026-10-22",
+            "minutes": 120,
+            "tasks": [
+              "review",
+              "priority",
+              "check",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-23",
+            "minutes": 120,
+            "tasks": [
+              "review",
+              "priority",
+              "check",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-24",
+            "minutes": 120,
+            "tasks": [
+              "review",
+              "priority",
+              "check",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-25",
+            "minutes": 120,
+            "tasks": [
+              "review",
+              "priority",
+              "check",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-26",
+            "minutes": 120,
+            "tasks": [
+              "review",
+              "priority",
+              "check",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-27",
+            "minutes": 120,
+            "tasks": [
+              "review",
+              "priority",
+              "check",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-28",
+            "minutes": 120,
+            "tasks": [
+              "review",
+              "priority",
+              "check",
+              "recap"
+            ]
+          }
+        ]
+      }
+    ],
+    "rounds": [
+      {
+        "id": "foundation",
+        "ordinal": 1,
+        "kind": "foundation",
+        "start": "2026-10-22",
+        "end": "2026-12-05"
+      },
+      {
+        "id": "focus",
+        "ordinal": 2,
+        "kind": "focus",
+        "start": "2026-12-06",
+        "end": "2027-01-19"
+      },
+      {
+        "id": "practice",
+        "ordinal": 3,
+        "kind": "practice",
+        "start": "2027-01-20",
+        "end": "2027-03-06"
+      },
+      {
+        "id": "final",
+        "ordinal": 4,
+        "kind": "final",
+        "start": "2027-03-07",
+        "end": "2027-03-13"
+      }
+    ],
+    "repairs": [],
+    "first_week": {
+      "items": [
+        "review",
+        "priority",
+        "check",
+        "recap"
+      ]
+    },
+    "data_source": "sample"
+  },
+  "quick_forecast": {
+    "low": 52,
+    "high": 92,
+    "target": 78,
+    "gap": 3,
+    "pass_line": 70,
+    "confidence": "low"
+  },
+  "quick_evidence_count": 8,
+  "locked_repairs": [
+    {
+      "kind": "granularity",
+      "count": 2
+    },
+    {
+      "kind": "coverage",
+      "count": 1
+    },
+    {
+      "kind": "target",
+      "count": 3
+    }
+  ]
+}
