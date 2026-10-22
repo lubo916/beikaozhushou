@@ -1,1 +1,236 @@
-{}
+{
+  "title": "会员与权益",
+  "description": "买的是这一次备考，或持续的学习服务。核心闭环不设限，到期不锁数据。",
+  "sample": "示例数据",
+  "exam": "当前目标：{{exam}}",
+  "soon": "即将上线",
+  "close": "关闭",
+  "cancel": "暂不操作",
+  "confirm": "确认操作",
+  "state": {
+    "empty": {
+      "title": "还没有订单",
+      "body": "核心闭环免费，不需要购买也能完整备考",
+      "action": "看档位对比"
+    },
+    "offline": {
+      "title": "当前处于离线状态",
+      "body": "可查看权益；购买与退款需要联网",
+      "action": "重新连接"
+    },
+    "restricted": {
+      "title": "人工服务暂未上架",
+      "body": "人工服务就绪后才上架人工档",
+      "action": "联系人工客服"
+    },
+    "insufficient_data": {
+      "title": "数据不足：不适用",
+      "body": "权益与订单按实际记录展示，不依据学习样本推断。"
+    },
+    "error": {
+      "title": "会员与权益没能加载",
+      "body": "会员与权益的数据暂时没取到：网络或服务异常。已保存的内容不受影响，点“重试”即可；连续失败会自动上报。"
+    }
+  },
+  "current": {
+    "title": "当前权益",
+    "kind": "权益类型",
+    "valid": "当期有效至",
+    "final": "最终到期日",
+    "renewal": "续费状态",
+    "renewing": "将自动续期",
+    "manual": "未开启自动续费",
+    "next": "下次扣款：{{date}} · {{amount}}",
+    "close_renewal": "关闭自动续费",
+    "close_title": "关闭自动续费",
+    "close_body": "关闭后不再自动扣款，当期权益仍有效至 {{date}}。",
+    "close_confirm": "确认关闭续费",
+    "devices": "已用 {{used}} 台 / 上限 {{limit}} 台",
+    "manage_devices": "管理设备",
+    "support": "联系人工客服",
+    "pending": "待生效权益",
+    "pending_empty": "暂无待生效权益",
+    "pending_period": "{{start}} 至 {{end}}",
+    "pending_note": "有效期内再次购买、兑换或获赠的权益排在当前权益之后，不重叠浪费。",
+    "grace": "扣款失败宽限期至 {{date}}，期间权益保留；计划于 {{retry}} 重试扣款。",
+    "payment_method": "更新支付方式",
+    "retained": "到期后，数据全部可见、可导出，核心闭环照常；超出免费规模的部分转为只读。",
+    "lifetime": "长期有效"
+  },
+  "plans": {
+    "free": "免费",
+    "member": "会员",
+    "human": "会员加人工服务"
+  },
+  "kind": {
+    "free": "免费权益",
+    "pass": "考期通行证",
+    "subscription": "时长订阅",
+    "institution": "机构权益"
+  },
+  "source": {
+    "purchase": "购买",
+    "redemption": "兑换",
+    "gift": "获赠",
+    "institution": "机构开通"
+  },
+  "core": {
+    "title": "核心闭环，任何档位都不限量",
+    "body": "今日清单、计划、到期复习、错题回炉，免费也能完整使用。"
+  },
+  "usage": {
+    "title": "用量与额度",
+    "notice": "限的是规模与高成本能力。耗额度的操作会在执行前告知，不影响核心闭环。",
+    "used": "已用 {{used}} / {{limit}}",
+    "remaining": "剩余 {{remaining}}",
+    "details": "查看明细",
+    "detail_title": "{{name}}使用明细",
+    "none": "暂无使用明细",
+    "targets": "同时进行的目标",
+    "parsing": "资料解析",
+    "ai_points": "AI 点数",
+    "correction": "主观题批改",
+    "oral": "口头表达训练",
+    "at": "时间",
+    "activity": "使用项目",
+    "amount": "消耗"
+  },
+  "addons": {
+    "title": "一次性加量包",
+    "body": "批改、口述、解析可按需加量，未使用的加量包可退。",
+    "item": "{{name}} · {{amount}}",
+    "buy": "购买加量包",
+    "refundable": "未用可退"
+  },
+  "compare": {
+    "title": "档位对比",
+    "feature": "权益",
+    "core": "核心闭环",
+    "targets": "同时进行的目标",
+    "parsing": "资料解析量",
+    "ai_points": "导师深度能力",
+    "human_service": "人工服务",
+    "devices": "设备上限",
+    "expiry": "权益有效期",
+    "note": "额度用完只暂停高成本 AI；学习记录与核心闭环照常。"
+  },
+  "purchase": {
+    "title": "两种买法",
+    "pass": "考期通行证",
+    "subscription": "时长订阅",
+    "pass_body": "适合围绕一个目标备考，有效至目标日后一段时间，不自动续费。",
+    "pass_until": "目标日 {{target}} · 有效至 {{until}}",
+    "pass_buy": "单次购买通行证",
+    "subscription_body": "适合多目标持续学习；自动续费只用于时长订阅，可随时关闭。",
+    "period": "每 {{months}} 个月 {{amount}}",
+    "single": "单次购买",
+    "auto": "自动续费",
+    "choose": "请选择购买方式，两项均不预选。",
+    "single_note": "只购买当前周期，不自动扣款。",
+    "auto_note": "下次扣款日 {{date}}，金额 {{amount}}。扣款前提醒；目标日已过且长期未学时，续费前再确认一次。",
+    "submit": "继续购买订阅",
+    "disabled": "联网后可购买与退款",
+    "transfer": "转换购买方式",
+    "transfer_body": "考期通行证与时长订阅可互转。当前可折算价值 {{amount}}，最终以确认页为准。",
+    "channel": "支付方式",
+    "channel_note": "续费与退款回到原购买渠道办理。",
+    "ios_note": "苹果应用内购买不支持优惠码。",
+    "confirm_title": "确认购买信息",
+    "confirm_note": "请核对权益类型、周期和金额。本阶段仅演示确认流程，不会扣款。",
+    "confirm": "确认购买"
+  },
+  "channel": {
+    "web": "网页端",
+    "ios": "苹果应用",
+    "android": "安卓应用",
+    "institution": "机构开通"
+  },
+  "method": {
+    "wechat": "微信支付",
+    "alipay": "支付宝",
+    "apple": "苹果应用内购买"
+  },
+  "upgrade": {
+    "title": "升级补差",
+    "body": "剩余价值折算 {{credit}}，需补差 {{due}}。",
+    "until": "升级后有效至 {{date}}",
+    "rules": "查看折算与到期算法",
+    "action": "升级档位",
+    "restriction": "人工服务就绪后开放升级"
+  },
+  "orders": {
+    "title": "订单与退款",
+    "all": "查看全部订单",
+    "number": "订单号：{{number}}",
+    "date": "购买时间",
+    "amount": "实付",
+    "status": "订单状态",
+    "invoice": "申请发票",
+    "download": "下载发票",
+    "invoice_unavailable": "此订单暂不可开票",
+    "refund": "退款试算",
+    "refund_progress": "查看退款进度",
+    "support": "带订单号联系客服",
+    "channel": "购买渠道",
+    "detail": "订单详情",
+    "empty": "暂无订单"
+  },
+  "order_status": {
+    "paid": "已支付",
+    "pending": "待支付",
+    "failed": "支付未完成",
+    "refunding": "退款中",
+    "refunded": "已退款"
+  },
+  "refund": {
+    "title": "退款试算与进度",
+    "formula": "退款公式",
+    "paid": "实付金额",
+    "consumed": "已用价值",
+    "fee": "渠道费用",
+    "estimated": "预计可退",
+    "note": "以上为接口返回的示例试算，实际金额以原渠道确认结果为准。",
+    "apply": "申请退款",
+    "status": "当前进度",
+    "application": "提交申请",
+    "review": "渠道审核",
+    "returned": "原路退回",
+    "done": "已完成",
+    "waiting": "待处理",
+    "unavailable": "暂不可退款",
+    "confirm": "确认申请退款",
+    "confirm_note": "预计可退 {{amount}}，请核对订单及原购买渠道。本阶段仅演示申请，不会提交真实退款。"
+  },
+  "payment": {
+    "title": "支付遇到问题",
+    "reason": "支付情况",
+    "retry": "重试支付",
+    "support": "已扣款未开通？联系人工客服",
+    "cancelled": "你已取消本次支付，权益未变更，可重新发起。",
+    "balance_or_network": "余额或网络问题，请检查余额与连接后重试。",
+    "expired": "订单已超时，请重新确认订单后支付。",
+    "system": "支付系统暂时异常，已保存的订单不受影响，请稍后重试。",
+    "charged_not_activated": "已扣款但权益未开通，请携带订单号联系人工客服，避免重复支付。"
+  },
+  "redemption": {
+    "title": "兑换码与机构权益",
+    "label": "兑换码",
+    "placeholder": "输入兑换码",
+    "action": "兑换权益",
+    "hint": "兑换权益将在当前权益之后生效。",
+    "institution": "{{name}} · 服务期至 {{date}}",
+    "institution_note": "机构批量开通的权益与服务期绑定。",
+    "empty": "请输入兑换码"
+  },
+  "reminders": {
+    "title": "到期与续费提醒",
+    "expiry": "到期前 {{days}} 天提醒续费",
+    "renewal": "将自动续期：扣款前 {{days}} 天提醒",
+    "final": "最后一次提醒：到期后数据可见可导出，核心闭环照常",
+    "at": "提醒时间：{{date}}"
+  },
+  "promise": {
+    "title": "这里没有的东西",
+    "body": "不制造备考焦虑，不用购买条件限制核心学习。按需要选择档位，用量合适就不必升级。"
+  }
+}
