@@ -84,11 +84,12 @@ for (const size of WIDTHS) {
   });
 }
 
-test("S09 四个视图都能用 ?view= 打开；点标签时地址跟着变", async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 900 });
-  const watch = await watchPage(page);
-  const total = totalOf(KJ);
-  for (const key of VIEWS) {
+// 每个视图独立加载，避免四次导航共用一个用例的时间预算。
+for (const key of VIEWS) {
+  test(`S09 视图 ${key} 能用 ?view= 打开`, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    const watch = await watchPage(page);
+    const total = totalOf(KJ);
     await watch.open(urlOf(entry, { view: key }));
     await expectLoaded(page, entry);
     await expect(main(page).getByRole("tab", { name: copy(`views.${key}`) })).toHaveAttribute("aria-selected", "true");
@@ -98,16 +99,25 @@ test("S09 四个视图都能用 ?view= 打开；点标签时地址跟着变", as
     if (key === "graph") await expect(panel.getByRole("img", { name: copy("graph.label") })).toBeVisible();
     if (key === "list") await expect(panel.locator("tbody tr")).toHaveCount(total);
     expectNoProblems(watch, "normal", `${key}：`);
-  }
+  });
+}
+
+test("S09 视图切换标签同步更新地址", async ({ page }) => {
+  const watch = await watchPage(page);
+  await watch.open(urlOf(entry, { view: "list" }));
+  await expectLoaded(page, entry);
   await main(page)
     .getByRole("tab", { name: copy("views.tree") })
     .press("Enter");
   await expect(page).toHaveURL(/[?&]view=tree/);
+  await expect(main(page).getByRole("tab", { name: copy("views.tree") })).toHaveAttribute("aria-selected", "true");
+  expectNoProblems(watch, "normal");
 });
 
-test("S09 七态都能用 ?state= 强制显示，文案按 bk spec", async ({ page }) => {
-  const watch = await watchPage(page);
-  for (const state of ABNORMAL_STATES) {
+// 七态逐态保留原有校验，每次导航都有独立用例的时间预算。
+for (const state of ABNORMAL_STATES) {
+  test(`S09 状态 ${state} 能强制显示且文案符合规格`, async ({ page }) => {
+    const watch = await watchPage(page);
     await watch.open(urlOf(entry, { state }));
     await expectState(page, entry, state);
     expectNoProblems(watch, state);
@@ -123,13 +133,13 @@ test("S09 七态都能用 ?state= 强制显示，文案按 bk spec", async ({ pa
       await expect(shown).toContainText(copy(`state.${state}.body`));
       await expect(main(page).locator(".s09-views"), "只在顶上提示，地图照常显示").toBeVisible();
     }
-  }
-});
+  });
+}
 
-test("S09 四个演示考试切过去，格子数对得上；数据结构那场体检不通过，性价比阶梯锁定", async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 900 });
-  const watch = await watchPage(page);
-  for (const exam of EXAMS) {
+for (const exam of EXAMS) {
+  test(`S09 演示考试 ${exam.key} 的格子数和体检锁定正确`, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    const watch = await watchPage(page);
     await watch.open(urlOf(entry, { exam: exam.key, view: "grid" }));
     await expectLoaded(page, entry);
     await expect(main(page).locator("button.s09-cell[data-point]"), exam.key).toHaveCount(totalOf(exam.exam_id));
@@ -137,8 +147,8 @@ test("S09 四个演示考试切过去，格子数对得上；数据结构那场�
     if (exam.key === "ds") await expect(lock).toBeVisible();
     else await expect(lock).toHaveCount(0);
     expectNoProblems(watch, "normal", `${exam.key}：`);
-  }
-});
+  });
+}
 
 test("S09 主要按钮都能点：跳到路由表里的页面，或提示“即将上线”", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
