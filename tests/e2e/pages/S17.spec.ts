@@ -171,7 +171,10 @@ test("S17 窄屏真题、限时、拍照、导入和导师入口可预览", asyn
   await close();
   for (const kind of ["photo", "import", "tutor"]) {
     await main.getByRole("button", { name: copy("add"), exact: true }).click();
-    await main.getByRole("button", { name: copy(kind), exact: true }).click();
+    await main
+      .locator("#s17-add-menu")
+      .getByRole("button", { name: copy(kind), exact: true })
+      .click();
     const dialog = page.getByRole("dialog", { name: copy("dialog." + kind + ".title"), exact: true });
     await expect(dialog).toBeVisible();
     if (kind === "photo") await expect(dialog.getByLabel(copy("form.intent"), { exact: true })).toBeVisible();
