@@ -3,16 +3,20 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import COPY from "../../../apps/learner/src/i18n/zh-CN/S07.json";
 import { pageById, urlOf } from "../support/catalog.ts";
 import { ABNORMAL_STATES, expectLoaded, expectNoProblems, expectOpened, expectState, watchPage } from "../support/checks.ts";
 import { ROOT } from "../support/env.ts";
 
+const readJson = (rel: string): unknown => JSON.parse(readFileSync(join(ROOT, rel), "utf8")) as unknown;
+const COPY = readJson("apps/learner/src/i18n/zh-CN/S07.json");
+
 const entry = pageById("S07");
 const VIEWS = ["week", "scope", "ranking", "log", "calendar", "rounds", "today", "sandbox"] as const;
-const EXAMS = (JSON.parse(readFileSync(join(ROOT, "fixtures/exams/index.json"), "utf8")) as {
-  exams: { key: string; exam_id: string }[];
-}).exams;
+const EXAMS = (
+  JSON.parse(readFileSync(join(ROOT, "fixtures/exams/index.json"), "utf8")) as {
+    exams: { key: string; exam_id: string }[];
+  }
+).exams;
 
 interface PageFixture {
   readonly exam_name: string;
@@ -30,11 +34,14 @@ function copy(path: string, values: Readonly<Record<string, string | number>> = 
     node = typeof node === "object" && node !== null ? (node as Record<string, unknown>)[key] : undefined;
   }
   if (typeof node !== "string") throw new Error(`S07.json 没有文案 ${path}`);
-  return node.replace(/\{\{\s*(\w+)\s*\}\}/g, (whole: string, name: string) => values[name] === undefined ? whole : String(values[name]));
+  return node.replace(/\{\{\s*(\w+)\s*\}\}/g, (whole: string, name: string) => (values[name] === undefined ? whole : String(values[name])));
 }
 
 function button(page: Page, path: string): Locator {
-  return page.locator("main#main").getByRole("button", { name: copy(path), exact: true }).first();
+  return page
+    .locator("main#main")
+    .getByRole("button", { name: copy(path), exact: true })
+    .first();
 }
 
 async function expectNoOverflow(page: Page): Promise<void> {
@@ -103,6 +110,44 @@ for (const width of [375, 834, 1280]) {
   });
 }
 
+// 回归：手机隐藏表头后，每一格必须显示实际的 ::before 字段标签，不能只剩没有含义的数值。
+const STACKED_TABLES = [
+  { view: "scope", fields: ["name", "state", "target", "gap", "minutes", "action"] },
+  { view: "ranking", fields: ["rank", "name", "score", "frequency", "gap", "prerequisite", "minutes", "star"] },
+] as const;
+
+for (const { view, fields } of STACKED_TABLES) {
+  test(`S07 375 宽：${view} 堆叠表格的每一列均显示中文字段标签`, async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    const watch = await watchPage(page);
+    await watch.open(urlOf(entry, { view }));
+    await expectLoaded(page, entry);
+    const table = page
+      .locator("main#main")
+      .getByRole("region", { name: copy(`${view}.title`), exact: true })
+      .locator("table");
+    const rows = table.locator("tbody tr");
+    const rowCount = await rows.count();
+    expect(rowCount, "演示数据应有可检查的表格行").toBeGreaterThan(0);
+    const expected = fields.map((field) => copy(`${view}.${field}`));
+    for (let index = 0; index < rowCount; index += 1) {
+      const row = rows.nth(index);
+      await expect(row, "手机表格应切换成堆叠卡片").toHaveCSS("display", "grid");
+      const cells = row.locator("td");
+      await expect(cells).toHaveCount(fields.length);
+      const labels = await cells.evaluateAll((elements) =>
+        elements.map((element) => {
+          const content = getComputedStyle(element, "::before").content;
+          return content === "none" || content === "normal" ? content : (JSON.parse(content) as unknown);
+        }),
+      );
+      expect(labels, `${view} 第 ${index + 1} 行：每个值旁应显示对应中文字段名`).toEqual(expected);
+    }
+    await expectNoOverflow(page);
+    expectNoProblems(watch, "normal");
+  });
+}
+
 test("S07 七态均可强制显示，局部限制保留学习计划，离线只读", async ({ page }) => {
   const watch = await watchPage(page);
   for (const state of ABNORMAL_STATES) {
@@ -154,10 +199,18 @@ test("S07 五个主要标签可切换，周任务写操作只提示，更多菜�
   await button(page, "timeline.edit").press("Enter");
   await expect(page).toHaveURL(/[?&]view=rounds(?:&|$)/);
   await expect(button(page, "timeline.add")).toBeVisible();
-  const roundsEdit = page.locator('main#main .ui-card').filter({ has: page.locator("summary") }).first()
+  const roundsEdit = page
+    .locator("main#main .ui-card")
+    .filter({ has: page.locator("summary") })
+    .first()
     .getByRole("button", { name: copy("timeline.edit"), exact: true });
   await roundsEdit.press("Enter");
-  await expect(page.getByRole("status").filter({ hasText: copy("soon") }).first()).toBeVisible();
+  await expect(
+    page
+      .getByRole("status")
+      .filter({ hasText: copy("soon") })
+      .first(),
+  ).toBeVisible();
   await watch.open(urlOf(entry, { view: "week" }));
   await expectLoaded(page, entry);
   for (const path of ["week.lock", "week.move"]) {
@@ -167,7 +220,12 @@ test("S07 五个主要标签可切换，周任务写操作只提示，更多菜�
       .and(page.locator("button:enabled"))
       .first()
       .press("Enter");
-    await expect(page.getByRole("status").filter({ hasText: copy("soon") }).first()).toBeVisible();
+    await expect(
+      page
+        .getByRole("status")
+        .filter({ hasText: copy("soon") })
+        .first(),
+    ).toBeVisible();
   }
   await button(page, "header.more").press("Enter");
   const menu = page.getByRole("menu");
@@ -175,7 +233,12 @@ test("S07 五个主要标签可切换，周任务写操作只提示，更多菜�
   const item = menu.getByRole("menuitem", { name: copy("header.sync"), exact: true });
   await expect(item).toBeVisible();
   await item.press("Enter");
-  await expect(page.getByRole("status").filter({ hasText: copy("soon") }).first()).toBeVisible();
+  await expect(
+    page
+      .getByRole("status")
+      .filter({ hasText: copy("soon") })
+      .first(),
+  ).toBeVisible();
   expectNoProblems(watch, "normal");
 });
 
@@ -197,7 +260,12 @@ test("S07 沙盘可填输入并试算，采用前保持待确认，关闭后不�
   await expect(dialog.locator(".ui-proposal")).toBeVisible();
   await expect(dialog.getByText("待确认", { exact: true })).toBeVisible();
   await dialog.getByRole("button", { name: copy("sandbox.adopt"), exact: true }).press("Enter");
-  await expect(page.getByRole("status").filter({ hasText: copy("soon") }).first()).toBeVisible();
+  await expect(
+    page
+      .getByRole("status")
+      .filter({ hasText: copy("soon") })
+      .first(),
+  ).toBeVisible();
   await dialog.press("Escape");
   await expect(dialog).toBeHidden();
   expect(await page.getByTestId("week-grid").innerText()).toBe(before);
@@ -207,7 +275,12 @@ test("S07 沙盘可填输入并试算，采用前保持待确认，关闭后不�
   await dialog.getByLabel(copy("leave.end"), { exact: true }).fill("2026-10-25");
   await dialog.getByRole("textbox", { name: copy("leave.reason"), exact: true }).fill("出差期间保留到期复习");
   await dialog.getByRole("button", { name: copy("leave.preview"), exact: true }).press("Enter");
-  await expect(page.getByRole("status").filter({ hasText: copy("soon") }).first()).toBeVisible();
+  await expect(
+    page
+      .getByRole("status")
+      .filter({ hasText: copy("soon") })
+      .first(),
+  ).toBeVisible();
   await dialog.press("Escape");
   await expect(dialog).toBeHidden();
   expectNoProblems(watch, "normal");
@@ -234,6 +307,11 @@ test("S07 自定考试地图未通过时仅锁定预测，沙盘提议与学习�
   const start = button(page, "today.start");
   await expect(start).toBeEnabled();
   await start.press("Enter");
-  await expect(page.getByRole("status").filter({ hasText: copy("soon") }).first()).toBeVisible();
+  await expect(
+    page
+      .getByRole("status")
+      .filter({ hasText: copy("soon") })
+      .first(),
+  ).toBeVisible();
   expectNoProblems(watch, "normal");
 });
