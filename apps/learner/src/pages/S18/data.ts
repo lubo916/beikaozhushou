@@ -100,11 +100,11 @@ export function navStatus(item: S18QuizItem): NavStatus {
   return "ungraded";
 }
 
-/** 下一道还没做的题：从当前往后找，找不到再从头找；都做了为 null。 */
+/** 下一道还没做的题：从当前往后找，找不到再从头找（不算当前这题）；都做了为 null。 */
 export function nextOpenIndex(items: readonly S18QuizItem[], from: number): number | null {
   const after = items.findIndex((item, index) => index > from && item.status === "unanswered");
   if (after >= 0) return after;
-  const before = items.findIndex((item) => item.status === "unanswered");
+  const before = items.findIndex((item, index) => index !== from && item.status === "unanswered");
   return before >= 0 ? before : null;
 }
 
