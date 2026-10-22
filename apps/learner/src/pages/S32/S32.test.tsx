@@ -1,4 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { act } from "react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { MemoryRouter } from "react-router";
+import { getGetPrivacyCenterQueryKey } from "@exam-prep/contract";
+import { click, mount, settle, testClient } from "../../app/testing.tsx";
+import copy from "../../i18n/zh-CN/S32.json";
+import Page from "./index.tsx";
 import type { S32PrivacyCenter } from "@exam-prep/contract";
 import { ApiError } from "@exam-prep/contract/errors";
 import * as schemas from "@exam-prep/contract/zod";
@@ -100,5 +107,73 @@ describe("S32 七态与重试策略", () => {
     expect(shouldRetry(1, new TypeError("offline"))).toBe(false);
     expect(shouldRetry(0, new ApiError("COMMON_INTERNAL"))).toBe(true);
     expect(shouldRetry(0, new ApiError("COMMON_FORBIDDEN"))).toBe(false);
+  });
+});
+
+describe("S32 缓存权限与离线操作回归", () => {
+  it("已有缓存后收到403，不继续展示原隐私数据", async () => {
+    const data = await setup().home();
+    expect(privacyView({ data, error: new ApiError("COMMON_FORBIDDEN"), status: "error", fetchStatus: "idle" })).toMatchObject({
+      state: "restricted",
+      data: undefined,
+      stale: false,
+    });
+  });
+  it("无权限不误报离线，且导出不可点", async () => {
+    const client = testClient();
+    const key = getGetPrivacyCenterQueryKey();
+    client.setQueryData(key, await setup().home());
+    const { host, unmount } = await mount(
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={["/privacy"]}>
+          <Page />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+    try {
+      await act(async () => {
+        client
+          .getQueryCache()
+          .find({ queryKey: key })
+          ?.setState({ data: undefined, status: "error", error: new ApiError("COMMON_FORBIDDEN"), fetchStatus: "idle" });
+      });
+      await settle(() => host.querySelector(".ui-state--restricted") !== null);
+      expect(host.querySelector(".ui-state--restricted")?.textContent).not.toContain(copy.state.offline.body);
+      const button = [...host.querySelectorAll("button")].find((node) => node.textContent === copy.export.all);
+      expect(button?.disabled).toBe(true);
+    } finally {
+      await unmount();
+      client.clear();
+    }
+  });
+  it.each(["privacy", "assets", "account"])("缓存离线的%s视图不能发起授权、导出或危险操作", async (view) => {
+    const client = testClient();
+    const key = getGetPrivacyCenterQueryKey();
+    client.setQueryData(key, await setup().home());
+    const { host, unmount } = await mount(
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={["/privacy?view=" + view]}>
+          <Page />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+    try {
+      await act(async () => {
+        client
+          .getQueryCache()
+          .find({ queryKey: key })
+          ?.setState({ status: "error", error: new TypeError("offline"), fetchStatus: "paused" });
+      });
+      await settle(() => host.textContent?.includes(copy.state.offline.cached) === true);
+      expect(host.textContent).toContain(copy.state.offline.cached);
+      const controls = [...host.querySelectorAll("button")].filter((node) => node.getAttribute("role") !== "tab");
+      for (const control of controls) {
+        await click(control);
+        expect(document.querySelector('dialog[open], [role="dialog"]'), control.textContent ?? "").toBeNull();
+      }
+    } finally {
+      await unmount();
+      client.clear();
+    }
   });
 });

@@ -41,6 +41,28 @@ export function PrivacyView({ data, confirm, exportData }: ViewProps) {
             </Rows>
             <p className={secondary}>{t("privacy.organization.notice")}</p>
           </Card>
+          {/* feat:S32-02 数据总览的计数由接口提供。 */}
+          <Card
+            title={t("privacy.data.title")}
+            actions={
+              <Button size="sm" onClick={exportData}>
+                {t("assets.tasks.export")}
+              </Button>
+            }
+          >
+            <Rows>
+              {data.data_categories.map((category) => (
+                <Row key={category.key} actions={<Tag>{t("common.count", { total: formatCount(category.count) })}</Tag>}>
+                  <p className="font-medium">{t("privacy.data." + category.key)}</p>
+                  <p className={secondary}>{t("privacy.data.purpose", { purpose: t("privacy.data." + category.key + "_help") })}</p>
+                </Row>
+              ))}
+            </Rows>
+          </Card>
+        </div>
+      }
+      aside={
+        <div className="flex flex-col gap-4">
           {/* feat:S32-04 个性化单独同意，可撤回。 feat:S32-05 自动化关闭后每次先问。 feat:S32-06 模型训练默认不授权。 */}
           <Card title={t("privacy.settings.title")}>
             <Rows>
@@ -62,28 +84,6 @@ export function PrivacyView({ data, confirm, exportData }: ViewProps) {
                 >
                   <p className="font-medium">{t("privacy.settings." + setting.key)}</p>
                   <p className={secondary}>{t("privacy.settings." + setting.key + "_help")}</p>
-                </Row>
-              ))}
-            </Rows>
-          </Card>
-        </div>
-      }
-      aside={
-        <div className="flex flex-col gap-4">
-          {/* feat:S32-02 数据总览的计数由接口提供。 */}
-          <Card
-            title={t("privacy.data.title")}
-            actions={
-              <Button size="sm" onClick={exportData}>
-                {t("assets.tasks.export")}
-              </Button>
-            }
-          >
-            <Rows>
-              {data.data_categories.map((category) => (
-                <Row key={category.key} actions={<Tag>{t("common.count", { total: formatCount(category.count) })}</Tag>}>
-                  <p className="font-medium">{t("privacy.data." + category.key)}</p>
-                  <p className={secondary}>{t("privacy.data.purpose", { purpose: t("privacy.data." + category.key + "_help") })}</p>
                 </Row>
               ))}
             </Rows>

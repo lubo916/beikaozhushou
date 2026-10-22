@@ -22,9 +22,15 @@ function copy(path: string): string {
 }
 
 function pattern(path: string): RegExp {
-  const escaped = copy(path).replace(/[.*+?^$()|[\]\\]/g, "\\$&");
-  return new RegExp(escaped.replace(/\\{\\{\s*\w+\s*\\}\\}/g, ".+"));
+  const parts = copy(path).split(/\{\{\s*\w+\s*\}\}/g);
+  return new RegExp(parts.map((part) => part.replace(/[.*+?^$()|[\]\\]/g, "\\$&")).join(".+"));
 }
+
+test("S32 文案匹配器保留正文并允许接口字段插值", () => {
+  const rendered = copy("confirm.authorization.body").replace("{{name}}", copy("privacy.organization.progress"));
+  expect(pattern("confirm.authorization.body").test(rendered)).toBe(true);
+  expect(pattern("confirm.authorization.body").test("没有说明授权后果")).toBe(false);
+});
 
 async function boxOf(locator: Locator): Promise<{ x: number; y: number; width: number; height: number }> {
   const box = await locator.first().boundingBox();

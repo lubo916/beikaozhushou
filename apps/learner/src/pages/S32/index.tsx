@@ -26,9 +26,29 @@ export default function Page() {
   const [exportOpen, setExportOpen] = useState(false);
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const soon = () => toast(t("common.soon"));
-  const confirm = (kind: string, values: Record<string, string | number> = {}) => setConfirmation({ kind, values });
   const data = home.data;
-  const props = data === undefined ? undefined : { data, confirm, soon, exportData: () => setExportOpen(true) };
+  const canWrite = data !== undefined && !home.stale && home.state !== "empty" && home.state !== "error" && home.state !== "offline";
+  const blocked = () => toast(t(home.stale || home.state === "offline" ? "state.offline.body" : "state.access.body"));
+  // 缓存离线仍可查看；所有视图共用操作闸门，避免页内入口绕过页头禁用。
+  const confirm = (kind: string, values: Record<string, string | number> = {}) => {
+    if (!canWrite) {
+      blocked();
+      return;
+    }
+    setConfirmation({ kind, values });
+  };
+  const exportData = () => {
+    if (!canWrite) {
+      blocked();
+      return;
+    }
+    setExportOpen(true);
+  };
+  const perform = () => {
+    if (canWrite) soon();
+    else blocked();
+  };
+  const props = data === undefined ? undefined : { data, confirm, soon: perform, exportData };
   const selectView = (key: View) => {
     const next = new URLSearchParams(search);
     next.set("view", key);
@@ -78,7 +98,8 @@ export default function Page() {
         <PageState
           state="restricted"
           pageName={t("title")}
-          body={t("state.offline.body")}
+          title={t("state.access.title")}
+          body={t("state.access.body")}
           action={
             <Link to={pathTo("S33")} className={buttonClass("secondary")}>
               {t("common.settings")}
@@ -140,9 +161,14 @@ export default function Page() {
           <Button
             variant="primary"
             disabled={
-              home.state === "loading" || home.state === "offline" || home.state === "error" || home.state === "empty" || home.stale
+              data === undefined ||
+              home.state === "loading" ||
+              home.state === "offline" ||
+              home.state === "error" ||
+              home.state === "empty" ||
+              home.stale
             }
-            onClick={() => setExportOpen(true)}
+            onClick={exportData}
           >
             {t("export.all")}
           </Button>
@@ -152,15 +178,15 @@ export default function Page() {
         {content()}
       </Tabs>
       <ExportDialog
-        open={exportOpen}
+        open={exportOpen && canWrite}
         close={() => setExportOpen(false)}
         confirm={() => {
           setExportOpen(false);
-          soon();
+          perform();
         }}
       />
       <Dialog
-        open={confirmation !== null}
+        open={confirmation !== null && canWrite}
         onClose={() => setConfirmation(null)}
         title={confirmation === null ? "" : t("confirm." + confirmation.kind + ".title")}
         description={confirmation === null ? "" : t("confirm." + confirmation.kind + ".body", confirmation.values)}
@@ -171,7 +197,7 @@ export default function Page() {
               variant="primary"
               onClick={() => {
                 setConfirmation(null);
-                soon();
+                perform();
               }}
             >
               {t("common.confirm")}
