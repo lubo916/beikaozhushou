@@ -30,6 +30,7 @@
     "@exam-prep/params": "workspace:*",
     "@exam-prep/shared": "workspace:*",
     "@exam-prep/ui": "workspace:*",
+    "@tanstack/react-query": "5.85.0",
     "i18next": "25.3.0",
     "react": "19.2.5",
     "react-dom": "19.2.5",
