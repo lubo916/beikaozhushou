@@ -66,7 +66,7 @@ for (const size of WIDTHS) {
     else expect(aside.y).toBeGreaterThanOrEqual(main.y + main.height - 1);
     const overflow = await page.locator("main#main").evaluate((element) => element.scrollWidth - element.clientWidth);
     expect(overflow, "正文区不应横向溢出").toBeLessThanOrEqual(1);
-    await page.screenshot({ path: join(ROOT, ".bk/qa/S23", `default@${size.width}.png`), fullPage: true });
+    await page.screenshot({ path: join(ROOT, ".bk/qa/S23", `default@${size.width}.png`), fullPage: false });
     expectNoProblems(watch, "normal");
   });
 }
