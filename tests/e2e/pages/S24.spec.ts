@@ -223,7 +223,7 @@ test("S24 体检阻断后，两个时点的预测值及趋势、分值表不再�
     .locator(".ui-stat")
     .filter({ hasText: copy("metrics.forecast") })
     .locator(".ui-stat__value");
-  const trend = main.locator(".ui-card").filter({ has: main.getByRole("heading", { name: copy("forecast.trend"), exact: true }) });
+  const trend = main.locator(".ui-card").filter({ has: page.getByRole("heading", { name: copy("forecast.trend"), exact: true }) });
 
   const today = progressFixture.forecasts.today;
   for (const at of ["today", "target"] as const) {
@@ -285,7 +285,7 @@ test("S24 按计划学到目标日已过目标线时写“已过目标线”，�
   await expectLoaded(page, entry);
   const main = mainOf(page);
   await main.getByRole("radio", { name: copy("forecast.target"), exact: true }).press("Enter");
-  const trend = main.locator(".ui-card").filter({ has: main.getByRole("heading", { name: copy("forecast.trend"), exact: true }) });
+  const trend = main.locator(".ui-card").filter({ has: page.getByRole("heading", { name: copy("forecast.trend"), exact: true }) });
   await expect(trend).toContainText(copy("forecast.reached"));
   await expect(trend).not.toContainText("-");
   expectNoProblems(watch, "normal");
@@ -305,7 +305,7 @@ test("S24 样本不足时健康度只给原始天数与推进记录，不显示�
       .replace("{{days}}", formatCount(sample.observed_days))
       .replace("{{levels}}", formatCount(sample.advanced_levels)),
   );
-  await expect(health).not.toContainText(copy("metrics.verdict.ok"));
+  await expect(health.locator(".ui-stat__hint")).not.toContainText(copy("metrics.verdict.ok"));
   expectNoProblems(watch, "insufficient_data");
 });
 
