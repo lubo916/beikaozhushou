@@ -7,9 +7,15 @@
   gap: var(--size-space-2);
   align-items: center;
 }
+/* 输入框至少留出能看全关键词的宽度；放不下时按钮整组换行（见 .s29-search-actions）。 */
 .s29-input {
-  flex: 1;
-  min-width: calc(var(--size-space-8) * 4);
+  flex: 1 1 calc(var(--size-space-8) * 8);
+  min-width: 0;
+}
+.s29-search-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-space-2);
 }
 .s29-input input,
 .s29-select select {
@@ -87,4 +93,13 @@
 }
 .s29-ai {
   margin-block: var(--size-space-2);
+}
+/* 速查表“要点”一格：公式在上、回到知识点的链接在下；窄屏堆叠时也不会被挤成竖排。 */
+.s29-quick-cell {
+  display: grid;
+  gap: var(--size-space-1);
+}
+/* 窄屏堆叠时，左侧列名（条目、要点）不被挤成竖排。公共表格组件也有同样的情况，已在交接单里建议整合任务统一处理。 */
+.s29-page td[data-label]::before {
+  flex-shrink: 0;
 }

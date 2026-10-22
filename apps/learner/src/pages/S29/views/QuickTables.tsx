@@ -19,13 +19,12 @@ function QuickTable({ table }: { table: S29QuickTable }) {
           header: t("quick.value"),
           label: t("quick.value"),
           render: (row) => (
-            <>
-              {row.value}
-              <br />
+            <span className="s29-quick-cell">
+              <span>{row.value}</span>
               <Link to={pathTo("S10", { kpId: row.point_id })} aria-label={t("quick.point_named", { name: row.label })}>
                 {t("quick.point")}
               </Link>
-            </>
+            </span>
           ),
         },
       ]}

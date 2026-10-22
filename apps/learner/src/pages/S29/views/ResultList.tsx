@@ -12,7 +12,7 @@ function ResultBody({ item }: { item: S29Result }) {
       <Link className="s29-result-title" to={resultPath(item)} aria-label={t("results.open", { title: item.title })}>
         {item.title}
       </Link>
-      <p>{item.excerpt}</p>
+      {item.excerpt !== "" && <p>{item.excerpt}</p>}
       <p className="s29-hint">{t("results.source", { source: item.source })}</p>
     </>
   );

@@ -23,6 +23,7 @@ import {
 import { useToast } from "../../app/toast.tsx";
 import { pathTo } from "../../routes.ts";
 import { useStudyRoom } from "./data.ts";
+import "./style.css";
 
 type Reason = "spam" | "anxiety" | "harassment" | "privacy";
 const REASONS: readonly Reason[] = ["spam", "anxiety", "harassment", "privacy"];
@@ -160,72 +161,75 @@ export default function Page() {
           action={<Button onClick={() => soon("room")}>{t("state.insufficient_data.action")}</Button>}
         />
       )}
+      {/* 空态说的是小组（bk spec：还没加入小组）：放在页头下面，说明加一个动作（F08-Q2）。空态示例没有开放的房间，房间卡不显示空壳。 */}
+      {room.state === "empty" && (
+        <PageState
+          state="empty"
+          title={t("state.empty.title")}
+          body={t("state.empty.body", { group_size: formatCount(data.group_size) })}
+          action={<Button onClick={() => soon("group")}>{t("state.empty.action")}</Button>}
+        />
+      )}
       <Columns
         main={
           <div className="flex flex-col gap-4">
-            {/* feat:S30-02 简版保留自习室主体和可点入口，进入计时等待后端。 */}
-            <Card title={t("room.title")} meta={t("room.description")}>
-              <div className="flex flex-col gap-3">
-                {room.stale && <p className="text-ink-secondary">{t("room.offline")}</p>}
-                {!room.stale &&
-                  data.rooms.map((item) => (
-                    <Card
-                      key={item.id}
-                      as="article"
-                      title={item.name}
-                      headingLevel={3}
-                      tone="sunk"
-                      meta={<Tag>{t(`room.kind.${item.kind}`)}</Tag>}
-                    >
-                      <div className="flex flex-col gap-3">
-                        <p className="text-small text-ink-secondary">
-                          {t("room.people", { participants: formatCount(item.participants), capacity: formatCount(item.capacity) })}
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          <Button variant="primary" onClick={() => soon("room")}>
-                            {t("room.enter")}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            aria-label={t("room.report_room", { name: item.name })}
-                            onClick={() => openReport(t("room.report_room", { name: item.name }))}
-                          >
-                            {t("room.report")}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            aria-label={t("room.block_room", { name: item.name })}
-                            onClick={() => setBlocked(item.name)}
-                          >
-                            {t("room.block")}
-                          </Button>
+            {/* feat:S30-02 简版保留自习室主体和可点入口，进入计时等待后端。房间卡按宽度排成网格（style.css）。 */}
+            {(room.stale || data.rooms.length > 0) && (
+              <Card title={t("room.title")} meta={t("room.description")}>
+                {room.stale ? (
+                  <p className="text-ink-secondary">{t("room.offline")}</p>
+                ) : (
+                  <div className="s30-rooms">
+                    {data.rooms.map((item) => (
+                      <Card
+                        key={item.id}
+                        as="article"
+                        title={item.name}
+                        headingLevel={3}
+                        tone="sunk"
+                        meta={<Tag>{t(`room.kind.${item.kind}`)}</Tag>}
+                      >
+                        <div className="flex flex-col gap-3">
+                          <p className="text-small text-ink-secondary">
+                            {t("room.people", { participants: formatCount(item.participants), capacity: formatCount(item.capacity) })}
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            <Button variant="primary" onClick={() => soon("room")}>
+                              {t("room.enter")}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              aria-label={t("room.report_room", { name: item.name })}
+                              onClick={() => openReport(t("room.report_room", { name: item.name }))}
+                            >
+                              {t("room.report")}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              aria-label={t("room.block_room", { name: item.name })}
+                              onClick={() => setBlocked(item.name)}
+                            >
+                              {t("room.block")}
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    </Card>
-                  ))}
-                {room.state === "empty" && (
-                  <PageState
-                    state="empty"
-                    title={t("state.empty.title")}
-                    body={t("state.empty.body", { group_size: formatCount(data.group_size) })}
-                    action={<Button onClick={() => soon("group")}>{t("state.empty.action")}</Button>}
-                  />
+                      </Card>
+                    ))}
+                  </div>
                 )}
-              </div>
-            </Card>
+              </Card>
+            )}
             {/* feat:S30-03 只展示接口给的时长；不把计时当作任务完成或掌握证据。 */}
             <Card title={t("focus.title")} footer={<p className="text-small text-ink-tertiary">{t("focus.note")}</p>}>
               <div className="flex flex-col gap-3">
                 <p className="text-small text-ink-secondary">{t("focus.task")}</p>
                 <p>{data.focus.task}</p>
                 <div className="flex flex-wrap items-center gap-3">
-                  <Tag>
-                    {t("focus.duration")}: {formatDuration(data.focus.minutes)}
-                  </Tag>
+                  <Tag>{t("focus.duration", { duration: formatDuration(data.focus.minutes) })}</Tag>
                   <span className="text-small text-ink-secondary">
-                    {t("focus.today")}: {formatDuration(data.focus.today_minutes)}
+                    {t("focus.today", { duration: formatDuration(data.focus.today_minutes) })}
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2">

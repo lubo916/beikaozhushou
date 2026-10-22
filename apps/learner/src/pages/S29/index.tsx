@@ -124,27 +124,30 @@ export default function Page() {
               onChange={(event) => setInput(event.target.value)}
             />
           </label>
-          <Button variant="primary" type="submit">
-            {t("search.submit")}
-          </Button>
-          <Button
-            disabled={!online}
-            onClick={() => {
-              setIntent("");
-              setPhotoOpen(true);
-            }}
-          >
-            {t("search.photo")}
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => {
-              setInput("");
-              update({ q: "", view: "recent" });
-            }}
-          >
-            {t("search.clear")}
-          </Button>
+          {/* 按钮编成一组：窄屏放不下时整组换到下一行，输入框占满一行，关键词不被截断。 */}
+          <div className="s29-search-actions">
+            <Button variant="primary" type="submit">
+              {t("search.submit")}
+            </Button>
+            <Button
+              disabled={!online}
+              onClick={() => {
+                setIntent("");
+                setPhotoOpen(true);
+              }}
+            >
+              {t("search.photo")}
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setInput("");
+                update({ q: "", view: "recent" });
+              }}
+            >
+              {t("search.clear")}
+            </Button>
+          </div>
         </form>
         <p className="s29-hint">{t("search.hint")}</p>
         <p className="s29-hint">{t("search.shortcut")}</p>
@@ -236,23 +239,21 @@ export default function Page() {
             ) : (
               <Columns
                 main={
-                  <div className="flex flex-col gap-4">
-                    <Card title={t("results.title")} meta={t("results.count", { total: formatNumber(data.result_count, 0) })}>
-                      {/* feat:S29-02 分层结果由接口返回；筛选条件继续交给接口。 */}
-                      <FilterChips
-                        label={t("results.title")}
-                        multiple={false}
-                        selected={[kind]}
-                        options={["all", "point", "material", "question", "note", "mistake", "tutor"].map((value) => ({
-                          value,
-                          label: t(`kind.${value}`),
-                        }))}
-                        onChange={(values) => update({ kind: values[0] ?? "all" })}
-                      />
-                      <ResultList groups={data.groups} onAction={soon} />
-                    </Card>
-                    {recent}
-                  </div>
+                  // 原型：有结果时左栏分组结果、右栏相关速查表；最近访问与全部速查表在搜索框为空时显示。
+                  <Card title={t("results.title")} meta={t("results.count", { total: formatNumber(data.result_count, 0) })}>
+                    {/* feat:S29-02 分层结果由接口返回；筛选条件继续交给接口。 */}
+                    <FilterChips
+                      label={t("results.title")}
+                      multiple={false}
+                      selected={[kind]}
+                      options={["all", "point", "material", "question", "note", "mistake", "tutor"].map((value) => ({
+                        value,
+                        label: t(`kind.${value}`),
+                      }))}
+                      onChange={(values) => update({ kind: values[0] ?? "all" })}
+                    />
+                    <ResultList groups={data.groups} onAction={soon} />
+                  </Card>
                 }
                 aside={<QuickTables data={data} onSelect={(table) => update({ table })} />}
               />

@@ -73,7 +73,8 @@ export function searchPage(ctx: MockContext, mode: Mode = "normal"): S29SearchPa
             : kind === "note"
               ? textOf(note?.["title"], point.name)
               : point.name,
-      excerpt: kind === "note" ? textOf(note?.["body"], fixture.excerpt) : fixture.excerpt,
+      // 题目与错题的标题就是题干：不再重复讲义原文，也不在搜索结果里提前露出解析（摘要留空，页面不显示）。
+      excerpt: kind === "note" ? textOf(note?.["body"], fixture.excerpt) : kind === "question" || kind === "mistake" ? "" : fixture.excerpt,
       source: kind === "point" ? exam.profile.name : copy.kind[kind],
       target: TARGET[kind],
       // 作答、笔记本与导师的路由不带内容 ID（作答用路由表的 demo 会话），不把题目 ID 当会话。

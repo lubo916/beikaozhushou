@@ -22,8 +22,8 @@
     "title": "任务绑定番茄钟",
     "task": "本次专注",
     "choose": "选择今日任务",
-    "duration": "专注时长",
-    "today": "今天已专注",
+    "duration": "专注时长：{{duration}}",
+    "today": "今天已专注：{{duration}}",
     "start": "开始专注",
     "note": "专注时长只记录投入，不算任务完成，也不作为掌握证据。",
     "offline": "使用离线番茄钟"
