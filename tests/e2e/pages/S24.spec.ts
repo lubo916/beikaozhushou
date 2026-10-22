@@ -47,6 +47,25 @@ for (const size of WIDTHS) {
       await expect(mainOf(page).getByRole("tabpanel")).toBeVisible();
       const overflow = await mainOf(page).evaluate((element) => element.scrollWidth - element.clientWidth);
       expect(overflow, "正文应在当前宽度内排版").toBeLessThanOrEqual(1);
+      if (view === "overview") {
+        const cards = mainOf(page).locator(".s24-metrics .ui-stat");
+        const first = await cards.nth(0).boundingBox();
+        const second = await cards.nth(1).boundingBox();
+        const third = await cards.nth(2).boundingBox();
+        if (!first || !second || !third) throw new Error("总览三个数未显示");
+        if (size.width === 375) {
+          expect(second.y, "手机三个数按顺序纵向排列").toBeGreaterThanOrEqual(first.y + first.height - 1);
+          expect(third.y, "手机三个数按顺序纵向排列").toBeGreaterThanOrEqual(second.y + second.height - 1);
+        } else {
+          expect(second.x, "平板与桌面三个数并列").toBeGreaterThanOrEqual(first.x + first.width - 1);
+          expect(third.x, "平板与桌面三个数并列").toBeGreaterThanOrEqual(second.x + second.width - 1);
+        }
+        const oneLine = await mainOf(page)
+          .getByRole("heading", { name: copy("forecast.trend"), exact: true })
+          .evaluate((el) => el.getBoundingClientRect().height <= parseFloat(getComputedStyle(el).lineHeight) * 1.1);
+        expect(oneLine, "预测走势标题不应被按钮挤成多行").toBe(true);
+      }
+
       expectNoProblems(watch, "normal");
     });
   }

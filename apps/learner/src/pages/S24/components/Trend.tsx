@@ -4,11 +4,12 @@ import { formatDate, formatScore } from "@exam-prep/shared/format";
 import { DataTable } from "@exam-prep/ui";
 
 // 仅将接口分数映射到绘图坐标；不推算预测、差额或业务指标。
-const LEFT = 28;
-const RIGHT = 572;
+const LEFT = 36;
+const RIGHT = 564;
 const TOP = 20;
 const BOTTOM = 190;
 const LABEL_Y = 224;
+const AXIS_TICKS = 5;
 /** 纵轴上下各留出数值跨度的这一比例，免得走势贴边（只影响画法）。 */
 const PAD_RATIO = 0.15;
 
@@ -16,6 +17,7 @@ export function Trend({ data }: { data: S24Progress }) {
   const { t } = useTranslation("S24");
   const rows = data.trend;
   if (rows.length === 0) return null;
+  const ticks = new Set(Array.from({ length: AXIS_TICKS }, (_, index) => Math.round((index * (rows.length - 1)) / (AXIS_TICKS - 1))));
   const target = data.forecasts.today?.target_line;
   const qualification = data.qualification_line;
   const values = [
@@ -63,18 +65,13 @@ export function Trend({ data }: { data: S24Progress }) {
             </text>
           </>
         )}
-        {rows.map((row, index) => (
-          <text
-            key={row.day}
-            x={x(index)}
-            y={LABEL_Y}
-            textAnchor={index === 0 ? "start" : index === rows.length - 1 ? "end" : "middle"}
-            fill="var(--color-ink-secondary)"
-            className="text-small"
-          >
-            {formatDate(row.day)}
-          </text>
-        ))}
+        {rows.map((row, index) =>
+          ticks.has(index) ? (
+            <text key={row.day} x={x(index)} y={LABEL_Y} textAnchor="middle" fill="var(--color-ink-secondary)" className="text-small">
+              {formatDate(row.day)}
+            </text>
+          ) : null,
+        )}
       </svg>
       <details>
         <summary className="cursor-pointer text-small text-brand-primary">{t("forecast.chart_data")}</summary>

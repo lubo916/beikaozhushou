@@ -50,7 +50,7 @@ export function Overview({ data, soon }: { data: S24Progress; soon: () => void }
       {data.headline_subject !== undefined && (
         <p className="text-small text-ink-secondary">{t("metrics.subject", { subject: data.headline_subject })}</p>
       )}
-      <StatGroup>
+      <StatGroup className="s24-metrics">
         <Stat
           label={t("metrics.forecast")}
           question={t("metrics.forecast_question")}
@@ -75,6 +75,7 @@ export function Overview({ data, soon }: { data: S24Progress; soon: () => void }
           ) : (
             shown !== undefined && (
               <Card
+                className="s24-trend-card"
                 title={t("forecast.trend")}
                 meta={t("forecast.trend_note")}
                 actions={
