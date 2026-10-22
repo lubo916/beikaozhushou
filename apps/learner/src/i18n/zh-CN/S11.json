@@ -1,1 +1,222 @@
-{}
+{
+  "title": "我的资料",
+  "description": "不要求换资料，把已有的书、课、题接到知识地图上。",
+  "sample": "示例数据",
+  "soon": "即将上线",
+  "tabs": {
+    "materials": "资料",
+    "pending": "待确认",
+    "health": "体检",
+    "inbox": "收件箱",
+    "templates": "模板与学习包"
+  },
+  "views": {
+    "pending": "待确认的对齐",
+    "health": "资料体检",
+    "inbox": "学习收件箱",
+    "templates": "模板与学习包"
+  },
+  "actions": {
+    "add": "添加资料",
+    "soon": "即将上线",
+    "accept_high": "接受高置信对齐",
+    "capture": "快速捕获",
+    "publish": "发布我的模板",
+    "export": "整包导出",
+    "open": "打开",
+    "retry": "重试",
+    "organize": "整理",
+    "enhance": "增强资料",
+    "reparse": "重新解析",
+    "rename": "重命名",
+    "duplicate": "复制",
+    "move": "移动到其他科目或目标",
+    "confirm": "确认",
+    "reject": "拒绝",
+    "edit": "修改对齐",
+    "accept_selected": "接受所选",
+    "report": "举报",
+    "use": "查看学习包",
+    "author": "作者中心",
+    "revenue": "申请原创收益分成",
+    "close": "关闭",
+    "cancel": "取消",
+    "save": "保存整理"
+  },
+  "summary": {
+    "coverage": "资料覆盖率",
+    "pending": "待确认",
+    "quota": "解析额度",
+    "inbox": "学习收件箱",
+    "quota_value": "{{remaining}} / {{total}} 页",
+    "storage": "存储 {{used}} / {{limit}} MB",
+    "private": "仅本人可见 · 不进公共库 · 不用于训练"
+  },
+  "materials": {
+    "title": "按目标与科目管理",
+    "birth": "地图出生记录",
+    "name": "资料与位置",
+    "access": "接入方式",
+    "progress": "双进度",
+    "status": "处理状态",
+    "action": "操作",
+    "read": "已读 {{value}}",
+    "attained": "已达标 {{value}}",
+    "dual_hint": "已读记录阅读位置；已达标来自知识点目标档。读完不等于学会。",
+    "no_text": "纸书影子书只建目录与页码映射，不采集正文。",
+    "course": "外部课程登记目录，标明讲次与时段；从原平台观看，回来做题确认。",
+    "return_check": "回来做题确认",
+    "recommend": "主资料建议",
+    "outline": "目录与页码",
+    "external": "前往原平台",
+    "processing": "解析进度 {{value}}",
+    "failure": "失败原因：{{reason}}",
+    "reparse_hint": "重新解析保留标注、笔记与学习记录。内容变化较大的知识点由你决定合并或拆分。",
+    "merge": "合并到原知识点",
+    "split": "拆分为新知识点"
+  },
+  "access": {
+    "parsable": "可解析",
+    "mapped_only": "只映射",
+    "link_only": "只外链"
+  },
+  "kind": {
+    "textbook": "教材",
+    "course": "课程",
+    "questions": "题库",
+    "past_paper": "往年卷",
+    "notes": "笔记",
+    "link": "链接"
+  },
+  "status": {
+    "ready": "已就绪",
+    "queued": "排队中",
+    "parsing": "解析中",
+    "failed": "解析未完成"
+  },
+  "pending": {
+    "description": "高置信自动接受；中置信等你确认。低价值片段不挂接。",
+    "segment": "资料片段",
+    "point": "知识点",
+    "relation": "关联类型",
+    "confidence": "置信度",
+    "value": "价值分",
+    "disposition": "审核状态",
+    "select": "选择 {{segment}}",
+    "empty": "暂时没有待确认的对齐",
+    "suggestion": "AI 生成的对齐建议，确认后才生效。",
+    "point_edit": "调整知识点名称",
+    "relation_edit": "调整关联类型"
+  },
+  "relation": {
+    "explanation": "讲解",
+    "example": "例题",
+    "exercise": "练习"
+  },
+  "disposition": {
+    "accepted": "高置信已接受",
+    "pending": "待确认",
+    "excluded": "低价值不挂接"
+  },
+  "health": {
+    "description": "查看缺口、重复和版本变化，再决定用哪一份主资料。",
+    "gap": "无资料覆盖",
+    "duplicate": "多份重复",
+    "outdated": "与新版不一致",
+    "primary": "主资料建议",
+    "count": "{{value}} 项",
+    "map": "去知识地图查看缺口"
+  },
+  "inbox": {
+    "description": "先收下碎片，由导师预处理并建议去向；你确认后再归档。",
+    "capture_title": "快速捕获",
+    "capture_label": "记录文字或链接",
+    "capture_placeholder": "粘贴链接，或记下一段想整理的内容",
+    "capture_confirm": "确认捕获",
+    "suggestion": "建议去向",
+    "accept": "确认归档"
+  },
+  "templates": {
+    "description": "按版本查看模板与学习包，选择要接入的内容。",
+    "by": "作者：{{author}} · 版本 {{version}}",
+    "publish_title": "发布我的模板",
+    "include": "选择发布内容",
+    "content": {
+      "map": "知识地图",
+      "questions": "个人题库",
+      "notes": "笔记",
+      "cards": "卡片",
+      "materials": "有权分享的原创资料"
+    },
+    "boundary": "只发布你拥有分享权的内容。私人笔记、标注与学习记录默认不分享。",
+    "publish_confirm": "确认发布",
+    "effective_users": "有效使用人数",
+    "attainment": "使用者达标率",
+    "reports": "题目报错",
+    "updates": "待更新提醒",
+    "incentive": "按有效使用人数计，不按导入量；可获得认证标识、导师额度或会员时长。",
+    "copyright": "原创内容通过版权核验后可申请收益分成。"
+  },
+  "organize": {
+    "title": "整理资料",
+    "name": "资料名称",
+    "destination": "目标或科目",
+    "move_hint": "移动时知识点、笔记、标注与学习记录随之迁移。",
+    "enhance_hint": "在段落旁添加图片、音视频、网页、画板或讲解片段。",
+    "types": ["图片", "音视频", "网页", "画板", "讲解片段"],
+    "export_hint": "将当前科目的知识地图、个人题库、笔记、卡片整包导出。"
+  },
+  "import": {
+    "title": "添加资料",
+    "steps": ["选择文件", "解析预览", "执行", "结果"],
+    "step": "导入步骤",
+    "mode": "接入方式",
+    "type": "资料类型",
+    "types": ["文档", "课件", "文本", "图片与手写", "视频", "音频", "网页", "题库表格", "书号", "模板"],
+    "file": "选择文件",
+    "source": "资料名称、书号或课程链接",
+    "directory": "目录与页码 / 课程讲次与时段",
+    "example": "使用示例文件",
+    "rights": "我确认有权使用此资料",
+    "boundary": "导入内容仅本人可见、不进公共库、不用于训练。",
+    "target": "地图去向",
+    "new_map": "据此生成新地图",
+    "align": "对齐到已有地图",
+    "next": "下一步",
+    "back": "上一步",
+    "execute": "演示执行",
+    "result": "查看示例结果",
+    "retry": "重试导入",
+    "cancel": "取消",
+    "preview_hint": "以下为接口提供的解析预览示例，不会上传或保存本地文件。",
+    "preview": "识别 {{sections}} 节 · 自动对齐 {{matched}} 项 · 待确认 {{pending}} 项 · 低价值不挂接 {{excluded}} 项",
+    "executing": "正在演示解析与对齐流程",
+    "success": "导入结果示例",
+    "success_body": "演示流程已结束。真实上传与保存即将上线，当前资料列表未改变。",
+    "failure": "导入未完成示例",
+    "failure_toggle": "查看失败示例",
+    "failure_reason": "原因：{{reason}}",
+    "done": "完成"
+  },
+  "state": {
+    "empty": {
+      "title": "还没有资料",
+      "body": "把手头的书、课、题接进来，不用换资料",
+      "action": "添加资料"
+    },
+    "offline": {
+      "title": "当前处于离线状态",
+      "body": "已解析的资料可离线阅读；上传与解析需要联网"
+    },
+    "restricted": {
+      "title": "解析额度已用完",
+      "body": "解析额度用完时，新文件进入队列；已解析的不受影响",
+      "action": "查看会员与权益"
+    },
+    "insufficient_data": {
+      "title": "资料覆盖仍有缺口",
+      "body": "资料只覆盖了部分知识点：体检会列出缺口",
+      "action": "查看资料体检"
+    }
+  }
+}

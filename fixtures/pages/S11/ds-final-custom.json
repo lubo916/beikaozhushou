@@ -1,0 +1,244 @@
+{
+  "exam_id": "ds-final-custom",
+  "exam_name": "《数据结构》期末考",
+  "subject_name": "绪论与复杂度",
+  "summary": {
+    "coverage": 0.68,
+    "pending": 1,
+    "parse_remaining": 180,
+    "parse_total": 500,
+    "inbox_count": 2,
+    "storage_used_mb": 238,
+    "storage_limit_mb": 2048
+  },
+  "materials": [
+    {
+      "material": {
+        "id": "019a040b-0000-7000-8000-000000000001",
+        "exam_id": "ds-final-custom",
+        "title": "数据结构教材（纸书，按页码映射）",
+        "access": "mapped_only",
+        "knowledge_point_ids": [
+          "019a0403-0000-7000-8000-000000000001"
+        ],
+        "created_at": "2026-10-15T12:00:00Z"
+      },
+      "subject": "绪论与复杂度",
+      "kind": "textbook",
+      "location": "目录已登记 · 第 12—26 页",
+      "read_ratio": 0.64,
+      "attained_ratio": 0.38,
+      "status": "ready",
+      "processing_ratio": 1
+    },
+    {
+      "material": {
+        "id": "019a040b-0000-7000-8000-000000000002",
+        "exam_id": "ds-final-custom",
+        "title": "数据结构讲义（电子文件，可全文阅读）",
+        "access": "parsable",
+        "knowledge_point_ids": [
+          "019a0403-0000-7000-8000-000000000006"
+        ],
+        "created_at": "2026-10-16T12:00:00Z"
+      },
+      "subject": "绪论与复杂度",
+      "kind": "notes",
+      "location": "第一节 · 重点讲义",
+      "read_ratio": 0.64,
+      "attained_ratio": 0.38,
+      "status": "ready",
+      "processing_ratio": 1,
+      "recommendation": "建议作为主资料：目录与当前知识地图一致，内容覆盖较完整。"
+    },
+    {
+      "material": {
+        "id": "019a040b-0000-7000-8000-000000000003",
+        "exam_id": "ds-final-custom",
+        "title": "数据结构考试公告（外链）",
+        "access": "link_only",
+        "url": "https://example.org/exam-notice",
+        "knowledge_point_ids": [],
+        "created_at": "2026-10-17T12:00:00Z"
+      },
+      "subject": "绪论与复杂度",
+      "kind": "course",
+      "location": "第 3 讲 · 08:00—18:00",
+      "read_ratio": 0.64,
+      "attained_ratio": 0.38,
+      "status": "ready",
+      "processing_ratio": 1
+    },
+    {
+      "material": {
+        "id": "019a040b-0000-7000-8000-000000000101",
+        "exam_id": "ds-final-custom",
+        "title": "数据结构 · 个人题库整理表",
+        "access": "parsable",
+        "knowledge_point_ids": [
+          "019a0403-0000-7000-8000-000000000006"
+        ],
+        "created_at": "2026-10-16T12:00:00Z"
+      },
+      "subject": "绪论与复杂度",
+      "kind": "questions",
+      "location": "待解析后登记目录",
+      "read_ratio": 0,
+      "attained_ratio": 0,
+      "status": "queued",
+      "processing_ratio": 0
+    },
+    {
+      "material": {
+        "id": "019a040b-0000-7000-8000-000000000102",
+        "exam_id": "ds-final-custom",
+        "title": "数据结构 · 课堂笔记扫描件",
+        "access": "parsable",
+        "knowledge_point_ids": [
+          "019a0403-0000-7000-8000-000000000006"
+        ],
+        "created_at": "2026-10-16T12:00:00Z"
+      },
+      "subject": "绪论与复杂度",
+      "kind": "notes",
+      "location": "待解析后登记目录",
+      "read_ratio": 0,
+      "attained_ratio": 0,
+      "status": "parsing",
+      "processing_ratio": 0.46
+    },
+    {
+      "material": {
+        "id": "019a040b-0000-7000-8000-000000000103",
+        "exam_id": "ds-final-custom",
+        "title": "数据结构 · 往年卷扫描件",
+        "access": "parsable",
+        "knowledge_point_ids": [
+          "019a0403-0000-7000-8000-000000000006"
+        ],
+        "created_at": "2026-10-16T12:00:00Z"
+      },
+      "subject": "绪论与复杂度",
+      "kind": "past_paper",
+      "location": "待解析后登记目录",
+      "read_ratio": 0,
+      "attained_ratio": 0,
+      "status": "failed",
+      "processing_ratio": 0,
+      "failure_reason": "部分页面倾斜且文字模糊，请更换清晰文件后重试。"
+    }
+  ],
+  "alignments": [
+    {
+      "id": "019a0403-0000-7000-8000-000000000201",
+      "segment": "讲义第一节 · 概念说明",
+      "point_id": "019a0403-0000-7000-8000-000000000001",
+      "point_name": "时间复杂度分析",
+      "relation": "explanation",
+      "confidence": 0.98,
+      "value_score": 92,
+      "disposition": "accepted"
+    },
+    {
+      "id": "019a0403-0000-7000-8000-000000000202",
+      "segment": "课堂笔记 · 例题讲解",
+      "point_id": "019a0403-0000-7000-8000-000000000002",
+      "point_name": "线性表的顺序存储",
+      "relation": "example",
+      "confidence": 0.76,
+      "value_score": 74,
+      "disposition": "pending"
+    },
+    {
+      "id": "019a0403-0000-7000-8000-000000000203",
+      "segment": "资料尾页 · 无关推广信息",
+      "point_id": "019a0403-0000-7000-8000-000000000001",
+      "point_name": "时间复杂度分析",
+      "relation": "explanation",
+      "confidence": 0.35,
+      "value_score": 8,
+      "disposition": "excluded"
+    }
+  ],
+  "health": [
+    {
+      "id": "gap",
+      "kind": "gap",
+      "count": 6,
+      "detail": "部分知识点尚无资料覆盖，建议先补充对应章节的讲义或页码。"
+    },
+    {
+      "id": "duplicate",
+      "kind": "duplicate",
+      "count": 2,
+      "detail": "教材与讲义有重合内容，可选定一份作为主资料，其余保留作补充。"
+    },
+    {
+      "id": "outdated",
+      "kind": "outdated",
+      "count": 1,
+      "detail": "往年卷引用了旧版表述，阅读时请对照当前版本，不自动覆盖已有记录。"
+    },
+    {
+      "id": "primary",
+      "kind": "primary",
+      "count": 1,
+      "detail": "建议主学本目标讲义：目录与知识地图一致，缺口较少；由你确认后生效。"
+    }
+  ],
+  "inbox": [
+    {
+      "id": "019a0403-0000-7000-8000-000000000301",
+      "title": "课堂截图：易混概念对照",
+      "suggestion": "建议保存为辨析笔记，并关联到“时间复杂度分析”；等你确认后再整理。",
+      "ai_generated": true
+    },
+    {
+      "id": "019a0403-0000-7000-8000-000000000302",
+      "title": "稍后学习的课程链接",
+      "suggestion": "建议归入本目标的外部课程目录，并在看完后做题确认；等你确认后再接入。",
+      "ai_generated": true
+    }
+  ],
+  "templates": [
+    {
+      "id": "019a0403-0000-7000-8000-000000000401",
+      "title": "数据结构 · 入门学习包",
+      "author": "示例作者",
+      "version": "v1.2",
+      "included": [
+        "知识地图",
+        "个人题库",
+        "笔记",
+        "卡片"
+      ]
+    },
+    {
+      "id": "019a0403-0000-7000-8000-000000000402",
+      "title": "数据结构 · 重点梳理模板",
+      "author": "示例作者",
+      "version": "v1.0",
+      "included": [
+        "知识地图",
+        "笔记"
+      ]
+    }
+  ],
+  "author": {
+    "effective_users": 126,
+    "attainment_ratio": 0.72,
+    "reports": 2,
+    "updates": 1
+  },
+  "import_preview": {
+    "filename": "数据结构示例讲义.pdf",
+    "sections": 24,
+    "matched": 18,
+    "pending": 4,
+    "excluded": 2,
+    "failure_reason": "示例文件有页面无法识别，请更换清晰扫描件后重试。"
+  },
+  "availability": "normal",
+  "data_source": "sample",
+  "map_birth": "自建地图出生记录：由课程目录整理，经本人确认后建立；来源材料与确认记录会保留。"
+}

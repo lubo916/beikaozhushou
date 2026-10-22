@@ -1,0 +1,420 @@
+{
+  "paths": {
+    "/content/materials/workspace": {
+      "get": {
+        "operationId": "getS11MaterialsWorkspace",
+        "x-owner": "content",
+        "x-action": "content.material.read",
+        "summary": "我的资料聚合视图（开发示例）",
+        "responses": {
+          "200": {
+            "description": "业务计数与进度均由接口返回",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/S11Workspace"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "S11Workspace": {
+        "type": "object",
+        "required": [
+          "exam_id",
+          "exam_name",
+          "subject_name",
+          "summary",
+          "materials",
+          "alignments",
+          "health",
+          "inbox",
+          "templates",
+          "author",
+          "import_preview",
+          "availability",
+          "data_source"
+        ],
+        "properties": {
+          "exam_id": {
+            "type": "string"
+          },
+          "exam_name": {
+            "type": "string"
+          },
+          "subject_name": {
+            "type": "string"
+          },
+          "map_birth": {
+            "type": "string"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/S11Summary"
+          },
+          "materials": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S11MaterialRow"
+            }
+          },
+          "alignments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S11Alignment"
+            }
+          },
+          "health": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S11HealthItem"
+            }
+          },
+          "inbox": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S11InboxItem"
+            }
+          },
+          "templates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S11Template"
+            }
+          },
+          "author": {
+            "$ref": "#/components/schemas/S11Author"
+          },
+          "import_preview": {
+            "$ref": "#/components/schemas/S11ImportPreview"
+          },
+          "availability": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "empty",
+              "restricted",
+              "insufficient_data"
+            ]
+          },
+          "data_source": {
+            "$ref": "#/components/schemas/DataSource"
+          }
+        }
+      },
+      "S11Summary": {
+        "type": "object",
+        "required": [
+          "coverage",
+          "pending",
+          "parse_remaining",
+          "parse_total",
+          "inbox_count",
+          "storage_used_mb",
+          "storage_limit_mb"
+        ],
+        "properties": {
+          "coverage": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "pending": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "parse_remaining": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "parse_total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "inbox_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "storage_used_mb": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "storage_limit_mb": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "S11MaterialRow": {
+        "type": "object",
+        "required": [
+          "material",
+          "subject",
+          "kind",
+          "location",
+          "read_ratio",
+          "attained_ratio",
+          "status",
+          "processing_ratio"
+        ],
+        "properties": {
+          "material": {
+            "$ref": "#/components/schemas/Material"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "textbook",
+              "course",
+              "questions",
+              "past_paper",
+              "notes",
+              "link"
+            ]
+          },
+          "location": {
+            "type": "string"
+          },
+          "read_ratio": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "attained_ratio": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "queued",
+              "parsing",
+              "failed"
+            ]
+          },
+          "processing_ratio": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "failure_reason": {
+            "type": "string"
+          },
+          "recommendation": {
+            "type": "string"
+          }
+        }
+      },
+      "S11Alignment": {
+        "type": "object",
+        "required": [
+          "id",
+          "segment",
+          "point_id",
+          "point_name",
+          "relation",
+          "confidence",
+          "value_score",
+          "disposition"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "segment": {
+            "type": "string"
+          },
+          "point_id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "point_name": {
+            "type": "string"
+          },
+          "relation": {
+            "type": "string",
+            "enum": [
+              "explanation",
+              "example",
+              "exercise"
+            ]
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "value_score": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "disposition": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "pending",
+              "excluded"
+            ]
+          }
+        }
+      },
+      "S11HealthItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "count",
+          "detail"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "gap",
+              "duplicate",
+              "outdated",
+              "primary"
+            ]
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "detail": {
+            "type": "string"
+          }
+        }
+      },
+      "S11InboxItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "suggestion",
+          "ai_generated"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "title": {
+            "type": "string"
+          },
+          "suggestion": {
+            "type": "string"
+          },
+          "ai_generated": {
+            "type": "boolean"
+          }
+        }
+      },
+      "S11Template": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "author",
+          "version",
+          "included"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "title": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "included": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "S11Author": {
+        "type": "object",
+        "required": [
+          "effective_users",
+          "attainment_ratio",
+          "reports",
+          "updates"
+        ],
+        "properties": {
+          "effective_users": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "attainment_ratio": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "reports": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "updates": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "S11ImportPreview": {
+        "type": "object",
+        "required": [
+          "filename",
+          "sections",
+          "matched",
+          "pending",
+          "excluded",
+          "failure_reason"
+        ],
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "sections": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "matched": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "pending": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "excluded": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "failure_reason": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
