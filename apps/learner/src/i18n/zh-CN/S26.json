@@ -2,7 +2,7 @@
   "title": "报考决策",
   "description": "选择之前，先把信息看清楚。",
   "sample": "示例数据",
-  "extension": "扩展包 · 简版",
+  "extension": "扩展包",
   "source": "数据来源与说明",
   "data_year": "数据年份：{{year}}",
   "source_name": "来源：{{source}}",
@@ -21,7 +21,7 @@
   "detail_title": "选项信息",
   "detail_note": "说明",
   "goal": "管理备考目标",
-  "footer": "条件筛选、竞争分析、并排对比与目标联动将在对应后端阶段接入。",
+  "footer": "当前可查看选项与来源。报名前请前往官方渠道核验条件、时间和材料。",
   "state": {
     "empty": {
       "title": "当前考试没有决策数据",
@@ -31,7 +31,8 @@
     "offline": {
       "title": "需要联网",
       "body": "报考决策需要联网获取最新数据，恢复网络后重试。已保存的目标不受影响。",
-      "action": "重新获取"
+      "action": "重新获取",
+      "cached": "已缓存信息仍可查看；更新数据与核验报名要求需要联网。"
     },
     "restricted": {
       "title": "只提供信息，不替你决定",
