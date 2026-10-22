@@ -320,14 +320,14 @@
     }
   ],
   "upgrade": {
-    "from_plan": "free",
-    "to_plan": "member",
+    "from_plan": "member",
+    "to_plan": "human",
     "credit_cents": 3600,
-    "credit_text": "¥36",
-    "due_cents": 16200,
-    "due_text": "¥162",
+    "credit_text": "¥36.00",
+    "due_cents": 56200,
+    "due_text": "¥562.00",
     "valid_until": "2027-06-14",
-    "calculation_text": "新档费用扣除未使用权益的剩余价值；有效期按当前余额与新档价格折算，由接口返回，不在页面计算。人工服务档尚未上架。"
+    "calculation_text": "会员加人工服务的演示报价为 ¥598.00，抵扣当前会员未使用权益价值 ¥36.00，示例补差 ¥562.00。既有权益按剩余价值折算，升级到期日采用接口给定结果；人工服务档尚未上架，当前仅展示试算。"
   },
   "redemption": {
     "institution_name": "青禾学习服务中心（演示）",

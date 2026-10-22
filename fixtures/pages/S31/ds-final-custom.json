@@ -271,12 +271,12 @@
   "upgrade": {
     "from_plan": "free",
     "to_plan": "member",
-    "credit_cents": 3600,
-    "credit_text": "¥36",
-    "due_cents": 16200,
-    "due_text": "¥162",
+    "credit_cents": 0,
+    "credit_text": "¥0.00",
+    "due_cents": 19800,
+    "due_text": "¥198.00",
     "valid_until": "2027-06-14",
-    "calculation_text": "新档费用扣除未使用权益的剩余价值；有效期按当前余额与新档价格折算，由接口返回，不在页面计算。人工服务档尚未上架。"
+    "calculation_text": "免费档没有已付费权益的剩余价值。演示会员报价为 ¥198.00，抵扣 ¥0.00，示例补差 ¥198.00；有效期采用本次考期通行证的接口结果，实际购买前再确认。"
   },
   "redemption": {
     "institution_name": "青禾学习服务中心（演示）",
