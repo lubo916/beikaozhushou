@@ -1,0 +1,145 @@
+# S19 错题本：只读页面契约，未登记的写操作由页面提示即将上线。
+paths:
+  /learner/mistake-notebook:
+    get:
+      operationId: getS19Notebook
+      x-owner: practice
+      x-action: practice.mistake.read
+      summary: 错题本的列表、统计、毕业说明与洞察示例
+      responses:
+        "200":
+          description: 错题本页面数据；业务数字由接口返回
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S19Notebook"}
+        "403": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S19Notebook:
+      type: object
+      required: [data_source, stats, graduation, items, insights]
+      properties:
+        data_source: {$ref: "#/components/schemas/DataSource"}
+        stats: {$ref: "#/components/schemas/S19Stats"}
+        graduation: {$ref: "#/components/schemas/S19Graduation"}
+        items:
+          type: array
+          items: {$ref: "#/components/schemas/S19MistakeRow"}
+        insights: {$ref: "#/components/schemas/S19Insights"}
+    S19Stats:
+      type: object
+      required: [total, today, stubborn, graduated]
+      properties:
+        total: {type: integer, minimum: 0}
+        today: {type: integer, minimum: 0}
+        stubborn: {type: integer, minimum: 0}
+        graduated: {type: integer, minimum: 0}
+    S19Graduation:
+      type: object
+      description: 当前毕业规则的展示值；fallback_correct_times 是无可用变式时的总做对次数
+      required: [correct_times, interval_days, variant_times, fallback_correct_times]
+      properties:
+        correct_times: {type: integer, minimum: 1}
+        interval_days: {type: integer, minimum: 1}
+        variant_times: {type: integer, minimum: 1}
+        fallback_correct_times: {type: integer, minimum: 1}
+    S19MistakeRow:
+      type: object
+      required: [mistake, stem, subject, point_name, source, cause_code, trap_code, due_today, retry_count, correction, history, solution]
+      properties:
+        mistake: {$ref: "#/components/schemas/Mistake"}
+        stem: {type: string}
+        subject: {type: string}
+        point_name: {type: string}
+        source: {$ref: "#/components/schemas/S19Source"}
+        cause_code: {$ref: "#/components/schemas/S19CauseCode"}
+        trap_code: {$ref: "#/components/schemas/S19TrapCode"}
+        due_today: {type: boolean}
+        retry_count: {type: integer, minimum: 0}
+        correction: {$ref: "#/components/schemas/S19Correction"}
+        history:
+          type: array
+          items: {$ref: "#/components/schemas/S19History"}
+        solution: {type: string}
+    S19Source:
+      type: string
+      description: 自动收录的来源不包含摸底诊断；manual 是手动加入的易错题
+      enum: [practice, mock_exam, in_class, photo, import, manual]
+    S19CauseCode:
+      type: string
+      description: 统一错因七类；每类补救动作的文案由本页中文文案表提供
+      enum: [not_learned, forgot, concept_unclear, method_unknown, misread, slip, time_short]
+    S19TrapCode:
+      type: string
+      description: 统一陷阱十二类
+      enum: [concept_swap, scope_widen, scope_narrow, absolutize, time_confusion, subject_confusion, cause_reversal, partially_true, true_but_irrelevant, over_inference, boundary_break, ignore_exception]
+    S19Correction:
+      type: object
+      description: 学员自己写的三步订正；只有这些文字可用于聚类
+      required: [thought, wrong_step, signal]
+      properties:
+        thought: {type: string}
+        wrong_step: {type: string}
+        signal: {type: string}
+    S19History:
+      type: object
+      required: [day, result, confidence]
+      properties:
+        day: {$ref: "#/components/schemas/LearningDay"}
+        result: {type: string, enum: [correct, wrong]}
+        confidence: {$ref: "#/components/schemas/Confidence"}
+    S19Insights:
+      type: object
+      description: AI 生成的示例洞察，只展示，不直接修改知识点、卡片或计划
+      required: [available, restricted, sample_count, minimum_count, analysis_cost, clusters, root_points, traps, causes]
+      properties:
+        available: {type: boolean}
+        restricted: {type: boolean}
+        sample_count: {type: integer, minimum: 0}
+        minimum_count:
+          type: integer
+          minimum: 1
+          description: 聚类门槛展示值，当前为原型示例，接后端时须登记为参数
+        analysis_cost:
+          type: integer
+          minimum: 0
+          description: 单次分析点数展示值，当前为原型示例，接后端时须登记为参数
+        clusters:
+          type: array
+          items: {$ref: "#/components/schemas/S19Cluster"}
+        root_points:
+          type: array
+          items: {$ref: "#/components/schemas/S19RootPoint"}
+        traps:
+          type: array
+          items: {$ref: "#/components/schemas/S19TrapStat"}
+        causes:
+          type: array
+          items: {$ref: "#/components/schemas/S19CauseStat"}
+    S19Cluster:
+      type: object
+      required: [title, body, count]
+      properties:
+        title: {type: string}
+        body: {type: string}
+        count: {type: integer, minimum: 0}
+    S19RootPoint:
+      type: object
+      required: [id, name, reason]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        reason: {type: string}
+    S19TrapStat:
+      type: object
+      required: [code, hit_rate, count]
+      properties:
+        code: {$ref: "#/components/schemas/S19TrapCode"}
+        hit_rate: {type: number, minimum: 0, maximum: 1}
+        count: {type: integer, minimum: 0}
+    S19CauseStat:
+      type: object
+      required: [code, count]
+      properties:
+        code: {$ref: "#/components/schemas/S19CauseCode"}
+        count: {type: integer, minimum: 0}

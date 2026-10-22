@@ -1,0 +1,272 @@
+{
+  "normal": {
+    "data_source": "sample",
+    "stats": {
+      "total": 126,
+      "today": 12,
+      "stubborn": 8,
+      "graduated": 42
+    },
+    "graduation": {
+      "correct_times": 2,
+      "interval_days": 3,
+      "variant_times": 1,
+      "fallback_correct_times": 3
+    },
+    "items": [
+      {
+        "mistake": {
+          "id": "019a0419-0000-7000-8000-000000000001",
+          "question_id": "019a0404-0000-7000-8000-000000000001",
+          "exam_id": "ds-final-custom",
+          "knowledge_point_ids": [
+            "019a0403-0000-7000-8000-000000000006"
+          ],
+          "status": "new",
+          "tags": [
+            "needs_correction"
+          ],
+          "wrong_count": 1,
+          "correct_streak": 0,
+          "created_at": "2026-10-01T09:00:00Z",
+          "last_answered_at": "2026-10-18T09:00:00Z",
+          "next_due_day": "2026-10-22"
+        },
+        "stem": "已知一棵二叉树的先序序列为 ABDEC，中序序列为 DBEAC，则其后序序列为（　）。",
+        "subject": "数据结构",
+        "point_name": "二叉树的遍历",
+        "source": "practice",
+        "cause_code": "concept_unclear",
+        "trap_code": "concept_swap",
+        "due_today": true,
+        "retry_count": 0,
+        "correction": {
+          "thought": "直接按字母顺序拼接遍历结果。",
+          "wrong_step": "没有先用中序切出左右子树。",
+          "signal": "先定位根，再画出左右子树，最后核对访问顺序。"
+        },
+        "history": [
+          {
+            "day": "2026-10-11",
+            "result": "wrong",
+            "confidence": "sure"
+          },
+          {
+            "day": "2026-10-18",
+            "result": "wrong",
+            "confidence": "vague"
+          }
+        ],
+        "solution": "根是 A；中序中 A 左边 DBE 为左子树、右边 C 为右子树。左子树先序为 BDE，根 B，左 D 右 E。后序：D、E、B、C、A。"
+      },
+      {
+        "mistake": {
+          "id": "019a0419-0000-7000-8000-000000000002",
+          "question_id": "019a0404-0000-7000-8000-000000000002",
+          "exam_id": "ds-final-custom",
+          "knowledge_point_ids": [
+            "019a0403-0000-7000-8000-000000000006"
+          ],
+          "status": "retrying",
+          "tags": [
+            "stubborn",
+            "due_retry"
+          ],
+          "wrong_count": 4,
+          "correct_streak": 0,
+          "created_at": "2026-10-01T09:00:00Z",
+          "last_answered_at": "2026-10-18T09:00:00Z",
+          "next_due_day": "2026-10-22"
+        },
+        "stem": "写出二叉树中序遍历的非递归算法，并说明栈的作用。",
+        "subject": "数据结构",
+        "point_name": "二叉树的遍历",
+        "source": "mock_exam",
+        "cause_code": "misread",
+        "trap_code": "ignore_exception",
+        "due_today": true,
+        "retry_count": 4,
+        "correction": {
+          "thought": "直接按字母顺序拼接遍历结果。",
+          "wrong_step": "没有先用中序切出左右子树。",
+          "signal": "先定位根，再画出左右子树，最后核对访问顺序。"
+        },
+        "history": [
+          {
+            "day": "2026-10-11",
+            "result": "wrong",
+            "confidence": "sure"
+          },
+          {
+            "day": "2026-10-18",
+            "result": "wrong",
+            "confidence": "vague"
+          }
+        ],
+        "solution": "初始化栈与当前指针；沿左链入栈；出栈并访问；转向右子树；循环终止条件（栈空且指针空）；说明栈保存回溯路径"
+      },
+      {
+        "mistake": {
+          "id": "019a0419-0000-7000-8000-000000000003",
+          "question_id": "019a0404-0000-7000-8000-000000000001",
+          "exam_id": "ds-final-custom",
+          "knowledge_point_ids": [
+            "019a0403-0000-7000-8000-000000000006"
+          ],
+          "status": "awaiting_check",
+          "tags": [
+            "due_retry"
+          ],
+          "wrong_count": 2,
+          "correct_streak": 2,
+          "created_at": "2026-10-01T09:00:00Z",
+          "last_answered_at": "2026-10-18T09:00:00Z",
+          "next_due_day": "2026-10-22"
+        },
+        "stem": "已知一棵二叉树的先序序列为 ABDEC，中序序列为 DBEAC，则其后序序列为（　）。",
+        "subject": "数据结构",
+        "point_name": "二叉树的遍历",
+        "source": "photo",
+        "cause_code": "forgot",
+        "trap_code": "scope_widen",
+        "due_today": true,
+        "retry_count": 2,
+        "correction": {
+          "thought": "直接按字母顺序拼接遍历结果。",
+          "wrong_step": "没有先用中序切出左右子树。",
+          "signal": "先定位根，再画出左右子树，最后核对访问顺序。"
+        },
+        "history": [
+          {
+            "day": "2026-10-11",
+            "result": "wrong",
+            "confidence": "sure"
+          },
+          {
+            "day": "2026-10-18",
+            "result": "correct",
+            "confidence": "sure"
+          }
+        ],
+        "solution": "根是 A；中序中 A 左边 DBE 为左子树、右边 C 为右子树。左子树先序为 BDE，根 B，左 D 右 E。后序：D、E、B、C、A。"
+      },
+      {
+        "mistake": {
+          "id": "019a0419-0000-7000-8000-000000000004",
+          "question_id": "019a0404-0000-7000-8000-000000000002",
+          "exam_id": "ds-final-custom",
+          "knowledge_point_ids": [
+            "019a0403-0000-7000-8000-000000000006"
+          ],
+          "status": "graduated",
+          "tags": [],
+          "wrong_count": 1,
+          "correct_streak": 3,
+          "created_at": "2026-10-01T09:00:00Z",
+          "last_answered_at": "2026-10-18T09:00:00Z",
+          "next_due_day": "2026-10-22"
+        },
+        "stem": "写出二叉树中序遍历的非递归算法，并说明栈的作用。",
+        "subject": "数据结构",
+        "point_name": "二叉树的遍历",
+        "source": "manual",
+        "cause_code": "method_unknown",
+        "trap_code": "partially_true",
+        "due_today": false,
+        "retry_count": 3,
+        "correction": {
+          "thought": "直接按字母顺序拼接遍历结果。",
+          "wrong_step": "没有先用中序切出左右子树。",
+          "signal": "先定位根，再画出左右子树，最后核对访问顺序。"
+        },
+        "history": [
+          {
+            "day": "2026-10-11",
+            "result": "wrong",
+            "confidence": "sure"
+          },
+          {
+            "day": "2026-10-18",
+            "result": "correct",
+            "confidence": "sure"
+          }
+        ],
+        "solution": "初始化栈与当前指针；沿左链入栈；出栈并访问；转向右子树；循环终止条件（栈空且指针空）；说明栈保存回溯路径"
+      }
+    ],
+    "insights": {
+      "available": true,
+      "restricted": false,
+      "sample_count": 126,
+      "minimum_count": 10,
+      "analysis_cost": 3,
+      "clusters": [
+        {
+          "title": "遍历的步骤次序混淆",
+          "body": "订正文字多次遗漏根的位置，建议每次先画最小树，再核对遍历顺序。",
+          "count": 18
+        },
+        {
+          "title": "看漏限定条件",
+          "body": "自己的订正中出现跳过限定词的情况；重做时先标出否定、范围与例外。",
+          "count": 12
+        }
+      ],
+      "root_points": [
+        {
+          "id": "019a0403-0000-7000-8000-000000000001",
+          "name": "时间复杂度分析",
+          "reason": "先明确根和子树的边界，再按访问次序还原序列。"
+        }
+      ],
+      "traps": [
+        {
+          "code": "concept_swap",
+          "hit_rate": 0.42,
+          "count": 18
+        },
+        {
+          "code": "ignore_exception",
+          "hit_rate": 0.28,
+          "count": 12
+        },
+        {
+          "code": "scope_widen",
+          "hit_rate": 0.17,
+          "count": 7
+        }
+      ],
+      "causes": [
+        {
+          "code": "concept_unclear",
+          "count": 36
+        },
+        {
+          "code": "misread",
+          "count": 28
+        },
+        {
+          "code": "forgot",
+          "count": 22
+        },
+        {
+          "code": "method_unknown",
+          "count": 18
+        },
+        {
+          "code": "slip",
+          "count": 12
+        },
+        {
+          "code": "time_short",
+          "count": 6
+        },
+        {
+          "code": "not_learned",
+          "count": 4
+        }
+      ]
+    }
+  },
+  "insufficient_sample_count": 6
+}
