@@ -28,7 +28,7 @@ import { useLeads } from "./data.ts";
 
 export default function Page() {
   return (
-    <OrgPageRuntime>
+    <OrgPageRuntime pageId="O02">
       <LeadsPage />
     </OrgPageRuntime>
   );

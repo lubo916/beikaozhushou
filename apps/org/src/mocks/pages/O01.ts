@@ -8,6 +8,13 @@ const EXAMS: Readonly<Record<string, string>> = {
   en: "cet-6",
   ds: "ds-final-custom",
 };
+const ROLE_TODOS: Readonly<Record<string, readonly string[]>> = {
+  academic_admin: ["schedule", "review"],
+  head_teacher: ["contact"],
+  lecturer: ["grading", "qa"],
+  researcher: ["review"],
+  advisor: ["contact"],
+};
 export function o01Fixture(exam = "kj"): O01Workbench {
   const id = EXAMS[exam] ?? exam;
   const data = Object.entries(FILES).find(([path]) => path.endsWith(`/${id}.json`))?.[1] ?? Object.values(FILES)[0];
@@ -45,17 +52,7 @@ export async function handleO01(request: MockRequest): Promise<MockOutcome> {
     data.metrics = data.metrics.map((m) => (m.id === "students" ? { ...m, value: 64 } : m));
   }
   if (role !== "org_owner" && role !== "campus_manager")
-    data.todos = data.todos.filter((t) =>
-      (
-        ({
-          academic_admin: ["schedule", "review"],
-          head_teacher: ["contact"],
-          lecturer: ["grading", "qa"],
-          researcher: ["review"],
-          advisor: ["contact"],
-        })[role] ?? ["contact"]
-      ).includes(t.id),
-    );
+    data.todos = data.todos.filter((todo) => (ROLE_TODOS[role] ?? ["contact"]).includes(todo.id));
   if (state === "empty") {
     data.classes = [];
     data.todos = [];

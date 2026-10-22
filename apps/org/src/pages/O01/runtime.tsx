@@ -19,8 +19,8 @@ function prepare(): Promise<void> {
   });
   return starting;
 }
-export function OrgPageRuntime({ children }: { children: ReactNode }) {
-  const { t } = useTranslation("O01");
+export function OrgPageRuntime({ children, pageId = "O01" }: { children: ReactNode; pageId?: "O01" | "O02" }) {
+  const { t } = useTranslation(pageId);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   useEffect(() => {
     let active = true;
@@ -37,7 +37,15 @@ export function OrgPageRuntime({ children }: { children: ReactNode }) {
     };
   }, []);
   if (status === "error")
-    return <PageState state="error" title={t("state.error.title")} body={t("state.error.body")} onRetry={() => window.location.reload()} />;
+    return (
+      <PageState
+        state="error"
+        pageName={t("title")}
+        audience="staff"
+        body={t("state.error.body")}
+        onRetry={() => window.location.reload()}
+      />
+    );
   if (status === "loading") return <PageState state="loading" pageName={t("title")} />;
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }
