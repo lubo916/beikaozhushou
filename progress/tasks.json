@@ -807,9 +807,18 @@
       "title": "S18 做题与解析·上半：全站共用的作答组件与做题主流程（前端，假数据）",
       "goal": "先做全站共用的作答组件（题干渲染、各题型作答、把握度必选、提交、揭晓后不能改），放 packages/ui/src/quiz/；再做 S18 的做题主流程。S04 摸底、S22 模考、错题回炉都复用这个组件。",
       "notes": "这是唯一允许页面任务改 packages/ui 的地方：只限 packages/ui/src/quiz/。",
-      "status": "todo",
+      "status": "done",
       "owns": [
         "packages/ui/src/quiz/**"
+      ],
+      "history": [
+        {
+          "round": 2,
+          "version": "v0031",
+          "tool": "local",
+          "date": "2026-10-23 06:55",
+          "status": "done"
+        }
       ]
     },
     {
