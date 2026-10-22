@@ -1,1 +1,133 @@
-{}
+{
+  "title": "复盘与报告",
+  "description": "看投入换来了什么，下个周期只改一件事。",
+  "sample": "示例数据",
+  "self_only": "只与自己比",
+  "period": "报告周期",
+  "range": "{{start}} — {{end}}",
+  "views": {
+    "week": "本周",
+    "month": "本月",
+    "round": "轮次总结"
+  },
+  "sections": {
+    "summary": "一句话与三个数",
+    "highlights": "亮点与待改进",
+    "mastery": "掌握度变化",
+    "methods": "学习方式效率",
+    "rhythm": "学习节奏",
+    "sources": "提分来源",
+    "mistakes": "错题趋势",
+    "coach": "教练点评",
+    "questions": "两个问题，想一想",
+    "decision": "下周只改一件事",
+    "feedback": "这份报告准吗",
+    "comparison": "与上一轮对比"
+  },
+  "metrics": {
+    "effective_minutes": "有效学习时长",
+    "tier_gains": "档位提升",
+    "forecast_delta": "预测变化",
+    "active_days": "有效学习日"
+  },
+  "unit": {
+    "points": "分",
+    "tiers": "档",
+    "days": "天",
+    "items": "个",
+    "questions": "题",
+    "evidence": "条"
+  },
+  "highlight": "三个亮点",
+  "improvement": "一个待改进",
+  "input_output": "{{duration}} 的有效学习，带来 {{gains}} 档位提升。",
+  "forecast_change": "预测变化 +{{score}}",
+  "forecast_locked": "地图体检通过后，再查看预测变化。",
+  "before": "期初",
+  "after": "期末",
+  "previous": "上一轮",
+  "current": "本轮",
+  "level_count": "{{count}} 个知识点",
+  "method": {
+    "read": "读",
+    "watch": "看",
+    "listen": "听",
+    "practice": "练",
+    "recite": "背"
+  },
+  "efficiency": "每小时 {{gains}} 档位增量",
+  "duration": "学习时长",
+  "rate": "每小时档位增量",
+  "raw_only": "当前只展示原始记录，暂不比较效率。",
+  "rhythm_days": "本期有效学习 {{days}}",
+  "rhythm_axis": "各学习日的有效学习时长",
+  "rhythm_empty": "学习节奏记录还在积累中。",
+  "sources_note": "展示预测变化的来源，不把预测当作实际考试成绩。",
+  "mistake": {
+    "new": "新增",
+    "graduated": "已毕业",
+    "stubborn": "顽固题"
+  },
+  "coach_sample": "依据 {{samples}} 学习证据",
+  "coach_note": "建议供你判断；选择并确认后才会申请调整计划。",
+  "questions": {
+    "effective": "本期最有效的是什么？",
+    "waste": "本期最浪费的是什么？",
+    "save": "保存复盘想法",
+    "placeholder": "写下自己的发现"
+  },
+  "decision": {
+    "title": "下周只改一件事",
+    "confirm": "查看待确认提议",
+    "own": "自己写一条",
+    "own_label": "我想改的一件事",
+    "placeholder": "写一件具体、可执行的事",
+    "hint": "单选，无默认。只在这里决定计划怎么改。",
+    "pending": "待确认的计划调整",
+    "own_reason": "来自你本次复盘的自定建议。",
+    "own_cost": "确认时核对时间预算与影响，不自动增加任务。",
+    "own_declined": "保持当前计划。",
+    "offline": "离线时可以查看报告，联网后再确认计划调整。",
+    "unavailable": "先积累有效学习记录，再决定下个周期的调整。",
+    "next_period": "下个周期只改一件事"
+  },
+  "feedback": {
+    "yes": "准确",
+    "no": "不太准确",
+    "hint": "反馈将用于改进报告质量。"
+  },
+  "links": {
+    "map": "查看知识地图",
+    "plan": "查看学习计划",
+    "progress": "查看进度与预测"
+  },
+  "soon": "即将上线",
+  "save_soon": "即将上线：复盘记录暂未保存。",
+  "plan_soon": "即将上线：计划暂未修改。",
+  "feedback_soon": "即将上线：反馈暂未提交。",
+  "state": {
+    "empty": {
+      "title": "本周还没有可复盘的数据",
+      "body": "至少有 {{days}} 天学习记录后生成周报",
+      "action": "先去学习"
+    },
+    "offline": {
+      "title": "当前处于离线状态",
+      "body": "显示已生成的报告；“只改一件事”写回计划需要联网",
+      "missing": "本机还没有已生成的报告，联网后重试。"
+    },
+    "restricted": {
+      "title": "教练点评暂不可用",
+      "body": "教练点评属于导师功能，额度用完时只显示数据部分",
+      "action": "查看会员与权益"
+    },
+    "insufficient_data": {
+      "title": "还需要更多有效学习记录",
+      "body": "有效学习不足 {{duration}} 时，只给数据，不给结论"
+    },
+    "error": {
+      "body": "复盘与报告的数据暂时没取到：网络或服务异常。已保存的内容不受影响，点“重试”即可；连续失败会自动上报。"
+    }
+  },
+  "retry": "重试"
+}
