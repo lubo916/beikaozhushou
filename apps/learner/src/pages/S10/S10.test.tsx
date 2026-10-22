@@ -2,6 +2,7 @@
 // ① 假数据：四个演示考试、demo 与每个示例知识点，正常与空、受限、数据不足四种数据都通过生成的 Zod 校验；做错一题，关联题目跟着变。
 // ② 七态判断（data.ts）只看请求结果；重试策略。③ 整个学员端挂在 /kp/demo，假数据接口接到生成的钩子上：正常、空态、出错各走一遍。
 import { afterEach, describe, expect, it, vi } from "vitest";
+import type { S09MapOverview } from "@exam-prep/contract";
 import { ApiError } from "@exam-prep/contract/errors";
 import * as zodSchemas from "@exam-prep/contract/zod";
 import { App } from "../../App.tsx";
@@ -80,6 +81,82 @@ describe("S10 假数据（mocks/pages/S10.ts）", () => {
         const ids = ["demo", ...exam.map.chapters.flatMap((chapter) => chapter.sample_points.map((point) => point.id))];
         for (const id of ids) await home(id);
       }
+    }
+  });
+
+  it("四个演示考试：地图每个格子都能打开详情，名称、档位、证据与范围和地图一致", async () => {
+    const { control, call, home } = setup();
+    for (const exam of fixtures.exams) {
+      control.setExam(exam.key);
+      const outcome = await call("GET", "/learner/map-overview");
+      expect(outcome.kind === "json" && outcome.status).toBe(200);
+      if (outcome.kind !== "json") continue;
+      const map = outcome.body as S09MapOverview;
+      for (const [index, chapter] of map.chapters.entries()) {
+        for (const point of chapter.points) {
+          const detail = await home(point.id);
+          expect(detail["point"], `${exam.key} ${point.id}`).toMatchObject({
+            id: point.id,
+            name: point.name,
+            chapter_no: index + 1,
+            chapter_name: chapter.name,
+            map_source: map.map.source,
+            knowledge_types: point.knowledge_types,
+            scope_state: point.in_scope ? "default" : "removed",
+          });
+          expect(detail["ladder"]).toMatchObject({
+            system: point.level,
+            target: point.target_level ?? 0,
+            gap: (point.target_level ?? 0) - point.level,
+            evidence_sufficient: point.evidence_sufficient,
+            ...(point.self_level === undefined ? {} : { self: point.self_level }),
+          });
+          expect(detail["data_source"]).toBe("sample");
+        }
+      }
+    }
+  }, 15_000);
+
+  it("地图补充的演示点在空、受限、数据不足三种状态都符合详情契约；未知或越界 ID 仍回 404", async () => {
+    const normal = setup();
+    for (const exam of fixtures.exams) {
+      normal.control.setExam(exam.key);
+      const outcome = await normal.call("GET", "/learner/map-overview");
+      if (outcome.kind !== "json") throw new Error("没有拿到地图");
+      const map = outcome.body as S09MapOverview;
+      const samples = new Set(exam.map.chapters.flatMap((chapter) => chapter.sample_points.map((point) => point.id)));
+      const filler = map.chapters.flatMap((chapter) => chapter.points).filter((point) => !samples.has(point.id));
+      expect(filler.length).toBeGreaterThan(0);
+      for (const mode of MODES.filter((mode) => mode !== "")) {
+        const { control, home } = setup(mode);
+        control.setExam(exam.key);
+        for (const point of filler) await home(point.id);
+      }
+      const first = filler[0];
+      if (first === undefined) throw new Error("没有地图补充演示点");
+      const forged = `${first.id.slice(0, -12)}ffffffffffff`;
+      const missing = await normal.call("GET", `/learner/points/${forged}/home`);
+      expect(missing.kind === "json" && missing.status).toBe(404);
+    }
+  }, 15_000);
+
+  it("切换考试后，地图演示点仍按全局 ID 返回所属考试的名称、章节与来源", async () => {
+    const { control, call, home } = setup();
+    for (const exam of fixtures.exams) {
+      control.setExam(exam.key);
+      const outcome = await call("GET", "/learner/map-overview");
+      if (outcome.kind !== "json") throw new Error("没有拿到地图");
+      const map = outcome.body as S09MapOverview;
+      const samples = new Set(exam.map.chapters.flatMap((chapter) => chapter.sample_points.map((point) => point.id)));
+      const chapter = map.chapters.find((row) => row.points.some((point) => !samples.has(point.id)));
+      const point = chapter?.points.find((candidate) => !samples.has(candidate.id));
+      if (point === undefined || chapter === undefined) throw new Error("没有地图补充演示点");
+      const other = fixtures.exams.find((candidate) => candidate.key !== exam.key);
+      if (other === undefined) throw new Error("没有其他演示考试");
+      control.setExam(other.key);
+      const detail = await home(point.id);
+      expect(detail["point"]).toMatchObject({ id: point.id, name: point.name, chapter_name: chapter.name, map_source: map.map.source });
+      expect(detail["ladder"]).toMatchObject({ system: point.level, target: point.target_level });
     }
   });
 

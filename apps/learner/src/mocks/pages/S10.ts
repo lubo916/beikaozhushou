@@ -1,11 +1,12 @@
 // S10 知识点主页的假数据（F08；api-rules 第 3、4 节）。知识点、掌握档、题目、卡片、笔记与学员资料取 fixtures/exams/，
-// 页面专用的示例（错误模式、证据、资料位置、考点档案、知识关系、估算耗时等）取 fixtures/pages/S10/<考试 ID>.json。
+// 地图补充的演示点复用 S09 的解码（ID、名称、掌握档与范围一致）；页面专用的示例（错误模式、证据、资料位置、考点档案等）取 fixtures/pages/S10/<考试 ID>.json。
 // 规则还没实现：档位差只是把演示数据里的两个档相减，整份标 data_source 为 sample；关联题目的状态会随内存仓库里的作答变。
 // ?state= 的空、受限、数据不足由下面的 variants 给数据；加载、出错、离线由接口层统一处理（mocks/api.ts），这里不管。
 import { ApiError } from "@exam-prep/contract/errors";
 import { DEMO_PARAM } from "../../routes.ts";
 import type { ChapterFixture, DemoExam, PointFixture, QuestionFixture } from "../demo.ts";
 import { defineRoute, type MockContext } from "../route.ts";
+import { mapChapters, type Cell } from "./S09.ts";
 
 type Json = Record<string, unknown>;
 type Mode = "normal" | "empty" | "restricted" | "insufficient_data";
@@ -109,6 +110,7 @@ interface Located {
   readonly chapter: ChapterFixture;
   readonly chapterNo: number;
   readonly point: PointFixture;
+  readonly cell: Cell;
 }
 
 /** 按知识点 ID 找它所在的考试与章（知识点 ID 全局唯一）；找不到回 404。 */
@@ -116,9 +118,17 @@ function locate(ctx: MockContext): Located {
   const asked = ctx.params["pointId"] ?? DEMO_PARAM;
   const id = asked === DEMO_PARAM ? demoPointId(ctx.exam) : asked;
   for (const exam of ctx.db.fixtures.exams) {
-    for (const [index, chapter] of exam.map.chapters.entries()) {
-      const point = chapter.sample_points.find((p) => p.id === id);
-      if (point !== undefined) return { exam, chapter, chapterNo: index + 1, point };
+    for (const [index, { chapter, cells }] of mapChapters(exam).entries()) {
+      const cell = cells.find((candidate) => candidate.id === id);
+      if (cell === undefined) continue;
+      // 地图补充的演示点也有详情；只接受解码后确实存在的 ID，未知或越界 ID 仍走 404。
+      const point = chapter.sample_points.find((candidate) => candidate.id === id) ?? {
+        id: cell.id,
+        name: cell.name,
+        knowledge_types: cell.types,
+        default_target_level: cell.target ?? 0,
+      };
+      return { exam, chapter, chapterNo: index + 1, point, cell };
     }
   }
   throw new ApiError("COMMON_NOT_FOUND", { point_id: asked });
@@ -212,14 +222,14 @@ function examLevel(profile: Json, extra: PointExtra, importance: number): Json {
 }
 
 function home(ctx: MockContext, mode: Mode): Json {
-  const { exam, chapter, chapterNo, point } = locate(ctx);
+  const { exam, chapter, chapterNo, point, cell } = locate(ctx);
   const page = pageFixture(exam.examId);
   const extra: PointExtra = page.points[point.id] ?? {};
   const empty = mode === "empty";
-  const mastery = exam.learner.mastery.find((m) => m.knowledge_point_id === point.id);
-  const system = mastery?.level ?? 0;
-  const target = mastery?.target_level ?? point.default_target_level ?? 0;
-  const importanceDefault = extra.importance?.default_level ?? page.defaults.importance_level;
+  const system = cell.level;
+  const target = cell.target ?? 0;
+  const self = cell.self ?? extra.self;
+  const importanceDefault = extra.importance?.default_level ?? cell.importance;
   const importance = extra.importance?.level ?? importanceDefault;
   const profile = examProfile(mode, extra, page);
   const spots = empty ? [] : materialSpots(exam, point.id, extra);
@@ -237,7 +247,7 @@ function home(ctx: MockContext, mode: Mode): Json {
       ...(extra.section_name === undefined ? {} : { section_name: extra.section_name }),
       map_source: exam.map.source,
       knowledge_types: [...point.knowledge_types],
-      scope_state: mastery?.in_scope === false ? "removed" : "default",
+      scope_state: cell.inScope ? "default" : "removed",
       importance: { level: importance, default_level: importanceDefault, overridden: importance !== importanceDefault },
       exam_level: examLevel(profile, extra, importance),
       starred: extra.starred ?? false,
@@ -249,8 +259,8 @@ function home(ctx: MockContext, mode: Mode): Json {
       target_is_default: target === point.default_target_level,
       gap: target - system,
       self_pending: extra.self_pending ?? false,
-      evidence_sufficient: mastery?.evidence_sufficient ?? false,
-      ...(extra.self === undefined ? {} : { self: extra.self, self_vs_system: extra.self - system }),
+      evidence_sufficient: cell.sufficient,
+      ...(self === undefined ? {} : { self, self_vs_system: self - system }),
     },
     methods: {
       knowledge_type: point.knowledge_types[0] ?? "concept",

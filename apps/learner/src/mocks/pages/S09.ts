@@ -63,8 +63,8 @@ interface PageFixture {
   readonly relations: { readonly center_id: string; readonly edges: readonly EdgeFixture[] };
 }
 
-/** 解码后的一格（只在这里用；输出前换成契约里的字段名）。 */
-interface Cell {
+/** 地图与详情共用的一格（输出前换成各自契约里的字段名）。 */
+export interface Cell {
   readonly id: string;
   readonly name: string;
   readonly types: readonly string[];
@@ -202,7 +202,8 @@ function fillerCells(chapter: ChapterFixture, chapterNo: number, cells: ChapterC
 function effective(cell: Cell, mode: Mode): Cell {
   if (mode === "insufficient_data" && cell.hasEvidence && cell.inScope) return { ...cell, sufficient: false };
   if (mode === "locked" && cell.roi !== undefined) {
-    const { roi: _dropped, ...rest } = cell;
+    const rest = { ...cell };
+    delete rest.roi;
     return rest;
   }
   return cell;
@@ -269,17 +270,25 @@ function mainTypes(all: readonly Cell[]): string[] {
     .map(([type]) => type);
 }
 
+/** 地图与知识点详情共用同一份解码：补充演示点的 ID、名称、档位与范围不另造一份。 */
+export function mapChapters(
+  exam: DemoExam,
+): { readonly chapter: ChapterFixture; readonly cells: readonly Cell[]; readonly collapsed: boolean }[] {
+  const page = pageFixture(exam.examId);
+  return exam.map.chapters.map((chapter, index) => {
+    const named = chapter.sample_points.map((point) => namedCell(exam, point, page.named[point.id]));
+    const filler = fillerCells(chapter, index + 1, page.chapters[chapter.id], named.length + 1);
+    return { chapter, cells: [...named, ...filler], collapsed: page.chapters[chapter.id]?.collapsed ?? false };
+  });
+}
+
 function overview(ctx: MockContext, mode: Mode): Json {
   const { exam } = ctx;
   const page = pageFixture(exam.examId);
   const empty = mode === "empty";
   const chapters = empty
     ? []
-    : exam.map.chapters.map((chapter, index) => {
-        const named = chapter.sample_points.map((point) => namedCell(exam, point, page.named[point.id]));
-        const filler = fillerCells(chapter, index + 1, page.chapters[chapter.id], named.length + 1);
-        return { chapter, cells: [...named, ...filler].map((cell) => effective(cell, mode)), collapsed: page.chapters[chapter.id]?.collapsed ?? false };
-      });
+    : mapChapters(exam).map(({ chapter, cells, collapsed }) => ({ chapter, cells: cells.map((cell) => effective(cell, mode)), collapsed }));
   const all = chapters.flatMap((entry) => entry.cells);
   const inScope = all.filter((cell) => cell.inScope);
   const count = (list: readonly Cell[], test: (cell: Cell) => boolean): number => list.filter(test).length;
