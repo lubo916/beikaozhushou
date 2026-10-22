@@ -1,15 +1,21 @@
-# 每次推送都跑完整验证（与本地 bk verify --level full 相同）：带 PostgreSQL 17（pgvector）与 Redis 7 服务，装好三个浏览器。
+# 每次推送由两片共同跑完整验证（本地 bk verify --level full 默认不分片）：带 PostgreSQL 17（pgvector）与 Redis 7 服务，装好三个浏览器。
 # zhparser、pg_bigm 需要自制镜像（deploy/postgres/Dockerfile），CI 先用官方 pgvector 镜像；现有迁移不依赖这两个扩展。
 name: verify
 
 on:
   push:
+    branches: ["**"]
   pull_request:
 
 jobs:
-  verify:
+  verify-shard:
+    name: verify (${{ matrix.shard }}/2)
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    strategy:
+      fail-fast: true
+      matrix:
+        shard: [1, 2]
+    # 各测试与命令保留正常超时，完整覆盖不再受额外累计时限截断。
     services:
       postgres:
         image: pgvector/pgvector:pg17
@@ -31,11 +37,18 @@ jobs:
           --health-interval 5s --health-timeout 5s --health-retries 20
     env:
       CI: "1"
+      # 显式配置浏览器并发，让全量冒烟在 bk 的 25 分钟上限内跑完。
+      E2E_WORKERS: "4"
+      E2E_SHARD: "${{ matrix.shard }}/2"
       DATABASE_URL: postgresql://exam_prep@127.0.0.1:5432/exam_prep
       TEST_DATABASE_URL: postgresql://exam_prep@127.0.0.1:5432/exam_prep_test
       REDIS_URL: redis://127.0.0.1:6379
     steps:
       - uses: actions/checkout@v4
+      - name: 关闭测试临时仓库的后台维护
+        run: |
+          git config --global gc.auto 0
+          git config --global maintenance.auto false
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
@@ -52,14 +65,34 @@ jobs:
         run: psql "postgresql://exam_prep@127.0.0.1:5432/exam_prep" -c "CREATE DATABASE exam_prep_test"
       - name: 安装 Playwright 浏览器
         run: pnpm exec playwright install --with-deps chromium webkit firefox
+      - name: CI 差异回归：图标与临时 Git 仓库
+        env:
+          E2E_SHARD: ""
+        timeout-minutes: 5
+        run: |
+          python3 -m unittest discover -s tests/tooling -p 'test_bk_prerequisites.py'
+          pnpm gen
+          pnpm exec playwright test tests/e2e/smoke/favicon.spec.ts tests/e2e/smoke/checks.spec.ts --project=chromium
       - name: 完整验证
         run: python3 tools/bk.py verify --level full
       - name: 上传失败日志
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: verify-logs
+          name: verify-logs-${{ matrix.shard }}
+          include-hidden-files: true
           path: |
             .bk/logs/
             .test-results/
           if-no-files-found: ignore
+
+  verify:
+    name: verify
+    if: always()
+    needs: verify-shard
+    runs-on: ubuntu-24.04
+    steps:
+      - name: 确认全部分片通过
+        env:
+          SHARDS_RESULT: ${{ needs.verify-shard.result }}
+        run: test "$SHARDS_RESULT" = "success"
