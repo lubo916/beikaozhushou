@@ -60,6 +60,7 @@ export function HomeView({ data, onStart }: { data: S15ReviewHome; onStart: () =
                     <Stat label={t("queue.minutes")} value={formatDuration(data.queue.minutes)} />
                   </StatGroup>
                   <p className="mt-3 text-small text-ink-secondary">{t("queue.hint")}</p>
+                  <p className="mt-2 text-small text-ink-secondary">{t("queue.composition")}</p>
                   {/* feat:S15-17 选忘了的内容当天稍后再出现，不由前端计算重学计划。 */}
                   <p className="mt-2 text-small text-status-warning">{t("queue.relearning", { n: formatCount(data.queue.relearning) })}</p>
                 </Card>
@@ -238,6 +239,7 @@ export function HomeView({ data, onStart }: { data: S15ReviewHome; onStart: () =
               <textarea
                 className="mt-2 w-full rounded-sm border border-line-strong bg-bg-surface p-3"
                 onCopy={copyGenerated}
+                aria-label={t("pending.front")}
                 value={front}
                 onChange={(event) => setFront(event.target.value)}
               />
@@ -247,6 +249,7 @@ export function HomeView({ data, onStart }: { data: S15ReviewHome; onStart: () =
               <textarea
                 className="mt-2 w-full rounded-sm border border-line-strong bg-bg-surface p-3"
                 onCopy={copyGenerated}
+                aria-label={t("pending.back")}
                 value={back}
                 onChange={(event) => setBack(event.target.value)}
               />
