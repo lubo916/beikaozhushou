@@ -20,6 +20,7 @@
 from __future__ import annotations
 
 import argparse
+import codecs
 import datetime as dt
 import fnmatch
 import hashlib
@@ -27,6 +28,7 @@ import json
 import os
 import re
 import shutil
+import signal
 import socket
 import subprocess
 import sys
@@ -796,6 +798,139 @@ def caps_line(c: dict) -> str:
 
 # ───────────────────────── 验证 ─────────────────────────
 
+def run_verify_process(cmd, root: Path, env: dict, timeout: float, log: Path, shell: bool) -> tuple[int, bool, bool]:
+    """持续保存输出；结束时只清理本次命令拥有的进程，不改检查结果或时限。"""
+    token = os.urandom(16).hex()
+    marker = ("BK_VERIFY_RUN_ID=" + token).encode()
+    child_env = dict(env, BK_VERIFY_RUN_ID=token)
+    linux = sys.platform.startswith("linux") and Path("/proc").is_dir()
+    identities = {}
+
+    def record(pid):
+        try:
+            entry = Path("/proc") / str(pid)
+            if entry.stat().st_uid != os.getuid():
+                return None
+            fields = (entry / "stat").read_text().rsplit(")", 1)[1].split()
+            return fields[19], int(fields[1]), fields[0]
+        except (OSError, ValueError, IndexError):
+            return None
+
+    def owned():
+        # 只在清理阶段扫描当前用户。token 补收 setsid 后重新归属的后代；
+        # 父子关系同时覆盖仍在本次树内、但没有保留环境变量的进程。
+        records, found = {}, {}
+        for entry in Path("/proc").iterdir():
+            if not entry.name.isdigit():
+                continue
+            pid = int(entry.name)
+            value = record(pid)
+            if value is None:
+                continue
+            records[pid] = value
+            if identities.get(pid) == value[0]:
+                found[pid] = value
+            try:
+                if marker in (entry / "environ").read_bytes().split(b"\0"):
+                    found[pid] = value
+            except OSError:
+                pass
+        changed = True
+        while changed:
+            changed = False
+            for pid, value in records.items():
+                if pid not in found and value[1] in found:
+                    found[pid] = value
+                    changed = True
+        identities.update((pid, value[0]) for pid, value in found.items())
+        return {pid: value for pid, value in found.items() if value[2] != "Z"}
+
+    def cleanup():
+        if linux:
+            # 先礼貌退出，再终止拒绝退出者；每次发信号前重查启动时间。
+            for sig, grace in ((signal.SIGTERM, 0.5), (signal.SIGKILL, 0.5)):
+                deadline = time.monotonic() + grace
+                while True:
+                    proc.poll()
+                    remaining = owned()
+                    if not remaining:
+                        return True
+                    for pid, value in remaining.items():
+                        current = record(pid)
+                        if current and current[0] == value[0]:
+                            try:
+                                os.kill(pid, sig)
+                            except ProcessLookupError:
+                                pass
+                    if time.monotonic() >= deadline:
+                        break
+                    time.sleep(0.05)
+            proc.poll()
+            return not owned()
+        if os.name == "nt" and proc.poll() is None:
+            subprocess.run(["taskkill", "/PID", str(proc.pid), "/T", "/F"],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                           check=False, timeout=5)
+        elif os.name == "posix":
+            try:
+                os.killpg(proc.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+        if proc.poll() is None:
+            proc.kill()
+        return True
+
+    timed_out = False
+    with log.open("wb") as output, log.open("rb") as reader:
+        proc = subprocess.Popen(cmd, cwd=root, env=child_env, shell=shell,
+                                stdout=output, stderr=subprocess.STDOUT,
+                                start_new_session=os.name == "posix")
+        if linux:
+            initial = record(proc.pid)
+            if initial:
+                identities[proc.pid] = initial[0]
+        decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
+
+        def progress():
+            chunk = reader.read()
+            if chunk:
+                sys.stdout.write(decoder.decode(chunk))
+                sys.stdout.flush()
+
+        deadline = time.monotonic() + timeout
+        try:
+            while True:
+                progress()
+                if proc.poll() is not None:
+                    break
+                if time.monotonic() >= deadline:
+                    timed_out = True
+                    break
+                time.sleep(0.05)
+        finally:
+            try:
+                clean = cleanup()
+            except (OSError, subprocess.TimeoutExpired):
+                clean = False
+            try:
+                proc.wait(timeout=3)
+            except subprocess.TimeoutExpired:
+                clean = False
+            progress()
+            sys.stdout.write(decoder.decode(b"", final=True))
+            sys.stdout.flush()
+        if timed_out or not clean:
+            detail = (f"\n验证命令超时（{timeout} 秒）。\n" if timed_out else "")
+            if clean:
+                detail += "已清理自有进程。\n"
+            else:
+                detail += "未能确认所有自有进程已退出；本项记为失败，停止后续检查。\n"
+            output.write(detail.encode("utf-8"))
+            output.flush()
+            say(detail.rstrip())
+    return (proc.returncode if clean else 1), timed_out, clean
+
+
 def do_verify(root: Path, cfg: dict, level: str, caps: dict | None = None) -> dict:
     caps = caps or load_json(root / ".bk" / "env.json", {}) or {}
     pj = load_json(root / "package.json", {}) or {}
@@ -826,22 +961,19 @@ def do_verify(root: Path, cfg: dict, level: str, caps: dict | None = None) -> di
         log = bkdir(root, "logs") / ("verify-" + re.sub(r"[^\w.-]+", "_", name)[:60] + ".log")
         t0 = time.time()
         timeout = cfg["timeouts"].get(name, cfg["timeouts"]["default"])
-        try:
-            r = subprocess.run(name[4:] if is_cmd else runner + [name], cwd=root, capture_output=True, text=True,
-                               encoding="utf-8", errors="replace", timeout=timeout, env=envx, shell=is_cmd)
-            outtext = (r.stdout or "") + (r.stderr or "")
-            ok = r.returncode == 0
-            note = f"{int(time.time() - t0)} 秒"
-        except subprocess.TimeoutExpired as e:
-            outtext = str(e)
-            ok = False
-            note = f"超时（{timeout} 秒）"
-        log.write_text(outtext, encoding="utf-8")
+        code, timed_out, clean = run_verify_process(name[4:] if is_cmd else runner + [name],
+                                             root, envx, timeout, log, is_cmd)
+        outtext = log.read_text(encoding="utf-8", errors="replace")
+        ok = code == 0 and not timed_out
+        note = f"超时（{timeout} 秒）" if timed_out else f"{int(time.time() - t0)} 秒"
         results.append({"name": name, "result": "pass" if ok else "fail", "note": note,
                         "log": str(log.relative_to(root))})
         say(f"  {'✓' if ok else '✗'} {name}（{note}）")
         if not ok:
             say("    ── 日志末尾 ──\n" + "\n".join("    " + x for x in tail(outtext, 30).splitlines()))
+        if not clean:
+            say("  ✗ 自有进程未确认清理完成，停止后续检查，保留日志供复查。")
+            break
     for r in results:
         if r["result"] == "skip":
             say(f"  - {r['name']}：跳过（{r['note']}）")
