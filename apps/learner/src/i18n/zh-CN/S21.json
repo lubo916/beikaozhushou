@@ -1,1 +1,110 @@
-{}
+{
+  "title": "口头表达训练",
+  "sample": "示例数据",
+  "description": "把思路说清楚，也练习回应追问。",
+  "header": {
+    "start": "开始一次仿真",
+    "auto": "已按考试画像开启",
+    "manual": "已手动开启",
+    "disabled": "当前考试尚未开启",
+    "exam": "当前目标：{{exam}}",
+    "preview": "简版预览"
+  },
+  "activation": {
+    "title": "按考试需要开启",
+    "body": "考试画像包含口试环节时自动开启；其他考试也可手动开启本次训练预览。",
+    "enable": "手动开启训练",
+    "close": "关闭本次训练",
+    "disabled_title": "尚未开启口头表达训练",
+    "disabled_body": "当前目标未开启口试训练。你可以手动开启，先了解训练场景与录音隐私。",
+    "local": "本次训练已手动开启；刷新后恢复目标配置。"
+  },
+  "next": {
+    "title": "下一站",
+    "proposal": "查看口试突击计划提议",
+    "note": "计划调整需要你确认后才会生效。"
+  },
+  "scenes": {
+    "title": "选择训练场景",
+    "duration": "预计 {{duration}}",
+    "start": "查看流程"
+  },
+  "assessment": {
+    "title": "上次评估",
+    "date": "{{day}} · {{title}}",
+    "score": "综合表现",
+    "dimensions": "具体反馈",
+    "follow": "考官追问",
+    "retry": "同题重答",
+    "history": "查看重答对比",
+    "sample_note": "评估仅作训练参考，示例不会写入掌握证据。"
+  },
+  "transcript": {
+    "title": "逐字稿批注",
+    "timeline": "作答时间轴",
+    "at": "{{time}} 处",
+    "play": "回听这一段"
+  },
+  "reconstruction": {
+    "title": "高分重构",
+    "note": "保留原有思路，只优化结构与表达。",
+    "try": "照着框架再答一次"
+  },
+  "radar": {
+    "title": "能力雷达",
+    "sample": "基于 {{total}} 次训练",
+    "dimension": "多维能力",
+    "insufficient_title": "评估样本还不足",
+    "insufficient_body": "评估样本少于 {{minimum}} 次时不显示能力雷达。",
+    "count": "已完成评估",
+    "count_value": "{{total}} 次",
+    "missing": "完成更多仿真后再看能力概括；当前评估仍可查看。"
+  },
+  "privacy": {
+    "title": "录音与隐私",
+    "audio": "默认只录音，不留存音频。",
+    "retention": "留存录音需要每次单独同意，未勾选就不留存。",
+    "video": "画面分析可选，且只在本地处理。",
+    "restricted_title": "视频分析暂不可用",
+    "restricted_body": "未成年人模式下不开放视频分析",
+    "restricted_action": "继续仅音频训练",
+    "settings": "查看本次录音设置",
+    "preview": "当前为流程预览，不会开启麦克风、摄像头或留存媒体。"
+  },
+  "flow": {
+    "title": "开始前，先看训练流程",
+    "steps": "五步流程",
+    "scenario": "本次场景：{{name}}",
+    "audio_only": "录音方式：仅音频",
+    "save": "我单独同意本次留存录音，用于之后回听",
+    "video": "我选择开启本地画面分析",
+    "no_save": "当前选择：仅音频，不留存。",
+    "save_selected": "当前选择：已单独同意本次留存录音。",
+    "video_selected": "本地画面分析已选择。",
+    "confirm": "开始仿真",
+    "cancel": "稍后再练"
+  },
+  "state": {
+    "empty": {
+      "title": "还没有仿真记录",
+      "body": "开始一次仿真，系统会先讲清五步流程",
+      "action": "开始仿真"
+    },
+    "offline": {
+      "title": "仿真需要联网",
+      "body": "仿真需要联网。恢复连接后重试，已保存的内容不受影响。",
+      "retry": "重新连接",
+      "stale": "当前显示上次加载的训练记录"
+    },
+    "error": {
+      "report": "问题反馈即将上线"
+    }
+  },
+  "soon": {
+    "start": "开始录音功能即将上线，本次仅预览流程。",
+    "play": "录音回听即将上线。",
+    "retry": "同题重答即将上线。",
+    "history": "重答对比即将上线。",
+    "proposal": "口试突击计划提议即将上线，不会自动调整计划。"
+  }
+}

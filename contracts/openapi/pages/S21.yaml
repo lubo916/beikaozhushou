@@ -1,0 +1,99 @@
+# U21 简版：只读口头表达训练预览，写操作待后端权限登记后接通。
+paths:
+  /practice/oral/home:
+    get:
+      operationId: getOralTrainingHome
+      x-owner: practice
+      x-action: learner.mastery.read
+      summary: 口头表达训练的场景、评估与隐私设置预览
+      responses:
+        "200":
+          description: 数字与画像挂载结论由接口提供，示例数据不写入掌握证据
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S21OralTrainingHome"}
+        "403": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S21OralTrainingHome:
+      type: object
+      required: [exam_id, exam_name, activation, video_analysis_allowed, scenarios, flow, assessment, radar, next_stage, data_source]
+      properties:
+        exam_id: {$ref: "#/components/schemas/Id"}
+        exam_name: {type: string}
+        activation:
+          type: string
+          description: 按画像自动挂载、已手动开启或尚未开启；公共画像尚无口试字段，当前取本页演示配置
+          enum: [automatic, manual, disabled]
+        video_analysis_allowed: {type: boolean}
+        scenarios:
+          type: array
+          items: {$ref: "#/components/schemas/S21Scenario"}
+        flow:
+          type: array
+          items: {type: string}
+        assessment: {$ref: "#/components/schemas/S21Assessment"}
+        radar: {$ref: "#/components/schemas/S21Radar"}
+        next_stage: {type: string}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+    S21Scenario:
+      type: object
+      required: [id, title, description, duration_seconds]
+      properties:
+        id: {type: string}
+        title: {type: string}
+        description: {type: string}
+        duration_seconds: {type: integer, minimum: 0}
+    S21Assessment:
+      type: object
+      required: [available, title, day, score, score_total, summary, dimensions, follow_up, transcript, reconstruction, ai_generated]
+      properties:
+        available: {type: boolean}
+        title: {type: string}
+        day: {$ref: "#/components/schemas/LearningDay"}
+        score: {type: number}
+        score_total: {type: number}
+        summary: {type: string}
+        dimensions:
+          type: array
+          items: {$ref: "#/components/schemas/S21Dimension"}
+        follow_up: {type: string}
+        transcript:
+          type: array
+          items: {$ref: "#/components/schemas/S21TranscriptLine"}
+        reconstruction:
+          type: array
+          items: {type: string}
+        ai_generated: {type: boolean}
+    S21Dimension:
+      type: object
+      required: [id, label, score, description]
+      properties:
+        id: {type: string}
+        label: {type: string}
+        score: {type: number}
+        description: {type: string}
+    S21TranscriptLine:
+      type: object
+      required: [id, at_seconds, text, annotation]
+      properties:
+        id: {type: string}
+        at_seconds: {type: integer, minimum: 0}
+        text: {type: string}
+        annotation: {type: string}
+    S21Radar:
+      type: object
+      required: [sufficient, sample_count, minimum_samples, score_total, dimensions]
+      properties:
+        sufficient:
+          type: boolean
+          description: 接口决定是否可以展示能力概括，页面不按次数自行计算
+        sample_count: {type: integer, minimum: 0}
+        minimum_samples:
+          type: integer
+          minimum: 1
+          description: 只读示例配置；后端开工时登记领域参数
+        score_total: {type: number}
+        dimensions:
+          type: array
+          items: {$ref: "#/components/schemas/S21Dimension"}
