@@ -1,11 +1,14 @@
 // 学员端外壳：四种页面模式、导航三形态的结构、顶栏、导师浮标与面板、七态与没有的地址。
 // 断点只靠样式（容器查询），这里查结构与跳转；三档宽度的外观由截图检查（F06 画廊）。
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router";
+import { VOCAB } from "@exam-prep/shared/vocab";
 import { App } from "../App.tsx";
 import { PAGE_BY_ID } from "../router/pages.ts";
 import { DevViewBar } from "./DevViewBar.tsx";
-import { NO_GOAL_CONTEXT, click, heading, linkByText, mount, mountAt, settle } from "./testing.tsx";
+import { NO_GOAL_CONTEXT, click, heading, linkByText, mount, mountAt, settle, stubDemoApi } from "./testing.tsx";
+
+afterEach(() => vi.unstubAllGlobals());
 
 const nav = (host: ParentNode) => host.querySelector('nav[aria-label="主导航"]');
 const tabs = (host: ParentNode) => host.querySelector('nav[aria-label="底部标签"]');
@@ -13,13 +16,21 @@ const fab = (host: ParentNode) =>
   [...host.querySelectorAll("button")].find((button) => button.textContent?.includes("问导师") && button.className.includes("absolute"));
 
 async function open(path: string, expected?: string, context?: Parameters<typeof mountAt>[2]) {
+  stubDemoApi(path);
   const mounted = await mountAt(path, <App />, context);
-  await settle(() => (expected === undefined ? heading(mounted.host) !== undefined : heading(mounted.host) === expected));
+  const errorState = new URL(path, "http://localhost").searchParams.get("state") === "error";
+  await settle(() =>
+    errorState
+      ? mounted.host.querySelector(".ui-state--error") !== null
+      : expected === undefined
+        ? heading(mounted.host) !== undefined
+        : heading(mounted.host) === expected,
+  );
   return mounted;
 }
 
 describe("标准页外壳", () => {
-  it("今日：侧栏分组、底部五个标签、顶栏与空壳内容", async () => {
+  it("今日：侧栏分组、底部五个标签、顶栏与今日清单", async () => {
     const { host, unmount } = await open("/today", "今日");
     expect(heading(host)).toBe("今日");
     const main = nav(host);
@@ -39,9 +50,11 @@ describe("标准页外壳", () => {
     expect(host.querySelector('a[aria-label="消息与通知"]')?.getAttribute("href")).toBe("/messages");
     const goal = host.querySelector('a[href="/goals"]');
     expect(goal?.textContent).toBe("初级会计217 天");
-    expect(host.textContent).toContain("开发中");
-    expect(host.textContent).toContain("P0 必做：19 项");
-    expect(host.textContent).toContain("python3 tools/bk.py proto S06 --views");
+    expect(host.textContent).toContain("今日清单");
+    const hero = host.querySelector('section[aria-label="今天的安排"]');
+    expect(hero).not.toBeNull();
+    for (const segment of Object.values(VOCAB.today_segment)) expect(host.textContent).toContain(segment);
+    expect(linkByText(hero, "继续：" + VOCAB.task_source.verify_recheck)?.getAttribute("href")).toBe("/quiz/demo");
     await unmount();
   });
 
@@ -95,6 +108,7 @@ describe("标准页外壳", () => {
   it("?state= 强制状态：出错态用页名", async () => {
     const { host, unmount } = await open("/today?state=error");
     await settle(() => host.textContent?.includes("今日没能加载") === true);
+    expect(host.querySelector(".ui-state--error")).not.toBeNull();
     expect(host.textContent).toContain("今日没能加载");
     expect(host.textContent).not.toContain("原型里的功能点");
     await unmount();

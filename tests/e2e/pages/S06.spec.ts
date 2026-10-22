@@ -169,7 +169,10 @@ test("S06 主要按钮都能点：跳到路由表里的页面，或提示“即�
   await button(copy("list.adjust"), true).press("Enter");
   const adjust = page.getByRole("dialog", { name: copy("adjust.title") });
   await expect(adjust).toBeVisible();
-  await adjust.getByRole("button", { name: copy("adjust.seen"), exact: true }).first().press("Enter");
+  await adjust
+    .getByRole("button", { name: copy("adjust.seen"), exact: true })
+    .first()
+    .press("Enter");
   await toastShows(copy("soon.seen"));
   // 任务条的标题直达具体位置；英雄区的“继续”跳到下一项
   await expect(main.locator(".ui-task a").first()).toHaveAttribute("href", /^\/(review|quiz|reader|recite|recap|kp|mistakes)\b/);
