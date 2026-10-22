@@ -1,0 +1,491 @@
+{
+  "paths": {
+    "/account/privacy-center": {
+      "get": {
+        "operationId": "getPrivacyCenter",
+        "x-owner": "account",
+        "x-action": "account.context.read",
+        "summary": "读取本页授权、学习资产、设备与安全记录；写操作待权限登记",
+        "responses": {
+          "200": {
+            "description": "本页全部示例数据和规则参数",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/S32PrivacyCenter"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "S32Grant": {
+        "type": "object",
+        "required": [
+          "key",
+          "enabled",
+          "editable"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "tasks",
+              "progress",
+              "mistakes",
+              "notes",
+              "emotions",
+              "conversations"
+            ]
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "editable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "S32Setting": {
+        "type": "object",
+        "required": [
+          "key",
+          "enabled"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "analysis",
+              "carryover",
+              "allocation",
+              "training"
+            ]
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "S32DataCategory": {
+        "type": "object",
+        "required": [
+          "key",
+          "count"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "mistakes",
+              "cards",
+              "notes",
+              "answers"
+            ]
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "S32AssetTask": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "asset_type",
+          "title",
+          "status",
+          "progress",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "import",
+              "export"
+            ]
+          },
+          "asset_type": {
+            "type": "string",
+            "enum": [
+              "textbook",
+              "question_bank",
+              "subject"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "running",
+              "completed",
+              "failed"
+            ]
+          },
+          "progress": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "created_at": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "original_file": {
+            "type": "string"
+          }
+        }
+      },
+      "S32Share": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "expires_at",
+          "code",
+          "import_limit",
+          "import_count",
+          "active"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "title": {
+            "type": "string"
+          },
+          "expires_at": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "code": {
+            "type": "string"
+          },
+          "import_limit": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "import_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "S32RecycleItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "kind",
+          "expires_at"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "title": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "textbook",
+              "question_bank",
+              "subject"
+            ]
+          },
+          "expires_at": {
+            "$ref": "#/components/schemas/Timestamp"
+          }
+        }
+      },
+      "S32Activity": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "event",
+          "at"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "security",
+              "device",
+              "import",
+              "delete",
+              "order"
+            ]
+          },
+          "event": {
+            "type": "string",
+            "enum": [
+              "login",
+              "password",
+              "binding",
+              "offline",
+              "deregister",
+              "device_added",
+              "imported",
+              "deleted",
+              "ordered"
+            ]
+          },
+          "at": {
+            "$ref": "#/components/schemas/Timestamp"
+          }
+        }
+      },
+      "S32Device": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "location",
+          "last_active",
+          "current"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "name": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "last_active": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "current": {
+            "type": "boolean"
+          }
+        }
+      },
+      "S32Login": {
+        "type": "object",
+        "required": [
+          "id",
+          "at",
+          "device",
+          "method",
+          "location",
+          "unusual"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "at": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "device": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "password",
+              "code"
+            ]
+          },
+          "location": {
+            "type": "string"
+          },
+          "unusual": {
+            "type": "boolean"
+          }
+        }
+      },
+      "S32Permission": {
+        "type": "object",
+        "required": [
+          "key",
+          "purpose",
+          "at"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "camera",
+              "microphone",
+              "album"
+            ]
+          },
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "capture",
+              "oral",
+              "material"
+            ]
+          },
+          "at": {
+            "$ref": "#/components/schemas/Timestamp"
+          }
+        }
+      },
+      "S32Memory": {
+        "type": "object",
+        "required": [
+          "id",
+          "text"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      },
+      "S32PrivacyCenter": {
+        "type": "object",
+        "required": [
+          "data_source",
+          "display_state",
+          "time_zone",
+          "organization_name",
+          "institution_grants",
+          "settings",
+          "data_categories",
+          "tasks",
+          "shares",
+          "recycle",
+          "activities",
+          "devices",
+          "logins",
+          "permissions",
+          "memories",
+          "minor_mode",
+          "cooling_days",
+          "recycle_days",
+          "deregistration_pending"
+        ],
+        "properties": {
+          "data_source": {
+            "$ref": "#/components/schemas/DataSource"
+          },
+          "display_state": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "empty",
+              "restricted",
+              "insufficient_data"
+            ]
+          },
+          "time_zone": {
+            "type": "string"
+          },
+          "organization_name": {
+            "type": "string"
+          },
+          "institution_grants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S32Grant"
+            }
+          },
+          "settings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S32Setting"
+            }
+          },
+          "data_categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S32DataCategory"
+            }
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S32AssetTask"
+            }
+          },
+          "shares": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S32Share"
+            }
+          },
+          "recycle": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S32RecycleItem"
+            }
+          },
+          "activities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S32Activity"
+            }
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S32Device"
+            }
+          },
+          "logins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S32Login"
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S32Permission"
+            }
+          },
+          "memories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S32Memory"
+            }
+          },
+          "minor_mode": {
+            "type": "boolean"
+          },
+          "cooling_days": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "recycle_days": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "deregistration_pending": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}
