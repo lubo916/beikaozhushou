@@ -99,7 +99,9 @@ test("S09 四个视图都能用 ?view= 打开；点标签时地址跟着变", as
     if (key === "list") await expect(panel.locator("tbody tr")).toHaveCount(total);
     expectNoProblems(watch, "normal", `${key}：`);
   }
-  await main(page).getByRole("tab", { name: copy("views.tree") }).press("Enter");
+  await main(page)
+    .getByRole("tab", { name: copy("views.tree") })
+    .press("Enter");
   await expect(page).toHaveURL(/[?&]view=tree/);
 });
 
@@ -193,5 +195,51 @@ test("S09 主要按钮都能点：跳到路由表里的页面，或提示“即�
   // 列表：名字链到知识点主页
   await m.getByRole("tab", { name: copy("views.list") }).press("Enter");
   await expect(m.getByRole("link", { name: first.name, exact: true })).toHaveAttribute("href", `/kp/${first.id}`);
+  expectNoProblems(watch, "normal");
+});
+
+test("S09 折叠当前选中章后，Tab 仍能进入下一章方格并用方向键移动", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(urlOf(entry, { view: "grid" }));
+  await expectLoaded(page, entry);
+  const m = main(page);
+  await m.locator("button.s09-cell[data-point]").nth(2).press("Enter");
+  const chapter = m.locator("button.s09-row__name").first();
+  await chapter.press("Enter");
+  await expect(chapter).toHaveAttribute("aria-expanded", "false");
+  const tabStop = m.locator('button.s09-cell[data-point][tabindex="0"]');
+  await expect(tabStop).toHaveCount(1);
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Tab");
+  await expect(tabStop).toBeFocused();
+  const previousId = await tabStop.getAttribute("data-point");
+  await page.keyboard.press("ArrowRight");
+  await expect(tabStop).toBeFocused();
+  await expect(tabStop).not.toHaveAttribute("data-point", previousId ?? "");
+});
+
+test("S09 补充的演示格可以从去主页进入对应知识点详情", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const watch = await watchPage(page);
+  await watch.open(urlOf(entry, { view: "grid" }));
+  await expectLoaded(page, entry);
+  const cell = main(page).locator("button.s09-cell[data-point]").nth(2);
+  const id = await cell.getAttribute("data-point");
+  const label = await cell.getAttribute("aria-label");
+  expect(id).toBeTruthy();
+  expect(label).toBeTruthy();
+  await cell.press("Enter");
+  await main(page)
+    .locator(".s09-focus")
+    .getByRole("link", { name: copy("focus.open"), exact: true })
+    .press("Enter");
+  await expect(page).toHaveURL(new RegExp(`/kp/${id ?? ""}`));
+  await expect
+    .poll(async () => {
+      const title = await main(page).getByRole("heading", { level: 1 }).textContent();
+      return title !== null && title.trim() !== "" && label?.startsWith(title) === true;
+    })
+    .toBe(true);
+  await expect(main(page).locator(".ui-state--error")).toHaveCount(0);
   expectNoProblems(watch, "normal");
 });

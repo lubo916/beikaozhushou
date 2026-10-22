@@ -16,7 +16,10 @@ interface Row {
 
 export function ListView({ chapters, locked }: { readonly chapters: readonly S09Chapter[]; readonly locked: boolean }) {
   const { t } = useTranslation("S09");
-  const rows = useMemo(() => chapters.flatMap((chapter) => chapter.points.map((point): Row => ({ point, chapter: chapter.name }))), [chapters]);
+  const rows = useMemo(
+    () => chapters.flatMap((chapter) => chapter.points.map((point): Row => ({ point, chapter: chapter.name }))),
+    [chapters],
+  );
   const current = (point: S09Point): string => {
     if (!point.in_scope) return t("tree.out");
     if (!point.evidence_sufficient) return t("tree.uncertain");
@@ -33,7 +36,12 @@ export function ListView({ chapters, locked }: { readonly chapters: readonly S09
       rows={rows}
       rowKey={(row) => row.point.id}
       columns={[
-        { key: "name", header: t("list.name"), label: t("list.name"), render: (row) => <Link to={pathTo("S10", { kpId: row.point.id })}>{row.point.name}</Link> },
+        {
+          key: "name",
+          header: t("list.name"),
+          label: t("list.name"),
+          render: (row) => <Link to={pathTo("S10", { kpId: row.point.id })}>{row.point.name}</Link>,
+        },
         { key: "chapter", header: t("list.chapter"), label: t("list.chapter"), render: (row) => row.chapter },
         {
           key: "type",

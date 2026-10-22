@@ -40,7 +40,9 @@ export function GridView({ data, locked, selectedId, onSelect, onFix }: GridView
   const active = hasFilters(filters);
   const matched = useMemo(() => {
     if (!active) return undefined;
-    const ids = data.chapters.flatMap((chapter) => chapter.points.filter((point) => matchesFilters(point, filters)).map((point) => point.id));
+    const ids = data.chapters.flatMap((chapter) =>
+      chapter.points.filter((point) => matchesFilters(point, filters)).map((point) => point.id),
+    );
     return new Set(ids);
   }, [active, data.chapters, filters]);
 

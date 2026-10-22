@@ -27,7 +27,12 @@ export function TreeView({ chapters }: { readonly chapters: readonly S09Chapter[
         return (
           <li key={chapter.id}>
             <div className="s09-tree__row">
-              <button type="button" className="s09-tree__toggle" aria-expanded={expanded} onClick={() => setOpen((prev) => toggled(prev, chapter.id))}>
+              <button
+                type="button"
+                className="s09-tree__toggle"
+                aria-expanded={expanded}
+                onClick={() => setOpen((prev) => toggled(prev, chapter.id))}
+              >
                 {chapter.name}
               </button>
               <ProgressBar
