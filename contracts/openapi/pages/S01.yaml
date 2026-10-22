@@ -17,12 +17,16 @@ components:
   schemas:
     S01WelcomeData:
       type: object
-      required: [availability, age_options, minor_notice_key, sms, guest_merge, resume, account, invitation, data_source]
+      required: [availability, time_zone, today, age_options, minor_notice_key, sms, guest_merge, resume, account, invitation, data_source]
       properties:
         availability:
           type: string
           description: 首次进入无真实空态；空与数据不足只用于演示说明
           enum: [ready, empty, restricted, insufficient_data]
+        time_zone:
+          type: string
+          description: 用户时区（IANA 名），完整日期时刻按此显示
+        today: {$ref: "#/components/schemas/LearningDay"}
         age_options:
           type: array
           items: {$ref: "#/components/schemas/S01AgeOption"}
@@ -66,7 +70,7 @@ components:
     S01Account:
       type: object
       description: 账号异常的可检查示例，不代表真实账号状态
-      required: [restriction_reason_key, restricted_until, appeal_reference, device_limit, devices, cooling_days_remaining, deletion_scope_keys, logout_reason, drafts_available]
+      required: [restriction_reason_key, restricted_until, appeal_reference, device_limit, devices, cooling_days_remaining, deletion_at, deletion_scope_keys, logout_reason, drafts_available]
       properties:
         restriction_reason_key: {type: string}
         restricted_until: {$ref: "#/components/schemas/Timestamp"}
@@ -76,6 +80,7 @@ components:
           type: array
           items: {$ref: "#/components/schemas/S01Device"}
         cooling_days_remaining: {type: integer, minimum: 0}
+        deletion_at: {$ref: "#/components/schemas/Timestamp"}
         deletion_scope_keys:
           type: array
           items: {type: string}
