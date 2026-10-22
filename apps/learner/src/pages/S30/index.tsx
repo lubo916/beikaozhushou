@@ -240,6 +240,7 @@ export default function Page() {
                 </div>
               </div>
             </Card>
+            {/* feat:S30-04 简版只留小组入口与匿名说明，匹配等待后端（提示即将上线）；未成年人模式、空态与离线时不显示。 */}
             {!data.minor_mode && room.state !== "empty" && !room.stale && (
               <Card title={t("group.title")}>
                 <div className="flex flex-col gap-3">
