@@ -25,7 +25,7 @@ function main(page: Page) {
 
 for (const width of WIDTHS) {
   for (const view of entry.views) {
-    test(`S01 ${view.key} 视图在 ${width} 宽独立显示，无横向溢出`, async ({ page }) => {
+    test(`S01 ${view.key} 视图在 ${width} 宽独立显示，无横向溢出`, async ({ page }, testInfo) => {
       await page.setViewportSize({ width, height: 900 });
       const watch = await watchPage(page);
       await watch.open(urlOf(entry, { view: view.key }));
@@ -36,6 +36,17 @@ for (const width of WIDTHS) {
       expect(await main(page).evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
       if (view.key === "first") await expect(main(page).locator('input[type="tel"]')).toHaveCount(0);
       if (view.key === "back") await expect(main(page).locator('input[type="tel"]').first()).toBeVisible();
+      // 保存每档布局供人工对照原型，不维护环境敏感的视觉快照基线。
+      await page.screenshot({ path: testInfo.outputPath(`S01-${view.key}-${width}.png`), fullPage: true });
+      if (width === 375 && view.key === "first") {
+        const viewportHeight = await page.evaluate(() => window.innerHeight);
+        for (const action of ["welcome.guest", "welcome.login"]) {
+          const button = main(page).getByRole("button", { name: copy(action), exact: true });
+          const box = await button.boundingBox();
+          if (box === null) throw new Error(`${copy(action)} 没有可见边界`);
+          expect(box.y + box.height, `${copy(action)} 应在手机首屏内完整显示`).toBeLessThanOrEqual(viewportHeight);
+        }
+      }
       expectNoProblems(watch, "normal");
     });
   }
