@@ -1,1 +1,299 @@
-{}
+{
+  "title": "数据与隐私",
+  "description": "看得清、管得住、带得走、删得掉。",
+  "sample": "示例数据",
+  "view_label": "数据管理视图",
+  "tabs": {
+    "privacy": "隐私与授权",
+    "assets": "学习资产",
+    "account": "账号与设备"
+  },
+  "common": {
+    "soon": "即将上线",
+    "cancel": "取消",
+    "confirm": "确认",
+    "change": "修改",
+    "delete": "删除",
+    "enabled": "已开启",
+    "disabled": "未开启",
+    "count": "{{total}} 条",
+    "none": "暂无记录",
+    "settings": "前往设置",
+    "details": "查看详情",
+    "learn": "开始学习"
+  },
+  "state": {
+    "loading": "正在读取你的数据设置",
+    "empty": {
+      "title": "还没有可导出的数据",
+      "body": "开始学习后这里会列出你的全部数据",
+      "action": "开始学习"
+    },
+    "error": {
+      "title": "数据与隐私没能加载",
+      "body": "数据与隐私的数据暂时没取到：网络或服务异常。已保存的内容不受影响，点“重试”即可；连续失败会自动上报。"
+    },
+    "offline": {
+      "body": "导出、注销与授权变更需要联网",
+      "cached": "正在显示上次保存的设置；联网后才能更改",
+      "action": "重试"
+    },
+    "restricted": {
+      "title": "注销申请处于冷静期",
+      "body": "注销有 {{days}} 天冷静期，期间可撤销，注销前可完整导出",
+      "action": "撤销注销申请"
+    },
+    "insufficient_data": {
+      "title": "数据不足：本页不适用",
+      "body": "隐私设置与数据管理不依赖学习样本数量，现有功能可照常使用。"
+    }
+  },
+  "privacy": {
+    "organization": {
+      "title": "机构能看到什么",
+      "subtitle": "{{name}} · 机构任务按入班约定可见，个人学习数据由你逐项决定。",
+      "locked": "不可更改",
+      "never": "永不开放",
+      "notice": "情绪与导师对话永不向机构开放。个人学习数据默认不授权，撤回后不再提供新的个人数据。",
+      "tasks": "机构任务数据",
+      "tasks_help": "入班任务、提交情况与机构反馈，按入班约定可见。",
+      "progress": "个人学习进度",
+      "progress_help": "供机构了解你的个人学习进展。",
+      "mistakes": "个人错题记录",
+      "mistakes_help": "供机构提供针对性的练习建议。",
+      "notes": "个人笔记",
+      "notes_help": "供机构了解你的学习思路。",
+      "emotions": "情绪记录",
+      "emotions_help": "仅用于你的个人支持，不对机构开放。",
+      "conversations": "导师对话",
+      "conversations_help": "个人导师与机构助教严格分开，个人对话永不开放。"
+    },
+    "settings": {
+      "title": "你来决定数据怎么用",
+      "analysis": "个性化分析",
+      "analysis_help": "群体难度、陷阱对比在首次使用时单独征求同意；关闭后仍可使用客观难度。",
+      "carryover": "自动顺延",
+      "carryover_help": "关闭后，每次调整学习时间都先征求你的确认。",
+      "allocation": "自动分摊",
+      "allocation_help": "关闭后，每次分摊都先问你。",
+      "training": "用于模型训练",
+      "training_help": "默认不用于训练；只有你单独同意后才可使用，随时可撤回。"
+    },
+    "data": {
+      "title": "我的数据",
+      "purpose": "用途：{{purpose}}",
+      "mistakes": "错题",
+      "mistakes_help": "安排错题回炉，帮助定位需要复习的内容",
+      "cards": "卡片",
+      "cards_help": "安排到期复习，保留回忆记录",
+      "notes": "笔记",
+      "notes_help": "保存个人整理与资料关联",
+      "answers": "作答记录",
+      "answers_help": "记录作答证据，支持掌握档判定"
+    },
+    "tutor": {
+      "title": "导师数据声明",
+      "body": "发送给模型的只有内容文本，不含个人标识。请勿在学习内容里填写真实身份与联系方式。",
+      "memory": "导师记忆",
+      "memory_help": "可逐条查看与删除，以下为演示记忆。",
+      "delete_memory": "删除这条记忆"
+    }
+  },
+  "export": {
+    "all": "导出全部数据",
+    "title": "导出我的数据",
+    "description": "可导出错题、卡片、笔记与作答记录，使用通用格式，任何档位都不限次数。",
+    "options": {
+      "annotations": "标注",
+      "notes": "笔记",
+      "relations": "关联",
+      "records": "学习记录"
+    },
+    "personal": "包含个人数据，请妥善保存并确认接收对象。导出中的 AI 生成内容会保留“AI 生成”标识。",
+    "format": "通用格式：JSON、CSV、Markdown；此处为演示，真实文件生成即将上线。",
+    "confirm": "创建导出任务",
+    "empty": "请至少选择一项内容"
+  },
+  "assets": {
+    "type": {
+      "textbook": "教材",
+      "question_bank": "题库",
+      "subject": "整个科目"
+    },
+    "tasks": {
+      "title": "导入导出任务",
+      "import": "导入资产",
+      "export": "导出资产",
+      "kind": {
+        "import": "导入",
+        "export": "导出"
+      },
+      "status": {
+        "running": "进行中",
+        "completed": "已完成",
+        "failed": "未完成，需重试"
+      },
+      "retry": "用原文件重试",
+      "result": "查看结果",
+      "file": "原文件：{{name}}",
+      "failure": "文件结构校验未通过，原有内容未被覆盖。",
+      "progress": "任务进度",
+      "preview": "预览后导入",
+      "replace": "覆盖导入"
+    },
+    "shares": {
+      "title": "分享链接",
+      "create": "创建分享链接",
+      "notice": "接收方先预览，再确认导入；你可以随时撤销链接。",
+      "expires": "有效至 {{date}}",
+      "code": "提取码：{{code}}",
+      "usage": "已导入 {{used}} 次，上限 {{limit}} 次",
+      "revoke": "撤销链接",
+      "preview": "预览分享内容"
+    },
+    "recycle": {
+      "title": "回收站",
+      "notice": "误删内容保留 {{days}} 天，到期前提醒；到期后无法恢复。",
+      "expires": "将于 {{date}} 到期",
+      "restore": "恢复",
+      "delete": "永久删除",
+      "bulk": "批量永久删除"
+    },
+    "activity": {
+      "title": "操作历史",
+      "filter": "筛选操作类别",
+      "kind": {
+        "all": "全部",
+        "security": "安全事件",
+        "device": "设备",
+        "import": "导入",
+        "delete": "删除",
+        "order": "订购"
+      },
+      "event": {
+        "login": "账号登录",
+        "password": "修改密码",
+        "binding": "换绑联系方式",
+        "offline": "设备被下线",
+        "deregister": "提交注销申请",
+        "device_added": "新增登录设备",
+        "imported": "导入学习资产",
+        "deleted": "删除学习资产",
+        "ordered": "订购会员"
+      }
+    }
+  },
+  "account": {
+    "devices": {
+      "title": "登录设备",
+      "current": "当前设备",
+      "last": "最近活动：{{date}}",
+      "offline": "让此设备下线",
+      "all": "让全部设备下线"
+    },
+    "alert": {
+      "title": "异地登录提醒",
+      "body": "检测到在 {{location}} 使用 {{device}} 登录。请确认是否为你本人。",
+      "mine": "是我本人",
+      "not_mine": "不是我",
+      "mine_help": "确认后将记为常用地点。",
+      "not_mine_help": "将前往修改密码并让全部设备下线。"
+    },
+    "logins": {
+      "title": "登录记录",
+      "earlier": "加载更早记录",
+      "method": {
+        "password": "密码登录",
+        "code": "验证码登录"
+      },
+      "unusual": "新地点"
+    },
+    "security": {
+      "title": "安全提醒",
+      "fixed": "始终开启，无法关闭",
+      "location": "新地点登录会提醒本人。",
+      "attempts": "短时间多次输错密码会通知本人，并建议修改密码。",
+      "password": "修改密码"
+    },
+    "permissions": {
+      "title": "权限使用记录",
+      "camera": "相机",
+      "microphone": "麦克风",
+      "album": "相册",
+      "purpose": {
+        "capture": "拍题识别",
+        "oral": "口头表达训练",
+        "material": "选择学习资料"
+      }
+    },
+    "minor": {
+      "title": "未成年人模式",
+      "on": "已自动开启，本人不能关闭",
+      "off": "当前为成年人模式",
+      "body": "未确认年龄时按未成年人处理；年龄线按法规设定。"
+    },
+    "deregister": {
+      "title": "账号注销",
+      "body": "注销前可完整导出。申请后有 {{days}} 天冷静期，期间可撤销。期满删除账号与个人学习数据；依法需保存的记录按法定期限保存，并限制用途。",
+      "action": "申请注销账号"
+    }
+  },
+  "confirm": {
+    "authorization": {
+      "title": "确认授权变更",
+      "body": "将变更“{{name}}”的授权。机构任务按入班约定可见，情绪与个人导师对话永不开放。"
+    },
+    "setting": {
+      "title": "确认设置变更",
+      "body": "将变更“{{name}}”。关闭自动化后每次先问，撤回分析或训练授权后不再用于对应用途。"
+    },
+    "delete_memory": {
+      "title": "删除导师记忆",
+      "body": "将删除“{{name}}”这条记忆；学习记录仍保留。"
+    },
+    "offline": {
+      "title": "确认设备下线",
+      "body": "“{{name}}”需要重新登录。若为当前设备，本次会话也会结束。"
+    },
+    "all_offline": {
+      "title": "确认全部设备下线",
+      "body": "所有设备都需重新登录，包括当前设备。"
+    },
+    "mine": {
+      "title": "确认本人登录",
+      "body": "确认后会将这个地点记为常用地点。"
+    },
+    "not_mine": {
+      "title": "处理异常登录",
+      "body": "请立即修改密码；确认后将让全部设备下线。真实安全操作即将上线。"
+    },
+    "deregister": {
+      "title": "确认申请注销",
+      "body": "账号进入 {{days}} 天冷静期，期间可撤销。期满删除账号与个人学习数据，依法保存的记录除外。建议先完整导出。"
+    },
+    "revoke": {
+      "title": "撤销分享链接",
+      "body": "撤销后，其他人无法再用此链接预览或导入；已导入的副本不会自动删除。"
+    },
+    "restore": {
+      "title": "恢复误删内容",
+      "body": "“{{name}}”将恢复至原位置；同名冲突会先征求确认。"
+    },
+    "delete": {
+      "title": "永久删除内容",
+      "body": "将永久删除“{{name}}”，无法从回收站恢复。"
+    },
+    "bulk": {
+      "title": "批量永久删除",
+      "body": "将永久删除回收站中列出的全部内容，无法恢复。"
+    },
+    "replace": {
+      "title": "确认覆盖导入",
+      "body": "导入“{{name}}”可能覆盖同名教材、题库或科目。请先核对预览与备份，再确认覆盖。"
+    },
+    "import": {
+      "title": "预览导入内容",
+      "body": "可搬运教材、题库与整个科目。先预览文件内容，再确认导入；真实文件处理即将上线。"
+    }
+  }
+}
