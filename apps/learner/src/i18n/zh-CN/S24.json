@@ -40,6 +40,17 @@
       "ok": "来得及",
       "tight": "有点紧",
       "short": "来不及"
+    },
+    "health_raw": "{{days}} 天推进了 {{levels}} 档；样本不足，暂不提供健康度比值。",
+    "health_state": {
+      "insufficient_data": "数据不足",
+      "all_reached": "都已到目标档"
+    },
+    "health_reason": {
+      "insufficient_data": "还没有足够的可学日记录，先保留原始学习数据。",
+      "all_reached": "当前范围内的知识点都已达到目标档。",
+      "target_passed": "目标日已过，暂不提供健康度比值。",
+      "no_available_days": "没有剩余可学日，暂不提供健康度比值。"
     }
   },
   "forecast": {
@@ -63,7 +74,16 @@
     "reached": "已过目标线",
     "today_hint": "按今天的水平，最可能 {{likely}}；",
     "locked": "预测已锁定",
-    "none": "暂无预测"
+    "none": "暂无预测",
+    "confidence": {
+      "high": "置信度高",
+      "medium": "置信度中",
+      "low": "低置信"
+    },
+    "estimated_share": "估计代替的分值占比 {{ratio}}",
+    "weekly_change": "较上周 {{value}}",
+    "qualification_line": "合格线",
+    "history_basis": "历史走势按每次计算时“今天的水平”记录；下方数值可切换预测情景。"
   },
   "overview": {
     "subjects": "各科进度与目标线",
@@ -187,8 +207,8 @@
     "offline": {
       "title": "正在显示上次计算的结果",
       "body": "离线时可查看已缓存的内容与计算时间；重新计算、导出与提交需要联网。",
-      "missing": "这台设备上还没有缓存过进度结果，联网后点“重试”即可。",
-      "none_title": "现在没有联网，还没有可显示的进度"
+      "missing": "目前没有可确认的本目标缓存，联网后点“重试”即可。",
+      "none_title": "当前目标尚未确认，暂不显示进度"
     },
     "restricted": {
       "title": "地图体检未通过，预测已锁定",

@@ -13,10 +13,11 @@
   "metrics": {
     "workload": 0.46,
     "weighted": 0.58,
-    "recent_daily": 1.65,
+    "recent_daily": 1.71,
     "required_daily": 1.4,
-    "health": 1.18,
-    "verdict": "ok"
+    "health": 1.22,
+    "verdict": "ok",
+    "health_state": "normal"
   },
   "forecasts": {
     "today": {
@@ -26,7 +27,10 @@
       "target_line": 70,
       "gap": 9,
       "pass_probability": 0.62,
-      "low_confidence": false
+      "low_confidence": false,
+      "confidence": "medium",
+      "estimated_score_ratio": 0,
+      "weekly_change": 2
     },
     "target": {
       "conservative": 63,
@@ -35,7 +39,9 @@
       "target_line": 70,
       "gap": 2,
       "pass_probability": 0.86,
-      "low_confidence": false
+      "low_confidence": false,
+      "confidence": "medium",
+      "estimated_score_ratio": 0
     }
   },
   "trend": [
@@ -343,16 +349,25 @@
       "forecasts": {
         "today": {
           "conservative": 49,
-          "optimistic": 73
+          "optimistic": 73,
+          "estimated_score_ratio": 0.7
         },
         "target": {
           "conservative": 55,
-          "optimistic": 80
+          "optimistic": 80,
+          "estimated_score_ratio": 0.7
         }
+      },
+      "health_sample": {
+        "observed_days": 4,
+        "advanced_levels": 3
       }
     },
     "restricted": {
-      "blocked_reasons": ["有 3 个知识点缺少目标档"]
+      "blocked_reasons": [
+        "有 3 个知识点缺少目标档"
+      ]
     }
-  }
+  },
+  "qualification_line": 60
 }

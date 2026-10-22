@@ -1,18 +1,13 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { S24Forecast, S24Progress } from "@exam-prep/contract";
-import { EMPTY_VALUE, formatDuration, formatNumber, formatPercent, formatRange, formatScore } from "@exam-prep/shared/format";
-import { AiContent, Button, Card, Columns, DataTable, KeyValueList, Segmented, Stat, StatGroup, Tag } from "@exam-prep/ui";
+import { EMPTY_VALUE, formatDuration, formatPercent, formatRange, formatScore } from "@exam-prep/shared/format";
+import { AiContent, Banner, Button, Card, Columns, DataTable, KeyValueList, Segmented, Stat, StatGroup } from "@exam-prep/ui";
 import { ForecastLock } from "../components/ForecastLock.tsx";
 import { GapText } from "../components/GapText.tsx";
+import { HealthStat } from "../components/HealthStat.tsx";
+import { ForecastDetails } from "../components/ForecastDetails.tsx";
 import { Trend } from "../components/Trend.tsx";
-
-type Verdict = S24Progress["metrics"]["verdict"];
-
-/** 健康度判词对应的颜色（判词由接口给，R06 R21）。 */
-const HEALTH_TONE: Readonly<Record<Verdict, "success" | "warning" | "danger">> = { ok: "success", tight: "warning", short: "danger" };
-/** 健康度与两个速度显示两位小数（R06 R21）。 */
-const RATIO_DIGITS = 2;
 
 /** 三个数里“够不够”的说明：按今天的水平、最可能值与离目标线的差额，证据不足时带低置信标记。 */
 function ForecastHint({ forecast, blocked }: { forecast: S24Forecast | undefined; blocked: boolean }) {
@@ -22,7 +17,7 @@ function ForecastHint({ forecast, blocked }: { forecast: S24Forecast | undefined
     <>
       {t("forecast.today_hint", { likely: formatScore(forecast.likely) })}
       <GapText gap={forecast.gap} />
-      {forecast.low_confidence && <Tag tone="warning">{t("forecast.low")}</Tag>}
+      <ForecastDetails forecast={forecast} />
     </>
   );
 }
@@ -70,17 +65,7 @@ export function Overview({ data, soon }: { data: S24Progress; soon: () => void }
           hint={t("metrics.completion_note")}
           tone="brand"
         />
-        <Stat
-          label={t("metrics.health")}
-          question={t("metrics.health_question")}
-          value={formatNumber(metrics.health, RATIO_DIGITS)}
-          hint={t("metrics.health_hint", {
-            verdict: t("metrics.verdict." + metrics.verdict),
-            required: formatNumber(metrics.required_daily, RATIO_DIGITS),
-            actual: formatNumber(metrics.recent_daily, RATIO_DIGITS),
-          })}
-          tone={HEALTH_TONE[metrics.verdict]}
-        />
+        <HealthStat metrics={metrics} />
       </StatGroup>
       {/* feat:S24-03 feat:S24-07 feat:S24-19 体检阻断时预测、走势与差额都不渲染。 */}
       <Columns
@@ -101,9 +86,12 @@ export function Overview({ data, soon }: { data: S24Progress; soon: () => void }
                   />
                 }
               >
+                {data.importance_estimated && <Banner tone="warning">{t("value.estimated")}</Banner>}
+                <p className="text-small text-ink-secondary">{t("forecast.history_basis")}</p>
                 <Trend data={data} />
                 <AiContent note={t("common.ai_note")}>
-                  {shown.low_confidence && <Tag tone="warning">{t("forecast.low")}</Tag>}
+                  <p className="font-medium">{t("forecast." + at)}</p>
+                  <ForecastDetails forecast={shown} />
                   <KeyValueList
                     items={[
                       { key: "conservative", label: t("forecast.conservative"), value: formatScore(shown.conservative) },

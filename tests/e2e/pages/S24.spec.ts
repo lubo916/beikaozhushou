@@ -3,7 +3,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { formatDateTime, formatNumber, formatRange, formatScore } from "../../../packages/shared/src/format/index.ts";
+import { formatCount, formatDateTime, formatNumber, formatRange, formatScore } from "../../../packages/shared/src/format/index.ts";
 import { pageById, urlOf } from "../support/catalog.ts";
 import { ABNORMAL_STATES, expectLoaded, expectNoProblems, expectOpened, expectState, watchPage } from "../support/checks.ts";
 import { ROOT } from "../support/env.ts";
@@ -176,9 +176,16 @@ interface ForecastFixture {
   readonly conservative: number;
   readonly likely: number;
   readonly optimistic: number;
+  readonly confidence: string;
+  readonly estimated_score_ratio: number;
+  readonly weekly_change?: number;
 }
 
 interface ProgressFixture {
+  readonly qualification_line?: number;
+  readonly scenarios: {
+    readonly insufficient_data: { readonly health_sample: { readonly observed_days: number; readonly advanced_levels: number } };
+  };
   readonly computed_at: string;
   readonly time_zone: string;
   readonly forecasts: Readonly<Record<"today" | "target", ForecastFixture>>;
@@ -188,27 +195,22 @@ interface ProgressFixture {
 
 const progressFixture = JSON.parse(readFileSync(join(ROOT, "fixtures/pages/S24/junior-accounting.json"), "utf8")) as ProgressFixture;
 
-test("S24 正常查看后重新离线打开，缓存保留三个数和原计算时间", async ({ page }) => {
+test("S24 离线重新打开无法确认目标时保留缓存，但不冒用其中数字", async ({ page }) => {
   const watch = await watchPage(page);
   await watch.open(urlOf(entry, { view: "overview" }));
   await expectLoaded(page, entry);
-  const values = mainOf(page).locator(".ui-stats").first().locator(".ui-stat__value");
-  await expect(values).toHaveCount(3);
-  const originalValues = await values.allTextContents();
   const updated = copy("header.updated").replace("{{time}}", formatDateTime(progressFixture.computed_at, progressFixture.time_zone));
   await expect(mainOf(page).locator(".ui-pagehead")).toContainText(updated);
-  await expect
-    // 地址没写考试：存进“当前目标”这一格（不冒充初级会计，见 data.ts 与单元测试“离线缓存”）。
-    .poll(async () => page.evaluate(() => sessionStorage.getItem("S24:progress:v2:current")))
-    .not.toBeNull();
-
-  // goto 会重新加载页面模块，确保这里验证的是 sessionStorage，而非本次页面内的查询内存。
+  const key = "S24:progress:v3:junior-accounting";
+  await expect.poll(async () => page.evaluate((key) => sessionStorage.getItem(key), key)).not.toBeNull();
+  // 全局强制离线也让目标身份接口失败，旧的“当前目标”别名不能证明当前考试。
   await watch.open(urlOf(entry, { view: "overview", state: "offline" }));
   await expectState(page, entry, "offline");
-  await expect(mainOf(page).locator(".ui-state--offline")).toHaveClass(/ui-state--compact/);
-  await expect(values).toHaveText(originalValues);
-  await expect(mainOf(page).locator(".ui-pagehead")).toContainText(updated);
-  await expect(mainOf(page).getByRole("tabpanel")).toBeVisible();
+  await expect(mainOf(page).locator(".ui-state--offline")).not.toHaveClass(/ui-state--compact/);
+  await expect(mainOf(page).locator(".ui-stats")).toHaveCount(0);
+  await expect
+    .poll(async () => page.evaluate((key) => JSON.parse(sessionStorage.getItem(key) ?? "{}").computed_at as unknown, key))
+    .toBe(progressFixture.computed_at);
   expectNoProblems(watch, "offline");
 });
 
@@ -217,7 +219,10 @@ test("S24 体检阻断后，两个时点的预测值及趋势、分值表不再�
   await watch.open(urlOf(entry, { view: "overview" }));
   await expectLoaded(page, entry);
   const main = mainOf(page);
-  const forecastStat = main.locator(".ui-stat").filter({ hasText: copy("metrics.forecast") }).locator(".ui-stat__value");
+  const forecastStat = main
+    .locator(".ui-stat")
+    .filter({ hasText: copy("metrics.forecast") })
+    .locator(".ui-stat__value");
   const trend = main.locator(".ui-card").filter({ has: main.getByRole("heading", { name: copy("forecast.trend"), exact: true }) });
 
   const today = progressFixture.forecasts.today;
@@ -250,7 +255,7 @@ test("S24 离线缓存按考试分开：看过初级会计后离线打开六级�
   const watch = await watchPage(page);
   await watch.open(urlOf(entry, { exam: "kj" }));
   await expectLoaded(page, entry);
-  await expect.poll(async () => page.evaluate(() => sessionStorage.getItem("S24:progress:v2:kj"))).not.toBeNull();
+  await expect.poll(async () => page.evaluate(() => sessionStorage.getItem("S24:progress:v3:junior-accounting"))).not.toBeNull();
   await watch.open(urlOf(entry, { exam: "en", state: "offline" }));
   await expectState(page, entry, "offline");
   await expect(mainOf(page).locator(".ui-state--offline")).not.toHaveClass(/ui-state--compact/);
@@ -284,4 +289,52 @@ test("S24 按计划学到目标日已过目标线时写“已过目标线”，�
   await expect(trend).toContainText(copy("forecast.reached"));
   await expect(trend).not.toContainText("-");
   expectNoProblems(watch, "normal");
+});
+
+test("S24 样本不足时健康度只给原始天数与推进记录，不显示比值和判词", async ({ page }) => {
+  const watch = await watchPage(page);
+  await watch.open(urlOf(entry, { exam: "kj", state: "insufficient_data" }));
+  await expectState(page, entry, "insufficient_data");
+  const health = mainOf(page)
+    .locator(".ui-stat")
+    .filter({ hasText: copy("metrics.health") });
+  const sample = progressFixture.scenarios.insufficient_data.health_sample;
+  await expect(health.locator(".ui-stat__value")).toHaveText(copy("metrics.health_state.insufficient_data"));
+  await expect(health).toContainText(
+    copy("metrics.health_raw")
+      .replace("{{days}}", formatCount(sample.observed_days))
+      .replace("{{levels}}", formatCount(sample.advanced_levels)),
+  );
+  await expect(health).not.toContainText(copy("metrics.verdict.ok"));
+  expectNoProblems(watch, "insufficient_data");
+});
+
+test("S24 预测展示置信度与较上周，合格线和目标线独立标注", async ({ page }) => {
+  const watch = await watchPage(page);
+  await watch.open(urlOf(entry, { exam: "kj" }));
+  await expectLoaded(page, entry);
+  const main = mainOf(page);
+  const forecast = main.locator(".ui-stat").filter({ hasText: copy("metrics.forecast") });
+  await expect(forecast).toContainText(copy("forecast.confidence." + progressFixture.forecasts.today.confidence));
+  const change = progressFixture.forecasts.today.weekly_change;
+  if (change === undefined) throw new Error("初级会计示例缺少较上周变化");
+  await expect(forecast).toContainText(copy("forecast.weekly_change").replace("{{value}}", (change > 0 ? "+" : "") + formatScore(change)));
+  const chart = main.getByRole("img", { name: copy("forecast.chart_label"), exact: true });
+  await expect(chart).toContainText(copy("forecast.qualification_line"));
+  await expect(chart).toContainText(copy("forecast.target_line"));
+  await expect(main).toContainText(copy("forecast.history_basis"));
+  expectNoProblems(watch, "normal");
+});
+
+test("S24 强制不足的考情降级示例在预测和提分地图都标注估算依据", async ({ page }) => {
+  const watch = await watchPage(page);
+  await watch.open(urlOf(entry, { exam: "js", state: "insufficient_data" }));
+  await expectState(page, entry, "insufficient_data");
+  await expect(mainOf(page)).toContainText(copy("value.estimated"));
+  await mainOf(page)
+    .getByRole("tab", { name: copy("tabs.value"), exact: true })
+    .press("Enter");
+  await expect(mainOf(page)).toContainText(copy("value.estimated"));
+  await expect(mainOf(page).getByRole("table", { name: copy("value.map"), exact: true })).toContainText(copy("value.estimated_short"));
+  expectNoProblems(watch, "insufficient_data");
 });

@@ -6,7 +6,10 @@
   "data_source": "sample",
   "has_progress": true,
   "map_check": "blocked",
-  "blocked_reasons": ["有 4 个知识点缺少目标档", "“图”一章有 2 组疑似重复的知识点"],
+  "blocked_reasons": [
+    "有 4 个知识点缺少目标档",
+    "“图”一章有 2 组疑似重复的知识点"
+  ],
   "importance_estimated": true,
   "evidence_count": 24,
   "metrics": {
@@ -15,7 +18,8 @@
     "recent_daily": 1.5,
     "required_daily": 2.2,
     "health": 0.68,
-    "verdict": "short"
+    "verdict": "short",
+    "health_state": "normal"
   },
   "forecasts": {},
   "trend": [],
@@ -121,7 +125,11 @@
   },
   "scenarios": {
     "insufficient_data": {
-      "evidence_count": 3
+      "evidence_count": 3,
+      "health_sample": {
+        "observed_days": 4,
+        "advanced_levels": 3
+      }
     }
   }
 }

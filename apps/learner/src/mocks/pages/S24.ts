@@ -11,10 +11,13 @@ type Mode = "normal" | "empty" | "restricted" | "insufficient_data";
 interface RangeFixture {
   readonly conservative: number;
   readonly optimistic: number;
+  readonly estimated_score_ratio?: number;
 }
 
 interface InsufficientFixture {
   readonly evidence_count: number;
+  readonly health_sample?: { readonly observed_days: number; readonly advanced_levels: number };
+  readonly importance_estimated?: boolean;
   readonly forecasts?: { readonly today?: RangeFixture; readonly target?: RangeFixture };
 }
 
@@ -58,8 +61,15 @@ function locked(data: S24Progress, reasons: readonly string[]): S24Progress {
 }
 
 function widen(forecast: S24Forecast, range: RangeFixture | undefined): S24Forecast {
-  if (range === undefined) return { ...forecast, low_confidence: true };
-  return { ...forecast, conservative: range.conservative, optimistic: range.optimistic, low_confidence: true };
+  if (range === undefined) return { ...forecast, confidence: "low", low_confidence: true };
+  return {
+    ...forecast,
+    conservative: range.conservative,
+    optimistic: range.optimistic,
+    confidence: "low",
+    estimated_score_ratio: range.estimated_score_ratio ?? forecast.estimated_score_ratio,
+    low_confidence: true,
+  };
 }
 
 /** 证据不足（R06 R7、R11）：区间换成 fixture 给的更宽的两端并标低置信；走势的最后一天就是“今天”，跟着换。 */
@@ -73,7 +83,23 @@ function insufficient(data: S24Progress, scenario: InsufficientFixture | undefin
     today === undefined
       ? data.trend
       : data.trend.map((row, index) => (index === last ? { ...row, conservative: today.conservative, optimistic: today.optimistic } : row));
-  return { ...data, evidence_count: scenario?.evidence_count ?? data.evidence_count, forecasts, trend };
+  const metrics =
+    scenario?.health_sample === undefined
+      ? data.metrics
+      : {
+          workload: data.metrics.workload,
+          weighted: data.metrics.weighted,
+          health_state: "insufficient_data" as const,
+          ...scenario.health_sample,
+        };
+  return {
+    ...data,
+    evidence_count: scenario?.evidence_count ?? data.evidence_count,
+    importance_estimated: scenario?.importance_estimated ?? data.importance_estimated,
+    metrics,
+    forecasts,
+    trend,
+  };
 }
 
 function progress(ctx: MockContext, mode: Mode): S24Progress {

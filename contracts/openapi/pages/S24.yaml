@@ -1,5 +1,4 @@
-# S24 只读展示契约。预测与完成度均由接口提供；本页不计算业务规则。
-# 口径按规则卡 R06（docs/baseline/rule-cards/metrics-prediction.md）：目标线是学员自己的目标分，差额＝目标分 − 最可能值。
+# S24 只读展示契约；所有业务指标和无比值状态由接口提供，页面不重算。
 paths:
   /learner/progress:
     get:
@@ -23,10 +22,7 @@ components:
       required:
       - workload
       - weighted
-      - recent_daily
-      - required_daily
-      - health
-      - verdict
+      - health_state
       properties:
         workload:
           type: number
@@ -46,6 +42,23 @@ components:
           - ok
           - tight
           - short
+        health_state:
+          type: string
+          enum:
+          - normal
+          - insufficient_data
+          - all_reached
+          - target_passed
+          - no_available_days
+          description: 健康度显示状态由接口判定（R06 R22）；非normal不下发比值和速度
+        observed_days:
+          type: integer
+          minimum: 0
+          description: 可用观察天数，仅展示原始计数
+        advanced_levels:
+          type: integer
+          minimum: 0
+          description: 观察期已推进的档数，仅展示原始计数
     S24Forecast:
       type: object
       required:
@@ -56,6 +69,8 @@ components:
       - gap
       - pass_probability
       - low_confidence
+      - confidence
+      - estimated_score_ratio
       properties:
         conservative:
           type: number
@@ -73,6 +88,21 @@ components:
           type: number
         low_confidence:
           type: boolean
+        confidence:
+          type: string
+          enum:
+          - high
+          - medium
+          - low
+          description: 接口判定的预测置信度，页面不按宽度重算
+        estimated_score_ratio:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: 用同类数据或默认估计代替的分值占比（R06 R11）
+        weekly_change:
+          type: number
+          description: 与上周最后一条按今天的水平记录相比；无可比记录或锁定时不给（R06 R13）
     S24Forecasts:
       type: object
       properties:
@@ -421,3 +451,6 @@ components:
           $ref: '#/components/schemas/S24Confidence'
         calibration:
           $ref: '#/components/schemas/S24Calibration'
+        qualification_line:
+          type: number
+          description: 考试合格线，独立于个人目标线；不适用或没有可参考合格线时不给

@@ -31,7 +31,12 @@ async function load(exam: string, state = ""): Promise<S24Progress> {
   });
   const api = createMockApi({ db: new MockDb(fixtures), control, routes: collectRoutes(loadRouteModules()) });
   // GET 没有请求体：与 MSW 接线（mock-browser 的 readBody）一致，显式传 undefined。
-  const result = await api.handle({ method: "GET", url: "http://localhost/api/v1/learner/progress", headers: new Headers(), body: undefined });
+  const result = await api.handle({
+    method: "GET",
+    url: "http://localhost/api/v1/learner/progress",
+    headers: new Headers(),
+    body: undefined,
+  });
   expect(result.kind).toBe("json");
   if (result.kind !== "json") throw new Error("没有进度数据");
   expect(result.status).toBe(200);
@@ -116,7 +121,8 @@ describe("S24 示例数据口径（R06：目标线是学员自己的目标分，
       }
       const today = data.forecasts.today;
       const last = data.trend.at(-1);
-      if (today !== undefined) expect(last && [last.conservative, last.likely, last.optimistic]).toEqual([today.conservative, today.likely, today.optimistic]);
+      if (today !== undefined)
+        expect(last && [last.conservative, last.likely, last.optimistic]).toEqual([today.conservative, today.likely, today.optimistic]);
       if (data.score_bands.length > 0) expect(data.score_bands.reduce((sum, band) => sum + band.score, 0)).toBe(profile.full_score);
       for (const subject of data.subjects) if (subject.gap !== undefined) expect(subject.passed).toBe(subject.gap <= 0);
       const levels = new Map(exam.learner.mastery.map((m) => [m.knowledge_point_id, m.level]));
@@ -197,14 +203,15 @@ describe("S24 离线缓存（R06：离线只显示上次的结果和计算时间
     expect(CURRENT_SLOT).not.toBe(fixtures.defaultKey);
   });
 
-  it("只按格子取：初级会计的结果不会出现在六级或“当前目标”的格子里，取出来的计算时间不变", async () => {
+  it("缓存按真实考试身份读取：初级会计不冒充六级或未确认目标，计算时间不变", async () => {
     const store = memoryStore();
     const kj = await load("kj");
     writeCachedProgress("kj", kj, store);
-    expect(readCachedProgress("kj", store)?.computed_at).toBe(kj.computed_at);
-    expect(readCachedProgress("kj", store)?.exam_id).toBe(kj.exam_id);
+    expect(readCachedProgress(kj.exam_id, store)?.computed_at).toBe(kj.computed_at);
+    expect(readCachedProgress(kj.exam_id, store)?.exam_id).toBe(kj.exam_id);
     expect(readCachedProgress("en", store)).toBeUndefined();
     expect(readCachedProgress(CURRENT_SLOT, store)).toBeUndefined();
+    expect(readCachedProgress(CURRENT_SLOT, store, kj.exam_id)?.computed_at).toBe(kj.computed_at);
   });
 
   it("缓存损坏或是旧版本时丢掉，回到没有缓存的离线态", async () => {
@@ -217,5 +224,24 @@ describe("S24 离线缓存（R06：离线只显示上次的结果和计算时间
     expect(readCachedProgress("en", store)).toBeUndefined();
     const offline = { status: "error" as const, fetchStatus: "idle" as const, error: new TypeError("offline") };
     expect(progressView(offline, readCachedProgress("en", store)).state).toBe("offline");
+  });
+});
+
+describe("S24 本地补全回归", () => {
+  it("健康度样本不足时只给原始推进记录，不返回比值、判词或速度", async () => {
+    const low = await load("kj", "insufficient_data");
+    expect(low.metrics).toMatchObject({ health_state: "insufficient_data", observed_days: 4, advanced_levels: 3 });
+    expect(low.metrics.health).toBeUndefined();
+    expect(low.metrics.verdict).toBeUndefined();
+    expect(low.metrics.recent_daily).toBeUndefined();
+    expect(low.metrics.required_daily).toBeUndefined();
+  });
+  it("预测携带置信度、估计分值占比和可用的较上周变化，并单列合格线", async () => {
+    const normal = await load("kj");
+    const low = await load("kj", "insufficient_data");
+    expect(normal.forecasts.today).toMatchObject({ confidence: "medium", estimated_score_ratio: 0, weekly_change: 2 });
+    expect(low.forecasts.today).toMatchObject({ confidence: "low", estimated_score_ratio: 0.7 });
+    expect(normal).toHaveProperty("qualification_line", 60);
+    expect(normal.forecasts.today?.target_line).toBe(70);
   });
 });

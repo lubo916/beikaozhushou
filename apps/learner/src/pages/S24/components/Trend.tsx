@@ -17,7 +17,12 @@ export function Trend({ data }: { data: S24Progress }) {
   const rows = data.trend;
   if (rows.length === 0) return null;
   const target = data.forecasts.today?.target_line;
-  const values = [...rows.flatMap((row) => [row.conservative, row.optimistic]), ...(target === undefined ? [] : [target])];
+  const qualification = data.qualification_line;
+  const values = [
+    ...rows.flatMap((row) => [row.conservative, row.optimistic]),
+    ...(target === undefined ? [] : [target]),
+    ...(qualification === undefined ? [] : [qualification]),
+  ];
   const low = Math.min(...values);
   const high = Math.max(...values);
   const pad = Math.max((high - low) * PAD_RATIO, 1);
@@ -35,6 +40,21 @@ export function Trend({ data }: { data: S24Progress }) {
       <svg viewBox="0 0 600 240" className="w-full" role="img" aria-label={t("forecast.chart_label")}>
         <polygon points={band} fill="var(--color-brand-primary-soft)" />
         <polyline points={line} fill="none" stroke="var(--color-brand-primary)" strokeWidth="2" />
+        {qualification !== undefined && (
+          <>
+            <line
+              x1={LEFT}
+              x2={RIGHT}
+              y1={y(qualification)}
+              y2={y(qualification)}
+              stroke="var(--color-status-danger)"
+              strokeDasharray="2 5"
+            />
+            <text x={LEFT} y={y(qualification)} textAnchor="start" fill="var(--color-ink-secondary)" className="text-small">
+              {t("forecast.qualification_line")} {formatScore(qualification)}
+            </text>
+          </>
+        )}
         {target !== undefined && (
           <>
             <line x1={LEFT} x2={RIGHT} y1={y(target)} y2={y(target)} stroke="var(--color-status-warning)" strokeDasharray="4 4" />
