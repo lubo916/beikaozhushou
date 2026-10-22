@@ -19,7 +19,7 @@ components:
       type: object
       required: [exam_id, exam_name, activation, video_analysis_allowed, scenarios, flow, assessment, radar, next_stage, data_source]
       properties:
-        exam_id: {$ref: "#/components/schemas/Id"}
+        exam_id: {type: string, pattern: "^[a-z0-9][a-z0-9-]{2,40}$"}
         exam_name: {type: string}
         activation:
           type: string

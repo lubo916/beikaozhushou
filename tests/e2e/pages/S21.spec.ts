@@ -149,3 +149,13 @@ test("S21 视频受限时仍可继续仅音频流程，P1 按钮有明确即将�
   }
   expectNoProblems(watch, "restricted");
 });
+
+test("S21 未开启考试也可通过强制状态审阅样本不足与空记录", async ({ page }) => {
+  const watch = await watchPage(page);
+  for (const state of ["insufficient_data", "empty", "restricted"] as const) {
+    await watch.open(urlOf(entry, { exam: "ds", state }));
+    await expectState(page, entry, state);
+    if (state === "insufficient_data") await expect(page.getByText(copy.radar.insufficient_title, { exact: true })).toBeVisible();
+    expectNoProblems(watch, state);
+  }
+});

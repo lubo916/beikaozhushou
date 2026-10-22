@@ -11,20 +11,26 @@ function home(ctx: MockContext): S21OralTrainingHome {
   return structuredClone(entry[1]);
 }
 
+// 强制七态仅供开发查看，未开启考试也能预览各局部状态；正常数据不受影响。
+function preview(ctx: MockContext): S21OralTrainingHome {
+  const data = home(ctx);
+  return { ...data, activation: data.activation === "disabled" ? "manual" : data.activation };
+}
+
 export const routes = [
   defineRoute("getOralTrainingHome", home, {
     variants: {
       empty: (ctx) => {
-        const data = home(ctx);
+        const data = preview(ctx);
         return {
           ...data,
           assessment: { ...data.assessment, available: false },
           radar: { ...data.radar, sufficient: false, sample_count: 0, dimensions: [] },
         };
       },
-      restricted: (ctx) => ({ ...home(ctx), video_analysis_allowed: false }),
+      restricted: (ctx) => ({ ...preview(ctx), video_analysis_allowed: false }),
       insufficient_data: (ctx) => {
-        const data = home(ctx);
+        const data = preview(ctx);
         return { ...data, radar: { ...data.radar, sufficient: false, sample_count: 1, dimensions: [] } };
       },
     },

@@ -136,6 +136,18 @@ const checkbox = (root: ParentNode, text: string): HTMLInputElement | undefined 
     ?.querySelector<HTMLInputElement>("input[type=checkbox]") ?? undefined;
 
 describe("S21 真实页面链路", () => {
+  it("未开启考试也能用强制状态预览数据不足，不被开启入口挡住", async () => {
+    stubFetch(setup("insufficient_data", "ds").api);
+    const { host, unmount } = await mountAt("/oral?exam=ds&state=insufficient_data", <App />);
+    try {
+      await settle(() => host.querySelector(".ui-state--insufficient_data") !== null);
+      expect(host.querySelector(".ui-state--insufficient_data")).not.toBeNull();
+      expect(host.textContent).toContain(copy.assessment.title);
+    } finally {
+      await unmount();
+    }
+  });
+
   it("正常页显示评估、批注、重构和隐私，流程的留存同意每次默认清空", async () => {
     stubFetch(setup().api);
     const { host, unmount } = await mountAt("/oral", <App />);
