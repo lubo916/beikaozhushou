@@ -114,16 +114,21 @@ export default function Page() {
 
   let body: ReactNode;
   if (map.state === "loading") {
-    body = <PageState state="loading" pageName={pageName} skeleton={<MapSkeleton />} slowHintAfterSeconds={param("ui.loading.slow_hint_seconds")} />;
+    body = (
+      <PageState
+        state="loading"
+        pageName={pageName}
+        skeleton={<MapSkeleton />}
+        slowHintAfterSeconds={param("ui.loading.slow_hint_seconds")}
+      />
+    );
   } else if (map.state === "offline") {
     body = (
       <PageState
         state="offline"
         pageName={pageName}
         body={t("state.offline.body")}
-        action={
-          <Button onClick={map.retry}>{COPY.action.retry}</Button>
-        }
+        action={<Button onClick={map.retry}>{COPY.action.retry}</Button>}
       />
     );
   } else if (map.state === "restricted") {

@@ -26,7 +26,17 @@ const SLOTS: readonly { readonly x: number; readonly y: number }[] = [
 
 const short = (name: string): string => (name.length > NAME_MAX ? `${name.slice(0, NAME_MAX)}…` : name);
 
-function Node({ x, y, name, kind }: { readonly x: number; readonly y: number; readonly name: string; readonly kind: "center" | "plain" | "tutor" }) {
+function Node({
+  x,
+  y,
+  name,
+  kind,
+}: {
+  readonly x: number;
+  readonly y: number;
+  readonly name: string;
+  readonly kind: "center" | "plain" | "tutor";
+}) {
   return (
     <g className={`s09-graph__node s09-graph__node--${kind}`}>
       <title>{name}</title>

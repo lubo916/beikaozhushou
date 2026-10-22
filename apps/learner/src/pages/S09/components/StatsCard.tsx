@@ -10,8 +10,16 @@ export function StatsCard({ stats, className }: { readonly stats: S09Stats; read
   return (
     <Card className={className}>
       <StatGroup>
-        <Stat label={t("stats.learned")} value={t("stats.value", { n: n(stats.learned), total: n(stats.total) })} hint={t("stats.learned_hint")} />
-        <Stat label={t("stats.reached")} value={t("stats.value", { n: n(stats.reached), total: n(stats.in_scope) })} hint={t("stats.reached_hint")} />
+        <Stat
+          label={t("stats.learned")}
+          value={t("stats.value", { n: n(stats.learned), total: n(stats.total) })}
+          hint={t("stats.learned_hint")}
+        />
+        <Stat
+          label={t("stats.reached")}
+          value={t("stats.value", { n: n(stats.reached), total: n(stats.in_scope) })}
+          hint={t("stats.reached_hint")}
+        />
       </StatGroup>
       <p className="s09-note s09-note--muted s09-gap-top">{t("stats.scope", { in_scope: n(stats.in_scope), total: n(stats.total) })}</p>
     </Card>

@@ -2,12 +2,15 @@
 // ① 假数据：四个演示考试，正常、空、受限、数据不足、锁定五种数据都通过生成的 Zod 校验；每章格子数等于章里的知识点数；
 //    初级会计的数与原型一致；数据结构那场体检不通过、不给性价比阶梯。② 七态判断（data.ts）只看请求结果；重试策略；?view= 的键；
 //    筛选只比对接口给的值。③ 整个学员端挂在 /map：方格、列表、空态、出错各走一遍。
+import { act } from "react";
+import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { formatCount } from "@exam-prep/shared/format";
 import type { S09MapOverview } from "@exam-prep/contract";
 import { ApiError } from "@exam-prep/contract/errors";
 import * as zodSchemas from "@exam-prep/contract/zod";
 import { App } from "../../App.tsx";
-import { heading, linkByText, mountAt, settle } from "../../app/testing.tsx";
+import { click, heading, linkByText, mountAt, settle } from "../../app/testing.tsx";
 import common from "../../i18n/zh-CN/common.json";
 import copy from "../../i18n/zh-CN/S09.json";
 import { createMockApi, type MockApi } from "../../mocks/api.ts";
@@ -15,6 +18,7 @@ import { DevControl } from "../../mocks/control.ts";
 import { MockDb } from "../../mocks/db.ts";
 import { loadDemoFixtures } from "../../mocks/fixtures.ts";
 import { collectRoutes, loadRouteModules } from "../../mocks/registry.ts";
+import { MapGrid } from "./components/cells.tsx";
 import { NO_FILTERS, mapView, matchesFilters, shouldRetry, viewFromSearch, type MapQuery } from "./data.ts";
 
 interface Parser {
@@ -39,7 +43,12 @@ function setup(state = "") {
   const api = createMockApi({ db, control, routes });
   /** 取知识地图，并用生成的 Zod 结构校验。 */
   const overview = async (): Promise<S09MapOverview> => {
-    const outcome = await api.handle({ method: "GET", url: "http://localhost/api/v1/learner/map-overview", headers: new Headers(), body: undefined });
+    const outcome = await api.handle({
+      method: "GET",
+      url: "http://localhost/api/v1/learner/map-overview",
+      headers: new Headers(),
+      body: undefined,
+    });
     if (outcome.kind !== "json") throw new Error(`没有拿到 JSON：${outcome.kind}`);
     expect(outcome.status, JSON.stringify(outcome.body)).toBe(200);
     const result = parser?.safeParse(outcome.body);
@@ -50,7 +59,12 @@ function setup(state = "") {
 }
 
 const points = (body: S09MapOverview) => body.chapters.flatMap((chapter) => chapter.points);
-const success = (data: S09MapOverview, error: unknown = null): MapQuery => ({ data, error, status: error === null ? "success" : "error", fetchStatus: "idle" });
+const success = (data: S09MapOverview, error: unknown = null): MapQuery => ({
+  data,
+  error,
+  status: error === null ? "success" : "error",
+  fetchStatus: "idle",
+});
 
 describe("S09 假数据（mocks/pages/S09.ts）", () => {
   it("生成的 Zod 结构里有本页接口的响应", () => {
@@ -180,7 +194,8 @@ describe("S09 页面（整个学员端挂在 /map）", () => {
     expect(host.querySelectorAll("button.s09-cell[data-point]").length).toBe(212);
     const tabs = [...host.querySelectorAll('[role="tab"]')].map((tab) => tab.textContent);
     for (const label of [copy.views.grid, copy.views.tree, copy.views.graph, copy.views.list]) expect(tabs).toContain(label);
-    for (const title of [copy.stats.learned, copy.focus.title, copy.attention.title, copy.source.title]) expect(host.textContent).toContain(title);
+    for (const title of [copy.stats.learned, copy.focus.title, copy.attention.title, copy.source.title])
+      expect(host.textContent).toContain(title);
     await unmount();
   });
 
@@ -214,5 +229,110 @@ describe("S09 页面（整个学员端挂在 /map）", () => {
     expect(error?.textContent).toContain("知识地图没能加载");
     expect([...(error?.querySelectorAll("button") ?? [])].map((button) => button.textContent)).toContain("重试");
     await unmount();
+  });
+});
+
+describe("S09 方格键盘入口回归", () => {
+  const cells = (host: HTMLElement) => [...host.querySelectorAll<HTMLButtonElement>("button.s09-cell[data-point]")];
+  const entry = (host: HTMLElement) => cells(host).filter((cell) => cell.tabIndex === 0);
+
+  it("折叠当前选中格所在章后，展开章仍可用 Tab 进入并继续方向键导航", async () => {
+    const body = await setup().overview();
+    const selectedId = body.chapters[0]?.points[0]?.id;
+    const secondChapter = body.chapters[1];
+    if (selectedId === undefined || secondChapter === undefined) throw new Error("缺少回归测试章节");
+    const { host, unmount } = await mountAt(
+      "/map",
+      <MapGrid
+        chapters={body.chapters}
+        coloring="mastery"
+        locked={false}
+        matched={undefined}
+        selectedId={selectedId}
+        onSelect={() => undefined}
+      />,
+    );
+    try {
+      await click(cells(host)[0]);
+      await click(host.querySelector("button.s09-row__name"));
+      expect(entry(host).map((cell) => cell.dataset["point"])).toEqual([secondChapter.points[0]?.id]);
+      const start = entry(host)[0];
+      if (start === undefined) throw new Error("折叠后没有键盘入口");
+      await act(async () => {
+        start.focus();
+        start.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+      });
+      expect(document.activeElement).toBe(cells(host)[1]);
+      expect(entry(host)).toEqual([cells(host)[1]]);
+      await click(host.querySelector("button.s09-row__name"));
+      expect(entry(host)).toHaveLength(1);
+    } finally {
+      await unmount();
+    }
+  });
+
+  it("切换考试后，旧焦点和选中点不在新数据里时仍保留一个可见的键盘入口", async () => {
+    const body = await setup().overview();
+    const first = body.chapters[0];
+    const second = body.chapters[1];
+    if (first === undefined || second === undefined) throw new Error("缺少回归测试章节");
+    const onSelect = vi.fn();
+    const host = document.createElement("div");
+    document.body.append(host);
+    const root = createRoot(host);
+    try {
+      await act(async () =>
+        root.render(
+          <MapGrid
+            chapters={[first]}
+            coloring="mastery"
+            locked={false}
+            matched={undefined}
+            selectedId={first.points[0]?.id}
+            onSelect={onSelect}
+          />,
+        ),
+      );
+      await click(cells(host)[0]);
+      // 保留旧 selectedId，覆盖考试切换后选中点请求尚未同步的一帧。
+      await act(async () =>
+        root.render(
+          <MapGrid
+            chapters={[second]}
+            coloring="mastery"
+            locked={false}
+            matched={undefined}
+            selectedId={first.points[0]?.id}
+            onSelect={onSelect}
+          />,
+        ),
+      );
+      expect(entry(host).map((cell) => cell.dataset["point"])).toEqual([second.points[0]?.id]);
+    } finally {
+      await act(async () => root.unmount());
+      host.remove();
+    }
+  });
+});
+
+describe("S09 体检显示回归", () => {
+  it("体检项保留格式化的数量与修复建议，不留下文案占位符", async () => {
+    const { control, api, overview } = setup();
+    control.setExam("ds");
+    const body = await overview();
+    stubFetch(api);
+    const { host, unmount } = await mountAt("/map?view=grid", <App />);
+    try {
+      await settle(() => host.querySelector(".s09-health .s09-list") !== null);
+      const text = host.querySelector(".s09-health .s09-list")?.textContent ?? "";
+      for (const issue of body.health.issues) {
+        expect(text).toContain(copy.source.issue[issue.kind]);
+        expect(text).toContain(`${formatCount(issue.count)} 处`);
+        expect(text).toContain(copy.source.fix[issue.kind]);
+      }
+      expect(text).not.toContain("{{");
+    } finally {
+      await unmount();
+    }
   });
 });

@@ -117,8 +117,11 @@ export const MapGrid = memo(function MapGrid({ chapters, coloring, locked, match
   const look = useLook(coloring, locked);
   const [folded, setFolded] = useState<ReadonlySet<string>>(() => new Set(chapters.filter((c) => c.collapsed_by_default).map((c) => c.id)));
   const [roving, setRoving] = useState<string | undefined>(undefined);
-  const firstId = chapters.find((chapter) => !folded.has(chapter.id))?.points[0]?.id;
-  const tabStop = roving ?? selectedId ?? firstId;
+  // 折叠章节或切换数据后，旧焦点可能已隐藏；只让可见格子成为键盘入口。
+  const visibleIds = new Set(
+    chapters.filter((chapter) => !folded.has(chapter.id)).flatMap((chapter) => chapter.points.map((point) => point.id)),
+  );
+  const tabStop = [roving, selectedId].find((id) => id !== undefined && visibleIds.has(id)) ?? visibleIds.values().next().value;
 
   const onCell = (event: MouseEvent<HTMLButtonElement>): void => {
     const id = event.currentTarget.dataset["point"];
@@ -153,7 +156,14 @@ export const MapGrid = memo(function MapGrid({ chapters, coloring, locked, match
               {chapter.name}
             </button>
             {isFolded ? (
-              <ProgressBar className="s09-row__bar" value={chapter.reached_ratio} label={chapter.name} showLabel={false} size="sm" tone="success" />
+              <ProgressBar
+                className="s09-row__bar"
+                value={chapter.reached_ratio}
+                label={chapter.name}
+                showLabel={false}
+                size="sm"
+                tone="success"
+              />
             ) : (
               <div className="s09-cells">
                 {chapter.points.map((point, col) => {
@@ -225,14 +235,24 @@ export function Legend({ coloring, locked }: { readonly coloring: Coloring; read
       break;
     case "frequency":
       items = [
-        ...IMPORTANCE_LEVELS.map((level) => ({ key: `f${level}`, tone: `s09-cell--f${level}`, marker: String(level), label: t("legend.frequency_level", { level }) })),
+        ...IMPORTANCE_LEVELS.map((level) => ({
+          key: `f${level}`,
+          tone: `s09-cell--f${level}`,
+          marker: String(level),
+          label: t("legend.frequency_level", { level }),
+        })),
         none(t("legend.frequency_none")),
         out,
       ];
       break;
     case "forgetting":
       items = [
-        ...RISKS.map((risk) => ({ key: risk, tone: `s09-cell--risk-${risk}`, marker: t(`marker.${risk}`), label: t(`legend.forgetting_${risk}`) })),
+        ...RISKS.map((risk) => ({
+          key: risk,
+          tone: `s09-cell--risk-${risk}`,
+          marker: t(`marker.${risk}`),
+          label: t(`legend.forgetting_${risk}`),
+        })),
         none(t("legend.forgetting_none")),
         out,
       ];
