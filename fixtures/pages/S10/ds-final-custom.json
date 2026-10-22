@@ -1,0 +1,82 @@
+{
+  "note": "S10 知识点主页的页面专用演示数据（F08）：知识点、掌握档、题目、卡片、笔记与学员资料仍取 fixtures/exams/ds-final-custom/，这里只放页面要用、考试数据里还没有的部分。数字都是演示值，不是规则数字。",
+  "demo_point_id": "019a0403-0000-7000-8000-000000000006",
+  "defaults": {
+    "importance_level": 2,
+    "difficulty": {
+      "objective": "typical",
+      "personalized": false
+    },
+    "add_today_minutes": 15,
+    "attack_pack_minutes": 30,
+    "exam_profile": {
+      "maturity": "cold"
+    }
+  },
+  "points": {
+    "019a0403-0000-7000-8000-000000000006": {
+      "importance": {
+        "default_level": 3
+      },
+      "starred": false,
+      "difficulty": {
+        "objective": "harder",
+        "personalized": false
+      },
+      "self": 3,
+      "self_pending": false,
+      "question_history": {
+        "019a0404-0000-7000-8000-000000000001": {
+          "wrong": 1,
+          "correct": 0
+        }
+      },
+      "mistakes": [
+        {
+          "question_id": "019a0404-0000-7000-8000-000000000001",
+          "option": 3,
+          "error_cause": "method_unknown"
+        }
+      ],
+      "evidence": {
+        "total": 1,
+        "items": [
+          {
+            "id": "019a0411-0000-7000-8000-000000000001",
+            "day": "2026-10-13",
+            "kind": "answer",
+            "subject": "已知一棵二叉树的先序序列为 ABDEC……",
+            "result": "wrong",
+            "confidence": "vague",
+            "duration_seconds": 130,
+            "strength": "negative",
+            "credibility": "own",
+            "in_mistakes": true
+          }
+        ]
+      },
+      "exam_profile": {
+        "maturity": "cold"
+      },
+      "relations": [
+        {
+          "type": "prerequisite",
+          "items": [
+            {
+              "point_id": "019a0403-0000-7000-8000-000000000004",
+              "name": "栈与队列的应用",
+              "origin": "custom",
+              "pending": false
+            }
+          ]
+        }
+      ],
+      "cards_due_tomorrow": 1,
+      "add_today": {
+        "minutes": 25,
+        "displaces": "哈夫曼树与编码：新学"
+      },
+      "attack_pack_minutes": 30
+    }
+  }
+}
