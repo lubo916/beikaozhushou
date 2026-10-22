@@ -122,7 +122,13 @@ function StarToggle({ starred }: { starred: boolean }) {
   const { t } = useTranslation("S10");
   const toast = useToast();
   return (
-    <Button variant="ghost" size="sm" aria-pressed={starred} icon={<Icon name="star" filled={starred} />} onClick={() => toast(t("soon.star"))}>
+    <Button
+      variant="ghost"
+      size="sm"
+      aria-pressed={starred}
+      icon={<Icon name="star" filled={starred} />}
+      onClick={() => toast(t("soon.star"))}
+    >
       {starred ? t("header.starred") : t("header.star")}
     </Button>
   );
@@ -140,7 +146,11 @@ function DifficultyTag({ point }: { point: S10Point }) {
       ? t("header.difficulty_objective", { level: label(difficulty.objective) })
       : t("header.difficulty_personal", { level: label(personal) });
   const title = difficulty.personalized
-    ? t("header.difficulty_title", { objective: label(difficulty.objective), peer: label(difficulty.peer), personal: label(difficulty.personal) })
+    ? t("header.difficulty_title", {
+        objective: label(difficulty.objective),
+        peer: label(difficulty.peer),
+        personal: label(difficulty.personal),
+      })
     : undefined;
   return (
     <Tag tone="outline" size="sm" title={title}>

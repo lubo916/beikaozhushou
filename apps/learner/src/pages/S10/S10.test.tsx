@@ -109,7 +109,13 @@ describe("S10 假数据（mocks/pages/S10.ts）", () => {
     if (question === undefined) throw new Error("示范知识点没有选择题");
     const before = rowOf(await home("demo"), question.id);
     const wrongOption = question.answer?.includes(1) === true ? 0 : 1;
-    const answer = { question_id: question.id, question_version: question.version, response: { selected: [wrongOption] }, confidence: "sure", duration_ms: 9000 };
+    const answer = {
+      question_id: question.id,
+      question_version: question.version,
+      response: { selected: [wrongOption] },
+      confidence: "sure",
+      duration_ms: 9000,
+    };
     const submitted = await call("POST", "/practice/answers", answer, { "Idempotency-Key": "s10-wrong-once" });
     expect(submitted.kind === "json" && submitted.status).toBe(200);
     const after = rowOf(await home("demo"), question.id);

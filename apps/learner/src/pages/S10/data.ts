@@ -1,6 +1,6 @@
 // S10 的数据（ui-rules 第 8 节、api-rules 第 3 节）：页面只经生成的钩子拿数据；“该显示七态里的哪一态”也在这里按请求结果判断，
 // 页面组件只管显示。?state= 由接口层制造（加载挂起、出错回 500、离线断网，空、受限、数据不足给特定数据），页面不为测试写分支。
-import { isApiError, useGetKnowledgePointHome, type S10KnowledgePointHome } from "@exam-prep/contract";
+import { getGetKnowledgePointHomeQueryKey, isApiError, useGetKnowledgePointHome, type S10KnowledgePointHome } from "@exam-prep/contract";
 
 /** 网络或服务异常自动再试一次（约一秒后出结果，F08-Q3）；4xx（受限、找不到）再试也没用，不重试。 */
 const RETRY_LIMIT = 1;
@@ -50,6 +50,6 @@ export function homeView(query: HomeQuery): HomeView {
 
 /** 本页的数据钩子：生成的钩子，加上重试策略与七态判断。 */
 export function useKnowledgePointHome(pointId: string): HomeView & { readonly retry: () => void } {
-  const query = useGetKnowledgePointHome(pointId, { query: { retry: shouldRetry } });
+  const query = useGetKnowledgePointHome(pointId, { query: { queryKey: getGetKnowledgePointHomeQueryKey(pointId), retry: shouldRetry } });
   return { ...homeView(query), retry: () => void query.refetch() };
 }

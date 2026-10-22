@@ -5,6 +5,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { formatDuration } from "../../../packages/shared/src/format/index.ts";
 import { pageById, urlOf } from "../support/catalog.ts";
 import { ABNORMAL_STATES, expectLoaded, expectNoProblems, expectOpened, expectState, watchPage } from "../support/checks.ts";
 import { ROOT } from "../support/env.ts";
@@ -16,8 +17,12 @@ interface MapJson {
   readonly chapters: readonly { readonly sample_points: readonly { readonly id: string; readonly name: string }[] }[];
 }
 interface PointJson {
+  readonly add_today?: { readonly minutes: number };
   readonly materials?: readonly { readonly id: string; readonly title: string; readonly access: string }[];
-  readonly relations?: readonly { readonly type: string; readonly items: readonly { readonly point_id?: string; readonly name: string }[] }[];
+  readonly relations?: readonly {
+    readonly type: string;
+    readonly items: readonly { readonly point_id?: string; readonly name: string }[];
+  }[];
 }
 interface PageJson {
   readonly demo_point_id: string;
@@ -149,7 +154,9 @@ test("S10 主要按钮都能点：跳到路由表里的页面，或提示“即�
   await button(copy("header.add_today"), true).press("Enter");
   const dialog = page.getByRole("dialog", { name: copy("add_today.title") });
   await expect(dialog).toBeVisible();
-  await expect(dialog).toContainText(named("add_today.estimate"));
+  const estimate = KJ.extra.add_today;
+  if (estimate === undefined) throw new Error("示范知识点没有加入今日的耗时估算");
+  await expect(dialog).toContainText(copy("add_today.estimate", { duration: formatDuration(estimate.minutes) }));
   await dialog.getByRole("button", { name: copy("add_today.cancel"), exact: true }).press("Enter");
   await expect(dialog).toBeHidden();
   await pressFor(button(copy("header.scope_remove"), true), copy("soon.scope"));
@@ -183,9 +190,13 @@ test("S10 主要按钮都能点：跳到路由表里的页面，或提示“即�
   await pressFor(button(copy("cards.add_note"), true), copy("soon.add_note"));
 
   // 点前置知识点：打开那个知识点的主页（路由表里的 /kp/<知识点 ID>）
-  const prerequisite = KJ.extra.relations?.find((group) => group.type === "prerequisite")?.items.find((item) => item.point_id !== undefined);
+  const prerequisite = KJ.extra.relations
+    ?.find((group) => group.type === "prerequisite")
+    ?.items.find((item) => item.point_id !== undefined);
   if (prerequisite?.point_id === undefined) throw new Error("示范知识点没有可点的前置知识点");
-  const link = main.getByRole("link", { name: copy("relations.item", { type: copy("relations.type.prerequisite"), name: prerequisite.name }) });
+  const link = main.getByRole("link", {
+    name: copy("relations.item", { type: copy("relations.type.prerequisite"), name: prerequisite.name }),
+  });
   await expect(link).toHaveAttribute("href", `/kp/${prerequisite.point_id}`);
   await link.press("Enter");
   await expect(title(page, prerequisite.name)).toBeVisible();

@@ -38,7 +38,12 @@ export default function Page() {
   if (home.state === "loading") {
     return (
       <Frame>
-        <PageState state="loading" pageName={pageName} skeleton={<HomeSkeleton />} slowHintAfterSeconds={param("ui.loading.slow_hint_seconds")} />
+        <PageState
+          state="loading"
+          pageName={pageName}
+          skeleton={<HomeSkeleton />}
+          slowHintAfterSeconds={param("ui.loading.slow_hint_seconds")}
+        />
       </Frame>
     );
   }

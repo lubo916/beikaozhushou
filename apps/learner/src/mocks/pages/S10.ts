@@ -174,7 +174,13 @@ function materialSpots(exam: DemoExam, pointId: string, extra: PointExtra): Json
     .map((m): Json => {
       const id = String(m["id"]);
       const location = extra.material_locations?.[id];
-      return { id, title: String(m["title"]), access: String(m["access"]), licensed: false, ...(location === undefined ? {} : { location }) };
+      return {
+        id,
+        title: String(m["title"]),
+        access: String(m["access"]),
+        licensed: false,
+        ...(location === undefined ? {} : { location }),
+      };
     });
   return [...(extra.materials ?? []), ...own];
 }
@@ -193,7 +199,8 @@ function relationGroups(exam: DemoExam, extra: PointExtra): Json[] {
 
 function examProfile(mode: Mode, extra: PointExtra, page: PageFixture): Json {
   if (mode === "restricted") return { maturity: "cold" };
-  if (mode === "insufficient_data") return page.defaults.exam_profile["maturity"] === "maturing" ? page.defaults.exam_profile : MATURING_SAMPLE;
+  if (mode === "insufficient_data")
+    return page.defaults.exam_profile["maturity"] === "maturing" ? page.defaults.exam_profile : MATURING_SAMPLE;
   return extra.exam_profile ?? page.defaults.exam_profile;
 }
 
@@ -245,7 +252,10 @@ function home(ctx: MockContext, mode: Mode): Json {
       evidence_sufficient: mastery?.evidence_sufficient ?? false,
       ...(extra.self === undefined ? {} : { self: extra.self, self_vs_system: extra.self - system }),
     },
-    methods: { knowledge_type: point.knowledge_types[0] ?? "concept", ...(typeof readerDoc === "string" ? { reader_doc_id: readerDoc } : {}) },
+    methods: {
+      knowledge_type: point.knowledge_types[0] ?? "concept",
+      ...(typeof readerDoc === "string" ? { reader_doc_id: readerDoc } : {}),
+    },
     mistakes: empty ? { rows: [] } : { rows: mistakeRows(exam, extra), ...(extra.pattern === undefined ? {} : { pattern: extra.pattern }) },
     questions: empty ? [] : relatedQuestions(ctx, exam, point.id, extra),
     evidence: empty || extra.evidence === undefined ? { items: [], total: 0 } : extra.evidence,

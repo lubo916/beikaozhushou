@@ -62,7 +62,8 @@ export function ExamProfileCard({ profile }: { profile: S10ExamProfile }) {
   if (profile.traps !== undefined && profile.traps.length > 0) {
     items.push({ key: "traps", label: t("profile.traps"), value: profile.traps.map((trap) => VOCAB.trap_type[trap]).join("、") });
   }
-  if (profile.trend !== undefined) items.push({ key: "trend", label: t("profile.trend"), value: t(`profile.trend_value.${profile.trend}`) });
+  if (profile.trend !== undefined)
+    items.push({ key: "trend", label: t("profile.trend"), value: t(`profile.trend_value.${profile.trend}`) });
   const updated = profile.updated;
   return (
     <Card

@@ -50,7 +50,12 @@
     },
     "concept": { "learn": "讲解、类比、正反例", "memorize": "要点回顾卡、辨析卡", "practice": "选择、判断、辨析", "test": "换个问法再考" },
     "fact": { "learn": "对照表与口诀", "memorize": "挖空卡、数字卡、配对", "practice": "填空、配对、排序", "test": "隔天默写" },
-    "statute": { "learn": "原文精读、要件拆解", "memorize": "渐进挖空、要点背诵", "practice": "条文辨析、情境判断", "test": "默写或口述覆盖要点" },
+    "statute": {
+      "learn": "原文精读、要件拆解",
+      "memorize": "渐进挖空、要点背诵",
+      "practice": "条文辨析、情境判断",
+      "test": "默写或口述覆盖要点"
+    },
     "procedure": { "learn": "例题示范、步骤拆解", "memorize": "步骤卡、公式卡", "practice": "分步作答", "test": "换一组数据再走一遍" },
     "application": { "learn": "案例拆解、思路模板", "memorize": "思路卡", "practice": "材料题、案例题", "test": "采分点命中达标" },
     "essay": { "learn": "范文结构、素材积累", "memorize": "要点背诵、规范表述本", "practice": "限时写作", "test": "按细则得分区间达标" },
