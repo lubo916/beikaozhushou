@@ -1,0 +1,77 @@
+# S35：消息与帮助。写操作权限尚未登记，先提供明确的即将上线反馈。
+paths:
+  /engagement/messages:
+    get:
+      operationId: getS35Messages
+      x-owner: engagement
+      x-action: engagement.notification.read
+      summary: 消息、触达纪律、客服、工单回复与帮助
+      responses:
+        "200":
+          description: 消息与帮助页面数据，业务数字由接口返回
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S35Messages"}
+        "403": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S35Messages:
+      type: object
+      required: [notifications, tickets, faq, announcement, service, daily_cap, quiet_hours, push_enabled, insufficient_data, data_source, time_zone]
+      properties:
+        notifications: {type: array, items: {$ref: "#/components/schemas/S35Notification"}}
+        tickets: {type: array, items: {$ref: "#/components/schemas/S35Ticket"}}
+        faq: {type: array, items: {$ref: "#/components/schemas/S35Faq"}}
+        announcement: {$ref: "#/components/schemas/S35Announcement"}
+        service: {$ref: "#/components/schemas/S35Service"}
+        daily_cap: {type: integer, minimum: 0}
+        quiet_hours: {type: array, items: {type: string}, minItems: 2, maxItems: 2}
+        push_enabled: {type: boolean}
+        insufficient_data: {type: boolean, description: 本页不作样本推断，强制态仅说明不适用}
+        time_zone: {type: string}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+    S35Notification:
+      type: object
+      required: [id, category, title, body, created_at, unread, target, delayed]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        category: {type: string, enum: [review, node, completion, security]}
+        title: {type: string}
+        body: {type: string}
+        created_at: {$ref: "#/components/schemas/Timestamp"}
+        unread: {type: boolean}
+        target: {type: string, enum: [S06, S25, S33]}
+        delayed: {type: boolean}
+    S35Ticket:
+      type: object
+      required: [id, title, status, context, reply, conclusion, updated_at, order_id]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        title: {type: string}
+        status: {type: string, enum: [processing, replied, resolved]}
+        context: {type: string}
+        reply: {type: string}
+        conclusion: {type: string}
+        updated_at: {$ref: "#/components/schemas/Timestamp"}
+        order_id: {type: string}
+    S35Faq:
+      type: object
+      required: [id, question, answer]
+      properties:
+        id: {type: string}
+        question: {type: string}
+        answer: {type: string}
+    S35Announcement:
+      type: object
+      required: [title, body]
+      properties:
+        title: {type: string}
+        body: {type: string}
+    S35Service:
+      type: object
+      required: [working_hours, contact, available, ai_answer]
+      properties:
+        working_hours: {type: string}
+        contact: {type: string}
+        available: {type: boolean}
+        ai_answer: {type: string}

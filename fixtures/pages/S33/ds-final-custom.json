@@ -1,0 +1,608 @@
+{
+  "user": {
+    "id": "019a0700-0000-7000-8000-000000000033",
+    "display_name": "小林",
+    "is_guest": false
+  },
+  "phone_bound": false,
+  "phone_mask": "",
+  "groups": [
+    {
+      "id": "learning",
+      "fields": [
+        {
+          "id": "daily_minutes",
+          "kind": "select",
+          "value": "60",
+          "options": [
+            {
+              "value": "30",
+              "label_key": "duration",
+              "numeric_value": 30,
+              "unit": "minutes"
+            },
+            {
+              "value": "45",
+              "label_key": "duration",
+              "numeric_value": 45,
+              "unit": "minutes"
+            },
+            {
+              "value": "60",
+              "label_key": "duration",
+              "numeric_value": 60,
+              "unit": "minutes"
+            },
+            {
+              "value": "90",
+              "label_key": "duration",
+              "numeric_value": 90,
+              "unit": "minutes"
+            }
+          ]
+        },
+        {
+          "id": "pace",
+          "kind": "select",
+          "value": "cost",
+          "options": [
+            {
+              "value": "cost",
+              "label_key": "cost"
+            },
+            {
+              "value": "review_first",
+              "label_key": "review_first"
+            },
+            {
+              "value": "new_first",
+              "label_key": "new_first"
+            }
+          ]
+        },
+        {
+          "id": "retention",
+          "kind": "select",
+          "value": "0.9",
+          "options": [
+            {
+              "value": "0.8",
+              "label_key": "ratio",
+              "numeric_value": 0.8,
+              "unit": "percent"
+            },
+            {
+              "value": "0.85",
+              "label_key": "ratio",
+              "numeric_value": 0.85,
+              "unit": "percent"
+            },
+            {
+              "value": "0.9",
+              "label_key": "ratio",
+              "numeric_value": 0.9,
+              "unit": "percent"
+            },
+            {
+              "value": "0.95",
+              "label_key": "ratio",
+              "numeric_value": 0.95,
+              "unit": "percent"
+            }
+          ]
+        },
+        {
+          "id": "review_limit",
+          "kind": "select",
+          "value": "100",
+          "options": [
+            {
+              "value": "50",
+              "label_key": "number",
+              "numeric_value": 50,
+              "unit": "count"
+            },
+            {
+              "value": "100",
+              "label_key": "number",
+              "numeric_value": 100,
+              "unit": "count"
+            },
+            {
+              "value": "150",
+              "label_key": "number",
+              "numeric_value": 150,
+              "unit": "count"
+            },
+            {
+              "value": "200",
+              "label_key": "number",
+              "numeric_value": 200,
+              "unit": "count"
+            }
+          ]
+        },
+        {
+          "id": "new_limit",
+          "kind": "select",
+          "value": "20",
+          "options": [
+            {
+              "value": "10",
+              "label_key": "number",
+              "numeric_value": 10,
+              "unit": "count"
+            },
+            {
+              "value": "20",
+              "label_key": "number",
+              "numeric_value": 20,
+              "unit": "count"
+            },
+            {
+              "value": "30",
+              "label_key": "number",
+              "numeric_value": 30,
+              "unit": "count"
+            },
+            {
+              "value": "40",
+              "label_key": "number",
+              "numeric_value": 40,
+              "unit": "count"
+            }
+          ],
+          "caution": true
+        },
+        {
+          "id": "confidence",
+          "kind": "toggle",
+          "value": "enabled",
+          "options": [
+            {
+              "value": "enabled",
+              "label_key": "enabled"
+            },
+            {
+              "value": "disabled",
+              "label_key": "disabled"
+            }
+          ],
+          "caution": true
+        },
+        {
+          "id": "reading_check",
+          "kind": "toggle",
+          "value": "enabled",
+          "options": [
+            {
+              "value": "enabled",
+              "label_key": "enabled"
+            },
+            {
+              "value": "disabled",
+              "label_key": "disabled"
+            }
+          ],
+          "caution": true
+        }
+      ]
+    },
+    {
+      "id": "tutor",
+      "fields": [
+        {
+          "id": "explanation",
+          "kind": "select",
+          "value": "direct",
+          "options": [
+            {
+              "value": "direct",
+              "label_key": "direct"
+            },
+            {
+              "value": "guided",
+              "label_key": "guided"
+            },
+            {
+              "value": "explain_back",
+              "label_key": "explain_back"
+            }
+          ]
+        },
+        {
+          "id": "correction",
+          "kind": "select",
+          "value": "gentle",
+          "options": [
+            {
+              "value": "gentle",
+              "label_key": "gentle"
+            },
+            {
+              "value": "direct_fix",
+              "label_key": "direct_fix"
+            }
+          ]
+        },
+        {
+          "id": "warmup",
+          "kind": "toggle",
+          "value": "enabled",
+          "options": [
+            {
+              "value": "enabled",
+              "label_key": "enabled"
+            },
+            {
+              "value": "disabled",
+              "label_key": "disabled"
+            }
+          ]
+        },
+        {
+          "id": "card_count",
+          "kind": "select",
+          "value": "3",
+          "options": [
+            {
+              "value": "1",
+              "label_key": "number",
+              "numeric_value": 1,
+              "unit": "count"
+            },
+            {
+              "value": "3",
+              "label_key": "number",
+              "numeric_value": 3,
+              "unit": "count"
+            },
+            {
+              "value": "5",
+              "label_key": "number",
+              "numeric_value": 5,
+              "unit": "count"
+            }
+          ]
+        },
+        {
+          "id": "reading_size",
+          "kind": "select",
+          "value": "standard",
+          "options": [
+            {
+              "value": "standard",
+              "label_key": "standard"
+            },
+            {
+              "value": "large",
+              "label_key": "large"
+            },
+            {
+              "value": "larger",
+              "label_key": "larger"
+            }
+          ]
+        },
+        {
+          "id": "line_height",
+          "kind": "select",
+          "value": "comfortable",
+          "options": [
+            {
+              "value": "comfortable",
+              "label_key": "comfortable"
+            },
+            {
+              "value": "loose",
+              "label_key": "loose"
+            }
+          ]
+        },
+        {
+          "id": "annotation",
+          "kind": "select",
+          "value": "note",
+          "options": [
+            {
+              "value": "note",
+              "label_key": "note"
+            },
+            {
+              "value": "highlight",
+              "label_key": "highlight"
+            },
+            {
+              "value": "error",
+              "label_key": "error"
+            }
+          ]
+        },
+        {
+          "id": "annotation_color",
+          "kind": "select",
+          "value": "brand",
+          "options": [
+            {
+              "value": "brand",
+              "label_key": "brand"
+            },
+            {
+              "value": "warning",
+              "label_key": "warning"
+            }
+          ]
+        },
+        {
+          "id": "importance",
+          "kind": "select",
+          "value": "text",
+          "options": [
+            {
+              "value": "text",
+              "label_key": "text"
+            },
+            {
+              "value": "color",
+              "label_key": "color"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reminders",
+      "fields": [
+        {
+          "id": "review_reminder",
+          "kind": "toggle",
+          "value": "enabled",
+          "options": [
+            {
+              "value": "enabled",
+              "label_key": "enabled"
+            },
+            {
+              "value": "disabled",
+              "label_key": "disabled"
+            }
+          ]
+        },
+        {
+          "id": "plan_reminder",
+          "kind": "toggle",
+          "value": "enabled",
+          "options": [
+            {
+              "value": "enabled",
+              "label_key": "enabled"
+            },
+            {
+              "value": "disabled",
+              "label_key": "disabled"
+            }
+          ]
+        },
+        {
+          "id": "system_reminder",
+          "kind": "toggle",
+          "value": "enabled",
+          "options": [
+            {
+              "value": "enabled",
+              "label_key": "enabled"
+            },
+            {
+              "value": "disabled",
+              "label_key": "disabled"
+            }
+          ]
+        },
+        {
+          "id": "in_app",
+          "kind": "toggle",
+          "value": "enabled",
+          "options": [
+            {
+              "value": "enabled",
+              "label_key": "enabled"
+            },
+            {
+              "value": "disabled",
+              "label_key": "disabled"
+            }
+          ]
+        },
+        {
+          "id": "push",
+          "kind": "toggle",
+          "value": "enabled",
+          "options": [
+            {
+              "value": "enabled",
+              "label_key": "enabled"
+            },
+            {
+              "value": "disabled",
+              "label_key": "disabled"
+            }
+          ]
+        },
+        {
+          "id": "sms",
+          "kind": "toggle",
+          "value": "disabled",
+          "options": [
+            {
+              "value": "enabled",
+              "label_key": "enabled"
+            },
+            {
+              "value": "disabled",
+              "label_key": "disabled"
+            }
+          ]
+        },
+        {
+          "id": "reminder_start",
+          "kind": "time",
+          "value": "08:00",
+          "options": []
+        },
+        {
+          "id": "reminder_end",
+          "kind": "time",
+          "value": "21:00",
+          "options": []
+        },
+        {
+          "id": "quiet_start",
+          "kind": "time",
+          "value": "21:00",
+          "options": []
+        },
+        {
+          "id": "quiet_end",
+          "kind": "time",
+          "value": "08:00",
+          "options": []
+        }
+      ]
+    },
+    {
+      "id": "appearance",
+      "fields": [
+        {
+          "id": "theme",
+          "kind": "select",
+          "value": "system",
+          "options": [
+            {
+              "value": "light",
+              "label_key": "light"
+            },
+            {
+              "value": "dark",
+              "label_key": "dark"
+            },
+            {
+              "value": "eye",
+              "label_key": "eye"
+            },
+            {
+              "value": "system",
+              "label_key": "system"
+            }
+          ]
+        },
+        {
+          "id": "font_size",
+          "kind": "select",
+          "value": "standard",
+          "options": [
+            {
+              "value": "standard",
+              "label_key": "standard"
+            },
+            {
+              "value": "large",
+              "label_key": "large"
+            },
+            {
+              "value": "larger",
+              "label_key": "larger"
+            }
+          ]
+        },
+        {
+          "id": "contrast",
+          "kind": "select",
+          "value": "normal",
+          "options": [
+            {
+              "value": "normal",
+              "label_key": "normal"
+            },
+            {
+              "value": "high",
+              "label_key": "high"
+            }
+          ]
+        },
+        {
+          "id": "mastery_color",
+          "kind": "select",
+          "value": "shape",
+          "options": [
+            {
+              "value": "text",
+              "label_key": "text"
+            },
+            {
+              "value": "shape",
+              "label_key": "shape"
+            }
+          ]
+        },
+        {
+          "id": "screen_reader",
+          "kind": "toggle",
+          "value": "enabled",
+          "options": [
+            {
+              "value": "enabled",
+              "label_key": "enabled"
+            },
+            {
+              "value": "disabled",
+              "label_key": "disabled"
+            }
+          ]
+        },
+        {
+          "id": "reduced_motion",
+          "kind": "toggle",
+          "value": "enabled",
+          "options": [
+            {
+              "value": "enabled",
+              "label_key": "enabled"
+            },
+            {
+              "value": "disabled",
+              "label_key": "disabled"
+            }
+          ]
+        },
+        {
+          "id": "keyboard",
+          "kind": "toggle",
+          "value": "enabled",
+          "options": [
+            {
+              "value": "enabled",
+              "label_key": "enabled"
+            },
+            {
+              "value": "disabled",
+              "label_key": "disabled"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "account",
+      "fields": [
+        {
+          "id": "nickname",
+          "kind": "text",
+          "value": "小林",
+          "options": []
+        }
+      ]
+    }
+  ],
+  "page_state": "normal",
+  "data_source": "sample"
+}

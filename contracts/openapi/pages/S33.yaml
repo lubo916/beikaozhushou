@@ -1,0 +1,57 @@
+# S33 设置：偏好与平台允许选项由接口返回，写接口待权限整合后接入。
+paths:
+  /pages/S33:
+    get:
+      operationId: getS33Settings
+      x-owner: account
+      x-action: account.context.read
+      summary: 读取设置页的偏好、可选区间与账号状态
+      responses:
+        "200":
+          description: 设置页示例数据
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S33Settings"}
+        "403": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S33Settings:
+      type: object
+      required: [user, phone_bound, phone_mask, groups, page_state, data_source]
+      properties:
+        user: {$ref: "#/components/schemas/MeUser"}
+        phone_bound: {type: boolean}
+        phone_mask: {type: string}
+        page_state: {type: string, enum: [normal, empty, restricted, insufficient_data]}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+        groups:
+          type: array
+          items: {$ref: "#/components/schemas/S33Group"}
+    S33Group:
+      type: object
+      required: [id, fields]
+      properties:
+        id: {type: string, enum: [learning, tutor, reminders, appearance, account]}
+        fields:
+          type: array
+          items: {$ref: "#/components/schemas/S33Field"}
+    S33Field:
+      type: object
+      required: [id, kind, value, options]
+      properties:
+        id: {type: string}
+        kind: {type: string, enum: [select, toggle, time, text]}
+        value: {type: string}
+        caution: {type: boolean}
+        options:
+          type: array
+          description: 平台允许的选项，页面不得另行计算区间
+          items: {$ref: "#/components/schemas/S33Option"}
+    S33Option:
+      type: object
+      required: [value, label_key]
+      properties:
+        value: {type: string}
+        label_key: {type: string}
+        numeric_value: {type: number}
+        unit: {type: string, enum: [minutes, percent, count]}

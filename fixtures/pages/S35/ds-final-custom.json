@@ -1,0 +1,98 @@
+{
+  "notifications": [
+    {
+      "id": "s35-review",
+      "category": "review",
+      "title": "今天的复习已准备好",
+      "body": "先巩固，再向前推进。打开今日清单开始。",
+      "created_at": "2026-10-22T00:00:00Z",
+      "unread": true,
+      "target": "S06",
+      "delayed": true
+    },
+    {
+      "id": "s35-node",
+      "category": "node",
+      "title": "考试节点有更新",
+      "body": "请查看考试日历，核对官方通知。",
+      "created_at": "2026-10-21T07:20:00Z",
+      "unread": true,
+      "target": "S25",
+      "delayed": false
+    },
+    {
+      "id": "s35-completion",
+      "category": "completion",
+      "title": "已完成今天的练习",
+      "body": "学习记录已保存，继续按自己的节奏学习。",
+      "created_at": "2026-10-21T05:15:00Z",
+      "unread": false,
+      "target": "S06",
+      "delayed": false
+    },
+    {
+      "id": "s35-security",
+      "category": "security",
+      "title": "账号安全提醒",
+      "body": "如非本人操作，请检查账号登录与安全设置。",
+      "created_at": "2026-10-20T03:00:00Z",
+      "unread": false,
+      "target": "S33",
+      "delayed": false
+    }
+  ],
+  "tickets": [
+    {
+      "id": "FK-20261022-A",
+      "title": "题目解析报错",
+      "status": "resolved",
+      "context": "练习解析 · 示例题目",
+      "reply": "已核对原始资料并完成复核。",
+      "conclusion": "解析中的表述已修正，原有作答记录不受影响。",
+      "updated_at": "2026-10-22T03:00:00Z",
+      "order_id": ""
+    },
+    {
+      "id": "FK-20261021-B",
+      "title": "导师回答问题反馈",
+      "status": "processing",
+      "context": "AI 导师 · 示例回答",
+      "reply": "已收到问题，正在核对回答与资料来源。",
+      "conclusion": "待处理完成后在此回复结论。",
+      "updated_at": "2026-10-21T08:00:00Z",
+      "order_id": ""
+    }
+  ],
+  "faq": [
+    {
+      "id": "reminder",
+      "question": "为什么深夜没有收到提醒？",
+      "answer": "免打扰时段的学习提醒会延后到次日送达，并标明延后原因。可前往设置调整提醒。"
+    },
+    {
+      "id": "report",
+      "question": "题目、解析或导师回答有问题怎么办？",
+      "answer": "从对应内容的报错入口反馈，页面上下文会自动带入；可在本页查看处理进度与结论回复。"
+    },
+    {
+      "id": "bill",
+      "question": "支付与订阅问题怎样找人工？",
+      "answer": "从订单、退款或支付失败入口进入客服会带上订单号。费用、投诉和账号安全问题转人工处理。"
+    }
+  ],
+  "announcement": {
+    "title": "通知与帮助中心使用说明",
+    "body": "学习提醒支持类别筛选与免打扰。工单处理进度、回复及报错结论可在本页查看。"
+  },
+  "service": {
+    "working_hours": "工作日 09:00—18:00（北京时间）",
+    "contact": "站内客服留言（演示）",
+    "available": false,
+    "ai_answer": "可以先查看帮助中心。涉及费用、投诉或账号安全，请联系人工客服；非工作时间留言会转为工单。"
+  },
+  "push_enabled": true,
+  "insufficient_data": false,
+  "data_source": "sample",
+  "time_zone": "Asia/Shanghai",
+  "exam_id": "ds-final-custom"
+}
