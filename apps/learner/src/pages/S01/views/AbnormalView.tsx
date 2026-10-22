@@ -9,7 +9,6 @@ import { useToast } from "../../../app/toast.tsx";
 import { pathTo } from "../../../routes.ts";
 
 const ISSUES = ["banned", "devices", "cooling", "replaced", "forced", "password"] as const;
-const TIME_ZONE = "Asia/Shanghai";
 
 export interface AbnormalViewProps {
   readonly data: S01WelcomeData;
@@ -53,7 +52,7 @@ export function AbnormalView({ data, onLogin }: AbnormalViewProps) {
     issue === "banned"
       ? t(account.restriction_reason_key)
       : issue === "devices"
-        ? t("account.devices.body", { count: formatNumber(account.device_limit) })
+        ? t("account.devices.body", { deviceCount: formatNumber(account.device_limit) })
         : issue === "cooling"
           ? t("account.cooling.remaining", { days: formatDays(account.cooling_days_remaining) })
           : t(`account.logout.${issue}`);
@@ -80,7 +79,7 @@ export function AbnormalView({ data, onLogin }: AbnormalViewProps) {
       {issue === "banned" && (
         <Card tone="warning">
           <div className="flex flex-col gap-3">
-            <p>{t("account.restricted.until", { time: formatDateTime(account.restricted_until, TIME_ZONE) })}</p>
+            <p>{t("account.restricted.until", { time: formatDateTime(account.restricted_until, data.time_zone, { year: true }) })}</p>
             <p className="text-small text-ink-secondary">{t("account.restricted.reference", { reference: account.appeal_reference })}</p>
             <Button variant="primary" block onClick={() => toast(t("account.restricted.appealSoon"))}>
               {t("account.restricted.appeal")}
@@ -107,7 +106,7 @@ export function AbnormalView({ data, onLogin }: AbnormalViewProps) {
                 <span className="flex min-w-0 flex-col gap-1">
                   <span className="font-medium">{t(device.label_key)}</span>
                   <span className="text-small text-ink-secondary">
-                    {t("account.devices.lastSeen", { time: formatDateTime(device.last_seen_at, TIME_ZONE) })}
+                    {t("account.devices.lastSeen", { time: formatDateTime(device.last_seen_at, data.time_zone, { year: true }) })}
                   </span>
                 </span>
               </label>
@@ -127,6 +126,12 @@ export function AbnormalView({ data, onLogin }: AbnormalViewProps) {
       {/* feat:S01-20 展示剩余冷静期与删除范围；登录不会自动撤销注销。 */}
       {issue === "cooling" && (
         <Card tone="warning">
+          <p className="mb-3 font-medium">
+            {t("account.cooling.deletionAt", {
+              time: formatDateTime(account.deletion_at, data.time_zone, { year: true }),
+              timeZone: data.time_zone,
+            })}
+          </p>
           <ul className="flex list-disc flex-col gap-2 pl-5">
             {account.deletion_scope_keys.map((key) => (
               <li key={key}>{t(key)}</li>

@@ -1,0 +1,22 @@
+.s01-page {
+  max-width: calc(var(--size-space-4) * 35);
+}
+.s01-age-option:has(input:checked) {
+  border-color: var(--color-brand-primary);
+  background: var(--color-brand-primary-soft);
+}
+.s01-field {
+  width: 100%;
+  min-width: 0;
+  border: thin solid var(--color-line-strong);
+  border-radius: var(--radius-sm);
+  padding: var(--size-space-3);
+  color: var(--color-ink-primary);
+  background: var(--color-bg-surface);
+}
+.s01-field:focus-visible,
+.s01-page summary:focus-visible,
+.s01-age-option:has(input:focus-visible) {
+  outline: solid var(--size-space-1) var(--color-brand-primary);
+  outline-offset: var(--size-space-1);
+}
