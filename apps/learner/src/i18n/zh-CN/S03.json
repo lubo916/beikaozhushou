@@ -1,1 +1,183 @@
-{}
+{
+  "title": "时间与资料",
+  "sample": "示例数据",
+  "eyebrow": "先把你的真实情况告诉我",
+  "time": {
+    "title": "你每周能学多久？",
+    "description": "让计划排在真实的时间和手头的资料上。时间不必填得很满，留出生活的余地。",
+    "identity": "选择最接近你的身份",
+    "template_hint": "先带出典型时间结构，再按自己的情况调整。",
+    "grid": "每周可用时间",
+    "grid_hint": "点开一个时段，标注能学多久、适合做什么。",
+    "mobile_hint": "先填工作日与周末，再点开某天细调。",
+    "daily": "只填每天学多久",
+    "daily_hint": "不想填时间格？用每日目标时长按典型分布展开。",
+    "daily_label": "每天可学的分钟数",
+    "minutes": "分钟",
+    "duration": "学习时长",
+    "scenario": "学习场景",
+    "edit": "调整 {{day}} · {{period}}",
+    "edit_day": "细调 {{day}}",
+    "unavailable": "不可学日与忙季",
+    "add_unavailable": "添加不可学日",
+    "date": "日期",
+    "reason": "原因（如出差、加班）",
+    "no_unavailable": "还没有标记不可学日",
+    "summary": "这份时间预算",
+    "weekly": "每周可用",
+    "total": "到目标日声明投入",
+    "recommended": "考试画像建议投入",
+    "gap": "与建议投入的差额",
+    "hours": "{{value}} 小时",
+    "calibration": "用实测慢慢校准",
+    "calibration_body": "先按你声明的时间安排。积累实测数据后，再由你决定是否调整。",
+    "calibration_collecting": "实测还在积累中，暂不据此下结论。",
+    "declared": "声明时长",
+    "observed": "实测时长",
+    "sample": "已积累实测",
+    "replan": "按实测重排",
+    "invest": "提高投入",
+    "scope": "缩小范围",
+    "calibration_note": "这些调整都需要你确认。",
+    "weekday": "工作日",
+    "weekend": "周末",
+    "clear": "不可学",
+    "saved": "草稿已保存在此浏览器；联网同步即将上线。",
+    "offline_save": "保存离线草稿",
+    "offline_draft": "离线时间草稿"
+  },
+  "view": {
+    "label": "时间与资料步骤",
+    "time": "3a 时间",
+    "res": "3b 资料"
+  },
+  "identity": {
+    "working": "在职",
+    "fulltime": "全职备考",
+    "student": "在校",
+    "caregiver": "带娃"
+  },
+  "day": {
+    "mon": "周一",
+    "tue": "周二",
+    "wed": "周三",
+    "thu": "周四",
+    "fri": "周五",
+    "sat": "周六",
+    "sun": "周日"
+  },
+  "period": {
+    "morning": "早间",
+    "afternoon": "午间",
+    "evening": "晚间",
+    "early": "早晨",
+    "commute": "通勤",
+    "noon": "午休",
+    "daytime": "白天",
+    "bedtime": "睡前"
+  },
+  "scenario": {
+    "deep": "深度块",
+    "fragment": "碎片",
+    "audio": "通勤可听",
+    "unavailable": "不可学"
+  },
+  "res": {
+    "title": "把手头资料接进来",
+    "description": "教材、课程、题库、往年卷和笔记，都可以先登记。只映射和只外链也能用于安排学习。",
+    "list": "已有资料",
+    "add": "添加资料",
+    "empty": "还没有登记资料，可以先用学习包，稍后再补。",
+    "access": "按权利边界选择接入方式",
+    "parsable": "可解析",
+    "mapped_only": "只映射",
+    "link_only": "只外链",
+    "parsable_body": "你有权使用的电子文件，可解析目录和内容。",
+    "mapped_only_body": "纸书或受限资料只登记目录、页码和位置，不上传正文。",
+    "link_only_body": "保留原站链接，学习时前往原平台。",
+    "ready": "已就绪",
+    "queued": "等待解析",
+    "needs_alignment": "待对齐",
+    "manage": "去我的资料",
+    "import_title": "选择一种接入方式",
+    "import_hint": "在“我的资料”完成导入，返回后可继续建档。",
+    "maps": "地图从哪来",
+    "maps_hint": "每个目标确认一次。官方地图为主，个人资料可补充扩展层。",
+    "official": "官方地图",
+    "draft": "我的地图草案",
+    "template": "学习包",
+    "extension": "个人扩展",
+    "enabled": "已启用",
+    "enable": "启用",
+    "edit": "确认来源",
+    "rights": "请确认你有权使用资料；文件超过解析额度时排队，不阻塞建档。",
+    "map_dialog": "确认地图来源",
+    "map_description": "可使用官方地图、由资料生成我的地图草案，或套用学习包；官方地图和个人扩展可以并存。"
+  },
+  "kind": {
+    "textbook": "教材",
+    "course": "课程",
+    "handout": "讲义",
+    "questions": "题库",
+    "papers": "往年卷",
+    "notes": "笔记"
+  },
+  "import": {
+    "file": "文件",
+    "photo": "拍照",
+    "drive": "网盘",
+    "link": "链接",
+    "isbn": "书号",
+    "template": "模板"
+  },
+  "action": {
+    "back": "上一步",
+    "skip": "跳过这一步",
+    "next": "下一步：资料",
+    "diagnosis": "下一步：摸底诊断",
+    "cancel": "取消",
+    "save": "保存草稿",
+    "close": "知道了",
+    "continue": "使用典型值继续",
+    "confirm": "确认",
+    "edit": "调整",
+    "feedback": "反馈问题"
+  },
+  "skip": {
+    "title": "先使用典型值？",
+    "body": "跳过的项会使用同类考生的典型值，并在起点报告中标注。稍后仍可补充。",
+    "notice": "此步已选择使用典型值；起点报告衔接即将上线。"
+  },
+  "soon": {
+    "generic": "即将上线",
+    "template": "身份模板切换即将上线，当前展示示例时间结构。",
+    "save": "保存到学习档案即将上线；当前为本页草稿预览。",
+    "calibration": "实测校准提议即将上线，确认后才会改变计划。",
+    "map": "地图来源确认即将上线，当前选择不会自动改变学习范围。",
+    "report": "反馈问题即将上线"
+  },
+  "state": {
+    "empty": {
+      "title": "还没填时间",
+      "body": "只填每天学多久也可以，系统按典型分布展开",
+      "action": "只填每天学多久"
+    },
+    "error": {
+      "body": "时间与资料的数据暂时没取到：网络或服务异常。已保存的内容不受影响，点“重试”即可；连续失败会自动上报。"
+    },
+    "offline": {
+      "title": "当前处于离线状态",
+      "body": "时间格可离线填写，联网后同步；资料上传需要联网"
+    },
+    "restricted": {
+      "title": "解析已排队，建档可以继续",
+      "body": "单个文件超过解析额度时排队，不阻塞建档",
+      "action": "稍后到我的资料查看"
+    },
+    "insufficient_data": {
+      "title": "先使用同类考生的典型值",
+      "body": "跳过的项用同类考生的典型值，{{days}} 天后用实测校准",
+      "parameter_body": "跳过的项用同类考生的典型值，{{days}} 天后用实测校准"
+    }
+  }
+}

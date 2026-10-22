@@ -1,0 +1,138 @@
+# S03 时间与资料：读取入门设置预览。写动作尚未登记，页面仅做本地编辑预览与即将上线提示。
+# account.context.read 是现有的个人上下文读取权限；接后端前由整合任务登记专用设置档案动作。
+paths:
+  /learner/setup/profile:
+    get:
+      operationId: getSetupProfile
+      x-owner: account
+      x-action: account.context.read
+      summary: 时间、资料与地图来源的入门设置预览
+      responses:
+        "200":
+          description: 当前演示考试的时间与资料；业务数字均为接口给出的示例
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S03SetupProfile"}
+        "403": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S03SetupProfile:
+      type: object
+      required: [data_source, state, exam_name, identity, identities, days, templates, daily_minutes, unavailable_days, summary, calibration, materials, maps, import_methods]
+      properties:
+        data_source: {$ref: "#/components/schemas/DataSource"}
+        state:
+          type: string
+          enum: [normal, empty, restricted, insufficient_data]
+        exam_name: {type: string}
+        identity: {type: string}
+        identities:
+          type: array
+          items: {$ref: "#/components/schemas/S03LabelOption"}
+        days:
+          type: array
+          items: {$ref: "#/components/schemas/S03Day"}
+        templates:
+          type: array
+          items: {$ref: "#/components/schemas/S03TimeTemplate"}
+        daily_minutes:
+          type: integer
+          minimum: 0
+          description: 不画周时间格时使用的每日分钟数
+        unavailable_days:
+          type: array
+          items: {$ref: "#/components/schemas/S03UnavailableDay"}
+        summary: {$ref: "#/components/schemas/S03TimeSummary"}
+        calibration: {$ref: "#/components/schemas/S03Calibration"}
+        materials:
+          type: array
+          items: {$ref: "#/components/schemas/S03Material"}
+        maps:
+          type: array
+          items: {$ref: "#/components/schemas/S03MapChoice"}
+        import_methods:
+          type: array
+          items: {$ref: "#/components/schemas/S03LabelOption"}
+    S03LabelOption:
+      type: object
+      required: [id, label_key]
+      properties:
+        id: {type: string}
+        label_key: {type: string}
+    S03Day:
+      type: object
+      required: [id, label_key, slots]
+      properties:
+        id: {type: string}
+        label_key: {type: string}
+        slots:
+          type: array
+          items: {$ref: "#/components/schemas/S03TimeSlot"}
+    S03TimeSlot:
+      type: object
+      required: [id, period_key, kind, minutes]
+      properties:
+        id: {type: string}
+        period_key: {type: string}
+        kind:
+          type: string
+          enum: [deep, fragment, audio, unavailable]
+        minutes: {type: integer, minimum: 0}
+    S03TimeTemplate:
+      type: object
+      required: [id, minutes]
+      properties:
+        id:
+          type: string
+          enum: [weekday, weekend]
+        minutes: {type: integer, minimum: 0}
+    S03UnavailableDay:
+      type: object
+      required: [id, date, reason]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        date: {$ref: "#/components/schemas/LearningDay"}
+        reason: {type: string}
+    S03TimeSummary:
+      type: object
+      description: 所有业务数字由接口提供，界面不得按编辑中的格子重新估算
+      required: [weekly_minutes, total_hours, recommended_hours, gap_hours, calibration_days]
+      properties:
+        weekly_minutes: {type: integer, minimum: 0}
+        total_hours: {type: number, minimum: 0}
+        recommended_hours: {type: number, minimum: 0}
+        gap_hours: {type: number, minimum: 0}
+        calibration_days: {type: integer, minimum: 0}
+    S03Calibration:
+      type: object
+      required: [status, declared_minutes, observed_minutes, sample_minutes]
+      properties:
+        status:
+          type: string
+          enum: [collecting, ready]
+        declared_minutes: {type: integer, minimum: 0}
+        observed_minutes: {type: integer, minimum: 0}
+        sample_minutes: {type: integer, minimum: 0}
+    S03Material:
+      type: object
+      required: [id, title, kind_key, access, status]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        title: {type: string}
+        kind_key: {type: string}
+        access: {$ref: "#/components/schemas/MaterialAccess"}
+        status:
+          type: string
+          enum: [ready, queued, needs_alignment]
+    S03MapChoice:
+      type: object
+      description: 同一目标的官方地图、资料草案与学习包可以并存；extension 表示新增资料内容是否加入拓展
+      required: [id, target_name, source, enabled, extension]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        target_name: {type: string}
+        source:
+          type: string
+          enum: [official, draft, template]
+        enabled: {type: boolean}
+        extension: {type: boolean}
