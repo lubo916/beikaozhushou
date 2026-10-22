@@ -1,0 +1,182 @@
+{
+  "choice": {
+    "id": "junior-accounting",
+    "name": "初级会计职称",
+    "short_name": "初级会计",
+    "aliases": [
+      "初会",
+      "会计证",
+      "chujikuaiji",
+      "chujihuiji",
+      "kj"
+    ],
+    "search_terms": "初级会计职称 初级会计 初会 会计证 chujikuaiji chujihuiji kj",
+    "category": "财经财会",
+    "readiness": "complete",
+    "summary": "官方审定知识地图、题库与考情已齐备。",
+    "profile": {
+      "exam_id": "junior-accounting",
+      "name": "初级会计职称",
+      "short_name": "初级会计",
+      "aliases": [],
+      "kind": "official",
+      "evaluation_rule": {
+        "type": "pass_line",
+        "description": "两科均不低于 60 分",
+        "pass_line": 60,
+        "per_subject": true
+      },
+      "full_score": 100,
+      "structure": [
+        {
+          "subject": "初级会计实务",
+          "sections": [
+            {
+              "name": "会计概述",
+              "knowledge_point_count": 18
+            },
+            {
+              "name": "会计基础",
+              "knowledge_point_count": 30
+            },
+            {
+              "name": "资产",
+              "knowledge_point_count": 46
+            },
+            {
+              "name": "负债",
+              "knowledge_point_count": 28
+            },
+            {
+              "name": "所有者权益",
+              "knowledge_point_count": 14
+            },
+            {
+              "name": "收入、费用和利润",
+              "knowledge_point_count": 32
+            },
+            {
+              "name": "财务报告",
+              "knowledge_point_count": 22
+            },
+            {
+              "name": "管理会计基础",
+              "knowledge_point_count": 22
+            }
+          ]
+        },
+        {
+          "subject": "经济法基础",
+          "sections": []
+        }
+      ],
+      "question_types": [
+        {
+          "type": "single_choice",
+          "label": "单选",
+          "response_form": "choice",
+          "count": 20,
+          "subjective": false
+        },
+        {
+          "type": "multi_choice",
+          "label": "多选",
+          "response_form": "choice",
+          "count": 10,
+          "subjective": false
+        },
+        {
+          "type": "true_false",
+          "label": "判断",
+          "response_form": "choice",
+          "count": 10,
+          "subjective": false
+        },
+        {
+          "type": "indefinite_choice",
+          "label": "不定项",
+          "response_form": "choice",
+          "count": 15,
+          "subjective": false
+        }
+      ],
+      "scoring": {
+        "target_default": 70,
+        "target_basis": "两科各 70 分",
+        "rubrics": []
+      },
+      "duration_minutes": 120,
+      "key_dates": [
+        {
+          "kind": "exam",
+          "date": "2027-05-16",
+          "status": "estimated",
+          "basis": "按近 3 年考期推算，官方公告后核对"
+        }
+      ],
+      "readiness": {
+        "map": {
+          "level": 3,
+          "note": "官方审定"
+        },
+        "questions": {
+          "level": 3,
+          "note": "审定题 4,260 道"
+        },
+        "exam_intel": {
+          "level": 3,
+          "note": "近 6 年真题档案"
+        }
+      },
+      "variation_extensions": []
+    },
+    "target_date": "2027-05-16",
+    "estimated": true,
+    "date_basis": "按近 3 年考期推算，官方公告后核对",
+    "target_score": 70,
+    "target_basis": "两科各 70 分",
+    "assessment": "按示例学习时间可开始准备；摸底后再校准方案，当前不作达标结论。",
+    "form": "无纸化机考",
+    "validity": "两科须在同一考试年度通过",
+    "suggestion": "先建立实务框架，再把经济法条文放进场景辨析。",
+    "question_distribution": "单选 20 题 / 多选 10 题 / 判断 10 题 / 不定项 15 题",
+    "template_quality": "完整度 96% · 题目密度充足 · 本月持续维护",
+    "map_version": "2027 版",
+    "map_pending": false
+  },
+  "goal": {
+    "id": "019a0002-0000-7000-8000-000000000001",
+    "exam_id": "junior-accounting",
+    "name": "初级会计职称",
+    "primary": true,
+    "target_date": "2027-05-16",
+    "target_score": 70,
+    "map_source": "官方",
+    "overlap": 0.18,
+    "status": "active"
+  },
+  "categories": [
+    "财经财会",
+    "职业资格",
+    "语言学习",
+    "自定学习"
+  ],
+  "extensions": [
+    "报考决策",
+    "考前速查表"
+  ],
+  "passed_subjects": [
+    {
+      "name": "经济法基础（往年成绩）",
+      "expires_on": "2026-12-31",
+      "status": "同一年度有效，请核对报考要求"
+    }
+  ],
+  "certificate_path": [
+    "确认报考科目与年度",
+    "同一考试年度完成两科",
+    "核对成绩与资格审核安排"
+  ],
+  "conflict": "另一目标与当前目标共享晚间学习时间；到时间与资料页确认可用时间。",
+  "guest_limit": 1
+}

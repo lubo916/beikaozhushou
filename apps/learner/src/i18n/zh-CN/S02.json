@@ -1,1 +1,167 @@
-{}
+{
+  "title": "备考目标",
+  "subtitle": "先定方向，再把每一天用在值得的地方。",
+  "first_title": "你想准备什么考试？",
+  "first_subtitle": "选一个目标，或把自己的考试带进来。之后随时可以调整。",
+  "sample": "示例数据",
+  "soon": "即将上线",
+  "source": "目标来源",
+  "tabs": {
+    "official": "官方考试库",
+    "template": "模板",
+    "custom": "自建目标"
+  },
+  "catalog": {
+    "search": "搜索考试",
+    "search_placeholder": "考试全称、简称、俗称或拼音",
+    "category": "考试类别",
+    "all": "全部",
+    "choose": "选择目标",
+    "no_results": "没有找到匹配的考试",
+    "no_results_body": "换个关键词试试，也可以从自建目标开始。",
+    "natural": "用一句话说说你的目标",
+    "natural_placeholder": "例如：我想准备明年的中学教师资格笔试",
+    "natural_action": "查找候选考试",
+    "natural_hint": "AI 会协助整理候选，考试与科目由你确认。",
+    "readiness": "就绪程度",
+    "date": "目标日",
+    "custom_action": "去自建目标",
+    "results": "考试候选"
+  },
+  "readiness": {
+    "complete": "地图、题库、考情齐备",
+    "map_only": "仅地图",
+    "exam_only": "仅考试信息",
+    "template_only": "仅模板",
+    "none": "暂无"
+  },
+  "template": {
+    "intro": "从已发布的考试包开始，也可以只选需要的科目与内容。",
+    "quality": "完整度 · 题目密度 · 维护活跃度",
+    "choose": "挑选科目与内容",
+    "content": "导入内容",
+    "map": "知识地图",
+    "questions": "题目",
+    "materials": "资料",
+    "note": "勾选的内容只作为本次导入草稿；正式导入即将上线。"
+  },
+  "custom": {
+    "title": "把你的考试带进来",
+    "body": "说一句话，或提供大纲、目录、往年试卷。AI 协助识别，你逐项确认。",
+    "description": "目标描述",
+    "placeholder": "例如：我想在学期末考完《数据结构》，重点复习树和图。",
+    "upload": "添加大纲、目录或试卷",
+    "upload_hint": "支持文档与图片；上传解析即将上线，也可以直接手动填写。",
+    "parse": "识别考试画像",
+    "manual": "手动填写画像",
+    "generated": "识别结果仅作建议，请逐项核对。"
+  },
+  "profile": {
+    "title": "确认考试画像",
+    "description": "先核对考试信息，再进入时间与资料设置。",
+    "name": "目标名称",
+    "subject": "备考科目",
+    "date": "目标日",
+    "estimated": "预计",
+    "date_basis": "日期依据",
+    "rule": "评价规则",
+    "score": "目标分",
+    "target_basis": "目标分依据",
+    "assessment": "目标初判",
+    "assessment_hint": "修改目标后，需重新评估；当前初判仅供参考。",
+    "details": "编辑完整画像",
+    "full_score": "满分",
+    "duration": "考试时长（分钟）",
+    "form": "考试形式",
+    "question_distribution": "题型分布",
+    "validity": "成绩有效期",
+    "suggestion": "备考建议",
+    "map_version": "地图版本",
+    "pending": "待更新",
+    "cancel": "取消",
+    "next": "下一步",
+    "save": "保存画像",
+    "required": "请填写目标名称、目标日、满分和目标分，并至少选一个科目。",
+    "save_soon": "目标保存即将上线，可先预览下一步。",
+    "scope": "已选内容",
+    "selected_file": "已选择：{{name}}",
+    "subject_name": "科目名称",
+    "include_subject": "选择科目：{{name}}",
+    "add_subject": "添加科目",
+    "date_custom": "由我设置的目标日",
+    "target_custom": "由我填写，保存后重新评估"
+  },
+  "rule": {
+    "pass_line": "合格线型",
+    "selective": "择优型",
+    "score_band": "分数段型",
+    "custom": "自定型"
+  },
+  "manage": {
+    "title": "我的目标",
+    "subtitle": "主次有序，共用一份时间预算。",
+    "add": "＋新增目标",
+    "name": "目标与主次",
+    "date": "考期",
+    "score": "目标",
+    "map": "地图来源",
+    "overlap": "知识重叠率",
+    "actions": "操作",
+    "primary_label": "主要目标",
+    "secondary_label": "次要目标",
+    "status": {
+      "active": "进行中",
+      "paused": "已暂停",
+      "archived": "已归档"
+    },
+    "edit": "修改画像",
+    "primary": "换为主要目标",
+    "pause": "暂停目标",
+    "archive": "归档目标",
+    "conflict": "时间冲突提醒",
+    "passed": "已过科目与有效期",
+    "passed_add": "录入已过科目",
+    "expires": "有效至 {{date}}",
+    "maps": "地图版本",
+    "certificate": "证书路径",
+    "inherit": "再战继承",
+    "inherit_body": "带入上次的成绩、错题与卡片，从精准补漏开始。",
+    "inherit_action": "导入上次备考记录",
+    "extensions": "扩展包",
+    "extension_action": "管理扩展包",
+    "back": "返回我的目标",
+    "no_passed": "还没有录入已过科目",
+    "no_path": "这个目标暂未提供证书路径",
+    "current": "当前演示目标"
+  },
+  "state": {
+    "empty": {
+      "title": "还没有备考目标",
+      "body": "从官方考试库、模板或自建三条来路选一个",
+      "action": "选目标"
+    },
+    "offline": {
+      "title": "当前处于离线状态",
+      "body": "离线可看已建目标；搜索考试库与导入模板需要联网",
+      "retry": "重新连接"
+    },
+    "restricted": {
+      "title": "当前目标数量受限",
+      "body": "游客最多建 {{limit}} 个目标；登录后可同时进行的目标数随档位，见会员与权益",
+      "action": "查看会员与权益",
+      "login": "去登录",
+      "generic": "当前账号暂不能管理更多目标，请登录或查看会员与权益。"
+    },
+    "insufficient_data": {
+      "title": "考试库里还没有这个考试",
+      "body": "可以自建目标，并如实标注就绪程度。完善画像后再接入知识地图与资料。",
+      "action": "自建目标"
+    }
+  },
+  "preview": "当前修改为本页草稿，保存即将上线。",
+  "summary": {
+    "title": "目标画像预览",
+    "body": "选择目标后，逐项核对再继续。",
+    "confirm": "核对画像并继续"
+  }
+}
