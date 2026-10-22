@@ -2,18 +2,22 @@
 // ① 假数据：四个演示考试、两个示范题组，正常、空、受限、数据不足四种数据都通过生成的 Zod 校验；提交揭晓、再交回 409、生成题核对、测评态交卷各走一遍。
 // ② 七态判断（data.ts）只看请求结果；重试策略；demo 在 gen 视图换成导师出题的示范题组。③ 整个学员端挂在 /quiz/demo：正常、空态、出错各走一遍。
 import { afterEach, describe, expect, it, vi } from "vitest";
+import type { S18QuizSession } from "@exam-prep/contract";
 import { ApiError } from "@exam-prep/contract/errors";
 import * as zodSchemas from "@exam-prep/contract/zod";
 import kj from "../../../../../fixtures/pages/S18/junior-accounting.json";
 import { App } from "../../App.tsx";
-import { heading, mountAt, settle } from "../../app/testing.tsx";
+import { click, heading, mountAt, settle } from "../../app/testing.tsx";
 import copy from "../../i18n/zh-CN/S18.json";
 import { createMockApi, type MockApi } from "../../mocks/api.ts";
 import { DevControl } from "../../mocks/control.ts";
 import { MockDb } from "../../mocks/db.ts";
 import { loadDemoFixtures } from "../../mocks/fixtures.ts";
 import { collectRoutes, loadRouteModules } from "../../mocks/registry.ts";
-import { DEMO_GENERATED, sessionIdFor, sessionView, shouldRetry, type SessionQuery } from "./data.ts";
+import { emptyResponse } from "../../../../../packages/ui/src/quiz/index.ts";
+import quizCopy from "../../../../../packages/ui/src/quiz/copy.zh-CN.json";
+import { QuestionCard } from "./components/QuestionCard.tsx";
+import { DEMO_GENERATED, nextOpenIndex, sessionIdFor, sessionView, shapeOf, shouldRetry, type SessionQuery } from "./data.ts";
 
 type Json = Record<string, unknown>;
 
@@ -68,14 +72,19 @@ function setup(state = "") {
       "submitQuizAnswerResponse",
       status,
     );
-  return { control, call, json, session, answer };
+  return { api, control, call, json, session, answer };
 }
 
 const itemsOf = (body: Json): Json[] => body["items"] as Json[];
 
 describe("S18 假数据（mocks/pages/S18.ts）", () => {
   it("生成的 Zod 结构里有本页四个接口", () => {
-    for (const name of ["getQuizSessionResponse", "submitQuizAnswerResponse", "checkGeneratedQuestionResponse", "finishQuizSessionResponse"]) {
+    for (const name of [
+      "getQuizSessionResponse",
+      "submitQuizAnswerResponse",
+      "checkGeneratedQuestionResponse",
+      "finishQuizSessionResponse",
+    ]) {
       expect(typeof parser(name)?.safeParse, name).toBe("function");
     }
   });
@@ -94,7 +103,12 @@ describe("S18 假数据（mocks/pages/S18.ts）", () => {
     const { session, call } = setup();
     const objective = await session("demo");
     expect(objective["title"]).toBe(kj.sessions.objective.title);
-    expect([objective["kind"], objective["mode"], objective["resume_index"], objective["data_source"]]).toEqual(["objective", "in_class", 3, "sample"]);
+    expect([objective["kind"], objective["mode"], objective["resume_index"], objective["data_source"]]).toEqual([
+      "objective",
+      "in_class",
+      3,
+      "sample",
+    ]);
     const generated = await session(DEMO_GENERATED);
     expect([generated["kind"], generated["mode"]]).toEqual(["generated", "in_class"]);
     expect(itemsOf(generated).every((item) => item["check"] !== "not_needed")).toBe(true);
@@ -127,7 +141,14 @@ describe("S18 假数据（mocks/pages/S18.ts）", () => {
     await json(
       "POST",
       "/practice/sessions/demo/answers",
-      { item_id: next["id"], question_id: (next["question"] as Json)["id"], question_version: 1, response: { selected: [0] }, duration_ms: 1, hint_level: 0 },
+      {
+        item_id: next["id"],
+        question_id: (next["question"] as Json)["id"],
+        question_version: 1,
+        response: { selected: [0] },
+        duration_ms: 1,
+        hint_level: 0,
+      },
       "",
       422,
     );
@@ -145,6 +166,68 @@ describe("S18 假数据（mocks/pages/S18.ts）", () => {
     expect((checked["result"] as Json)["evidence_counted"]).toBe(true);
     expect((checked["question"] as Json)["credibility"]).toBe("generated_confirmed");
     await json("POST", path, { item_id: item["id"], verdict: "problem" }, "", 409);
+  });
+
+  it("提前交卷后：已答题和未答题都不能再提交，小结保持不变", async () => {
+    const { session, answer, json } = setup("restricted");
+    const before = itemsOf(await session("demo"));
+    const answered = before[3] ?? {};
+    const unanswered = before[4] ?? {};
+    await answer("demo", answered, [0]);
+    const finished = await json("POST", "/practice/sessions/demo/finish", undefined, "finishQuizSessionResponse");
+    await answer("demo", answered, [1], 409);
+    await answer("demo", unanswered, [0], 409);
+    const after = await session("demo");
+    expect(after["progress"]).toEqual(finished["progress"]);
+    expect(after["summary"]).toEqual(finished["summary"]);
+    expect(itemsOf(after)[4]?.["answer"]).toBeUndefined();
+  });
+
+  it.each(["ok", "problem"] as const)("生成题答完但未核对时仍能续做；最后一题核对后才完成（%s）", async (verdict) => {
+    const { session, answer, json } = setup();
+    const initial = await session(DEMO_GENERATED);
+    for (const item of itemsOf(initial)) {
+      if (item["status"] === "unanswered") await answer(DEMO_GENERATED, item, [0]);
+    }
+    const pending = await session(DEMO_GENERATED);
+    const waiting = itemsOf(pending).filter((item) => item["check"] === "pending");
+    expect(waiting.length).toBeGreaterThan(0);
+    expect(pending["finished"]).toBe(false);
+    expect(pending["resume_index"]).toBe(itemsOf(pending).findIndex((item) => item["check"] === "pending"));
+    for (const item of waiting) {
+      await json("POST", `/practice/sessions/${DEMO_GENERATED}/checks`, { item_id: item["id"], verdict }, "checkGeneratedQuestionResponse");
+    }
+    expect((await session(DEMO_GENERATED))["finished"]).toBe(true);
+  });
+
+  it("生成题测评交卷后仍可从待核对题继续，作答则保持结束", async () => {
+    const { session, answer, json } = setup("restricted");
+    const item = itemsOf(await session(DEMO_GENERATED))[2] ?? {};
+    await answer(DEMO_GENERATED, item, [0]);
+    const done = (await json(
+      "POST",
+      `/practice/sessions/${DEMO_GENERATED}/finish`,
+      undefined,
+      "finishQuizSessionResponse",
+    )) as unknown as S18QuizSession;
+    const pendingIndex = done.items.findIndex((entry) => entry.status === "revealed" && entry.check === "pending");
+    expect(pendingIndex).toBeGreaterThanOrEqual(0);
+    expect(done.finished).toBe(true);
+    expect(done.resume_index).toBe(pendingIndex);
+    expect(sessionView({ data: done, error: null, status: "success", fetchStatus: "idle" }).state).toBe("normal");
+    await answer(DEMO_GENERATED, itemsOf(done as unknown as Json)[3] ?? {}, [0], 409);
+  });
+
+  it("生成题全答完：下一题按钮仍能回到先前跳过的待核对题", async () => {
+    const { session, answer } = setup();
+    for (const item of itemsOf(await session(DEMO_GENERATED))) {
+      if (item["status"] === "unanswered") await answer(DEMO_GENERATED, item, [0]);
+    }
+    const data = (await session(DEMO_GENERATED)) as unknown as S18QuizSession;
+    const current = data.items.length - 1;
+    expect(nextOpenIndex(data.items, current)).toBe(
+      data.items.findIndex((entry, index) => index !== current && entry.status === "revealed" && entry.check === "pending"),
+    );
   });
 
   it("测评态（?state=restricted）：交的题先不揭晓，交卷后一起揭晓", async () => {
@@ -212,6 +295,78 @@ afterEach(() => {
 });
 
 describe("S18 页面（整个学员端挂在 /quiz/demo）", () => {
+  it("交卷后的未答题仍展示原题，但作答、把握度和提交都锁定", async () => {
+    const { json } = setup("restricted");
+    const done = (await json(
+      "POST",
+      "/practice/sessions/demo/finish",
+      undefined,
+      "finishQuizSessionResponse",
+    )) as unknown as S18QuizSession;
+    const item = done.items[3];
+    if (item === undefined) throw new Error("缺少未作答示范题");
+    expect(item.status).toBe("unanswered");
+    const onResponse = vi.fn();
+    const onConfidence = vi.fn();
+    const { host, unmount } = await mountAt(
+      "/quiz/demo",
+      <QuestionCard
+        session={done}
+        item={item}
+        response={emptyResponse(shapeOf(item))}
+        onResponse={onResponse}
+        confidence={null}
+        onConfidence={onConfidence}
+        scratch=""
+        onScratch={() => undefined}
+        struck={[]}
+        onStrike={() => undefined}
+        strikeMode={false}
+        onStrikeMode={() => undefined}
+        flagged={false}
+        onFlag={() => undefined}
+        seconds={0}
+        busy={false}
+        onSubmit={() => undefined}
+        after={null}
+      />,
+    );
+    try {
+      const inputs = [...host.querySelectorAll<HTMLInputElement>("input[type=radio]")];
+      expect(inputs.length).toBeGreaterThan(0);
+      expect(inputs.every((input) => input.disabled)).toBe(true);
+      await click(inputs[0]);
+      expect(onResponse).not.toHaveBeenCalled();
+      expect(onConfidence).not.toHaveBeenCalled();
+      expect([...host.querySelectorAll("button")].some((button) => button.textContent?.trim() === quizCopy.submit.action)).toBe(false);
+    } finally {
+      await unmount();
+    }
+  });
+
+  it.each(["", "restricted"])("生成题答完后重新进入：仍停在未核对题并显示确认入口（%s）", async (state) => {
+    const { api, session, answer, json } = setup(state);
+    for (const item of itemsOf(await session(DEMO_GENERATED))) {
+      if (item["status"] === "unanswered") await answer(DEMO_GENERATED, item, [0]);
+    }
+    if (state === "restricted") await json("POST", `/practice/sessions/${DEMO_GENERATED}/finish`, undefined, "finishQuizSessionResponse");
+    stubFetch(api);
+    const { host, unmount } = await mountAt("/quiz/demo?view=gen", <App />);
+    try {
+      await settle(() => host.textContent?.includes(copy.reveal.check_title) === true);
+      expect(host.querySelector(".ui-state--empty")).toBeNull();
+      const confirm = [...host.querySelectorAll<HTMLButtonElement>("button")].find(
+        (button) => button.textContent?.trim() === copy.reveal.check_ok,
+      );
+      expect(confirm).toBeDefined();
+      await click(confirm);
+      await settle(() => host.textContent?.includes(copy.reveal.check_done_ok) === true);
+      expect(host.textContent).toContain(copy.reveal.check_done_ok);
+    } finally {
+      await unmount();
+    }
+  });
+
   it("正常态：页头是题组名，题目卡有把握度三档，右栏有本组进度与练习小结", async () => {
     stubFetch(apiFor());
     const { host, unmount } = await mountAt("/quiz/demo", <App />);

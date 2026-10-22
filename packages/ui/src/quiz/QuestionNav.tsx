@@ -39,7 +39,10 @@ export function QuestionNav({ items, current, onSelect, tone = "dark", className
       <ol className="flex items-center gap-1">
         {items.map((item, index) => {
           const here = index === current;
-          const name = fill(item.flagged === true ? copy.nav.item_flagged : copy.nav.item, { n: index + 1, status: copy.nav.status[item.status] });
+          const name = fill(item.flagged === true ? copy.nav.item_flagged : copy.nav.item, {
+            n: index + 1,
+            status: copy.nav.status[item.status],
+          });
           return (
             <li key={item.key}>
               <button

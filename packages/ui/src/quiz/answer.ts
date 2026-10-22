@@ -3,7 +3,16 @@
 // 这里只判断“答完没有、能不能提交”，不判对错（对错、证据都由服务端算，红线 5）。
 
 /** 作答形态九种（术语表 response_form）。 */
-export type QuizResponseForm = "choice" | "fill" | "match_order" | "stepwise" | "written" | "material" | "listening" | "oral" | "practical_self";
+export type QuizResponseForm =
+  | "choice"
+  | "fill"
+  | "match_order"
+  | "stepwise"
+  | "written"
+  | "material"
+  | "listening"
+  | "oral"
+  | "practical_self";
 
 /** 把握度三档（术语表 confidence）；日常做题不提供“不会”（F01-Q1，勘误第 5 条）。 */
 export type QuizConfidence = "sure" | "vague" | "guess";
@@ -62,7 +71,12 @@ export function isAnswered(shape: QuizShape, response: QuizResponse): boolean {
 }
 
 /** 还差哪一步（固定流程：作答 → 选把握度 → 提交 → 揭晓）；都齐了为 null。把握度关着时不用选。 */
-export function submitBlocker(shape: QuizShape, response: QuizResponse, confidence: QuizConfidence | null, confidenceOn: boolean): SubmitBlocker | null {
+export function submitBlocker(
+  shape: QuizShape,
+  response: QuizResponse,
+  confidence: QuizConfidence | null,
+  confidenceOn: boolean,
+): SubmitBlocker | null {
   if (!isAnswered(shape, response)) return "answer";
   if (confidenceOn && confidence === null) return "confidence";
   return null;
@@ -105,7 +119,10 @@ export function toWireResponse(shape: QuizShape, response: QuizResponse): WireRe
 }
 
 /** 接口给回的作答（我交过的）换成组件里的样子，揭晓后照原样显示。 */
-export function fromWireResponse(shape: QuizShape, wire: { readonly selected?: readonly number[] | undefined; readonly text?: string | undefined }): QuizResponse {
+export function fromWireResponse(
+  shape: QuizShape,
+  wire: { readonly selected?: readonly number[] | undefined; readonly text?: string | undefined },
+): QuizResponse {
   const selected = [...(wire.selected ?? [])];
   if (wire.text === undefined) return { selected, texts: [] };
   if (shape.form === "fill" || shape.form === "stepwise") return { selected, texts: wire.text.split(PART_SEPARATOR) };

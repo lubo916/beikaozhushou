@@ -36,7 +36,15 @@ export function ConfidencePicker({ value, onChange, locked = false, off = false,
                 chosen ? "border-brand-primary bg-brand-primary-soft" : "border-line-strong bg-bg-surface",
               )}
             >
-              <input type="radio" name={name} value={code} className="sr-only" checked={chosen} disabled={locked} onChange={() => onChange(code)} />
+              <input
+                type="radio"
+                name={name}
+                value={code}
+                className="sr-only"
+                checked={chosen}
+                disabled={locked}
+                onChange={() => onChange(code)}
+              />
               <span className="font-bold text-ink-primary">{vocabLabel("confidence", code)}</span>
               <span className="text-small text-ink-secondary">{copy.confidence.hint[code]}</span>
             </label>

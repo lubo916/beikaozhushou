@@ -26,7 +26,11 @@ export function SummaryCard({ session }: { session: S18QuizSession }) {
               <ul className="list-disc pl-5">
                 {summary.overtime.map((entry) => (
                   <li key={entry.index}>
-                    {t("summary.slow_item", { n: entry.index + 1, used: formatSeconds(entry.seconds), suggested: formatSeconds(entry.suggested_seconds) })}
+                    {t("summary.slow_item", {
+                      n: entry.index + 1,
+                      used: formatSeconds(entry.seconds),
+                      suggested: formatSeconds(entry.suggested_seconds),
+                    })}
                   </li>
                 ))}
               </ul>

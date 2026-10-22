@@ -19,16 +19,33 @@ export function ProgressCard({ session, current, rule, onHandIn }: ProgressCardP
   return (
     <Card title={t("side.progress")}>
       <div className="flex flex-col gap-3">
-        <ProgressBar value={share(progress.correct)} label={t("side.correct")} valueText={t("side.count", { n: progress.correct })} tone="success" />
-        <ProgressBar value={share(progress.wrong)} label={t("side.wrong")} valueText={t("side.count", { n: progress.wrong })} tone="danger" />
+        <ProgressBar
+          value={share(progress.correct)}
+          label={t("side.correct")}
+          valueText={t("side.count", { n: progress.correct })}
+          tone="success"
+        />
+        <ProgressBar
+          value={share(progress.wrong)}
+          label={t("side.wrong")}
+          valueText={t("side.count", { n: progress.wrong })}
+          tone="danger"
+        />
         {progress.waiting > 0 && (
-          <ProgressBar value={share(progress.waiting)} label={t("side.waiting")} valueText={t("side.count", { n: progress.waiting })} tone="warning" />
+          <ProgressBar
+            value={share(progress.waiting)}
+            label={t("side.waiting")}
+            valueText={t("side.count", { n: progress.waiting })}
+            tone="warning"
+          />
         )}
         <ProgressBar
           value={share(progress.unanswered)}
           label={t("side.unanswered")}
           valueText={
-            currentOpen ? t("side.unanswered_current", { n: progress.unanswered, current: current + 1 }) : t("side.count", { n: progress.unanswered })
+            currentOpen
+              ? t("side.unanswered_current", { n: progress.unanswered, current: current + 1 })
+              : t("side.count", { n: progress.unanswered })
           }
           tone="brand"
         />

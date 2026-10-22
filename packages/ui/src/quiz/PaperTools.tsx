@@ -54,7 +54,17 @@ export function Calculator() {
   );
 }
 
-export function PaperTools({ draft, onDraft, strikeMode, onStrikeMode, canStrike, flagged, onFlag, locked = false, className }: PaperToolsProps) {
+export function PaperTools({
+  draft,
+  onDraft,
+  strikeMode,
+  onStrikeMode,
+  canStrike,
+  flagged,
+  onFlag,
+  locked = false,
+  className,
+}: PaperToolsProps) {
   const [draftOpen, setDraftOpen] = useState(false);
   const [calcOpen, setCalcOpen] = useState(false);
   return (

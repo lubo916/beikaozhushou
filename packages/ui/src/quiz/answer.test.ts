@@ -1,6 +1,16 @@
 // 共用作答组件的纯函数：答完没有、差哪一步、作答与接口格式互换、计算器（U18a）。
 import { describe, expect, it } from "vitest";
-import { emptyResponse, fromWireResponse, isAnswered, moveItem, setText, submitBlocker, toWireResponse, toggleOption, type QuizShape } from "./answer.ts";
+import {
+  emptyResponse,
+  fromWireResponse,
+  isAnswered,
+  moveItem,
+  setText,
+  submitBlocker,
+  toWireResponse,
+  toggleOption,
+  type QuizShape,
+} from "./answer.ts";
 import { CALC_START, pressKey, type CalcState } from "./calculator.ts";
 
 const single: QuizShape = { form: "choice", options: ["甲", "乙", "丙"] };

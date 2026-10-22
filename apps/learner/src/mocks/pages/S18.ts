@@ -20,7 +20,15 @@ const VERDICTS: readonly string[] = ["ok", "problem"];
 const STRENGTH_ORDER: readonly string[] = ["weak", "medium", "strong"];
 const MS_PER_SECOND = 1000;
 const QUESTION_OPTIONAL_KEYS = ["options", "label", "hints"] as const;
-const SOLUTION_KEYS = ["answer", "explanation", "option_notes", "common_wrong_option", "group_miss_rate", "scoring_points", "sample_answer"] as const;
+const SOLUTION_KEYS = [
+  "answer",
+  "explanation",
+  "option_notes",
+  "common_wrong_option",
+  "group_miss_rate",
+  "scoring_points",
+  "sample_answer",
+] as const;
 
 interface Prefill {
   readonly selected?: readonly number[];
@@ -224,7 +232,10 @@ function evidenceOf(rules: SampleRules, credibility: string, verdict: Verdict, a
 
 function fromPrefill(prefill: Prefill): Answer {
   return {
-    response: { ...(prefill.selected === undefined ? {} : { selected: [...prefill.selected] }), ...(prefill.text === undefined ? {} : { text: prefill.text }) },
+    response: {
+      ...(prefill.selected === undefined ? {} : { selected: [...prefill.selected] }),
+      ...(prefill.text === undefined ? {} : { text: prefill.text }),
+    },
     confidence: prefill.confidence,
     duration_ms: prefill.duration_ms,
     hint_level: prefill.hint_level ?? 0,
@@ -260,10 +271,19 @@ function buildRow(where: Located, state: Live, mode: Mode, index: number, fixtur
   const prefill = fixture.prefill ?? (mode === "empty" ? synthesize(question, fixture) : undefined);
   const answer = stored ?? (prefill === undefined ? undefined : fromPrefill(prefill));
   const status = answer === undefined ? "unanswered" : open && mode !== "empty" ? "answered" : "revealed";
-  const check = where.kind === "generated" ? (state.checks.get(storeKey) ?? fixture.prefill?.check ?? "pending") : "not_needed";
+  const savedCheck = state.checks.get(storeKey) ?? fixture.prefill?.check;
+  const check =
+    where.kind === "generated"
+      ? mode === "empty"
+        ? savedCheck === "problem"
+          ? "problem"
+          : "ok"
+        : (savedCheck ?? "pending")
+      : "not_needed";
   const credibility = where.kind === "generated" ? (check === "ok" ? "generated_confirmed" : "generated_instant") : question.credibility;
   const verdict = status === "revealed" && answer !== undefined ? grade(question, answer.response) : null;
-  const evidence = verdict === null || answer === undefined ? null : evidenceOf(where.page.sample_rules, credibility, verdict, answer, check);
+  const evidence =
+    verdict === null || answer === undefined ? null : evidenceOf(where.page.sample_rules, credibility, verdict, answer, check);
   const sampleMistake = stored === undefined && where.kind === "objective" && verdict?.correct === false ? storeKey : null;
   const mistakeId = answer?.mistake_id ?? sampleMistake;
   const pointId = question.knowledge_point_ids[0] ?? "";
@@ -281,7 +301,14 @@ function buildRow(where: Located, state: Live, mode: Mode, index: number, fixtur
     flagged: fixture.flagged ?? false,
     ...(answer === undefined
       ? {}
-      : { answer: { response: answer.response, confidence: answer.confidence, duration_ms: answer.duration_ms, hint_level: answer.hint_level } }),
+      : {
+          answer: {
+            response: answer.response,
+            confidence: answer.confidence,
+            duration_ms: answer.duration_ms,
+            hint_level: answer.hint_level,
+          },
+        }),
     ...(verdict === null || evidence === null
       ? {}
       : {
@@ -353,11 +380,17 @@ function sessionBody(ctx: MockContext, mode: Mode): Json {
   const rows = where.fixture.items.map((fixture, index) => buildRow(where, state, mode, index, fixture, open));
   const count = (test: (row: Row) => boolean): number => rows.filter(test).length;
   const unanswered = count((row) => row.status === "unanswered");
-  const finished = mode === "empty" || (assessment ? !open : unanswered === 0);
+  // feat:S18-12 作答结束仍要完成生成题核对，重新进入时回到第一道待核对题。
+  const firstPendingCheck = rows.findIndex((row) => row.status === "revealed" && row.item["check"] === "pending");
+  const finished = mode === "empty" || (assessment ? !open : unanswered === 0 && firstPendingCheck < 0);
   const firstOpen = rows.findIndex((row) => row.status === "unanswered");
+  const firstAction = assessment && !open ? firstPendingCheck : firstOpen >= 0 ? firstOpen : firstPendingCheck;
   const lastChoice = rows.reduce((found, row, index) => (row.status === "revealed" && row.hasOptions ? index : found), -1);
-  const resume = mode === "insufficient_data" && lastChoice >= 0 ? lastChoice : firstOpen >= 0 ? firstOpen : Math.max(0, rows.length - 1);
-  const spent = [...state.answers.entries()].filter(([key]) => key.startsWith(`${where.key}:`)).reduce((sum, [, answer]) => sum + answer.duration_ms, 0);
+  const resume =
+    mode === "insufficient_data" && lastChoice >= 0 ? lastChoice : firstAction >= 0 ? firstAction : Math.max(0, rows.length - 1);
+  const spent = [...state.answers.entries()]
+    .filter(([key]) => key.startsWith(`${where.key}:`))
+    .reduce((sum, [, answer]) => sum + answer.duration_ms, 0);
   return {
     id: where.sessionId,
     title: where.fixture.title,
@@ -424,12 +457,16 @@ function submit(ctx: MockContext, mode: Mode): Json {
   if (fixture === undefined) throw new ApiError("COMMON_NOT_FOUND", { item_id: itemId });
   const question = questionOf(where, fixture.question_id);
   if (body["question_id"] !== question.id) throw new ApiError("COMMON_VALIDATION", { field: "question_id", expected: question.id });
-  if (body["question_version"] !== question.version) throw new ApiError("COMMON_VALIDATION", { field: "question_version", expected: question.version });
+  if (body["question_version"] !== question.version)
+    throw new ApiError("COMMON_VALIDATION", { field: "question_version", expected: question.version });
   const confidence = body["confidence"];
-  if (typeof confidence !== "string" || !CONFIDENCES.includes(confidence)) throw new ApiError("PRAC_CONFIDENCE_REQUIRED", { item_id: itemId });
+  if (typeof confidence !== "string" || !CONFIDENCES.includes(confidence))
+    throw new ApiError("PRAC_CONFIDENCE_REQUIRED", { item_id: itemId });
   const state = live(ctx.db);
+  // feat:S18-02 交卷锁定整场练习，未作答题也不能在交卷后补交。
+  if (state.handedIn.has(where.key)) throw new ApiError("PRAC_REVEAL_LOCKED", { session_id: where.sessionId });
   const storeKey = `${where.key}:${itemId}`;
-  const open = isAssessment(where, mode) && !state.handedIn.has(where.key);
+  const open = isAssessment(where, mode);
   const answeredBefore = fixture.prefill !== undefined || state.answers.has(storeKey);
   if (answeredBefore && !open) throw new ApiError("PRAC_REVEAL_LOCKED", { item_id: itemId });
   const duration = body["duration_ms"];
@@ -452,7 +489,8 @@ function check(ctx: MockContext, mode: Mode): Json {
   const itemId = text(body["item_id"]) ?? "";
   const verdict = text(body["verdict"]) ?? "";
   const index = itemAt(where, itemId);
-  if (where.kind !== "generated" || !VERDICTS.includes(verdict)) throw new ApiError("COMMON_VALIDATION", { field: "verdict", item_id: itemId });
+  if (where.kind !== "generated" || !VERDICTS.includes(verdict))
+    throw new ApiError("COMMON_VALIDATION", { field: "verdict", item_id: itemId });
   const current = itemBody(ctx, mode, index);
   if (current["status"] !== "revealed") throw new ApiError("COMMON_VALIDATION", { field: "item_id", reason: "not_revealed" });
   if (current["check"] !== "pending") throw new ApiError("PRAC_REVEAL_LOCKED", { item_id: itemId });
@@ -468,7 +506,8 @@ function finish(ctx: MockContext, mode: Mode): Json {
     where.fixture.items.forEach((fixture, index) => {
       const storeKey = `${where.key}:${itemIdOf(index)}`;
       const answer = state.answers.get(storeKey);
-      if (answer !== undefined) state.answers.set(storeKey, { ...answer, mistake_id: recordInDb(ctx, where, questionOf(where, fixture.question_id), answer) });
+      if (answer !== undefined)
+        state.answers.set(storeKey, { ...answer, mistake_id: recordInDb(ctx, where, questionOf(where, fixture.question_id), answer) });
     });
     state.handedIn.add(where.key);
   }

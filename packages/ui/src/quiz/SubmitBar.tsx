@@ -19,7 +19,15 @@ export interface SubmitBarProps {
   className?: string | undefined;
 }
 
-export function SubmitBar({ blocker, onSubmit, busy = false, submitLabel = copy.submit.action, locked = false, children, className }: SubmitBarProps) {
+export function SubmitBar({
+  blocker,
+  onSubmit,
+  busy = false,
+  submitLabel = copy.submit.action,
+  locked = false,
+  children,
+  className,
+}: SubmitBarProps) {
   const hintId = useId();
   const reason = blocker === null ? null : copy.submit.blocker[blocker];
   return (
@@ -32,7 +40,13 @@ export function SubmitBar({ blocker, onSubmit, busy = false, submitLabel = copy.
       {locked ? (
         <p className="text-small text-ink-secondary">{copy.submit.locked}</p>
       ) : (
-        <Button variant="primary" busy={busy} disabled={blocker !== null} aria-describedby={reason === null ? undefined : hintId} onClick={onSubmit}>
+        <Button
+          variant="primary"
+          busy={busy}
+          disabled={blocker !== null}
+          aria-describedby={reason === null ? undefined : hintId}
+          onClick={onSubmit}
+        >
           {submitLabel}
         </Button>
       )}

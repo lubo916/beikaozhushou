@@ -14,6 +14,7 @@ import {
 } from "../../../../../../packages/ui/src/quiz/index.ts";
 import { useToast } from "../../../app/toast.tsx";
 import { nextOpenIndex, shapeOf, useQuizActions } from "../data.ts";
+import { useQuestionTiming } from "../timing.ts";
 import { ProgressCard } from "./ProgressCard.tsx";
 import { QuestionCard } from "./QuestionCard.tsx";
 import { RevealPanel } from "./RevealPanel.tsx";
@@ -55,25 +56,26 @@ export function QuizRunner({ session, sessionId, onStarted, rule, intro }: QuizR
   const [strikeMode, setStrikeMode] = useState(false);
   const [handInOpen, setHandInOpen] = useState(false);
   const [elapsed, setElapsed] = useState(session.time.elapsed_seconds);
-  const [seconds, setSeconds] = useState(0);
-  const shownAt = useRef(Date.now());
+  const item = session.items[Math.min(current, last)];
+  const { seconds, refresh, pauseForSubmit, resumeAfterFailure } = useQuestionTiming(
+    item === undefined ? undefined : `${sessionId}:${item.id}`,
+    item?.answer?.duration_ms,
+    !session.finished && item?.status === "unanswered",
+  );
   const summaryRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setElapsed((value) => value + 1);
-      setSeconds((value) => value + 1);
+      refresh();
     }, MS_PER_SECOND);
     return () => clearInterval(timer);
-  }, []);
+  }, [refresh]);
 
   useEffect(() => {
-    shownAt.current = Date.now();
-    setSeconds(0);
     setStrikeMode(false);
   }, [current]);
 
-  const item = session.items[Math.min(current, last)];
   if (item === undefined) return null;
 
   const shape = shapeOf(item);
@@ -83,7 +85,7 @@ export function QuizRunner({ session, sessionId, onStarted, rule, intro }: QuizR
   const saved = item.answer?.confidence;
   const confidence = confidences[item.id] ?? (saved === undefined || saved === "off" ? null : saved);
   const flagged = flags[item.id] ?? item.flagged;
-  const nextOpen = nextOpenIndex(session.items, current);
+  const nextOpen = nextOpenIndex(session.items, current, session.finished);
   const resumed = session.items.some((entry) => entry.status !== "unanswered");
 
   const goNext = () => {
@@ -93,7 +95,15 @@ export function QuizRunner({ session, sessionId, onStarted, rule, intro }: QuizR
   };
 
   const send = () => {
-    if (submitBlocker(shape, response, confidence, session.confidence_enabled) !== null || session.other_device) return;
+    if (
+      item.status === "revealed" ||
+      session.finished ||
+      submit.isPending ||
+      finish.isPending ||
+      submitBlocker(shape, response, confidence, session.confidence_enabled) !== null ||
+      session.other_device
+    )
+      return;
     onStarted();
     const data: S18AnswerInput = {
       item_id: item.id,
@@ -101,7 +111,7 @@ export function QuizRunner({ session, sessionId, onStarted, rule, intro }: QuizR
       question_version: item.question.version,
       response: toWireResponse(shape, response),
       confidence: session.confidence_enabled && confidence !== null ? confidence : "off",
-      duration_ms: Math.max(0, Date.now() - shownAt.current),
+      duration_ms: pauseForSubmit(),
       hint_level: 0,
     };
     submit.mutate(
@@ -114,7 +124,10 @@ export function QuizRunner({ session, sessionId, onStarted, rule, intro }: QuizR
             setCurrent(nextOpen);
           }
         },
-        onError: () => toast(t("question.submit_failed")),
+        onError: () => {
+          resumeAfterFailure();
+          toast(t("question.submit_failed"));
+        },
       },
     );
   };
@@ -154,7 +167,9 @@ export function QuizRunner({ session, sessionId, onStarted, rule, intro }: QuizR
     <>
       <SessionBar session={session} current={current} onSelect={setCurrent} elapsed={elapsed} flags={flags} />
       <SessionHeader session={session} />
-      {resumed && !session.finished && <p className="text-small text-ink-secondary">{t("question.resume", { n: session.resume_index + 1 })}</p>}
+      {resumed && !session.finished && (
+        <p className="text-small text-ink-secondary">{t("question.resume", { n: session.resume_index + 1 })}</p>
+      )}
       {intro}
       <Columns
         main={
@@ -200,7 +215,9 @@ export function QuizRunner({ session, sessionId, onStarted, rule, intro }: QuizR
         open={handInOpen}
         onClose={() => setHandInOpen(false)}
         title={t("question.hand_in_title")}
-        description={session.progress.unanswered > 0 ? t("question.hand_in_body", { n: session.progress.unanswered }) : t("question.hand_in_body_all")}
+        description={
+          session.progress.unanswered > 0 ? t("question.hand_in_body", { n: session.progress.unanswered }) : t("question.hand_in_body_all")
+        }
         actions={
           <>
             <Button onClick={() => setHandInOpen(false)}>{t("question.hand_in_cancel")}</Button>

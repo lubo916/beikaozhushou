@@ -21,7 +21,16 @@ export {
   type WireResponse,
 } from "./answer.ts";
 export { AnswerInput, type AnswerInputProps } from "./AnswerInput.tsx";
-export { CALC_START, isOperator, pressDigit, pressEquals, pressKey, pressOperator, type CalcOperator, type CalcState } from "./calculator.ts";
+export {
+  CALC_START,
+  isOperator,
+  pressDigit,
+  pressEquals,
+  pressKey,
+  pressOperator,
+  type CalcOperator,
+  type CalcState,
+} from "./calculator.ts";
 export { ConfidencePicker, type ConfidencePickerProps } from "./ConfidencePicker.tsx";
 export { Calculator, PaperTools, type PaperToolsProps } from "./PaperTools.tsx";
 export { QuestionNav, type NavStatus, type QuestionNavItem, type QuestionNavProps } from "./QuestionNav.tsx";

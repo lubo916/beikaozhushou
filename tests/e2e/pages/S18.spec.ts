@@ -40,7 +40,9 @@ function raw(source: unknown, path: string): string {
 
 /** 本页文案，填好占位符。 */
 function copy(path: string, values: Readonly<Record<string, string | number>> = {}): string {
-  return raw(PAGE_COPY, path).replace(PLACEHOLDER, (whole: string, name: string) => (values[name] === undefined ? whole : String(values[name])));
+  return raw(PAGE_COPY, path).replace(PLACEHOLDER, (whole: string, name: string) =>
+    values[name] === undefined ? whole : String(values[name]),
+  );
 }
 
 /** 共用作答组件的文案。 */
@@ -98,7 +100,10 @@ for (const size of WIDTHS) {
     const overflow = await page.locator("main#main").evaluate((element) => element.scrollWidth - element.clientWidth);
     expect(overflow, "正文区不应横向溢出").toBeLessThanOrEqual(1);
     if (size.width === WIDTHS[0].width) {
-      const position = await page.locator("main#main .ui-cols__main .sticky").first().evaluate((element) => getComputedStyle(element).position);
+      const position = await page
+        .locator("main#main .ui-cols__main .sticky")
+        .first()
+        .evaluate((element) => getComputedStyle(element).position);
       expect(position, "手机上提交条贴在底部（拇指区）").toBe("sticky");
     }
     expectNoProblems(watch, "normal");

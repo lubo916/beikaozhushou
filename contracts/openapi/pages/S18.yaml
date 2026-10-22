@@ -196,10 +196,7 @@ components:
         solution: {$ref: "#/components/schemas/QuestionSolution"}
     S18EvidenceReason:
       type: string
-      description: >-
-        这次为什么记这个证据：sure_correct 标确定且做对；vague_correct 标模糊做对；guess_correct 蒙对（待验证，稍后换问法再考）；
-        too_fast 用时过短（待验证）；hint_used 用过提示（弱证据）；confidence_off 把握度已关闭（做对最高记中）；wrong 做错；
-        awaiting_check 生成题还没确认（确认前不计）；question_problem 报了题目有问题（不计）；ungraded 主观题等批改或自评
+      description: "这次为什么记这个证据：sure_correct 标确定且做对；vague_correct 标模糊做对；guess_correct 蒙对（待验证，稍后换问法再考）；too_fast 用时过短（待验证）；hint_used 用过提示（弱证据）；confidence_off 把握度已关闭（做对最高记中）；wrong 做错；awaiting_check 生成题还没确认（确认前不计）；question_problem 报了题目有问题（不计）；ungraded 主观题等批改或自评"
       enum: [sure_correct, vague_correct, guess_correct, too_fast, hint_used, confidence_off, wrong, awaiting_check, question_problem, ungraded]
     S18CheckState:
       type: string

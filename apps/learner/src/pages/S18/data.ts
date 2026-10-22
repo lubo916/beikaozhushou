@@ -64,6 +64,8 @@ function isOffline(query: SessionQuery): boolean {
 
 /** 空态：这一组题做完了（bk spec：这一组题做完了｜看练习小结，或再来一组）。只看接口给的 finished 与题目列表，不算业务数字。 */
 export function isDone(data: S18QuizSession): boolean {
+  // 交卷结束作答，但已揭晓的生成题仍需显示核对入口；未作答题的 pending 不算核对任务。
+  if (data.items.some((item) => item.status === "revealed" && item.check === "pending")) return false;
   return data.finished || data.items.length === 0;
 }
 
@@ -100,12 +102,16 @@ export function navStatus(item: S18QuizItem): NavStatus {
   return "ungraded";
 }
 
-/** 下一道还没做的题：从当前往后找，找不到再从头找（不算当前这题）；都做了为 null。 */
-export function nextOpenIndex(items: readonly S18QuizItem[], from: number): number | null {
-  const after = items.findIndex((item, index) => index > from && item.status === "unanswered");
-  if (after >= 0) return after;
-  const before = items.findIndex((item, index) => index !== from && item.status === "unanswered");
-  return before >= 0 ? before : null;
+/** 下一道仍有操作的题：先未答题，再已揭晓的待核对题；交卷后只找待核对题。不算当前题。 */
+export function nextOpenIndex(items: readonly S18QuizItem[], from: number, answeringClosed = false): number | null {
+  const find = (matches: (item: S18QuizItem) => boolean): number | null => {
+    const after = items.findIndex((item, index) => index > from && matches(item));
+    if (after >= 0) return after;
+    const before = items.findIndex((item, index) => index !== from && matches(item));
+    return before >= 0 ? before : null;
+  };
+  const unanswered = answeringClosed ? null : find((item) => item.status === "unanswered");
+  return unanswered ?? find((item) => item.status === "revealed" && item.check === "pending");
 }
 
 /** 给共用作答组件的题目形状。 */

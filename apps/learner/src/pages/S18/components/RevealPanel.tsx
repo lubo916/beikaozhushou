@@ -14,7 +14,15 @@ import { pathTo } from "../../../routes.ts";
 import { shapeOf } from "../data.ts";
 
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const ERROR_CAUSES: readonly S18ErrorCause[] = ["not_learned", "forgot", "concept_unclear", "method_unknown", "misread", "slip", "time_short"];
+const ERROR_CAUSES: readonly S18ErrorCause[] = [
+  "not_learned",
+  "forgot",
+  "concept_unclear",
+  "method_unknown",
+  "misread",
+  "slip",
+  "time_short",
+];
 
 export interface RevealPanelProps {
   readonly item: S18QuizItem;
@@ -51,7 +59,9 @@ export function RevealPanel({ item, onCheck, checking }: RevealPanelProps) {
             )}
           </p>
           <p className="text-small text-ink-secondary">
-            {result.evidence_counted ? t("reveal.evidence", { strength: vocabLabel("evidence_strength", result.evidence_strength) }) : t("reveal.evidence_none")}
+            {result.evidence_counted
+              ? t("reveal.evidence", { strength: vocabLabel("evidence_strength", result.evidence_strength) })
+              : t("reveal.evidence_none")}
             {t(`reveal.reason.${result.evidence_reason}`)}
           </p>
           {/* feat:S18-10 异题印证 */}
@@ -78,7 +88,9 @@ export function RevealPanel({ item, onCheck, checking }: RevealPanelProps) {
             )}
           </section>
         )}
-        {noPeers && <PageState state="insufficient_data" compact title={t("state.insufficient.title")} body={t("state.insufficient.body")} />}
+        {noPeers && (
+          <PageState state="insufficient_data" compact title={t("state.insufficient.title")} body={t("state.insufficient.body")} />
+        )}
         {/* feat:S18-06 分层解析：一句话结论、分步推导、知识点回链、资料定位 */}
         <section className="flex flex-col gap-2">
           <h3 className="font-bold">{t("reveal.conclusion")}</h3>

@@ -51,6 +51,7 @@ export function QuestionCard(props: QuestionCardProps) {
   const toast = useToast();
   const shape = shapeOf(item);
   const revealed = item.status === "revealed";
+  const locked = revealed || session.finished;
   const generated = item.check !== "not_needed";
   const hints = item.question.hints?.length ?? 0;
   const used = revealed && item.answer !== undefined ? Math.round(item.answer.duration_ms / MS_PER_SECOND) : props.seconds;
@@ -105,7 +106,7 @@ export function QuestionCard(props: QuestionCardProps) {
           value={props.response}
           onChange={props.onResponse}
           multiple={isMultiple(item)}
-          locked={revealed}
+          locked={locked}
           answer={revealed ? item.result?.solution.answer : undefined}
           struck={props.struck}
           strikeMode={props.strikeMode}
@@ -123,16 +124,16 @@ export function QuestionCard(props: QuestionCardProps) {
           canStrike={choosesOptions(shape)}
           flagged={props.flagged}
           onFlag={props.onFlag}
-          locked={revealed}
+          locked={locked}
         />
         {/* feat:S18-04 把握度：必选、无默认，可关闭 */}
-        <ConfidencePicker value={props.confidence} onChange={props.onConfidence} locked={revealed} off={!session.confidence_enabled} />
+        <ConfidencePicker value={props.confidence} onChange={props.onConfidence} locked={locked} off={!session.confidence_enabled} />
         <p className="text-small text-ink-tertiary tabular-nums">
           {t("question.timing", { used: formatSeconds(used), suggested: formatSeconds(item.suggested_seconds) })}
         </p>
         {item.status === "answered" && <p className="text-small text-ink-secondary">{t("question.answered_wait")}</p>}
-        <SubmitBar blocker={blocker} onSubmit={props.onSubmit} busy={props.busy} locked={revealed}>
-          {revealed
+        <SubmitBar blocker={blocker} onSubmit={props.onSubmit} busy={props.busy} locked={locked}>
+          {locked
             ? props.after
             : hints > 0 &&
               !session.restrictions.hints_locked && (

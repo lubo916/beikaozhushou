@@ -85,7 +85,9 @@ function ChoiceList({ options, value, onChange, multiple, locked, label, answer,
                 {letter}
               </span>
               <span className={cx("flex-1", isStruck && "text-ink-tertiary line-through")}>{option}</span>
-              {mark === "right" && <span className="text-small font-bold text-status-success">{chosen ? copy.choice.mine_right : copy.choice.correct}</span>}
+              {mark === "right" && (
+                <span className="text-small font-bold text-status-success">{chosen ? copy.choice.mine_right : copy.choice.correct}</span>
+              )}
               {mark === "wrong" && <span className="text-small font-bold text-status-danger">{copy.choice.mine}</span>}
             </label>
             {strikeMode && !locked && onStrike !== undefined && (
@@ -108,7 +110,8 @@ function ChoiceList({ options, value, onChange, multiple, locked, label, answer,
 
 function partLabel(kind: "fill" | "stepwise", index: number, name: string | undefined): string {
   const n = index + 1;
-  if (kind === "stepwise") return name === undefined || name === "" ? fill(copy.stepwise.step, { n }) : fill(copy.stepwise.step_named, { n, name });
+  if (kind === "stepwise")
+    return name === undefined || name === "" ? fill(copy.stepwise.step, { n }) : fill(copy.stepwise.step_named, { n, name });
   return name === undefined || name === "" ? fill(copy.fill.blank, { n }) : fill(copy.fill.blank_named, { n, name });
 }
 
@@ -162,7 +165,9 @@ function OrderList(props: {
         const name = options[optionIndex] ?? "";
         return (
           <li key={optionIndex} className="flex flex-wrap items-center gap-2 rounded-md border border-line-strong bg-bg-surface px-3 py-2">
-            <span className="shrink-0 text-small text-ink-secondary">{parts[position] ?? fill(copy.order.position, { n: position + 1 })}</span>
+            <span className="shrink-0 text-small text-ink-secondary">
+              {parts[position] ?? fill(copy.order.position, { n: position + 1 })}
+            </span>
             <span className="min-w-[0] flex-1">{name}</span>
             {!locked && (
               <span className="flex shrink-0 gap-1">
@@ -274,10 +279,14 @@ export function AnswerInput(props: AnswerInputProps) {
           {copy.oral.record}
         </Button>
       )}
-      {(form === "fill" || form === "stepwise") && <TextParts kind={form} parts={parts} value={value} onChange={onChange} locked={locked} />}
+      {(form === "fill" || form === "stepwise") && (
+        <TextParts kind={form} parts={parts} value={value} onChange={onChange} locked={locked} />
+      )}
       {form === "match_order" && <OrderList options={options} parts={parts} value={value} onChange={onChange} locked={locked} />}
       {form === "practical_self" && <Checklist parts={parts} value={value} onChange={onChange} locked={locked} />}
-      {form === "oral" && <Written value={value} onChange={onChange} locked={locked} label={copy.oral.notes} placeholder={copy.oral.notes} />}
+      {form === "oral" && (
+        <Written value={value} onChange={onChange} locked={locked} label={copy.oral.notes} placeholder={copy.oral.notes} />
+      )}
       {(form === "choice" || form === "material" || form === "listening") && (choices ?? written)}
       {form === "written" && written}
     </div>
