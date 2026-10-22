@@ -1,0 +1,213 @@
+# S31 会员与权益：页面专用读接口。金额以分存储，展示文本与试算结果由接口返回，页面不计算。
+# account.context.read 是当前已登记的本人只读动作；真实支付、续费、退款写权限留待后端整合。
+paths:
+  /billing/membership:
+    get:
+      operationId: getS31Membership
+      x-owner: billing
+      x-action: account.context.read
+      summary: 当前会员权益、额度、档位比较、购买方式、订单与退款示例
+      responses:
+        "200":
+          description: 本人会员与权益；规则未实现时明确标为示例数据
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S31Membership"}
+        "403": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S31Membership:
+      type: object
+      required: [view_state, data_source, exam_name, time_zone, current, usage, comparison, purchase, orders, refund, add_ons, channels, payment_failures, upgrade, redemption, reminders]
+      properties:
+        view_state: {type: string, enum: [normal, empty, restricted, insufficient_data]}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+        exam_name: {type: string}
+        time_zone: {type: string}
+        current: {$ref: "#/components/schemas/S31Current"}
+        usage: {type: array, items: {$ref: "#/components/schemas/S31Usage"}}
+        comparison: {type: array, items: {$ref: "#/components/schemas/S31ComparisonRow"}}
+        purchase: {$ref: "#/components/schemas/S31Purchase"}
+        orders: {type: array, items: {$ref: "#/components/schemas/S31Order"}}
+        refund: {$ref: "#/components/schemas/S31Refund"}
+        add_ons: {type: array, items: {$ref: "#/components/schemas/S31AddOn"}}
+        channels: {type: array, items: {$ref: "#/components/schemas/S31Channel"}}
+        payment_failures: {type: array, items: {$ref: "#/components/schemas/S31PaymentFailure"}}
+        upgrade: {$ref: "#/components/schemas/S31Upgrade"}
+        redemption: {$ref: "#/components/schemas/S31Redemption"}
+        reminders: {type: array, items: {$ref: "#/components/schemas/S31Reminder"}}
+    S31Current:
+      type: object
+      required: [plan_id, kind, valid_until, final_expiry, auto_renew, next_charge_at, next_charge_cents, next_charge_text, device_limit, devices_used, purchase_channel, pending, grace]
+      properties:
+        plan_id: {type: string, enum: [free, member, human]}
+        kind: {type: string, enum: [free, pass, subscription, institution]}
+        valid_until: {$ref: "#/components/schemas/LearningDay"}
+        final_expiry: {$ref: "#/components/schemas/LearningDay"}
+        auto_renew: {type: boolean}
+        next_charge_at: {$ref: "#/components/schemas/Timestamp"}
+        next_charge_cents: {type: integer, minimum: 0}
+        next_charge_text: {type: string}
+        device_limit: {type: integer, minimum: 1}
+        devices_used: {type: integer, minimum: 0}
+        purchase_channel: {type: string, enum: [web, ios, android, institution]}
+        pending: {type: array, items: {$ref: "#/components/schemas/S31Pending"}}
+        grace: {$ref: "#/components/schemas/S31Grace"}
+    S31Pending:
+      type: object
+      required: [id, source, starts_on, ends_on]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        source: {type: string, enum: [purchase, redemption, gift, institution]}
+        starts_on: {$ref: "#/components/schemas/LearningDay"}
+        ends_on: {$ref: "#/components/schemas/LearningDay"}
+    S31Grace:
+      type: object
+      required: [active, until, next_retry_at]
+      properties:
+        active: {type: boolean}
+        until: {$ref: "#/components/schemas/LearningDay"}
+        next_retry_at: {$ref: "#/components/schemas/Timestamp"}
+    S31Usage:
+      type: object
+      required: [key, used, remaining, limit, unit, percent, details]
+      properties:
+        key: {type: string, enum: [targets, parsing, ai_points, correction, oral]}
+        used: {type: integer, minimum: 0}
+        remaining: {type: integer, minimum: 0}
+        limit: {type: integer, minimum: 0}
+        unit: {type: string}
+        percent: {type: number, minimum: 0, maximum: 1, description: "由接口算好的已用占比"}
+        details: {type: array, items: {$ref: "#/components/schemas/S31UsageDetail"}}
+    S31UsageDetail:
+      type: object
+      required: [at, label, amount, unit]
+      properties:
+        at: {$ref: "#/components/schemas/Timestamp"}
+        label: {type: string}
+        amount: {type: integer, minimum: 0}
+        unit: {type: string}
+    S31ComparisonRow:
+      type: object
+      required: [key, free, member, human]
+      properties:
+        key: {type: string, enum: [core, targets, parsing, ai_points, human_service, devices, expiry]}
+        free: {type: string}
+        member: {type: string}
+        human: {type: string}
+    S31Purchase:
+      type: object
+      required: [pass, subscription, transfer_credit_cents, transfer_credit_text]
+      properties:
+        pass: {$ref: "#/components/schemas/S31Pass"}
+        subscription: {$ref: "#/components/schemas/S31Subscription"}
+        transfer_credit_cents: {type: integer, minimum: 0}
+        transfer_credit_text: {type: string}
+    S31Pass:
+      type: object
+      required: [price_cents, price_text, target_day, valid_until]
+      properties:
+        price_cents: {type: integer, minimum: 0}
+        price_text: {type: string}
+        target_day: {$ref: "#/components/schemas/LearningDay"}
+        valid_until: {$ref: "#/components/schemas/LearningDay"}
+    S31Subscription:
+      type: object
+      required: [price_cents, price_text, period_months, next_charge_at]
+      properties:
+        price_cents: {type: integer, minimum: 0}
+        price_text: {type: string}
+        period_months: {type: integer, minimum: 1}
+        next_charge_at: {$ref: "#/components/schemas/Timestamp"}
+    S31Order:
+      type: object
+      required: [id, order_number, product, purchased_at, amount_cents, amount_text, status, channel, invoice_status, refund_status]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        order_number: {type: string}
+        product: {type: string}
+        purchased_at: {$ref: "#/components/schemas/Timestamp"}
+        amount_cents: {type: integer, minimum: 0}
+        amount_text: {type: string}
+        status: {type: string, enum: [paid, pending, failed, refunding, refunded]}
+        channel: {type: string, enum: [web, ios, android, institution]}
+        invoice_status: {type: string, enum: [available, issued, unavailable]}
+        refund_status: {type: string, enum: [available, processing, completed, unavailable]}
+    S31Refund:
+      type: object
+      description: "演示试算，不发起真实退款；所有金额和公式来自接口"
+      required: [order_id, order_number, formula_text, paid_cents, paid_text, consumed_cents, consumed_text, fee_cents, fee_text, estimated_cents, estimated_text, status, status_text, progress]
+      properties:
+        order_id: {$ref: "#/components/schemas/Id"}
+        order_number: {type: string}
+        formula_text: {type: string}
+        paid_cents: {type: integer, minimum: 0}
+        paid_text: {type: string}
+        consumed_cents: {type: integer, minimum: 0}
+        consumed_text: {type: string}
+        fee_cents: {type: integer, minimum: 0}
+        fee_text: {type: string}
+        estimated_cents: {type: integer, minimum: 0}
+        estimated_text: {type: string}
+        status: {type: string, enum: [available, processing, completed]}
+        status_text: {type: string}
+        progress: {type: array, items: {$ref: "#/components/schemas/S31RefundProgress"}}
+    S31RefundProgress:
+      type: object
+      required: [step, completed]
+      properties:
+        step: {type: string, enum: [application, review, returned]}
+        completed: {type: boolean}
+    S31AddOn:
+      type: object
+      required: [id, key, amount, unit, price_cents, price_text, unused_refundable]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        key: {type: string, enum: [correction, oral, parsing]}
+        amount: {type: integer, minimum: 1}
+        unit: {type: string}
+        price_cents: {type: integer, minimum: 0}
+        price_text: {type: string}
+        unused_refundable: {type: boolean}
+    S31Channel:
+      type: object
+      required: [key, methods, supports_discount_code, original_channel_required]
+      properties:
+        key: {type: string, enum: [web, ios, android]}
+        methods: {type: array, items: {type: string, enum: [wechat, alipay, apple]}}
+        supports_discount_code: {type: boolean}
+        original_channel_required: {type: boolean}
+    S31PaymentFailure:
+      type: object
+      required: [reason, order_number, retry_allowed, contact_required]
+      properties:
+        reason: {type: string, enum: [cancelled, balance_or_network, expired, system, charged_not_activated]}
+        order_number: {type: string}
+        retry_allowed: {type: boolean}
+        contact_required: {type: boolean}
+    S31Upgrade:
+      type: object
+      required: [from_plan, to_plan, credit_cents, credit_text, due_cents, due_text, valid_until, calculation_text]
+      properties:
+        from_plan: {type: string, enum: [free, member, human]}
+        to_plan: {type: string, enum: [free, member, human]}
+        credit_cents: {type: integer, minimum: 0}
+        credit_text: {type: string}
+        due_cents: {type: integer, minimum: 0}
+        due_text: {type: string}
+        valid_until: {$ref: "#/components/schemas/LearningDay"}
+        calculation_text: {type: string}
+    S31Redemption:
+      type: object
+      required: [institution_name, service_until]
+      properties:
+        institution_name: {type: string}
+        service_until: {$ref: "#/components/schemas/LearningDay"}
+    S31Reminder:
+      type: object
+      required: [kind, at, days_before]
+      properties:
+        kind: {type: string, enum: [expiry, renewal, final]}
+        at: {$ref: "#/components/schemas/Timestamp"}
+        days_before: {type: integer, minimum: 0}
+

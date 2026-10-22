@@ -1,0 +1,361 @@
+{
+  "view_state": "normal",
+  "data_source": "sample",
+  "exam_name": "大学英语六级",
+  "current": {
+    "plan_id": "member",
+    "kind": "pass",
+    "valid_until": "2026-12-31",
+    "final_expiry": "2027-03-31",
+    "auto_renew": false,
+    "next_charge_at": "2027-02-22T02:00:00Z",
+    "next_charge_cents": 4900,
+    "next_charge_text": "¥49",
+    "device_limit": 3,
+    "devices_used": 2,
+    "purchase_channel": "ios",
+    "pending": [
+      {
+        "id": "019a0131-0000-7000-8000-000000000002",
+        "source": "gift",
+        "starts_on": "2027-01-01",
+        "ends_on": "2027-03-31"
+      }
+    ],
+    "grace": {
+      "active": false,
+      "until": "2026-10-25",
+      "next_retry_at": "2026-10-23T02:00:00Z"
+    }
+  },
+  "usage": [
+    {
+      "key": "targets",
+      "used": 2,
+      "remaining": 1,
+      "limit": 3,
+      "unit": "个",
+      "percent": 0.667,
+      "details": [
+        {
+          "at": "2026-10-21T09:30:00Z",
+          "label": "当前备考目标",
+          "amount": 2,
+          "unit": "个"
+        }
+      ]
+    },
+    {
+      "key": "parsing",
+      "used": 180,
+      "remaining": 320,
+      "limit": 500,
+      "unit": "页",
+      "percent": 0.36,
+      "details": [
+        {
+          "at": "2026-10-21T11:00:00Z",
+          "label": "教材章节解析",
+          "amount": 180,
+          "unit": "页"
+        }
+      ]
+    },
+    {
+      "key": "ai_points",
+      "used": 85,
+      "remaining": 215,
+      "limit": 300,
+      "unit": "点",
+      "percent": 0.28300000000000003,
+      "details": [
+        {
+          "at": "2026-10-21T13:00:00Z",
+          "label": "导师深度讲解与批改",
+          "amount": 85,
+          "unit": "点"
+        }
+      ]
+    },
+    {
+      "key": "correction",
+      "used": 3,
+      "remaining": 7,
+      "limit": 10,
+      "unit": "次",
+      "percent": 0.3,
+      "details": [
+        {
+          "at": "2026-10-21T12:00:00Z",
+          "label": "主观题批改",
+          "amount": 3,
+          "unit": "次"
+        }
+      ]
+    },
+    {
+      "key": "oral",
+      "used": 1,
+      "remaining": 4,
+      "limit": 5,
+      "unit": "次",
+      "percent": 0.2,
+      "details": [
+        {
+          "at": "2026-10-21T12:30:00Z",
+          "label": "口头表达训练",
+          "amount": 1,
+          "unit": "次"
+        }
+      ]
+    }
+  ],
+  "comparison": [
+    {
+      "key": "core",
+      "free": "不限量",
+      "member": "不限量",
+      "human": "不限量"
+    },
+    {
+      "key": "targets",
+      "free": "同时 1 个",
+      "member": "同时 3 个",
+      "human": "随服务方案"
+    },
+    {
+      "key": "parsing",
+      "free": "每月 30 页",
+      "member": "每月 500 页",
+      "human": "随服务方案"
+    },
+    {
+      "key": "ai_points",
+      "free": "每月 20 点",
+      "member": "每月 300 点",
+      "human": "随服务方案"
+    },
+    {
+      "key": "human_service",
+      "free": "—",
+      "member": "—",
+      "human": "就绪后上架"
+    },
+    {
+      "key": "devices",
+      "free": "1 台",
+      "member": "3 台",
+      "human": "随服务方案"
+    },
+    {
+      "key": "expiry",
+      "free": "长期有效",
+      "member": "当期有效",
+      "human": "与服务期绑定"
+    }
+  ],
+  "purchase": {
+    "pass": {
+      "price_cents": 19800,
+      "price_text": "¥198",
+      "target_day": "2026-12-12",
+      "valid_until": "2027-01-11"
+    },
+    "subscription": {
+      "price_cents": 4900,
+      "price_text": "¥49",
+      "period_months": 1,
+      "next_charge_at": "2026-11-22T02:00:00Z"
+    },
+    "transfer_credit_cents": 3600,
+    "transfer_credit_text": "¥36"
+  },
+  "orders": [
+    {
+      "id": "019a0131-0100-7000-8000-000000000001",
+      "order_number": "BK202610210001",
+      "product": "会员·考期通行证",
+      "purchased_at": "2026-10-21T08:30:00Z",
+      "amount_cents": 19800,
+      "amount_text": "¥198",
+      "status": "paid",
+      "channel": "ios",
+      "invoice_status": "unavailable",
+      "refund_status": "available"
+    },
+    {
+      "id": "019a0131-0100-7000-8000-000000000002",
+      "order_number": "BK202610180002",
+      "product": "资料解析加量包",
+      "purchased_at": "2026-10-18T09:30:00Z",
+      "amount_cents": 2900,
+      "amount_text": "¥29",
+      "status": "paid",
+      "channel": "web",
+      "invoice_status": "issued",
+      "refund_status": "available"
+    },
+    {
+      "id": "019a0131-0100-7000-8000-000000000003",
+      "order_number": "BK202610150003",
+      "product": "会员·时长订阅",
+      "purchased_at": "2026-10-15T03:30:00Z",
+      "amount_cents": 4900,
+      "amount_text": "¥49",
+      "status": "refunding",
+      "channel": "ios",
+      "invoice_status": "unavailable",
+      "refund_status": "processing"
+    }
+  ],
+  "refund": {
+    "order_id": "019a0131-0100-7000-8000-000000000001",
+    "order_number": "BK202610210001",
+    "formula_text": "预计退款＝实付金额－已使用权益价值－渠道费用；未使用加量包按实付金额退还。实际结果以原购买渠道核定为准。",
+    "paid_cents": 19800,
+    "paid_text": "¥198",
+    "consumed_cents": 4800,
+    "consumed_text": "¥48",
+    "fee_cents": 0,
+    "fee_text": "¥0",
+    "estimated_cents": 15000,
+    "estimated_text": "¥150",
+    "status": "available",
+    "status_text": "可先试算，再申请；本页示例不会提交真实退款。",
+    "progress": [
+      {
+        "step": "application",
+        "completed": true
+      },
+      {
+        "step": "review",
+        "completed": false
+      },
+      {
+        "step": "returned",
+        "completed": false
+      }
+    ]
+  },
+  "add_ons": [
+    {
+      "id": "019a0131-0200-7000-8000-000000000001",
+      "key": "correction",
+      "amount": 10,
+      "unit": "次",
+      "price_cents": 3900,
+      "price_text": "¥39",
+      "unused_refundable": true
+    },
+    {
+      "id": "019a0131-0200-7000-8000-000000000002",
+      "key": "oral",
+      "amount": 5,
+      "unit": "次",
+      "price_cents": 2900,
+      "price_text": "¥29",
+      "unused_refundable": true
+    },
+    {
+      "id": "019a0131-0200-7000-8000-000000000003",
+      "key": "parsing",
+      "amount": 200,
+      "unit": "页",
+      "price_cents": 2900,
+      "price_text": "¥29",
+      "unused_refundable": true
+    }
+  ],
+  "channels": [
+    {
+      "key": "web",
+      "methods": [
+        "wechat",
+        "alipay"
+      ],
+      "supports_discount_code": true,
+      "original_channel_required": true
+    },
+    {
+      "key": "ios",
+      "methods": [
+        "apple"
+      ],
+      "supports_discount_code": false,
+      "original_channel_required": true
+    },
+    {
+      "key": "android",
+      "methods": [
+        "wechat",
+        "alipay"
+      ],
+      "supports_discount_code": true,
+      "original_channel_required": true
+    }
+  ],
+  "payment_failures": [
+    {
+      "reason": "cancelled",
+      "order_number": "BK202610220101",
+      "retry_allowed": true,
+      "contact_required": false
+    },
+    {
+      "reason": "balance_or_network",
+      "order_number": "BK202610220102",
+      "retry_allowed": true,
+      "contact_required": false
+    },
+    {
+      "reason": "expired",
+      "order_number": "BK202610220103",
+      "retry_allowed": true,
+      "contact_required": false
+    },
+    {
+      "reason": "system",
+      "order_number": "BK202610220104",
+      "retry_allowed": true,
+      "contact_required": false
+    },
+    {
+      "reason": "charged_not_activated",
+      "order_number": "BK202610220105",
+      "retry_allowed": false,
+      "contact_required": true
+    }
+  ],
+  "upgrade": {
+    "from_plan": "free",
+    "to_plan": "member",
+    "credit_cents": 3600,
+    "credit_text": "¥36",
+    "due_cents": 16200,
+    "due_text": "¥162",
+    "valid_until": "2027-06-14",
+    "calculation_text": "新档费用扣除未使用权益的剩余价值；有效期按当前余额与新档价格折算，由接口返回，不在页面计算。人工服务档尚未上架。"
+  },
+  "redemption": {
+    "institution_name": "青禾学习服务中心（演示）",
+    "service_until": "2027-02-21"
+  },
+  "reminders": [
+    {
+      "kind": "renewal",
+      "at": "2027-02-15T01:00:00Z",
+      "days_before": 7
+    },
+    {
+      "kind": "renewal",
+      "at": "2027-02-18T01:00:00Z",
+      "days_before": 4
+    },
+    {
+      "kind": "final",
+      "at": "2027-02-21T01:00:00Z",
+      "days_before": 1
+    }
+  ],
+  "time_zone": "Asia/Shanghai"
+}
