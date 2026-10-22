@@ -1,0 +1,27 @@
+{
+  "page_state": "normal",
+  "minor_mode": false,
+  "group_size": 6,
+  "rooms": [
+    {
+      "id": "01900000-0030-7000-8000-000000000007",
+      "name": "数据结构自习室",
+      "kind": "quiet",
+      "participants": 18,
+      "capacity": 30
+    },
+    {
+      "id": "01900000-0030-7000-8000-000000000008",
+      "name": "期末冲刺自习室",
+      "kind": "sprint",
+      "participants": 8,
+      "capacity": 20
+    }
+  ],
+  "focus": {
+    "minutes": 25,
+    "today_minutes": 50,
+    "task": "线性表：复习与练习"
+  },
+  "data_source": "sample"
+}

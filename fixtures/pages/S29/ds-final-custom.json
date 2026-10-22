@@ -1,0 +1,86 @@
+{
+  "sample_query": "二叉树",
+  "aliases": [
+    "二叉树",
+    "erchashu",
+    "二叉树遍历",
+    "怎么理解二叉树",
+    "如何学习二叉树"
+  ],
+  "point_id": "019a0403-0000-7000-8000-000000000001",
+  "excerpt": "按根节点访问位置区分前序、中序和后序。",
+  "quick_tables": [
+    {
+      "id": "values",
+      "title": "二叉树遍历 · 数值与时限",
+      "category": "values",
+      "rows": [
+        {
+          "id": "values",
+          "label": "二叉树遍历",
+          "value": "树的遍历应访问所有节点",
+          "point_id": "019a0403-0000-7000-8000-000000000001"
+        }
+      ],
+      "ai_generated": false
+    },
+    {
+      "id": "formulas",
+      "title": "二叉树遍历 · 公式",
+      "category": "formulas",
+      "rows": [
+        {
+          "id": "formulas",
+          "label": "二叉树遍历",
+          "value": "前序：根、左、右；中序：左、根、右",
+          "point_id": "019a0403-0000-7000-8000-000000000001"
+        }
+      ],
+      "ai_generated": false
+    },
+    {
+      "id": "clauses",
+      "title": "二叉树遍历 · 条文",
+      "category": "clauses",
+      "rows": [
+        {
+          "id": "clauses",
+          "label": "二叉树遍历",
+          "value": "递归与迭代都应保持既定访问顺序",
+          "point_id": "019a0403-0000-7000-8000-000000000001"
+        }
+      ],
+      "ai_generated": false
+    },
+    {
+      "id": "terms",
+      "title": "二叉树遍历 · 术语",
+      "category": "terms",
+      "rows": [
+        {
+          "id": "terms",
+          "label": "二叉树遍历",
+          "value": "后序遍历在左右子树之后访问根节点",
+          "point_id": "019a0403-0000-7000-8000-000000000001"
+        }
+      ],
+      "ai_generated": false
+    },
+    {
+      "id": "compare",
+      "title": "二叉树遍历 · 易混对照",
+      "category": "compare",
+      "rows": [
+        {
+          "id": "compare",
+          "label": "二叉树遍历",
+          "value": "层序使用队列，深度优先通常使用栈",
+          "point_id": "019a0403-0000-7000-8000-000000000001"
+        }
+      ],
+      "ai_generated": false
+    }
+  ],
+  "material_id": "019a040b-0000-7000-8000-000000000001",
+  "question_id": "019a0404-0000-7000-8000-000000000001"
+}

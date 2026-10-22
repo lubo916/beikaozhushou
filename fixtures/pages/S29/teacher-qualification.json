@@ -1,0 +1,86 @@
+{
+  "sample_query": "最近发展区",
+  "aliases": [
+    "最近发展区",
+    "zuijinfazhanqu",
+    "最近发展区",
+    "怎么理解最近发展区",
+    "如何学习最近发展区"
+  ],
+  "point_id": "019a0203-0000-7000-8000-000000000006",
+  "excerpt": "区分独立完成与在帮助下完成的水平。",
+  "quick_tables": [
+    {
+      "id": "values",
+      "title": "最近发展区 · 数值与时限",
+      "category": "values",
+      "rows": [
+        {
+          "id": "values",
+          "label": "最近发展区",
+          "value": "关注现有发展水平与可能发展水平",
+          "point_id": "019a0203-0000-7000-8000-000000000006"
+        }
+      ],
+      "ai_generated": false
+    },
+    {
+      "id": "formulas",
+      "title": "最近发展区 · 公式",
+      "category": "formulas",
+      "rows": [
+        {
+          "id": "formulas",
+          "label": "最近发展区",
+          "value": "教学支持围绕两种水平之间的空间",
+          "point_id": "019a0203-0000-7000-8000-000000000006"
+        }
+      ],
+      "ai_generated": false
+    },
+    {
+      "id": "clauses",
+      "title": "最近发展区 · 条文",
+      "category": "clauses",
+      "rows": [
+        {
+          "id": "clauses",
+          "label": "最近发展区",
+          "value": "教学应考虑学生的实际发展水平",
+          "point_id": "019a0203-0000-7000-8000-000000000006"
+        }
+      ],
+      "ai_generated": false
+    },
+    {
+      "id": "terms",
+      "title": "最近发展区 · 术语",
+      "category": "terms",
+      "rows": [
+        {
+          "id": "terms",
+          "label": "最近发展区",
+          "value": "最近发展区：学生在帮助下可达到的水平",
+          "point_id": "019a0203-0000-7000-8000-000000000006"
+        }
+      ],
+      "ai_generated": false
+    },
+    {
+      "id": "compare",
+      "title": "最近发展区 · 易混对照",
+      "category": "compare",
+      "rows": [
+        {
+          "id": "compare",
+          "label": "最近发展区",
+          "value": "最近发展区与现有发展水平应分开理解",
+          "point_id": "019a0203-0000-7000-8000-000000000006"
+        }
+      ],
+      "ai_generated": false
+    }
+  ],
+  "material_id": "019a020b-0000-7000-8000-000000000001",
+  "question_id": "019a0204-0000-7000-8000-000000000001"
+}
