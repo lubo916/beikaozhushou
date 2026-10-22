@@ -54,6 +54,7 @@ describe("S34 契约与四考试数据", () => {
         env.control.setExam(exam.key);
         const data = await env.profile();
         expect(data.data_source).toBe("sample");
+        expect(data.user).toEqual(fixtures.learner);
         if (mode === "") expect(data.goals[0]?.name).toBe(exam.profile.name);
         if (mode === "empty") expect([data.goals, data.history, data.milestones]).toEqual([[], [], []]);
         if (mode === "restricted") {
