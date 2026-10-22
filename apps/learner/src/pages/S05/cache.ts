@@ -9,7 +9,12 @@ const identitySchema = getStartReportResponse.pick({ viewer_id: true, exam_id: t
 function key(identity: Identity, view: S05StartReport["view"]): string {
   return `${PREFIX}:${JSON.stringify([identity.viewer_id, identity.exam_id, identity.target_date, identity.target_score, view])}`;
 }
-function matches(data: Identity & Pick<S05StartReport, "view" | "demo_exam_key">, identity: Identity, view: S05StartReport["view"], selector?: string | null): boolean {
+function matches(
+  data: Identity & Pick<S05StartReport, "view" | "demo_exam_key">,
+  identity: Identity,
+  view: S05StartReport["view"],
+  selector?: string | null,
+): boolean {
   return (
     data.viewer_id === identity.viewer_id &&
     data.exam_id === identity.exam_id &&

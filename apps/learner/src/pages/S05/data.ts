@@ -1,6 +1,13 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router";
-import { getGetStartReportQueryKey, isApiError, useGetMeContext, useGetStartReport, type S05StartReport } from "@exam-prep/contract";
+import {
+  getGetMeContextQueryKey,
+  getGetStartReportQueryKey,
+  isApiError,
+  useGetMeContext,
+  useGetStartReport,
+  type S05StartReport,
+} from "@exam-prep/contract";
 import { restoreReport, storeReport } from "./cache.ts";
 const RETRY_LIMIT = 1;
 const SERVER_ERROR_STATUS = 500;
@@ -37,7 +44,9 @@ export function useStartReport(view: "normal" | "quick") {
     if (query.status === "success" && query.data !== undefined) storeReport(query.data);
   }, [query.data, query.status]);
   const offline = query.fetchStatus === "paused" || (query.status === "error" && !isApiError(query.error));
-  const savedIdentityAllowed = me.fetchStatus === "paused" || (me.status === "error" && !isApiError(me.error));
+  // 报告与身份两个请求各自重试，谁先失败说不准：身份还没回来或也没联网时，用本标签页最近一次成功报告的身份找缓存；
+  // 服务器明确拒绝身份（如登录失效）时不读旧报告。
+  const savedIdentityAllowed = identity === undefined && !(me.status === "error" && isApiError(me.error));
   const cached = offline ? restoreReport(view, identity, selector, savedIdentityAllowed) : undefined;
   return { ...reportView({ ...query, data: query.data ?? cached }), retry: () => void query.refetch() };
 }
