@@ -101,6 +101,17 @@ describe("S05 请求状态与重试", () => {
     expect(stale.data).toBe(data);
     expect(reportView({ ...pending, status: "error", error: new ApiError("COMMON_INTERNAL") }).state).toBe("error");
   });
+  for (const status of [401, 403]) {
+    it(`已有报告后重新请求被 ${status} 拒绝时返回受限态，不再暴露旧数据`, async () => {
+      const data = await setup().report();
+      // 401 尚无登记错误码，统一 fetcher 会保留原始 HTTP 状态在 details.status。
+      const error = status === 403 ? new ApiError("COMMON_FORBIDDEN") : new ApiError("COMMON_INTERNAL", { status });
+      const view = reportView({ data, error, status: "error", fetchStatus: "idle" });
+      expect(view.state).toBe("restricted");
+      expect(view.data).toBeUndefined();
+      expect(view.stale).toBe(false);
+    });
+  }
   it("网络/服务异常只重试一次，权限类错误不重试", () => {
     expect(shouldRetry(0, new TypeError("Failed to fetch"))).toBe(true);
     expect(shouldRetry(1, new TypeError("Failed to fetch"))).toBe(false);

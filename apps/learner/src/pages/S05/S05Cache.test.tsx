@@ -1,8 +1,11 @@
 import { QueryClientProvider } from "@tanstack/react-query";
+import { act } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router";
-import type { MeContext, S05StartReport } from "@exam-prep/contract";
+import { getGetMeContextQueryKey, getGetStartReportQueryKey, type MeContext, type S05StartReport } from "@exam-prep/contract";
+import { ApiError } from "@exam-prep/contract/errors";
 import { restoreReport, storeReport } from "./cache.ts";
+import copy from "../../i18n/zh-CN/S05.json";
 import { App } from "../../App.tsx";
 import { mount, settle, testClient } from "../../app/testing.tsx";
 import { createMockApi } from "../../mocks/api.ts";
@@ -17,9 +20,14 @@ function network() {
   const control = new DevControl({ examKeys: fixtures.exams.map((exam) => exam.key), defaultExamKey: fixtures.defaultKey });
   const api = createMockApi({ db: new MockDb(fixtures), control, routes });
   let offline = false;
+  let identityRejection: 401 | 403 | undefined;
   vi.stubGlobal("fetch", async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-    if (offline) throw new TypeError("Failed to fetch");
     const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+    if (new URL(url, "http://localhost").pathname === "/api/v1/me/context" && identityRejection !== undefined) {
+      const body = identityRejection === 403 ? new ApiError("COMMON_FORBIDDEN").toBody() : {};
+      return new Response(JSON.stringify(body), { status: identityRejection, headers: { "content-type": "application/json" } });
+    }
+    if (offline) throw new TypeError("Failed to fetch");
     const result = await api.handle({
       method: init?.method ?? "GET",
       url: new URL(url, "http://localhost").href,
@@ -35,11 +43,15 @@ function network() {
     offline: () => {
       offline = true;
     },
+    rejectIdentity: (status: 401 | 403) => {
+      identityRejection = status;
+      offline = true;
+    },
   };
 }
-function open(path = "/start-report") {
+function open(path = "/start-report", client = testClient()) {
   return mount(
-    <QueryClientProvider client={testClient()}>
+    <QueryClientProvider client={client}>
       <MemoryRouter initialEntries={[path]}>
         <App />
       </MemoryRouter>
@@ -125,4 +137,47 @@ describe("S05 缓存数据边界", () => {
     expect(quick.host.querySelector('input[name="s05-scheme"]')).toBeNull();
     await quick.unmount();
   });
+});
+
+describe("S05 身份失效后的缓存边界", () => {
+  for (const status of [401, 403] as const) {
+    it(`保留过身份数据后收到 ${status}，报告离线也不读取旧缓存`, async () => {
+      const connection = network();
+      const client = testClient();
+      sessionStorage.setItem("bk.other-feature", "保留其他页面缓存");
+      const identityKey = getGetMeContextQueryKey();
+      const reportKey = getGetStartReportQueryKey("normal");
+      const first = await open("/start-report", client);
+      await settle(() => first.host.querySelector('input[name="s05-scheme"]') !== null);
+      expect(first.host.querySelector('input[name="s05-scheme"]')).not.toBeNull();
+      const identity = client.getQueryData<MeContext>(identityKey);
+      expect(identity).toBeDefined();
+      await first.unmount();
+      connection.rejectIdentity(status);
+      await act(() => client.refetchQueries({ queryKey: identityKey, exact: true, type: "all" }));
+      expect(client.getQueryState(identityKey)?.status).toBe("error");
+      expect(client.getQueryData(identityKey)).toEqual(identity);
+      // 清掉查询里的报告，专门验证 sessionStorage 缓存不会绕过身份拒绝。
+      client.removeQueries({ queryKey: reportKey });
+      const refreshed = await open("/start-report", client);
+      try {
+        await settle(() =>
+          client
+            .getQueryCache()
+            .findAll({ queryKey: reportKey })
+            .some((query) => query.state.status === "error"),
+        );
+        expect(client.getQueryState(identityKey)?.status).toBe("error");
+        expect(restoreReport("normal", identity)).toBeUndefined();
+        expect(restoreReport("normal", undefined, undefined, true)).toBeUndefined();
+        expect(sessionStorage.getItem("bk.other-feature")).toBe("保留其他页面缓存");
+        expect(refreshed.host.querySelector(".ui-state--restricted")).not.toBeNull();
+        expect(refreshed.host.querySelector('input[name="s05-scheme"]')).toBeNull();
+        expect(refreshed.host.textContent).not.toContain(copy.hero.forecast);
+      } finally {
+        await refreshed.unmount();
+        client.clear();
+      }
+    });
+  }
 });

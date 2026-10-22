@@ -34,6 +34,16 @@ export function storeReport(report: S05StartReport): void {
     // 浏览器禁用存储或空间不足时，仍可查看当前请求得到的报告。
   }
 }
+/** 服务器明确拒绝身份或报告后，使本页离线缓存失效；不触碰其他页面的存储。 */
+export function clearReportCache(): void {
+  try {
+    for (const entry of Object.keys(sessionStorage)) {
+      if (entry.startsWith(`${PREFIX}:`)) sessionStorage.removeItem(entry);
+    }
+  } catch {
+    // 存储被禁用时仍由页面的权限态阻止读取旧报告。
+  }
+}
 export function restoreReport(
   view: S05StartReport["view"],
   context: MeContext | undefined,
