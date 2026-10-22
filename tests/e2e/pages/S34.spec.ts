@@ -18,7 +18,7 @@ const sizes = [
 
 for (const size of sizes) {
   test(`S34 ${size.width} 宽布局与正文不溢出`, async ({ page }, info) => {
-    await page.setViewportSize(size);
+    await page.setViewportSize({ width: size.width, height: size.height });
     const watch = await watchPage(page);
     await watch.open(urlOf(entry));
     await expectLoaded(page, entry);
@@ -33,7 +33,7 @@ for (const size of sizes) {
       else expect(right.y).toBeGreaterThanOrEqual(left.y + left.height - 1);
     }
     expect(await main.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(1);
-    await page.screenshot({ path: info.outputPath(`S34-${size.width}.png`), fullPage: true });
+    await page.screenshot({ path: info.outputPath(`S34-${size.width}.png`), fullPage: false });
     expectNoProblems(watch, "normal");
   });
 }
@@ -100,8 +100,8 @@ test("S34 主要按钮可用并跳到登记路由", async ({ page }) => {
     [copy.packages.manage, copy.soon.packages],
     [copy.packages.update, copy.soon.update],
     [copy.packages.withdraw, copy.soon.withdraw],
-  ])
-    if (name !== undefined && message !== undefined) await pressFor(name, message);
+  ] as const)
+    await pressFor(name, message);
   for (const [name, route] of [
     [copy.goals.add, "S02"],
     [copy.profile.membership, "S31"],
