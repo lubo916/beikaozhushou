@@ -1,0 +1,204 @@
+# S06 今日的接口（U06a 上半：英雄区、三段清单与任务条；U06b 接着补三个数、计划调整、提议与节点提醒）。api-rules 第 2、3 节。
+# 一次取齐英雄区与今日清单要显示的数据；件数、用时、天数、理由里的数字都由服务端算好，页面只显示（红线 5）。
+# 公共形状引用 schemas/（今日任务、三段、任务来源、配比模式）；本页私有的形状用 S06 作前缀。规则还没实现时，假数据层返回演示数据并标 data_source 为 sample。
+# 短时重组、换档、手动记为看过、今天不想学这个、今天其实能学、加练这些写操作还没有登记权限动作（contracts/permissions.yaml），先在界面上做成“即将上线”。
+paths:
+  /plan/today/home:
+    get:
+      operationId: getTodayHome
+      x-owner: plan
+      x-action: plan.today.read
+      summary: 今日页：英雄区（日期、轮次与周、倒计时、一句话、继续）与今日清单（三段任务条、换档、完成口径）
+      parameters:
+        - name: view
+          in: query
+          required: false
+          description: 只在开发与测试时生效的强制视图（页面地址里的 ?view=，ui-rules 第 5 节）；正式环境由数据决定视图，忽略这个参数
+          schema: {$ref: "#/components/schemas/S06View"}
+      responses:
+        "200":
+          description: 今日页的数据（view 是这次该显示的视图）
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S06TodayHome"}
+        "403": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S06View:
+      type: string
+      description: 今日页的六个视图：正常、首次进入、全部完成、今天不可学、中断回归、导师不可用
+      enum: [normal, first, done, off, back, noai]
+    S06TodayHome:
+      type: object
+      description: 今日页一次要显示的数据（英雄区与今日清单）
+      required: [view, day, countdown, summary, budget, segments, pace, ai_paused, data_source]
+      properties:
+        view: {$ref: "#/components/schemas/S06View"}
+        day: {$ref: "#/components/schemas/LearningDay"}
+        round: {$ref: "#/components/schemas/S06Round"}
+        day_no:
+          type: integer
+          minimum: 1
+          description: 开始备考的第几天；只在首次进入的头几天给，这时不给 round
+        countdown: {$ref: "#/components/schemas/S06Countdown"}
+        summary: {$ref: "#/components/schemas/S06Summary"}
+        next_task_id:
+          $ref: "#/components/schemas/Id"
+          description: 下一项（英雄区“继续”或“开始”的那一项）；都做完了不给
+        budget: {$ref: "#/components/schemas/S06Budget"}
+        segments:
+          type: array
+          description: 今日清单三段，已按“先做推迟有损失的，再做推迟无损失的”排好；不可学日与中断回归只有巩固段有任务
+          items: {$ref: "#/components/schemas/S06Segment"}
+        tiers: {$ref: "#/components/schemas/S06Tiers"}
+        tomorrow_first: {$ref: "#/components/schemas/S06TaskPreview"}
+        away_days:
+          type: integer
+          minimum: 1
+          description: 中断回归时给：中断了几天
+        pace: {$ref: "#/components/schemas/S06Pace"}
+        ai_paused: {$ref: "#/components/schemas/S06AiPause"}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+    S06Round:
+      type: object
+      description: 当前轮次与周次（界面写“第 N 轮 打基础 · 第 M 周”）
+      required: [index, name, week]
+      properties:
+        index: {type: integer, minimum: 1}
+        name:
+          type: string
+          description: 轮次名，只用打基础、攻重点、刷题冲刺、考前七天
+        week: {type: integer, minimum: 1}
+    S06Countdown:
+      type: object
+      description: 距目标日的天数；考试日期还没公布、按往年推算时 estimated 为真（界面写“预计”）
+      required: [days, estimated]
+      properties:
+        days: {type: integer, minimum: 0}
+        estimated: {type: boolean}
+    S06Summary:
+      type: object
+      description: 英雄区一句话里的数：今天几件事、共约多少分钟、已完成几件、有效学习多少分钟
+      required: [task_count, done_count, minutes_total, minutes_spent]
+      properties:
+        task_count: {type: integer, minimum: 0}
+        done_count:
+          type: integer
+          minimum: 0
+          description: 有证据的完成与手动勾选的“看过”都算
+        minutes_total: {type: integer, minimum: 0}
+        minutes_spent: {type: integer, minimum: 0}
+    S06Budget:
+      type: object
+      description: 时间预算的分配口径：配比模式（在学习计划里设置）与巩固段的保底占比（冲刺期更高）
+      required: [mix_mode, floor_ratio]
+      properties:
+        mix_mode: {$ref: "#/components/schemas/MixMode"}
+        floor_ratio:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: 巩固段至少占当天时间的比例（参数 plan.consolidate.min_ratio，冲刺期 plan.consolidate.sprint_ratio）
+    S06Segment:
+      type: object
+      description: 今日清单的一段
+      required: [segment, minutes, capped, items]
+      properties:
+        segment: {$ref: "#/components/schemas/TodaySegment"}
+        minutes:
+          type: integer
+          minimum: 0
+          description: 这一段分到的时间（分钟）
+        capped:
+          type: boolean
+          description: 到期过多保护：到期量超过每日上限，只给了最要紧的一批，其余顺延（不给积压数）
+        items:
+          type: array
+          items: {$ref: "#/components/schemas/S06Task"}
+    S06Task:
+      type: object
+      description: 一条任务：公共的今日任务，加上为什么是它、一键开始去哪里
+      required: [task, reasons, go]
+      properties:
+        task: {$ref: "#/components/schemas/TodayTask"}
+        reasons:
+          type: array
+          description: 为什么是它：每条是一个模板句的代码加上算法给的数字，页面按代码取文案
+          items: {$ref: "#/components/schemas/S06Reason"}
+        polished:
+          type: string
+          description: 导师润色过措辞的理由（数字不变）；导师不可用或 AI 暂停时不给，页面显示模板句
+        go: {$ref: "#/components/schemas/S06Go"}
+    S06Reason:
+      type: object
+      description: 一条理由；按 kind 取对应的数字字段
+      required: [kind]
+      properties:
+        kind: {$ref: "#/components/schemas/S06ReasonKind"}
+        count: {type: integer, minimum: 0}
+        days: {type: integer, minimum: 0}
+        gap: {type: integer, minimum: 0}
+        tier: {$ref: "#/components/schemas/S06RoiTier"}
+        years: {type: integer, minimum: 1}
+        times: {type: integer, minimum: 0}
+        score: {type: number, minimum: 0}
+        rank: {type: integer, minimum: 1}
+        low: {type: number, minimum: 0, maximum: 1}
+        high: {type: number, minimum: 0, maximum: 1}
+        name:
+          type: string
+          description: 理由里提到的名字（如另一个目标的简称、实操项目名）
+    S06ReasonKind:
+      type: string
+      description: 理由模板：到期、错题到期、蒙对待验证、档位差、性价比阶梯、还没学、考频、新学性价比名次、正确率区间、薄弱项一致、共用时间预算、离目标日、没有通过记录、睡前回顾、每周一次、不可学日已顺延、中断后取最要紧的、先做能做对的
+      enum: [due, mistake_due, guess_correct, gap, roi_tier, not_learned, frequency, new_rank, accuracy_band, weak_match, shared_budget, goal_deadline, no_pass, bedtime_recall, weekly, off_day_moved, restart_due, restart_easy]
+    S06RoiTier:
+      type: string
+      description: 性价比阶梯五级
+      enum: [S, A, B, C, D]
+    S06Go:
+      type: object
+      description: 一键开始直达的位置：路由表里的页面，带参数的页面再给参数（如做题的会话、阅读的资料）
+      required: [page]
+      properties:
+        page: {$ref: "#/components/schemas/S06GoPage"}
+        param: {type: string}
+    S06GoPage:
+      type: string
+      description: 任务能直达的页面：复盘与报告、知识点主页、阅读器、复习与卡片、背诵训练、做题与解析、错题本
+      enum: [S08, S10, S12, S15, S16, S18, S19]
+    S06Tiers:
+      type: object
+      description: 三档降级：剩下的任务换成哪一档、各要多少分钟
+      required: [current, options]
+      properties:
+        current: {$ref: "#/components/schemas/S06Tier"}
+        options:
+          type: array
+          items: {$ref: "#/components/schemas/S06TierOption"}
+    S06Tier:
+      type: string
+      description: 完整版、精简版、保底版（术语表 degrade_tier）
+      enum: [full, lite, minimal]
+    S06TierOption:
+      type: object
+      required: [tier, minutes]
+      properties:
+        tier: {$ref: "#/components/schemas/S06Tier"}
+        minutes: {type: integer, minimum: 0}
+    S06TaskPreview:
+      type: object
+      description: 全部完成时给：明天第一件事的预览
+      required: [source, title, minutes]
+      properties:
+        source: {$ref: "#/components/schemas/TaskSource"}
+        title: {type: string}
+        minutes: {type: integer, minimum: 0}
+    S06Pace:
+      type: string
+      description: 排程用谁的节奏：你的实测（measured），或数据不足时同类考生的典型节奏（typical）
+      enum: [measured, typical]
+    S06AiPause:
+      type: string
+      description: AI 是否暂停：没有暂停（none）、额度用完只暂停高成本 AI（quota）、导师不可用（unavailable）；暂停时理由显示模板句
+      enum: [none, quota, unavailable]

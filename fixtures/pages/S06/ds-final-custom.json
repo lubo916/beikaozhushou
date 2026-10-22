@@ -1,0 +1,25 @@
+{
+  "week": 6,
+  "date_estimated": false,
+  "capped": false,
+  "tiers": { "lite": 40, "minimal": 15 },
+  "minutes_spent": 61,
+  "tomorrow_first": { "source": "practice", "title": "二叉树的遍历：专项练习", "minutes": 15 },
+  "first_skip": ["consolidate"],
+  "tasks": [
+    { "id": "019a0406-0000-7000-8000-000000000001", "order": 10, "status": "done", "reasons": [{ "kind": "due", "count": 9 }], "go": { "page": "S15" } },
+    { "id": "019a0406-0000-7000-8000-000000000003", "order": 20, "reasons": [{ "kind": "not_learned" }], "go": { "page": "S12" } },
+    { "id": "019a0406-0000-7000-8000-000000000002", "order": 10, "reasons": [{ "kind": "accuracy_band", "low": 0.6, "high": 0.8 }], "go": { "page": "S18" } },
+    { "id": "019a0406-0000-7000-8000-000000000063", "order": 30, "segment": "advance", "source": "org_or_custom", "title": "课程作业：链表反转 3 题", "minutes": 20, "reasons": [{ "kind": "weak_match" }, { "kind": "shared_budget" }], "go": { "page": "S18" } },
+    { "id": "019a0406-0000-7000-8000-000000000004", "order": 10, "reasons": [{ "kind": "bedtime_recall" }], "go": { "page": "S16" } }
+  ],
+  "off": [
+    { "id": "019a0406-0000-7000-8000-000000000066", "order": 10, "segment": "consolidate", "source": "due_review", "title": "到期复习（最小版）5 项", "minutes": 5, "reasons": [{ "kind": "off_day_moved", "count": 3 }], "go": { "page": "S15" } }
+  ],
+  "back": {
+    "away_days": 6,
+    "tasks": [
+      { "id": "019a0406-0000-7000-8000-000000000067", "order": 10, "segment": "consolidate", "source": "due_review", "title": "到期复习 7 张", "minutes": 6, "reasons": [{ "kind": "restart_due" }], "go": { "page": "S15" } }
+    ]
+  }
+}
