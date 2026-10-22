@@ -1,8 +1,9 @@
+import "./state.test.ts";
 import { describe, expect, it } from "vitest";
 import { ApiError } from "@exam-prep/contract/errors";
 import * as zodSchemas from "@exam-prep/contract/zod";
 import { handleO02, o02Fixture } from "../../mocks/pages/O02.ts";
-import { leadsView, shouldRetry, type O02Query } from "./data.ts";
+import { leadsView, shouldRetry, type O02Query } from "./view.ts";
 
 interface Parser {
   safeParse(value: unknown): { success: boolean; error?: unknown };

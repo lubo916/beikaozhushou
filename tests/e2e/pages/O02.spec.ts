@@ -83,3 +83,20 @@ test("O02 四个演示考试和主要按钮可用", async ({ page }) => {
   await expect(page.getByRole("status").filter({ hasText: copy.compliance.empty })).toBeVisible();
   expectNoProblems(watch, "normal");
 });
+
+test("O02 打开沟通弹窗后切考试、受限或空态，不保留旧线索内容", async ({ page }) => {
+  for (const change of ["exam=js", "state=restricted", "state=empty"]) {
+    await page.goto(urlOf(entry));
+    const main = page.locator("main#main");
+    await main.getByRole("button", { name: copy.action.details, exact: true }).first().click();
+    const dialog = page.getByRole("dialog", { name: copy.communication.title, exact: true });
+    await expect(dialog).toBeVisible();
+    await page.evaluate((query) => {
+      window.history.pushState({}, "", `?${query}`);
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    }, change);
+    await expect(dialog).toBeHidden();
+    if (change === "exam=js") await expect(main.getByRole("heading", { name: copy.pool.title, exact: true })).toBeVisible();
+    else await expect(main.locator(`.ui-state--${change.split("=")[1]}`).first()).toBeVisible();
+  }
+});

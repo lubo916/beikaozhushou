@@ -22,14 +22,16 @@ import {
 } from "@exam-prep/ui";
 import type { O02Lead, O02Leads } from "@exam-prep/contract";
 import { useToast } from "../../app/toast.tsx";
-import { Link } from "../../router/history.tsx";
+import { Link, useLocation } from "../../router/history.tsx";
 import { pathTo } from "../../routes.ts";
 import { useLeads } from "./data.ts";
+import { visibleLead } from "./view.ts";
 
 export default function Page() {
+  const { search } = useLocation();
   return (
     <OrgPageRuntime pageId="O02">
-      <LeadsPage />
+      <LeadsPage key={search} />
     </OrgPageRuntime>
   );
 }
@@ -38,7 +40,8 @@ function LeadsPage() {
   const { t } = useTranslation("O02");
   const toast = useToast();
   const home = useLeads();
-  const [selected, setSelected] = useState<O02Lead | undefined>();
+  const [selection, setSelected] = useState<O02Lead | undefined>();
+  const selected = visibleLead(selection, home);
   const soon = () => toast(t("soon"));
   const data = home.data;
   return (

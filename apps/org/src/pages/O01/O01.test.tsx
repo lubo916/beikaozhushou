@@ -1,8 +1,9 @@
+import "./state.test.ts";
 import { describe, expect, it } from "vitest";
 import { ApiError } from "@exam-prep/contract/errors";
 import * as schemas from "@exam-prep/contract/zod";
 import { handleO01, o01Fixture } from "../../mocks/pages/O01.ts";
-import { workbenchView, shouldRetry } from "./data.ts";
+import { workbenchView, shouldRetry } from "./view.ts";
 interface Parser {
   safeParse(value: unknown): { success: boolean; error?: unknown };
 }
