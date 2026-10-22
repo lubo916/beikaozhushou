@@ -1,0 +1,24 @@
+{
+  "week": 3,
+  "date_estimated": false,
+  "capped": true,
+  "tiers": { "lite": 30, "minimal": 10 },
+  "minutes_spent": 47,
+  "tomorrow_first": { "source": "new_learning", "title": "新学：高频学术词汇 B 组", "minutes": 20 },
+  "first_skip": ["consolidate"],
+  "tasks": [
+    { "id": "019a0306-0000-7000-8000-000000000001", "order": 10, "reasons": [{ "kind": "due", "count": 40 }], "go": { "page": "S15" } },
+    { "id": "019a0306-0000-7000-8000-000000000003", "order": 10, "reasons": [{ "kind": "not_learned" }, { "kind": "new_rank", "rank": 1 }], "polished": "还没学过；这组词在新学里性价比排第 1", "go": { "page": "S12" } },
+    { "id": "019a0306-0000-7000-8000-000000000002", "order": 20, "reasons": [{ "kind": "accuracy_band", "low": 0.6, "high": 0.8 }], "go": { "page": "S18" } },
+    { "id": "019a0306-0000-7000-8000-000000000004", "order": 10, "reasons": [{ "kind": "bedtime_recall" }], "go": { "page": "S16" } }
+  ],
+  "off": [
+    { "id": "019a0306-0000-7000-8000-000000000066", "order": 10, "segment": "consolidate", "source": "due_review", "title": "到期复习（最小版）15 项", "minutes": 8, "reasons": [{ "kind": "off_day_moved", "count": 3 }], "go": { "page": "S15" } }
+  ],
+  "back": {
+    "away_days": 9,
+    "tasks": [
+      { "id": "019a0306-0000-7000-8000-000000000067", "order": 10, "segment": "consolidate", "source": "due_review", "title": "到期复习 10 张", "minutes": 8, "reasons": [{ "kind": "restart_due" }], "go": { "page": "S15" } }
+    ]
+  }
+}
