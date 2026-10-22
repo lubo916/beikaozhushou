@@ -243,5 +243,8 @@ describe("S24 本地补全回归", () => {
     expect(low.forecasts.today).toMatchObject({ confidence: "low", estimated_score_ratio: 0.7 });
     expect(normal).toHaveProperty("qualification_line", 60);
     expect(normal.forecasts.today?.target_line).toBe(70);
+    const previousWeek = normal.trend.filter((row) => row.day < "2026-10-19").at(-1);
+    if (previousWeek === undefined) throw new Error("示例缺少上周的历史记录");
+    expect(normal.forecasts.today?.weekly_change).toBe((normal.forecasts.today?.likely ?? 0) - previousWeek.likely);
   });
 });
