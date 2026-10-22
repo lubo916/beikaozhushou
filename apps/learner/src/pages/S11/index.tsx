@@ -110,22 +110,30 @@ export default function Page() {
             </Banner>
           )}
           {/* feat:S11-12 额度与存储数字由接口返回；受限只暂停新解析，保留已有资料。 */}
-          <StatGroup>
-            <Stat label={t("summary.coverage")} value={formatPercent(data.summary.coverage)} />
-            <Stat label={t("summary.pending")} value={formatCount(data.summary.pending)} />
-            <Stat
-              label={t("summary.quota")}
-              value={t("summary.quota_value", {
-                remaining: formatCount(data.summary.parse_remaining),
-                total: formatCount(data.summary.parse_total),
-              })}
-              hint={t("summary.storage", {
-                used: formatCount(data.summary.storage_used_mb),
-                limit: formatCount(data.summary.storage_limit_mb),
-              })}
-            />
-            <Stat label={t("summary.inbox")} value={formatCount(data.summary.inbox_count)} />
-          </StatGroup>
+          <div className="grid grid-cols-2 gap-4 @content-md:grid-cols-4">
+            <Card className="min-w-0">
+              <Stat label={t("summary.coverage")} value={formatPercent(data.summary.coverage)} />
+            </Card>
+            <Card className="min-w-0">
+              <Stat label={t("summary.pending")} value={formatCount(data.summary.pending)} />
+            </Card>
+            <Card className="min-w-0">
+              <Stat
+                label={t("summary.quota")}
+                value={t("summary.quota_value", {
+                  remaining: formatCount(data.summary.parse_remaining),
+                  total: formatCount(data.summary.parse_total),
+                })}
+                hint={t("summary.storage", {
+                  used: formatCount(data.summary.storage_used_mb),
+                  limit: formatCount(data.summary.storage_limit_mb),
+                })}
+              />
+            </Card>
+            <Card className="min-w-0">
+              <Stat label={t("summary.inbox")} value={formatCount(data.summary.inbox_count)} />
+            </Card>
+          </div>
           {home.state === "restricted" && state("restricted")}
           {home.state === "insufficient_data" && state("insufficient_data")}
           {home.state === "empty" ? (

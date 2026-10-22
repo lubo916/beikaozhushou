@@ -12,6 +12,8 @@ export function ImportDialog({ open, onClose, preview }: { open: boolean; onClos
   const [step, setStep] = useState<Step>("choose");
   const [access, setAccess] = useState("parsable");
   const [source, setSource] = useState("");
+  const [materialType, setMaterialType] = useState(() => (t("import.types", { returnObjects: true }) as string[])[0] ?? "");
+  const [directory, setDirectory] = useState("");
   const [rights, setRights] = useState(false);
   const [failure, setFailure] = useState(false);
   const [target, setTarget] = useState("align");
@@ -86,7 +88,11 @@ export function ImportDialog({ open, onClose, preview }: { open: boolean; onClos
           />
           <label className="flex flex-col gap-2">
             {t("import.type")}
-            <select className="w-full rounded-sm border border-line-strong p-2">
+            <select
+              className="w-full rounded-sm border border-line-strong p-2"
+              value={materialType}
+              onChange={(event) => setMaterialType(event.target.value)}
+            >
               {(t("import.types", { returnObjects: true }) as string[]).map((kind) => (
                 <option key={kind}>{kind}</option>
               ))}
@@ -94,7 +100,7 @@ export function ImportDialog({ open, onClose, preview }: { open: boolean; onClos
           </label>
           {access === "parsable" ? (
             <>
-              <label className="flex flex-col gap-2">
+              <label key="file-source" className="flex flex-col gap-2">
                 {t("import.file")}
                 <input type="file" className="w-full text-small" onChange={(event) => setSource(event.target.files?.[0]?.name ?? "")} />
               </label>
@@ -105,7 +111,7 @@ export function ImportDialog({ open, onClose, preview }: { open: boolean; onClos
             </>
           ) : (
             <>
-              <label className="flex flex-col gap-2">
+              <label key="mapped-source" className="flex flex-col gap-2">
                 {t("import.source")}
                 <input
                   className="w-full rounded-sm border border-line-strong p-2"
@@ -115,7 +121,11 @@ export function ImportDialog({ open, onClose, preview }: { open: boolean; onClos
               </label>
               <label className="flex flex-col gap-2">
                 {t("import.directory")}
-                <textarea className="w-full rounded-sm border border-line-strong p-2" />
+                <textarea
+                  className="w-full rounded-sm border border-line-strong p-2"
+                  value={directory}
+                  onChange={(event) => setDirectory(event.target.value)}
+                />
               </label>
               <Banner>{t(access === "mapped_only" ? "materials.no_text" : "materials.course")}</Banner>
             </>
@@ -141,6 +151,10 @@ export function ImportDialog({ open, onClose, preview }: { open: boolean; onClos
           <AiBadge />
           <Banner>{t("import.preview_hint")}</Banner>
           <p className="break-words">{source}</p>
+          <p>
+            {t("import.type")}：{materialType}
+          </p>
+          {directory !== "" && <p className="whitespace-pre-wrap break-words">{directory}</p>}
           {preview !== undefined && (
             <p>
               {t("import.preview", {

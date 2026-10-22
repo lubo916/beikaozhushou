@@ -13,10 +13,12 @@ export function MaterialsView({ data }: { data: S11Workspace }) {
   const soon = () => toast(t("soon"));
   const [selected, setSelected] = useState<S11MaterialRow>();
   const [name, setName] = useState("");
+  const [destination, setDestination] = useState("");
   const [dialog, setDialog] = useState<"organize" | "reparse" | "enhance">();
   const open = (row: S11MaterialRow, mode: "organize" | "reparse" | "enhance") => {
     setSelected(row);
     setName(row.material.title);
+    setDestination(row.subject);
     setDialog(mode);
   };
   const close = () => setDialog(undefined);
@@ -50,7 +52,7 @@ export function MaterialsView({ data }: { data: S11Workspace }) {
                     <div className="flex flex-col gap-1">
                       <strong>{row.material.title}</strong>
                       <span className="text-small text-ink-tertiary">{row.location}</span>
-                      <Tag size="sm" tone="outline">
+                      <Tag className="self-start" size="sm" tone="outline">
                         {t(`kind.${row.kind}`)}
                       </Tag>
                       {row.recommendation !== undefined && (
@@ -77,7 +79,7 @@ export function MaterialsView({ data }: { data: S11Workspace }) {
                   header: t("materials.progress"),
                   label: t("materials.progress"),
                   render: (row) => (
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 whitespace-nowrap">
                       <ProgressBar
                         size="sm"
                         label={t("materials.read", { value: formatPercent(row.read_ratio) })}
@@ -97,7 +99,9 @@ export function MaterialsView({ data }: { data: S11Workspace }) {
                   label: t("materials.status"),
                   render: (row) => (
                     <div className="flex flex-col gap-1">
-                      <Tag tone={row.status === "ready" ? "success" : "warning"}>{t(`status.${row.status}`)}</Tag>
+                      <Tag className="self-start" tone={row.status === "ready" ? "success" : "warning"}>
+                        {t(`status.${row.status}`)}
+                      </Tag>
                       {row.status === "parsing" && (
                         <span className="text-small">{t("materials.processing", { value: formatPercent(row.processing_ratio) })}</span>
                       )}
@@ -184,7 +188,11 @@ export function MaterialsView({ data }: { data: S11Workspace }) {
         </label>
         <label className="mt-3 flex flex-col gap-2">
           {t("organize.destination")}
-          <input className="w-full rounded-sm border border-line-strong bg-bg-surface p-2" defaultValue={selected?.subject} />
+          <input
+            className="w-full rounded-sm border border-line-strong bg-bg-surface p-2"
+            value={destination}
+            onChange={(event) => setDestination(event.target.value)}
+          />
         </label>
         <p className="mt-3 text-small">
           {t("actions.rename")} · {t("actions.move")}
