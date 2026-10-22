@@ -1,0 +1,148 @@
+{
+  "state": "normal",
+  "data_source": "sample",
+  "exam_name": "《数据结构》期末考",
+  "queue": {
+    "due": 36,
+    "new_cards": 8,
+    "minutes": 12,
+    "relearning": 3,
+    "tomorrow": 22
+  },
+  "memory": {
+    "retention": 0.91,
+    "target_retention": 0.9,
+    "daily_load": 44,
+    "warning": true
+  },
+  "policy": {
+    "daily_cap": 80,
+    "insufficient_threshold": 20,
+    "flip_guard_ms": 1500
+  },
+  "groups": [
+    {
+      "id": "019a0402-0000-7000-8000-000000000001",
+      "title": "绪论与复杂度",
+      "total": 24,
+      "due": 18,
+      "status": "active"
+    },
+    {
+      "id": "019a0402-0000-7000-8000-000000000002",
+      "title": "线性表",
+      "total": 18,
+      "due": 12,
+      "status": "paused"
+    },
+    {
+      "id": "019a0402-0000-7000-8000-000000000003",
+      "title": "栈、队列与串",
+      "total": 12,
+      "due": 6,
+      "status": "buried"
+    }
+  ],
+  "pending_cards": [
+    {
+      "id": "019a0455-0000-7000-8000-000000000002",
+      "knowledge_point_id": "019a0403-0000-7000-8000-000000000006",
+      "card_type": "辨析对比",
+      "front": "辨析对比：二叉树的遍历",
+      "back": "先序加中序，或后序加中序。只有先序加后序不能唯一确定。",
+      "material_id": "019a040b-0000-7000-8000-000000000002",
+      "source_title": "数据结构讲义（电子文件，可全文阅读）",
+      "origin": "mistake",
+      "ai_generated": true
+    },
+    {
+      "id": "019a0455-0000-7000-8000-000000000003",
+      "knowledge_point_id": "019a0403-0000-7000-8000-000000000006",
+      "card_type": "口诀",
+      "front": "用一句话回忆：二叉树的遍历",
+      "back": "先在心里回忆要点，再对照来源核对。先序加中序，或后序加中序。只有先序加后序不能唯一确定。",
+      "material_id": "019a040b-0000-7000-8000-000000000002",
+      "source_title": "数据结构讲义（电子文件，可全文阅读）",
+      "origin": "note",
+      "ai_generated": true
+    }
+  ],
+  "calendar": [
+    {
+      "day": "2026-10-19",
+      "due": 28,
+      "completed": 28,
+      "overloaded": false
+    },
+    {
+      "day": "2026-10-20",
+      "due": 32,
+      "completed": 32,
+      "overloaded": false
+    },
+    {
+      "day": "2026-10-21",
+      "due": 26,
+      "completed": 26,
+      "overloaded": false
+    },
+    {
+      "day": "2026-10-22",
+      "due": 36,
+      "completed": 12,
+      "overloaded": false
+    },
+    {
+      "day": "2026-10-23",
+      "due": 22,
+      "completed": 0,
+      "overloaded": false
+    },
+    {
+      "day": "2026-10-24",
+      "due": 80,
+      "completed": 0,
+      "overloaded": true
+    },
+    {
+      "day": "2026-10-25",
+      "due": 31,
+      "completed": 0,
+      "overloaded": false
+    }
+  ],
+  "session": {
+    "position": 1,
+    "total": 44,
+    "progress_ratio": 0,
+    "card": {
+      "id": "019a0455-0000-7000-8000-000000000001",
+      "knowledge_point_id": "019a0403-0000-7000-8000-000000000006",
+      "card_type": "知识点回忆卡",
+      "front": "二叉树的遍历",
+      "back": "先在心里回忆要点，再对照来源核对。先序加中序，或后序加中序。只有先序加后序不能唯一确定。",
+      "material_id": "019a040b-0000-7000-8000-000000000002",
+      "source_title": "数据结构讲义（电子文件，可全文阅读）",
+      "origin": "knowledge_point",
+      "ai_generated": false
+    },
+    "ratings": [
+      {
+        "id": "again",
+        "interval_text": "当天稍后"
+      },
+      {
+        "id": "hard",
+        "interval_text": "明天"
+      },
+      {
+        "id": "good",
+        "interval_text": "间隔复习"
+      },
+      {
+        "id": "easy",
+        "interval_text": "延长间隔"
+      }
+    ]
+  }
+}
