@@ -75,7 +75,7 @@ export default function Page() {
           pageName={t("title")}
           title={t("state.offline.title")}
           body={t("state.offline.no_cache")}
-          onRetry={home.retry}
+          action={<Button onClick={home.retry}>{t("state.offline.retry")}</Button>}
         />
       </ContainerScope>
     );
@@ -141,7 +141,7 @@ export default function Page() {
           title={t("state.offline.stale")}
           action={
             <Button size="sm" onClick={home.retry}>
-              {t("notification.open")}
+              {t("state.offline.retry")}
             </Button>
           }
         >
@@ -303,7 +303,7 @@ export default function Page() {
                   <li key={item.id} className="flex flex-col gap-2 py-3">
                     <div className="flex flex-wrap items-center gap-2">
                       <Tag tone={item.status === "resolved" ? "success" : "warning"}>{t(`tickets.${item.status}`)}</Tag>
-                      <span className="text-small text-ink-tertiary">{item.id}</span>
+                      <span className="break-all text-small text-ink-tertiary">{item.id}</span>
                     </div>
                     <h3 className="font-medium">{item.title}</h3>
                     <p className="text-small text-ink-secondary">{item.reply}</p>
@@ -424,7 +424,7 @@ export default function Page() {
         {ticket && (
           <div className="flex flex-col gap-3">
             <Tag>{t(`tickets.${ticket.status}`)}</Tag>
-            <p className="text-small text-ink-tertiary">
+            <p className="break-all text-small text-ink-tertiary">
               {ticket.id} · {formatDateTime(ticket.updated_at, data.time_zone)}
             </p>
             <h3 className="font-medium">{t("tickets.context")}</h3>

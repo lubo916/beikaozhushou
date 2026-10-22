@@ -46,8 +46,12 @@ export default function Page() {
         <PageState
           state="offline"
           title={t("state.offline.title")}
-          body={t("state.offline.body")}
-          action={<Button onClick={settings.retry}>{t("save")}</Button>}
+          body={
+            <>
+              {t("state.offline.body")} {t("state.offline.no_cache")}
+            </>
+          }
+          action={<Button onClick={settings.retry}>{t("retry")}</Button>}
         />
       ) : data === undefined ? (
         <PageState

@@ -1,7 +1,7 @@
 {
   "notifications": [
     {
-      "id": "s35-review",
+      "id": "019a0700-0035-7000-8000-0000000000c9",
       "category": "review",
       "title": "今天的复习已准备好",
       "body": "先巩固，再向前推进。打开今日清单开始。",
@@ -11,7 +11,7 @@
       "delayed": true
     },
     {
-      "id": "s35-node",
+      "id": "019a0700-0035-7000-8000-0000000000ca",
       "category": "node",
       "title": "考试节点有更新",
       "body": "请查看考试日历，核对官方通知。",
@@ -21,7 +21,7 @@
       "delayed": false
     },
     {
-      "id": "s35-completion",
+      "id": "019a0700-0035-7000-8000-0000000000cb",
       "category": "completion",
       "title": "已完成今天的练习",
       "body": "学习记录已保存，继续按自己的节奏学习。",
@@ -31,7 +31,7 @@
       "delayed": false
     },
     {
-      "id": "s35-security",
+      "id": "019a0700-0035-7000-8000-0000000000cc",
       "category": "security",
       "title": "账号安全提醒",
       "body": "如非本人操作，请检查账号登录与安全设置。",
@@ -43,7 +43,7 @@
   ],
   "tickets": [
     {
-      "id": "FK-20261022-A",
+      "id": "019a0700-0035-7000-8000-0000000000cd",
       "title": "题目解析报错",
       "status": "resolved",
       "context": "练习解析 · 示例题目",
@@ -53,7 +53,7 @@
       "order_id": ""
     },
     {
-      "id": "FK-20261021-B",
+      "id": "019a0700-0035-7000-8000-0000000000ce",
       "title": "导师回答问题反馈",
       "status": "processing",
       "context": "AI 导师 · 示例回答",

@@ -93,5 +93,5 @@ test("S33 账号安全、引导与离线主要按钮可点击，跨页出口正�
 test("S33 无缓存离线给出重试动作，不误标保存", async ({ page }) => {
   await page.goto("/settings?state=offline");
   const offline = page.locator("main#main .ui-state--offline");
-  await expect(offline.getByRole("button", { name: "重试", exact: true })).toBeVisible();
+  await expect(offline.getByRole("button", { name: copy.retry, exact: true })).toBeVisible();
 });
