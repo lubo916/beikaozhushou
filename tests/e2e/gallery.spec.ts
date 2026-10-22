@@ -79,12 +79,15 @@ componentTest.describe("公共组件陈列页 gallery（三档真实截图）", 
         await testInfo.attach(`组件陈列页-${width}`, { path: screenshotPath, contentType: "image/png" });
       });
 
-      componentTest("七态、页面切换与键盘操作可用", async ({ componentPage: page }) => {
-        const states = page.locator("#states");
-        const stateOptions = states.getByRole("radiogroup", { name: "页面状态", exact: true });
-        const stateDisplay = states.locator(".ui-card").first();
-        await expect(stateDisplay.getByText("这里是今日的内容。", { exact: true })).toBeVisible();
-        for (const state of STATES) {
+      // 每一条原有状态切换仍覆盖相邻的前一态；独立预算避免 WebKit 累计点击耗尽 30 秒。
+      for (const [index, state] of STATES.entries()) {
+        componentTest(`${state.label}态可用且没有横向滚动`, async ({ componentPage: page }) => {
+          const states = page.locator("#states");
+          const stateOptions = states.getByRole("radiogroup", { name: "页面状态", exact: true });
+          const stateDisplay = states.locator(".ui-card").first();
+          await expect(stateDisplay.getByText("这里是今日的内容。", { exact: true })).toBeVisible();
+          const previous = STATES[index - 1];
+          if (previous !== undefined) await stateOptions.getByRole("radio", { name: previous.label, exact: true }).click();
           const option = stateOptions.getByRole("radio", { name: state.label, exact: true });
           await option.click();
           await expect(option).toBeChecked();
@@ -94,7 +97,14 @@ componentTest.describe("公共组件陈列页 gallery（三档真实截图）", 
             await expect(stateDisplay.getByRole("button", { name: "重试", exact: true })).toBeVisible();
           }
           await expectNoHorizontalOverflow(page);
-        }
+        });
+      }
+
+      componentTest("页面切换与键盘操作可用", async ({ componentPage: page }) => {
+        const states = page.locator("#states");
+        const stateOptions = states.getByRole("radiogroup", { name: "页面状态", exact: true });
+        const stateDisplay = states.locator(".ui-card").first();
+        await stateOptions.getByRole("radio", { name: "锁定", exact: true }).click();
         await states.getByRole("radiogroup", { name: "页面", exact: true }).getByRole("radio", { name: "知识点主页" }).click();
         await stateOptions.getByRole("radio", { name: "空", exact: true }).click();
         await expect(stateDisplay.getByRole("heading", { name: "这个知识点还没有内容" })).toBeVisible();
@@ -105,14 +115,16 @@ componentTest.describe("公共组件陈列页 gallery（三档真实截图）", 
         await expect(stateDisplay.locator(".ui-state--loading")).toBeVisible();
       });
 
-      componentTest("提议撤销、弹层焦点与显示设置可用", async ({ componentPage: page }) => {
+      componentTest("提议确认后可以撤销", async ({ componentPage: page }) => {
         const proposal = page.locator("#proposal .ui-proposal").first();
         await proposal.getByRole("button", { name: "确认", exact: true }).click();
         await expect(proposal.getByText("已确认", { exact: true })).toBeVisible();
         await proposal.getByRole("button", { name: "撤销", exact: true }).click();
         await expect(proposal.getByText("已撤销", { exact: true })).toBeVisible();
         await expect(proposal.getByRole("button")).toHaveCount(0);
+      });
 
+      componentTest("对话框关闭后恢复焦点", async ({ componentPage: page }) => {
         const openDialog = page.getByRole("button", { name: "打开对话框", exact: true });
         await openDialog.click();
         const dialog = page.getByRole("dialog", { name: "加入今日", exact: true });
@@ -121,7 +133,9 @@ componentTest.describe("公共组件陈列页 gallery（三档真实截图）", 
         await page.keyboard.press("Escape");
         await expect(dialog).not.toBeVisible();
         await expect(openDialog).toBeFocused();
+      });
 
+      componentTest("底部面板关闭后恢复焦点", async ({ componentPage: page }) => {
         const openSheet = page.getByRole("button", { name: "打开底部面板", exact: true });
         await openSheet.click();
         const sheet = page.getByRole("dialog", { name: "问导师", exact: true });
@@ -129,7 +143,9 @@ componentTest.describe("公共组件陈列页 gallery（三档真实截图）", 
         await sheet.getByRole("button", { name: "关闭", exact: true }).click();
         await expect(sheet).not.toBeVisible();
         await expect(openSheet).toBeFocused();
+      });
 
+      componentTest("字号与配色设置可用", async ({ componentPage: page }) => {
         const display = page.getByRole("group", { name: "显示设置", exact: true });
         await display.getByRole("button", { name: "大字号", exact: true }).click();
         await display.getByRole("button", { name: "色觉友好配色", exact: true }).click();

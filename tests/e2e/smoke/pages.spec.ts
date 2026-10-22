@@ -1,7 +1,7 @@
 // 全部页面冒烟（F06 验收 1）：三端 70 页逐页打开默认视图与各视图，七态都用 ?state= 强制显示一遍（假数据模式）。
 // 每一步都不许有浏览器报错（未捕获的异常、控制台 error）；只放过出错、离线、受限三态下假数据层故意制造的接口失败。
 // 一页一个测试；某一步没过，记下来接着查下一步，最后一起报，方便一次看全这一页哪里坏了。
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { ALL_PAGES, PAGES_MD_IDS, pageLabel, urlOf, type PageEntry } from "../support/catalog.ts";
 import {
   ABNORMAL_STATES,
@@ -12,6 +12,7 @@ import {
   expectState,
   firstLine,
   watchPage,
+  type StateCode,
 } from "../support/checks.ts";
 
 test.describe.configure({ timeout: 5 * 60_000 });
@@ -21,25 +22,46 @@ test("页面清单与 docs/baseline/pages.md 一致：三端 70 页都在冒烟�
 });
 
 function definePageSmoke(entry: PageEntry): void {
-  test(`${pageLabel(entry)}：能打开、没有报错、七态都能显示`, async ({ page }) => {
-    const watch = await watchPage(page);
+  test(`${pageLabel(entry)}：能打开、没有报错、七态都能显示`, async ({ context }) => {
     const failures: string[] = [];
-    const check = async (title: string, body: () => Promise<void>): Promise<void> => {
+    type Scenario = { page: Page; watch: Awaited<ReturnType<typeof watchPage>>; state: StateCode; title: string };
+    let active: Scenario | undefined;
+    const closeScenario = async (scenario: Scenario): Promise<void> => {
+      await scenario.page.close();
       try {
-        await test.step(title, body);
+        // 迟到错误仍按产生它的页面状态核查，不能借下一态的失败额度，也不能丢掉应用错误。
+        expectNoProblems(scenario.watch, scenario.state);
+      } catch (error) {
+        failures.push(`${scenario.title}（关闭时复核）：${firstLine(error)}`);
+      }
+    };
+    const check = async (
+      title: string,
+      state: StateCode,
+      body: (page: Page, watch: Awaited<ReturnType<typeof watchPage>>) => Promise<void>,
+    ): Promise<void> => {
+      const page = await context.newPage();
+      const watch = await watchPage(page);
+      const previous = active;
+      active = { page, watch, state, title };
+      try {
+        await test.step(title, () => body(page, watch));
       } catch (error) {
         failures.push(`${title}：${firstLine(error)}`);
+      } finally {
+        // 先让新页接上 MSW，再关旧页，避免最后一个活动客户端先退出引起 Worker 注销竞态。
+        if (previous !== undefined) await closeScenario(previous);
       }
     };
 
-    await check("正常态（默认视图）", async () => {
+    await check("正常态（默认视图）", "normal", async (page, watch) => {
       await watch.open(urlOf(entry));
       await expectOpened(page, entry, entry.views[0]);
       await expectLoaded(page, entry);
       expectNoProblems(watch, "normal");
     });
     for (const view of entry.views.slice(1)) {
-      await check(`视图 ?view=${view.key}`, async () => {
+      await check(`视图 ?view=${view.key}`, "normal", async (page, watch) => {
         await watch.open(urlOf(entry, { view: view.key }));
         await expectOpened(page, entry, view);
         await expectLoaded(page, entry);
@@ -47,13 +69,14 @@ function definePageSmoke(entry: PageEntry): void {
       });
     }
     for (const state of ABNORMAL_STATES) {
-      await check(`${STATE_NAMES[state]}态 ?state=${state}`, async () => {
+      await check(`${STATE_NAMES[state]}态 ?state=${state}`, state, async (page, watch) => {
         await watch.open(urlOf(entry, { state }));
         await expectState(page, entry, state);
         expectNoProblems(watch, state);
       });
     }
 
+    if (active !== undefined) await closeScenario(active);
     expect(failures, `${pageLabel(entry)} 没通过的检查`).toEqual([]);
   });
 }
