@@ -1,1 +1,183 @@
-{}
+{
+  "header": {
+    "title": "起点报告与方案",
+    "description": "先看清起点，再选一条适合自己的路。",
+    "sample": "示例数据",
+    "subtitle": "{{exam}} · 摸底诊断结果"
+  },
+  "hero": {
+    "title": "现在在哪，离目标还有多远",
+    "forecast": "当前预测区间",
+    "target": "我的目标",
+    "pass_line": "合格线",
+    "gap": "距目标还差",
+    "basis": "依据 {{amount}} 条作答证据 · 置信程度：{{confidence}}",
+    "confidence": {
+      "low": "低",
+      "moderate": "中"
+    },
+    "explanation": "先补未学的高频点，再用复习稳住已经学过的内容。区间会随新证据更新。",
+    "jump": "直接选方案",
+    "unit": "分"
+  },
+  "state": {
+    "empty": {
+      "title": "还没有起点报告",
+      "body": "做完摸底诊断才能生成；也可先用快速定位",
+      "action": "去摸底"
+    },
+    "offline": {
+      "title": "当前处于离线状态",
+      "body": "显示上次生成的报告；重新生成需要联网",
+      "uncached": "还没有缓存的报告，联网后重试即可查看。",
+      "retry": "重新连接"
+    },
+    "restricted": {
+      "title": "报告可以先看",
+      "body": "游客可以看报告，生成计划时才需要登录"
+    },
+    "quick": {
+      "title": "只做了快速定位",
+      "body": "只做了快速定位：区间更宽，补做章节抽测可收窄",
+      "action": "补做章节抽测"
+    },
+    "error": {
+      "body": "起点报告与方案的数据暂时没取到：网络或服务异常。已保存的内容不受影响，点“重试”即可；连续失败会自动上报。"
+    }
+  },
+  "map": {
+    "title": "我的掌握分布",
+    "tabs": "地图视图",
+    "grid": "方格",
+    "chapters": "薄弱章节",
+    "open": "打开知识地图",
+    "met": "达标比例",
+    "unlearned": "未学数量",
+    "high_frequency": "高频",
+    "note": "每格一个知识点，点击查看；证据不足不等于不会。",
+    "chapter": "章节",
+    "count": "{{amount}} 个"
+  },
+  "time": {
+    "title": "时间够不够",
+    "available": "可用时间",
+    "required": "预计需要",
+    "buffer": "已留缓冲",
+    "unavailable": "已扣不可学日",
+    "coverage": "目标日前可覆盖",
+    "shortfall": "时间缺口",
+    "basis": "按你声明的时间，已扣除不可学日并预留缓冲。",
+    "adjust_time": "调整时间预算",
+    "adjust_scope": "查看范围初稿",
+    "adjust_goal": "调整备考目标"
+  },
+  "gap": {
+    "title": "差距主要在哪",
+    "kind": "差距来源",
+    "gain": "可提分",
+    "minutes": "所需时间",
+    "roi": "性价比阶梯",
+    "advice": "建议",
+    "unlearned": "未学的高频点",
+    "forgotten": "学过已忘",
+    "unstable": "会但不稳",
+    "low_frequency": "低频冷门",
+    "suggestion": {
+      "unlearned": "优先补到目标档",
+      "forgotten": "先回忆，再做变式题",
+      "unstable": "换个问法再考",
+      "low_frequency": "先留到时间充裕时"
+    }
+  },
+  "scope": {
+    "title": "学习范围初稿",
+    "intro": "默认纳入有目标档的 {{amount}} 个知识点；移出不删数据，仍然可以学。",
+    "name": "建议移出的知识点",
+    "cost": "代价",
+    "minutes": "可节省时间",
+    "proposal": "范围调整提议",
+    "what": "建议移出 {{amount}} 个低性价比知识点，预计节省 {{duration}}。",
+    "why": "当前时间预算有缺口，先把时间留给更能帮助接近目标的内容。",
+    "cost_text": "减少约 {{score}} 的覆盖机会；这些知识点仍可随时学习。",
+    "if_not": "保持原范围，可调整时间预算或目标，再重新查看方案。",
+    "pending": "这份初稿尚未生效，确认后才会改变学习范围。"
+  },
+  "schemes": {
+    "title": "选一档适合你的方案",
+    "hint": "预期区间是按目标日给出的示例预测，不代表实际结果。选好后再预览计划。",
+    "group": "学习方案",
+    "recommended": "推荐",
+    "selected": "已选择",
+    "name": {
+      "steady": "稳妥",
+      "standard": "标准",
+      "sprint": "冲刺"
+    },
+    "daily": "每日 {{duration}}",
+    "weekly": "每周 {{duration}}",
+    "expected": "目标日预期",
+    "cost": {
+      "steady": "时间占用较少，先稳住重点与复习。",
+      "standard": "需要稳定的学习时段，兼顾补缺和练测。",
+      "sprint": "占用更多休息时间，需要持续留出整块时间。"
+    },
+    "marginal": "比稳妥多 {{duration}}／周，区间上移约 {{score}}",
+    "baseline": "作为时间与收益的比较基线"
+  },
+  "rounds": {
+    "title": "轮次草案",
+    "round": "第 {{amount}} 轮 {{name}}",
+    "name": {
+      "foundation": "打基础",
+      "focus": "攻重点",
+      "practice": "刷题冲刺",
+      "final": "考前七天"
+    },
+    "method": {
+      "foundation": "通读资料，建立知识点轮廓。",
+      "focus": "精学高频薄弱点，补到目标档。",
+      "practice": "练测结合，用新证据检验掌握情况。",
+      "final": "回忆要点、查漏补缺，稳定作息。"
+    },
+    "dates": "{{start}} — {{end}}",
+    "note": "这是待确认的路线草案，生成计划后仍可调整。"
+  },
+  "locked": {
+    "title": "地图体检未通过，预测暂不可用",
+    "body": "先修复阻断项，再自动复检。掌握分布与已有学习记录仍可查看。",
+    "fix": "去修复",
+    "item": {
+      "granularity": "{{amount}} 处知识点粒度需要拆分",
+      "coverage": "{{amount}} 处题量覆盖不足",
+      "target": "{{amount}} 个知识点缺少目标档"
+    },
+    "distribution": "先看原始掌握分布，修复后再生成方案。"
+  },
+  "plan": {
+    "generate": "生成我的计划",
+    "title": "预览我的首版计划",
+    "description": "方案还没有保存；登录后才能保存并进入今日清单。",
+    "chosen": "已选：{{name}}方案",
+    "week": "第一周：{{duration}} · {{amount}} 项任务",
+    "logic": "先安排到期复习，再推进高频薄弱点，用章节抽测验证，最后用短回顾收尾。",
+    "items": {
+      "review": "巩固：到期复习与待验证复核",
+      "priority": "推进：高频薄弱点的学习和练习",
+      "check": "推进：章节抽测，验证新学内容",
+      "recap": "收尾：短回顾与要点整理"
+    },
+    "login": "登录并保存计划",
+    "save": "保存并进入今日",
+    "cancel": "再看看方案",
+    "ai_note": "方案说明为 AI 生成的待确认建议，未自动改变你的计划。",
+    "day": "学习日",
+    "minutes": "计划时长",
+    "tasks": "日计划"
+  },
+  "soon": {
+    "proposal": "范围确认即将上线；当前初稿尚未改变。",
+    "decline": "保留原范围即将上线；当前初稿尚未改变。",
+    "save": "保存计划即将上线。",
+    "report": "反馈问题即将上线。"
+  }
+}

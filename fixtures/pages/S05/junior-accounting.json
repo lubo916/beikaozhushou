@@ -1,0 +1,549 @@
+{
+  "report": {
+    "available": true,
+    "view": "normal",
+    "guest": true,
+    "map_health": "passed",
+    "exam_name": "",
+    "evidence_count": 24,
+    "forecast": {
+      "low": 48,
+      "high": 56,
+      "target": 70,
+      "gap": 18,
+      "pass_line": 60,
+      "confidence": "moderate"
+    },
+    "time": {
+      "available_minutes": 7200,
+      "required_minutes": 8400,
+      "buffer_minutes": 720,
+      "unavailable_days": 6,
+      "coverage_ratio": 0.86,
+      "shortfall_minutes": 1200
+    },
+    "grid": [
+      {
+        "knowledge_point_id": "019a0103-0000-7000-8000-000000000001",
+        "name": "会计基本假设",
+        "level": 2,
+        "target_level": 3,
+        "evidence_sufficient": true,
+        "pending_verification": false,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0103-0000-7000-8000-000000000002",
+        "name": "会计信息质量要求",
+        "level": 1,
+        "target_level": 3,
+        "evidence_sufficient": true,
+        "pending_verification": false,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0103-0000-7000-8000-000000000003",
+        "name": "借贷记账法",
+        "level": 3,
+        "target_level": 4,
+        "evidence_sufficient": true,
+        "pending_verification": true,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0103-0000-7000-8000-000000000004",
+        "name": "存货发出计价方法",
+        "level": 0,
+        "target_level": 4,
+        "evidence_sufficient": false,
+        "pending_verification": false,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0103-0000-7000-8000-000000000005",
+        "name": "交易性金融资产的后续计量",
+        "level": 4,
+        "target_level": 4,
+        "evidence_sufficient": true,
+        "pending_verification": false,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0103-0000-7000-8000-000000000006",
+        "name": "固定资产折旧方法",
+        "level": 2,
+        "target_level": 4,
+        "evidence_sufficient": true,
+        "pending_verification": false,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0103-0000-7000-8000-000000000007",
+        "name": "应付职工薪酬",
+        "level": 1,
+        "target_level": 3,
+        "evidence_sufficient": true,
+        "pending_verification": false,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0103-0000-7000-8000-000000000008",
+        "name": "增值税的核算",
+        "level": 3,
+        "target_level": 4,
+        "evidence_sufficient": false,
+        "pending_verification": true,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0103-0000-7000-8000-000000000009",
+        "name": "所有者权益变动",
+        "level": 0,
+        "target_level": 2,
+        "evidence_sufficient": false,
+        "pending_verification": false,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0103-0000-7000-8000-00000000000a",
+        "name": "收入确认五步法",
+        "level": 2,
+        "target_level": 4,
+        "evidence_sufficient": true,
+        "pending_verification": false,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0103-0000-7000-8000-00000000000b",
+        "name": "利润表的编制",
+        "level": 5,
+        "target_level": 3,
+        "evidence_sufficient": true,
+        "pending_verification": false,
+        "in_scope": true
+      },
+      {
+        "knowledge_point_id": "019a0103-0000-7000-8000-00000000000c",
+        "name": "管理会计基础",
+        "level": 1,
+        "target_level": 2,
+        "evidence_sufficient": false,
+        "pending_verification": false,
+        "in_scope": false
+      }
+    ],
+    "chapters": [
+      {
+        "id": "019a0102-0000-7000-8000-000000000001",
+        "name": "会计概述",
+        "met_ratio": 0.12,
+        "unlearned_count": 0,
+        "high_frequency": true,
+        "priority_order": 1
+      },
+      {
+        "id": "019a0102-0000-7000-8000-000000000002",
+        "name": "会计基础",
+        "met_ratio": 0.2,
+        "unlearned_count": 0,
+        "high_frequency": true,
+        "priority_order": 2
+      },
+      {
+        "id": "019a0102-0000-7000-8000-000000000003",
+        "name": "资产",
+        "met_ratio": 0.3,
+        "unlearned_count": 1,
+        "high_frequency": true,
+        "priority_order": 3
+      },
+      {
+        "id": "019a0102-0000-7000-8000-000000000004",
+        "name": "负债",
+        "met_ratio": 0.42,
+        "unlearned_count": 0,
+        "high_frequency": true,
+        "priority_order": 4
+      },
+      {
+        "id": "019a0102-0000-7000-8000-000000000005",
+        "name": "所有者权益",
+        "met_ratio": 0.5,
+        "unlearned_count": 1,
+        "high_frequency": true,
+        "priority_order": 5
+      },
+      {
+        "id": "019a0102-0000-7000-8000-000000000006",
+        "name": "收入、费用和利润",
+        "met_ratio": 0.62,
+        "unlearned_count": 0,
+        "high_frequency": true,
+        "priority_order": 6
+      },
+      {
+        "id": "019a0102-0000-7000-8000-000000000007",
+        "name": "财务报告",
+        "met_ratio": 0.75,
+        "unlearned_count": 0,
+        "high_frequency": false,
+        "priority_order": 7
+      },
+      {
+        "id": "019a0102-0000-7000-8000-000000000008",
+        "name": "管理会计基础",
+        "met_ratio": 0.88,
+        "unlearned_count": 0,
+        "high_frequency": false,
+        "priority_order": 8
+      }
+    ],
+    "gaps": [
+      {
+        "kind": "unlearned",
+        "points_gain": 14,
+        "minutes": 1800,
+        "roi": "S"
+      },
+      {
+        "kind": "forgotten",
+        "points_gain": 8,
+        "minutes": 720,
+        "roi": "A"
+      },
+      {
+        "kind": "unstable",
+        "points_gain": 5,
+        "minutes": 540,
+        "roi": "A"
+      },
+      {
+        "kind": "low_frequency",
+        "points_gain": 2,
+        "minutes": 1200,
+        "roi": "D"
+      }
+    ],
+    "scope": {
+      "total_count": 12,
+      "removed_count": 2,
+      "saved_minutes": 180,
+      "score_cost": 2,
+      "removals": [
+        {
+          "id": "019a0103-0000-7000-8000-00000000000b",
+          "name": "利润表的编制",
+          "roi": "D",
+          "minutes": 90,
+          "score_cost": 1
+        },
+        {
+          "id": "019a0103-0000-7000-8000-00000000000c",
+          "name": "管理会计基础",
+          "roi": "D",
+          "minutes": 90,
+          "score_cost": 1
+        }
+      ]
+    },
+    "schemes": [
+      {
+        "id": "steady",
+        "recommended": false,
+        "daily_minutes": 60,
+        "weekly_minutes": 420,
+        "low": 60,
+        "high": 68,
+        "extra_weekly_minutes": 0,
+        "uplift_low": 0,
+        "uplift_high": 0,
+        "first_week_minutes": 420,
+        "first_week_tasks": 14,
+        "day_plan": [
+          {
+            "day": "2026-10-22",
+            "minutes": 60,
+            "tasks": [
+              "review",
+              "priority"
+            ]
+          },
+          {
+            "day": "2026-10-23",
+            "minutes": 60,
+            "tasks": [
+              "review",
+              "priority"
+            ]
+          },
+          {
+            "day": "2026-10-24",
+            "minutes": 60,
+            "tasks": [
+              "review",
+              "priority"
+            ]
+          },
+          {
+            "day": "2026-10-25",
+            "minutes": 60,
+            "tasks": [
+              "review",
+              "priority"
+            ]
+          },
+          {
+            "day": "2026-10-26",
+            "minutes": 60,
+            "tasks": [
+              "review",
+              "priority"
+            ]
+          },
+          {
+            "day": "2026-10-27",
+            "minutes": 60,
+            "tasks": [
+              "review",
+              "priority"
+            ]
+          },
+          {
+            "day": "2026-10-28",
+            "minutes": 60,
+            "tasks": [
+              "review",
+              "priority"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "standard",
+        "recommended": true,
+        "daily_minutes": 90,
+        "weekly_minutes": 630,
+        "low": 70,
+        "high": 79,
+        "extra_weekly_minutes": 210,
+        "uplift_low": 7,
+        "uplift_high": 11,
+        "first_week_minutes": 630,
+        "first_week_tasks": 21,
+        "day_plan": [
+          {
+            "day": "2026-10-22",
+            "minutes": 90,
+            "tasks": [
+              "review",
+              "priority",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-23",
+            "minutes": 90,
+            "tasks": [
+              "review",
+              "priority",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-24",
+            "minutes": 90,
+            "tasks": [
+              "review",
+              "priority",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-25",
+            "minutes": 90,
+            "tasks": [
+              "review",
+              "priority",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-26",
+            "minutes": 90,
+            "tasks": [
+              "review",
+              "priority",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-27",
+            "minutes": 90,
+            "tasks": [
+              "review",
+              "priority",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-28",
+            "minutes": 90,
+            "tasks": [
+              "review",
+              "priority",
+              "recap"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "sprint",
+        "recommended": false,
+        "daily_minutes": 120,
+        "weekly_minutes": 840,
+        "low": 75,
+        "high": 84,
+        "extra_weekly_minutes": 420,
+        "uplift_low": 12,
+        "uplift_high": 16,
+        "first_week_minutes": 840,
+        "first_week_tasks": 28,
+        "day_plan": [
+          {
+            "day": "2026-10-22",
+            "minutes": 120,
+            "tasks": [
+              "review",
+              "priority",
+              "check",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-23",
+            "minutes": 120,
+            "tasks": [
+              "review",
+              "priority",
+              "check",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-24",
+            "minutes": 120,
+            "tasks": [
+              "review",
+              "priority",
+              "check",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-25",
+            "minutes": 120,
+            "tasks": [
+              "review",
+              "priority",
+              "check",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-26",
+            "minutes": 120,
+            "tasks": [
+              "review",
+              "priority",
+              "check",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-27",
+            "minutes": 120,
+            "tasks": [
+              "review",
+              "priority",
+              "check",
+              "recap"
+            ]
+          },
+          {
+            "day": "2026-10-28",
+            "minutes": 120,
+            "tasks": [
+              "review",
+              "priority",
+              "check",
+              "recap"
+            ]
+          }
+        ]
+      }
+    ],
+    "rounds": [
+      {
+        "id": "foundation",
+        "ordinal": 1,
+        "kind": "foundation",
+        "start": "2026-10-22",
+        "end": "2026-12-26"
+      },
+      {
+        "id": "focus",
+        "ordinal": 2,
+        "kind": "focus",
+        "start": "2026-12-27",
+        "end": "2027-03-03"
+      },
+      {
+        "id": "practice",
+        "ordinal": 3,
+        "kind": "practice",
+        "start": "2027-03-04",
+        "end": "2027-05-09"
+      },
+      {
+        "id": "final",
+        "ordinal": 4,
+        "kind": "final",
+        "start": "2027-05-10",
+        "end": "2027-05-16"
+      }
+    ],
+    "repairs": [],
+    "first_week": {
+      "items": [
+        "review",
+        "priority",
+        "check",
+        "recap"
+      ]
+    },
+    "data_source": "sample"
+  },
+  "quick_forecast": {
+    "low": 36,
+    "high": 62,
+    "target": 70,
+    "gap": 18,
+    "pass_line": 60,
+    "confidence": "low"
+  },
+  "quick_evidence_count": 8,
+  "locked_repairs": [
+    {
+      "kind": "granularity",
+      "count": 2
+    },
+    {
+      "kind": "coverage",
+      "count": 1
+    },
+    {
+      "kind": "target",
+      "count": 3
+    }
+  ]
+}

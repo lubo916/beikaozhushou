@@ -1,0 +1,151 @@
+# S05 起点报告：只读演示数据；计划、范围写权限尚未登记，按钮提供方案预览与登录入口。
+paths:
+  /learner/start-report/{view}:
+    get:
+      operationId: getStartReport
+      x-owner: plan
+      x-action: plan.plan.read
+      summary: 起点报告、时间可行性、范围初稿与三档方案
+      parameters:
+        - {name: view, in: path, required: true, schema: {type: string, enum: [normal, quick]}}
+      responses:
+        "200":
+          description: 业务数字均由接口返回；地图体检不通过时不返回 forecast
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S05StartReport"}
+        "403": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S05StartReport:
+      type: object
+      required: [viewer_id, exam_id, demo_exam_key, target_date, target_score, available, view, guest, map_health, exam_name, evidence_count, time, grid, chapters, gaps, scope, schemes, rounds, repairs, first_week, data_source]
+      properties:
+        viewer_id: {$ref: "#/components/schemas/Id"}
+        exam_id: {type: string}
+        demo_exam_key: {type: string, description: 演示考试选择键，仅用于示例缓存隔离}
+        target_date: {$ref: "#/components/schemas/LearningDay"}
+        target_score: {type: [number, "null"]}
+        available: {type: boolean}
+        view: {type: string, enum: [normal, quick]}
+        guest: {type: boolean}
+        map_health: {type: string, enum: [passed, blocked]}
+        exam_name: {type: string}
+        evidence_count: {type: integer, minimum: 0}
+        forecast: {$ref: "#/components/schemas/S05Forecast"}
+        time: {$ref: "#/components/schemas/S05TimeBudget"}
+        grid: {type: array, items: {$ref: "#/components/schemas/S05NamedCell"}}
+        chapters: {type: array, items: {$ref: "#/components/schemas/S05Chapter"}}
+        gaps: {type: array, items: {$ref: "#/components/schemas/S05Gap"}}
+        scope: {$ref: "#/components/schemas/S05Scope"}
+        schemes: {type: array, items: {$ref: "#/components/schemas/S05Scheme"}}
+        rounds: {type: array, items: {$ref: "#/components/schemas/S05Round"}}
+        repairs: {type: array, items: {$ref: "#/components/schemas/S05Repair"}}
+        first_week: {$ref: "#/components/schemas/S05FirstWeek"}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+    S05Forecast:
+      type: object
+      required: [low, high, target, gap, confidence]
+      properties:
+        low: {type: number}
+        high: {type: number}
+        target: {type: number}
+        pass_line: {type: number}
+        gap: {type: number, description: 最可能值距目标线的差额，由接口计算}
+        confidence: {type: string, enum: [low, moderate]}
+    S05TimeBudget:
+      type: object
+      required: [available_minutes, required_minutes, buffer_minutes, unavailable_days, coverage_ratio, shortfall_minutes]
+      properties:
+        available_minutes: {type: integer, minimum: 0}
+        required_minutes: {type: integer, minimum: 0}
+        buffer_minutes: {type: integer, minimum: 0}
+        unavailable_days: {type: integer, minimum: 0}
+        coverage_ratio: {type: number, minimum: 0}
+        shortfall_minutes: {type: integer, minimum: 0}
+    S05NamedCell:
+      allOf:
+        - {$ref: "#/components/schemas/MasteryCell"}
+        - type: object
+          required: [name]
+          properties:
+            name: {type: string}
+    S05Chapter:
+      type: object
+      required: [id, name, met_ratio, unlearned_count, high_frequency, priority_order]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        met_ratio: {type: number, minimum: 0, maximum: 1}
+        unlearned_count: {type: integer, minimum: 0}
+        high_frequency: {type: boolean}
+        priority_order: {type: integer, minimum: 1, description: 后端给定的薄弱优先顺序}
+    S05Gap:
+      type: object
+      required: [kind, points_gain, minutes, roi]
+      properties:
+        kind: {type: string, enum: [unlearned, forgotten, unstable, low_frequency]}
+        points_gain: {type: number}
+        minutes: {type: integer, minimum: 0}
+        roi: {type: string, enum: [S, A, B, C, D]}
+    S05Scope:
+      type: object
+      required: [total_count, removed_count, saved_minutes, score_cost, removals]
+      properties:
+        total_count: {type: integer, minimum: 0}
+        removed_count: {type: integer, minimum: 0}
+        saved_minutes: {type: integer, minimum: 0}
+        score_cost: {type: number, minimum: 0}
+        removals: {type: array, items: {$ref: "#/components/schemas/S05ScopeRemoval"}}
+    S05ScopeRemoval:
+      type: object
+      required: [id, name, roi, minutes, score_cost]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        roi: {type: string, enum: [S, A, B, C, D]}
+        minutes: {type: integer, minimum: 0}
+        score_cost: {type: number, minimum: 0}
+    S05Scheme:
+      type: object
+      required: [id, recommended, daily_minutes, weekly_minutes, low, high, extra_weekly_minutes, uplift_low, uplift_high, first_week_minutes, first_week_tasks, day_plan]
+      properties:
+        id: {type: string, enum: [steady, standard, sprint]}
+        recommended: {type: boolean}
+        daily_minutes: {type: integer, minimum: 0}
+        weekly_minutes: {type: integer, minimum: 0}
+        low: {type: number}
+        high: {type: number}
+        extra_weekly_minutes: {type: integer, minimum: 0}
+        uplift_low: {type: number}
+        uplift_high: {type: number}
+        first_week_minutes: {type: integer, minimum: 0}
+        first_week_tasks: {type: integer, minimum: 0}
+        day_plan: {type: array, items: {$ref: "#/components/schemas/S05PlanDay"}}
+    S05PlanDay:
+      type: object
+      required: [day, minutes, tasks]
+      properties:
+        day: {$ref: "#/components/schemas/LearningDay"}
+        minutes: {type: integer, minimum: 0}
+        tasks: {type: array, items: {type: string, enum: [review, priority, check, recap]}}
+    S05Round:
+      type: object
+      required: [id, ordinal, kind, start, end]
+      properties:
+        id: {type: string}
+        ordinal: {type: integer, minimum: 1}
+        kind: {type: string, enum: [foundation, focus, practice, final]}
+        start: {$ref: "#/components/schemas/LearningDay"}
+        end: {$ref: "#/components/schemas/LearningDay"}
+    S05Repair:
+      type: object
+      required: [kind, count]
+      properties:
+        kind: {type: string, enum: [granularity, coverage, target]}
+        count: {type: integer, minimum: 0}
+    S05FirstWeek:
+      type: object
+      required: [items]
+      properties:
+        items: {type: array, items: {type: string, enum: [review, priority, check, recap]}}
