@@ -3,12 +3,13 @@ import type { S27SprintHome } from "@exam-prep/contract";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { formatCount, formatDuration, formatRange, formatScore } from "@exam-prep/shared/format";
-import { Button, Card, Columns, DataTable, Dialog, PageState, Stat, StatGroup, buttonClass } from "@exam-prep/ui";
+import { Banner, Button, Card, Columns, DataTable, Dialog, PageState, Stat, StatGroup, buttonClass } from "@exam-prep/ui";
 import { pathTo } from "../../../routes.ts";
 
 export function AfterView({ data, soon }: { data: S27SprintHome; soon: () => void }) {
   const { t } = useTranslation("S27");
   const [register, setRegister] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const next = [
     { key: "next_subject", page: "S02" },
     { key: "retry", page: "S08" },
@@ -16,50 +17,56 @@ export function AfterView({ data, soon }: { data: S27SprintHome; soon: () => voi
   ] as const;
   return (
     <div className="flex flex-col gap-4" data-testid="S27-after">
-      {/* feat:S27-10 区间直接来自接口，不在页面估算。 */}
-      <Card title={t("after.estimate.title")} footer={<Button onClick={soon}>{t("after.estimate.action")}</Button>}>
-        <p>{t("after.estimate.body")}</p>
-        <DataTable
-          caption={t("after.estimate.title")}
-          stackOnNarrow
-          rows={data.estimates}
-          rowKey={(row) => row.subject_key}
-          columns={[
-            {
-              key: "subject",
-              header: t("after.estimate.subject"),
-              label: t("after.estimate.subject"),
-              render: (row) => t(`subject.${row.subject_key}`),
-            },
-            {
-              key: "objective",
-              header: t("after.estimate.objective"),
-              label: t("after.estimate.objective"),
-              render: (row) => formatScore(row.objective),
-            },
-            {
-              key: "subjective",
-              header: t("after.estimate.subjective"),
-              label: t("after.estimate.subjective"),
-              render: (row) => formatRange(row.subjective_low, row.subjective_high, t("unit.score")),
-            },
-            {
-              key: "total",
-              header: t("after.estimate.total"),
-              label: t("after.estimate.total"),
-              render: (row) => <strong>{formatRange(row.total_low, row.total_high, t("unit.score"))}</strong>,
-            },
-          ]}
-        />
-      </Card>
       <Columns
         main={
           <div className="flex flex-col gap-4">
+            {/* feat:S27-10 区间直接来自接口，不在页面估算。 */}
+            <Card title={t("after.estimate.title")} footer={<Button onClick={soon}>{t("after.estimate.action")}</Button>}>
+              <p>{t("after.estimate.body")}</p>
+              <DataTable
+                caption={t("after.estimate.title")}
+                stackOnNarrow
+                rows={data.estimates}
+                rowKey={(row) => row.subject_key}
+                columns={[
+                  {
+                    key: "subject",
+                    header: t("after.estimate.subject"),
+                    label: t("after.estimate.subject"),
+                    render: (row) => t(`subject.${row.subject_key}`),
+                  },
+                  {
+                    key: "objective",
+                    header: t("after.estimate.objective"),
+                    label: t("after.estimate.objective"),
+                    render: (row) => formatScore(row.objective),
+                  },
+                  {
+                    key: "subjective",
+                    header: t("after.estimate.subjective"),
+                    label: t("after.estimate.subjective"),
+                    render: (row) => formatRange(row.subjective_low, row.subjective_high, t("unit.score")),
+                  },
+                  {
+                    key: "total",
+                    header: t("after.estimate.total"),
+                    label: t("after.estimate.total"),
+                    render: (row) => <strong>{formatRange(row.total_low, row.total_high, t("unit.score"))}</strong>,
+                  },
+                ]}
+              />
+            </Card>
             {/* feat:S27-04 登记只是草稿演示，不回写学习证据或在页面校准。 */}
             <Card
               title={t("after.grades.title")}
               actions={
-                <Button variant="primary" onClick={() => setRegister(true)}>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    setSubmitted(false);
+                    setRegister(true);
+                  }}
+                >
                   {t("after.grades.action")}
                 </Button>
               }
@@ -80,6 +87,32 @@ export function AfterView({ data, soon }: { data: S27SprintHome; soon: () => voi
                   </li>
                 ))}
               </ul>
+            </Card>
+          </div>
+        }
+        aside={
+          <div className="flex flex-col gap-4">
+            {/* feat:S27-05 */}
+            <Card
+              title={t("after.archive.title")}
+              footer={
+                <div className="flex flex-wrap gap-2">
+                  <Button onClick={soon}>{t("after.archive.action")}</Button>
+                  <Link to={pathTo("S34")} className={buttonClass("secondary")}>
+                    {t("after.archive.open")}
+                  </Link>
+                </div>
+              }
+            >
+              <div className="flex flex-col gap-3">
+                <p>{t("after.archive.body")}</p>
+                <StatGroup>
+                  <Stat label={t("after.archive.study")} value={formatDuration(data.archive.study_minutes)} />
+                  <Stat label={t("after.archive.sessions")} value={formatCount(data.archive.sessions, t("unit.record"))} />
+                  <Stat label={t("after.archive.cards")} value={formatCount(data.archive.cards, t("unit.card"))} />
+                  <Stat label={t("after.archive.mistakes")} value={formatCount(data.archive.mistakes, t("unit.question"))} />
+                </StatGroup>
+              </div>
             </Card>
             <Card title={t("after.compare.title")}>
               <p>{t("after.compare.body")}</p>
@@ -116,44 +149,19 @@ export function AfterView({ data, soon }: { data: S27SprintHome; soon: () => voi
             </Card>
           </div>
         }
-        aside={
-          <div className="flex flex-col gap-4">
-            {/* feat:S27-05 */}
-            <Card
-              title={t("after.archive.title")}
-              footer={
-                <div className="flex flex-wrap gap-2">
-                  <Button onClick={soon}>{t("after.archive.action")}</Button>
-                  <Link to={pathTo("S34")} className={buttonClass("secondary")}>
-                    {t("after.archive.open")}
-                  </Link>
-                </div>
-              }
-            >
-              <div className="flex flex-col gap-3">
-                <p>{t("after.archive.body")}</p>
-                <StatGroup>
-                  <Stat label={t("after.archive.study")} value={formatDuration(data.archive.study_minutes)} />
-                  <Stat label={t("after.archive.sessions")} value={formatCount(data.archive.sessions, t("unit.record"))} />
-                  <Stat label={t("after.archive.cards")} value={formatCount(data.archive.cards, t("unit.card"))} />
-                  <Stat label={t("after.archive.mistakes")} value={formatCount(data.archive.mistakes, t("unit.question"))} />
-                </StatGroup>
-              </div>
-            </Card>
-          </div>
-        }
       />
       <Dialog open={register} onClose={() => setRegister(false)} title={t("after.grades.dialog")} description={t("after.grades.hint")}>
         <form
           className="flex flex-col gap-3"
           onSubmit={(event) => {
             event.preventDefault();
-            soon();
+            setSubmitted(true);
           }}
         >
+          {submitted && <Banner tone="warning">{t("soon")}</Banner>}
           <label className="flex flex-col gap-1">
             {t("after.grades.subject")}
-            <select name="subject" className="ui-input">
+            <select name="subject" className="min-w-0 rounded-sm border border-line-strong bg-bg-surface px-3 py-2">
               {data.estimates.map((row) => (
                 <option key={row.subject_key} value={row.subject_key}>
                   {t(`subject.${row.subject_key}`)}
@@ -163,7 +171,13 @@ export function AfterView({ data, soon }: { data: S27SprintHome; soon: () => voi
           </label>
           <label className="flex flex-col gap-1">
             {t("after.grades.score")}
-            <input name="score" type="number" step="any" required className="ui-input" />
+            <input
+              name="score"
+              type="number"
+              step="any"
+              required
+              className="min-w-0 rounded-sm border border-line-strong bg-bg-surface px-3 py-2"
+            />
           </label>
           <div className="flex flex-wrap gap-2">
             <Button type="submit" variant="primary">

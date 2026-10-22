@@ -8,22 +8,27 @@
   "time_zone": "Asia/Shanghai",
   "timeline": [
     {
-      "key": "overview",
-      "days": 10,
+      "key": "warm_start",
+      "days": 14,
       "active": false
     },
     {
-      "key": "warm",
-      "days": 7,
+      "key": "proposal",
+      "days": 10,
       "active": true
     },
     {
-      "key": "rest",
-      "days": 1,
+      "key": "align",
+      "days": 7,
       "active": false
     },
     {
       "key": "exam",
+      "days": 0,
+      "active": false
+    },
+    {
+      "key": "after",
       "days": 0,
       "active": false
     }
@@ -90,7 +95,7 @@
     },
     {
       "subject_key": "economics",
-      "objective": 48,
+      "objective": 46,
       "subjective_low": 16,
       "subjective_high": 22,
       "total_low": 62,

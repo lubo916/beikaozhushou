@@ -11,11 +11,15 @@ export function SprintView({ data, soon }: { data: S27SprintHome; soon: () => vo
   return (
     <div className="flex flex-col gap-4" data-testid="S27-sprint">
       <Card title={t("sprint.timeline.title")}>
-        <ol className="grid grid-cols-2 gap-3">
+        <ol className="grid grid-cols-5 gap-2">
           {data.timeline.map((step) => (
             <li key={step.key} className="flex min-w-0 flex-col gap-1">
-              <Tag tone={step.active ? "brand" : "neutral"}>
-                {step.days === 0 ? t("sprint.timeline.exam_day") : t("sprint.timeline.before", { days: formatDays(step.days) })}
+              <Tag tone={step.active ? "brand" : "neutral"} className="whitespace-normal">
+                {step.key === "after"
+                  ? t("views.after")
+                  : step.key === "exam"
+                    ? t("sprint.timeline.exam_day")
+                    : t("sprint.timeline.before", { days: formatDays(step.days) })}
               </Tag>
               <strong>{t(`sprint.timeline.${step.key}`)}</strong>
               {step.active && <span>{t("sprint.timeline.current")}</span>}
@@ -76,6 +80,26 @@ export function SprintView({ data, soon }: { data: S27SprintHome; soon: () => vo
                 />
               </div>
             </Card>
+          </div>
+        }
+        aside={
+          <div className="flex flex-col gap-4">
+            {/* feat:S27-08 feat:S27-12 */}
+            <Card title={t("sprint.sleep.title")} footer={<Button onClick={soon}>{t("sprint.sleep.action")}</Button>}>
+              <div className="flex flex-col gap-3">
+                <strong>{t("sprint.sleep.time", { time: formatTime(data.exam_start, data.time_zone) })}</strong>
+                <p>{t("sprint.sleep.body")}</p>
+                <Banner>{t("sprint.sleep.tip")}</Banner>
+              </div>
+            </Card>
+            <Checklist data={data} soon={soon} />
+            {/* feat:S27-03 */}
+            <Card title={t("sprint.quiet.title")}>
+              <p>{t("sprint.quiet.body")}</p>
+              <Link to={pathTo("S33")} className={buttonClass("ghost")}>
+                {t("sprint.quiet.action")}
+              </Link>
+            </Card>
             {/* feat:S27-06 AI 筛选结果带标识；生成/打印未接权限，保持提示态。 */}
             <Card
               title={t("sprint.sheet.title")}
@@ -101,26 +125,6 @@ export function SprintView({ data, soon }: { data: S27SprintHome; soon: () => vo
                   </ul>
                 </AiContent>
               </div>
-            </Card>
-          </div>
-        }
-        aside={
-          <div className="flex flex-col gap-4">
-            {/* feat:S27-08 feat:S27-12 */}
-            <Card title={t("sprint.sleep.title")} footer={<Button onClick={soon}>{t("sprint.sleep.action")}</Button>}>
-              <div className="flex flex-col gap-3">
-                <strong>{t("sprint.sleep.time", { time: formatTime(data.exam_start, data.time_zone) })}</strong>
-                <p>{t("sprint.sleep.body")}</p>
-                <Banner>{t("sprint.sleep.tip")}</Banner>
-              </div>
-            </Card>
-            <Checklist data={data} soon={soon} />
-            {/* feat:S27-03 */}
-            <Card title={t("sprint.quiet.title")}>
-              <p>{t("sprint.quiet.body")}</p>
-              <Link to={pathTo("S33")} className={buttonClass("ghost")}>
-                {t("sprint.quiet.action")}
-              </Link>
             </Card>
           </div>
         }

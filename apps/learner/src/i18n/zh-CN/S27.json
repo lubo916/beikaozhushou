@@ -48,7 +48,11 @@
       "overview": "高频速览",
       "warm": "手感保温",
       "rest": "放缓节奏",
-      "exam": "安心赴考"
+      "exam": "只留考务",
+      "warm_start": "卡片保温开启",
+      "proposal": "冲刺提议",
+      "align": "作息对齐",
+      "after": "估分与登记"
     },
     "today": {
       "title": "今日三件事",

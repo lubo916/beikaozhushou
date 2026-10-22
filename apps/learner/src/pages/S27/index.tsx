@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router";
 import { param } from "@exam-prep/params";
 import { formatCount, formatDate, formatDays } from "@exam-prep/shared/format";
-import { Banner, ContainerScope, PageHeader, PageState, Skeleton, Tabs, Tag, buttonClass } from "@exam-prep/ui";
+import { Banner, Card, ContainerScope, PageHeader, PageState, Skeleton, Tabs, Tag, buttonClass } from "@exam-prep/ui";
 import { useToast } from "../../app/toast.tsx";
 import { pathTo } from "../../routes.ts";
 import { useSprintHome } from "./data.ts";
@@ -107,7 +107,9 @@ export default function Page() {
             </Banner>
           )}
           {data !== undefined && home.state === "normal" && !restricted && view === "sprint" && !data.calibration_ready && (
-            <PageState state="insufficient_data" title={t("state.insufficient_data.title")} body={t("state.insufficient_data.body")} />
+            <Card title={t("after.compare.title")}>
+              <PageState state="insufficient_data" title={t("state.insufficient_data.title")} body={t("state.insufficient_data.body")} />
+            </Card>
           )}
           {content}
         </div>
