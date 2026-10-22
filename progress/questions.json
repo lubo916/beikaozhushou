@@ -1640,6 +1640,66 @@
       "asked": "v0024",
       "answer": "A",
       "answered": "v0024"
+    },
+    {
+      "id": "F08-Q1",
+      "task": "F08",
+      "q": "“受限”“数据不足”显示在哪里？",
+      "options": [
+        "A 只在考点档案卡片里提示，其余卡片照常",
+        "B 整页换成提示"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0028",
+      "answer": "A",
+      "answered": "v0028"
+    },
+    {
+      "id": "F08-Q2",
+      "task": "F08",
+      "q": "知识点还没挂资料和题目（空态）时，页面长什么样？",
+      "options": [
+        "A 页头照常显示名称和所属，下面放空态提示和“去挂资料”",
+        "B 整页只显示空态提示"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0028",
+      "answer": "A",
+      "answered": "v0028"
+    },
+    {
+      "id": "F08-Q3",
+      "task": "F08",
+      "q": "取数据失败时，多快告诉用户“没能加载”？（后面所有页面照这个写）",
+      "options": [
+        "A 自动再试 1 次，约 1 秒后提示",
+        "B 默认再试 3 次，约 7 秒后提示"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0028",
+      "answer": "A",
+      "answered": "v0028"
+    },
+    {
+      "id": "F08-Q4",
+      "task": "F08",
+      "q": "本页“改东西”的按钮（移出学习范围、加星标等），先做成真的还是先提示“即将上线”？",
+      "options": [
+        "A 先提示“即将上线”，整合任务登记权限后再接上",
+        "B 越界登记权限，把“移出学习范围”做成真的"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0028",
+      "answer": "A",
+      "answered": "v0028"
     }
   ]
 }

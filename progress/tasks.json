@@ -458,8 +458,17 @@
       "accept": [
         "在 docs/baseline/ui-rules.md 末尾的「样板页」一节写 15 行以内的“照着写”说明：目录结构、拿数据的写法、七态的写法、测试的写法"
       ],
-      "status": "todo",
-      "gate": "look"
+      "status": "done",
+      "gate": "look",
+      "history": [
+        {
+          "round": 1,
+          "version": "v0028",
+          "tool": "local",
+          "date": "2026-10-22 17:31",
+          "status": "done"
+        }
+      ]
     },
     {
       "id": "U01",
