@@ -2,8 +2,9 @@
 // ① 假数据：四个演示考试 × 六个视图（再加不传视图）× 正常、空、受限、数据不足，都通过生成的 Zod 校验；各视图的数据是该有的样子。
 // ② data.ts：七态判断只看请求结果；重试策略；?view= 只认页面登记的六个视图；一键开始的去向用路由表。
 // ③ 整个学员端挂在 /today，假数据接口接到生成的钩子上：正常、?view= 切视图、空态、出错各走一遍。
+// ④ 第 2 轮修的两处：生成的请求地址带上 view（?view= 才生效）；“待验证复核”按今天的作答算进度，做完英雄区接着指向下一项。
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { S06TodayHome } from "@exam-prep/contract";
+import { getGetTodayHomeUrl, type S06TodayHome } from "@exam-prep/contract";
 import { ApiError } from "@exam-prep/contract/errors";
 import * as zodSchemas from "@exam-prep/contract/zod";
 import { VOCAB } from "@exam-prep/shared/vocab";
@@ -25,6 +26,7 @@ interface Parser {
 const fixtures = loadDemoFixtures();
 const routes = collectRoutes(loadRouteModules());
 const parser = (zodSchemas as Record<string, unknown>)["getTodayHomeResponse"] as Parser | undefined;
+const answerParser = (zodSchemas as Record<string, unknown>)["submitAnswerBody"] as Parser | undefined;
 /** 北京时间 2026-10-21 10:00。 */
 const NOW = Date.parse("2026-10-21T02:00:00Z");
 const MODES = ["", "empty", "restricted", "insufficient_data"] as const;
@@ -48,7 +50,22 @@ function setup(state = "") {
     expect(result?.success, `view=${view}（?state=${state}）：${String(result?.error)}`).toBe(true);
     return outcome.body as S06TodayHome;
   };
-  return { control, api, today };
+  /** 在做题页作答：和做题页提交的是同一个接口（POST /practice/answers），作答记进内存仓库。 */
+  const answer = async (questionId: string): Promise<void> => {
+    const question = fixtures.exams.flatMap((exam) => exam.questions).find((item) => item.id === questionId);
+    const body = {
+      question_id: questionId,
+      question_version: question?.version,
+      response: { selected: [...(question?.answer ?? [])] },
+      confidence: "sure",
+      duration_ms: 0,
+    };
+    expect(answerParser?.safeParse(body).success, `作答的请求体不合契约：${questionId}`).toBe(true);
+    const headers = new Headers({ "idempotency-key": `S06-${questionId}` });
+    const outcome = await api.handle({ method: "POST", url: "http://localhost/api/v1/practice/answers", headers, body });
+    expect(outcome.kind === "json" ? outcome.status : outcome.kind, `作答没有记上：${questionId}`).toBe(200);
+  };
+  return { control, api, today, answer };
 }
 
 const itemsOf = (data: S06TodayHome) => data.segments.flatMap((group) => group.items);
@@ -117,6 +134,24 @@ describe("S06 假数据（mocks/pages/S06.ts）", () => {
     expect(itemsOf(restricted).every((item) => item.polished === undefined)).toBe(true);
     expect((await setup("insufficient_data").today()).pace).toBe("typical");
   });
+
+  it("待验证复核：进度按内存仓库里今天的作答算，做完记为已完成，下一项接着往下走（feat:S06-06、S06-07）", async () => {
+    const { today, answer } = setup();
+    const before = await today();
+    const verify = itemsOf(before).find((item) => item.task.source === "verify_recheck");
+    const ids = verify?.task.question_ids ?? [];
+    expect(ids.length, "待验证复核要有题，作答才有地方记").toBeGreaterThan(0);
+    // 还没作答：显示演示用的“进行中”，英雄区的“继续”指向它
+    expect([verify?.task.status, before.next_task_id]).toEqual(["in_progress", verify?.task.id]);
+    for (const id of ids) await answer(id);
+    const after = await today();
+    const done = itemsOf(after).find((item) => item.task.id === verify?.task.id);
+    expect([done?.task.status, done?.task.answered_count]).toEqual(["done", ids.length]);
+    expect(after.summary.done_count).toBe(before.summary.done_count + 1);
+    const open = itemsOf(after).filter((item) => item.task.status !== "done" && item.task.status !== "seen");
+    expect(after.next_task_id, "下一项是清单里还没做的第一项").toBe(open[0]?.task.id);
+    expect(after.next_task_id).not.toBe(verify?.task.id);
+  });
 });
 
 describe("S06 数据判断（data.ts）", () => {
@@ -152,13 +187,22 @@ describe("S06 数据判断（data.ts）", () => {
   });
 });
 
-/** 让生成的钩子发出的请求直接交给假数据接口（不经 Service Worker）。 */
-function stubFetch(api: MockApi): void {
+describe("S06 接口地址（生成的请求函数）", () => {
+  it("?view= 作为查询参数 view 发给接口：契约里写明 view 不展开，生成的地址不会丢掉它", () => {
+    expect(getGetTodayHomeUrl({ view: "first" })).toBe("/plan/today/home?view=first");
+    expect(getGetTodayHomeUrl({})).toBe("/plan/today/home");
+  });
+});
+
+/** 让生成的钩子发出的请求直接交给假数据接口（不经 Service Worker）；requested 记下每次请求的完整地址。 */
+function stubFetch(api: MockApi, requested: string[] = []): void {
   vi.stubGlobal("fetch", async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+    const href = new URL(url, "http://localhost").href;
+    requested.push(href);
     const outcome = await api.handle({
       method: init?.method ?? "GET",
-      url: new URL(url, "http://localhost").href,
+      url: href,
       headers: new Headers(init?.headers),
       body: undefined,
     });
@@ -191,6 +235,41 @@ describe("S06 页面（整个学员端挂在 /today）", () => {
     await settle(() => host.textContent?.includes(copy.list.off_meta) === true);
     expect(linkByText(host, copy.list.off_plan)?.getAttribute("href")).toBe("/plan");
     await unmount();
+  });
+
+  it("?view=first：今日页的请求带上 view=first，页面显示首次进入那一版（第 1 天，清单已按摸底结果排好）", async () => {
+    const requested: string[] = [];
+    stubFetch(setup().api, requested);
+    const { host, unmount } = await mountAt("/today?view=first", <App />);
+    const lead = copy.hero.line.first.split("{{")[0] ?? "";
+    await settle(() => host.textContent?.includes(lead) === true);
+    const views = requested.filter((url) => url.includes("/plan/today/home")).map((url) => new URL(url).searchParams.get("view"));
+    expect(views, "今日页的请求要带上地址里的 ?view=").toContain("first");
+    expect(host.textContent).toContain(lead);
+    expect(host.textContent).toContain(copy.hero.day_no.replace("{{n}}", "1"));
+    await unmount();
+  });
+
+  it("做完“待验证复核”回到今日：英雄区接着指向下一项，不再停在它上面（feat:S06-06）", async () => {
+    const { api, today, answer } = setup();
+    stubFetch(api);
+    const verify = itemsOf(await today()).find((item) => item.task.source === "verify_recheck");
+    const resume = copy.hero.continue.replace("{{source}}", VOCAB.task_source.verify_recheck);
+    const before = await mountAt("/today", <App />);
+    await settle(() => linkByText(before.host, resume) !== undefined);
+    expect(linkByText(before.host, resume)).toBeDefined();
+    await before.unmount();
+    // 在做题页把这一项的题做完（这里直接交给假数据接口），再回到今日
+    for (const id of verify?.task.question_ids ?? []) await answer(id);
+    const next = nextTask(await today());
+    const source = next === undefined ? "" : VOCAB.task_source[next.task.source];
+    const label = (next?.task.status === "in_progress" ? copy.hero.continue : copy.hero.start).replace("{{source}}", source);
+    const after = await mountAt("/today", <App />);
+    await settle(() => linkByText(after.host, label) !== undefined);
+    expect(next?.task.id).not.toBe(verify?.task.id);
+    expect(linkByText(after.host, label)?.getAttribute("href")).toBe(next === undefined ? undefined : goPath(next.go));
+    expect(linkByText(after.host, resume)).toBeUndefined();
+    await after.unmount();
   });
 
   it("空态：英雄区还在，提示“生成计划”并链到起点报告与方案", async () => {
