@@ -1,4 +1,5 @@
 # S24 只读展示契约。预测与完成度均由接口提供；本页不计算业务规则。
+# 口径按规则卡 R06（docs/baseline/rule-cards/metrics-prediction.md）：目标线是学员自己的目标分，差额＝目标分 − 最可能值。
 paths:
   /learner/progress:
     get:
@@ -37,11 +38,14 @@ components:
           type: number
         health:
           type: number
+          description: 健康度＝近期速度 ÷ 需要速度，两位小数（R06 R21）
         verdict:
           type: string
+          description: 判词（R06 R21）；ok 来得及、tight 有点紧、short 来不及，代码同 R06 例子表
           enum:
-          - steady
-          - adjust
+          - ok
+          - tight
+          - short
     S24Forecast:
       type: object
       required:
@@ -61,8 +65,10 @@ components:
           type: number
         target_line:
           type: number
+          description: 学员自己的目标分，不是合格线（R06 R9）
         gap:
           type: number
+          description: 差额＝目标分 − 最可能值（取整）；不大于 0 时页面写“已过目标线”，不显示负数
         pass_probability:
           type: number
         low_confidence:
@@ -108,10 +114,14 @@ components:
           type: number
         passed:
           type: boolean
+          description: 这一科的最可能值已到目标分（R06 R4）；预测锁定时为 false
         actual_minutes:
           type: number
         suggested_minutes:
           type: number
+        gap:
+          type: number
+          description: 这一科的差额（目标分 − 最可能值）；预测锁定时不给
     S24Time:
       type: object
       required:
@@ -333,9 +343,13 @@ components:
       - calibration
       properties:
         exam_id:
-          $ref: '#/components/schemas/Id'
+          type: string
+          description: 考试 ID，即 fixtures/exams 的目录名（与其他接口的 exam_id 一致，不是 UUID）
         exam_name:
           type: string
+        headline_subject:
+          type: string
+          description: 头部三个数所属科目（R06 R4：每科都要过的考试取差距最大的一科）；只有一科或不分科计分时不给
         computed_at:
           $ref: '#/components/schemas/Timestamp'
         time_zone:

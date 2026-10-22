@@ -1,294 +1,343 @@
 {
   "exam_id": "teacher-qualification",
-  "exam_name": "中学教师资格笔试",
+  "exam_name": "中学教师资格（笔试）",
   "computed_at": "2026-10-22T08:00:00Z",
   "time_zone": "Asia/Shanghai",
   "data_source": "sample",
   "has_progress": true,
   "map_check": "passed",
   "blocked_reasons": [],
-  "importance_estimated": true,
-  "evidence_count": 36,
+  "importance_estimated": false,
+  "evidence_count": 30,
   "metrics": {
-    "workload": 0.62,
-    "weighted": 0.58,
-    "recent_daily": 4.2,
-    "required_daily": 4,
-    "health": 1.05,
-    "verdict": "steady"
+    "workload": 0.52,
+    "weighted": 0.49,
+    "recent_daily": 1.2,
+    "required_daily": 1.4,
+    "health": 0.86,
+    "verdict": "tight"
   },
   "forecasts": {
     "today": {
-      "conservative": 54,
-      "likely": 61,
-      "optimistic": 68,
-      "target_line": 60,
-      "gap": 1,
-      "pass_probability": 0.72,
+      "conservative": 66,
+      "likely": 72,
+      "optimistic": 79,
+      "target_line": 78,
+      "gap": 6,
+      "pass_probability": 0.64,
       "low_confidence": false
     },
     "target": {
-      "conservative": 61,
-      "likely": 69,
-      "optimistic": 76,
-      "target_line": 60,
-      "gap": 9,
-      "pass_probability": 0.84,
+      "conservative": 74,
+      "likely": 80,
+      "optimistic": 86,
+      "target_line": 78,
+      "gap": -2,
+      "pass_probability": 0.9,
       "low_confidence": false
     }
   },
   "trend": [
     {
+      "day": "2026-09-03",
+      "conservative": 60,
+      "likely": 66,
+      "optimistic": 73
+    },
+    {
+      "day": "2026-09-10",
+      "conservative": 61,
+      "likely": 67,
+      "optimistic": 74
+    },
+    {
+      "day": "2026-09-17",
+      "conservative": 62,
+      "likely": 68,
+      "optimistic": 75
+    },
+    {
+      "day": "2026-09-24",
+      "conservative": 63,
+      "likely": 69,
+      "optimistic": 76
+    },
+    {
+      "day": "2026-10-01",
+      "conservative": 64,
+      "likely": 70,
+      "optimistic": 77
+    },
+    {
       "day": "2026-10-08",
-      "conservative": 48,
-      "likely": 54,
-      "optimistic": 63
+      "conservative": 64,
+      "likely": 70,
+      "optimistic": 77
     },
     {
       "day": "2026-10-15",
-      "conservative": 51,
-      "likely": 58,
-      "optimistic": 65
+      "conservative": 65,
+      "likely": 71,
+      "optimistic": 78
     },
     {
       "day": "2026-10-22",
-      "conservative": 54,
-      "likely": 61,
-      "optimistic": 68
+      "conservative": 66,
+      "likely": 72,
+      "optimistic": 79
     }
   ],
   "subjects": [
     {
-      "id": "subject-0",
-      "name": "综合素质",
-      "completion": 0.68,
-      "passed": true,
-      "actual_minutes": 180,
-      "suggested_minutes": 210
-    },
-    {
-      "id": "subject-1",
-      "name": "教育知识与能力",
-      "completion": 0.54,
+      "id": "019a0224-0000-7000-8000-000000000001",
+      "name": "科目二 教育知识与能力",
+      "completion": 0.52,
       "passed": false,
-      "actual_minutes": 120,
-      "suggested_minutes": 180
+      "actual_minutes": 1320,
+      "suggested_minutes": 1560,
+      "gap": 6
     }
   ],
   "time": {
-    "effective_minutes": 300,
-    "present_minutes": 420,
-    "pending_minutes": 45
+    "effective_minutes": 330,
+    "present_minutes": 468,
+    "pending_minutes": 72
   },
   "score_bands": [
     {
       "kind": "secured",
-      "score": 42
+      "score": 50
     },
     {
       "kind": "potential",
-      "score": 18
+      "score": 22
     },
     {
       "kind": "recoverable",
-      "score": 12
+      "score": 16
     },
     {
       "kind": "outside",
-      "score": 28
+      "score": 32
     }
   ],
   "points": [
     {
       "id": "019a0203-0000-7000-8000-000000000001",
       "name": "教育的本质与功能",
-      "expected_score": 6,
-      "exam_probability": 0.85,
+      "expected_score": 7,
+      "exam_probability": 0.82,
       "current_level": 2,
-      "personal_difficulty": "typical",
-      "minutes": 25,
+      "personal_difficulty": "easier",
+      "minutes": 30,
       "roi_grade": "S",
-      "roi_score": 92,
+      "roi_score": 90,
       "rank": 1,
-      "reason": "预期贡献较高，当前档接近目标档，适合先补。"
+      "reason": "导入的真题里 5 次考了 4 次，从已熟悉升到已掌握约需 30 分钟，预计多拿 7 分。"
     },
     {
-      "id": "019a0203-0000-7000-8000-000000000002",
-      "name": "课程类型",
-      "expected_score": 4,
-      "exam_probability": 0.7,
-      "current_level": 1,
-      "personal_difficulty": "harder",
+      "id": "019a0203-0000-7000-8000-000000000006",
+      "name": "最近发展区",
+      "expected_score": 6,
+      "exam_probability": 0.78,
+      "current_level": 2,
+      "personal_difficulty": "typical",
       "minutes": 35,
       "roi_grade": "A",
-      "roi_score": 84,
+      "roi_score": 80,
       "rank": 2,
-      "reason": "先补前置概念，再做变式题建立证据。"
+      "reason": "辨析题常考，补齐例子约需 35 分钟，预计多拿 6 分。"
     },
     {
       "id": "019a0203-0000-7000-8000-000000000003",
       "name": "教学原则",
-      "expected_score": 3,
-      "exam_probability": 0.65,
+      "expected_score": 5,
+      "exam_probability": 0.74,
       "current_level": 3,
-      "personal_difficulty": "easier",
-      "minutes": 20,
-      "roi_grade": "B",
-      "roi_score": 73,
+      "personal_difficulty": "typical",
+      "minutes": 25,
+      "roi_grade": "A",
+      "roi_score": 74,
       "rank": 3,
-      "reason": "预计用时较少，适合本轮收尾。"
+      "reason": "已经掌握，练两道材料分析到能应用约需 25 分钟，预计多拿 5 分。"
+    },
+    {
+      "id": "019a0203-0000-7000-8000-000000000004",
+      "name": "教学评价类型",
+      "expected_score": 4,
+      "exam_probability": 0.6,
+      "current_level": 0,
+      "personal_difficulty": "harder",
+      "minutes": 50,
+      "roi_grade": "C",
+      "roi_score": 45,
+      "rank": 4,
+      "reason": "还没学，先学再练约需 50 分钟，预计多拿 4 分。"
     }
   ],
   "path": [
     {
       "id": "019a0203-0000-7000-8000-000000000001",
       "name": "教育的本质与功能",
-      "expected_score": 6,
-      "exam_probability": 0.85,
+      "expected_score": 7,
+      "exam_probability": 0.82,
       "current_level": 2,
-      "personal_difficulty": "typical",
-      "minutes": 25,
+      "personal_difficulty": "easier",
+      "minutes": 30,
       "roi_grade": "S",
-      "roi_score": 92,
+      "roi_score": 90,
       "rank": 1,
-      "reason": "预期贡献较高，当前档接近目标档，适合先补。"
+      "reason": "导入的真题里 5 次考了 4 次，从已熟悉升到已掌握约需 30 分钟，预计多拿 7 分。"
     },
     {
-      "id": "019a0203-0000-7000-8000-000000000002",
-      "name": "课程类型",
-      "expected_score": 4,
-      "exam_probability": 0.7,
-      "current_level": 1,
-      "personal_difficulty": "harder",
+      "id": "019a0203-0000-7000-8000-000000000006",
+      "name": "最近发展区",
+      "expected_score": 6,
+      "exam_probability": 0.78,
+      "current_level": 2,
+      "personal_difficulty": "typical",
       "minutes": 35,
       "roi_grade": "A",
-      "roi_score": 84,
+      "roi_score": 80,
       "rank": 2,
-      "reason": "先补前置概念，再做变式题建立证据。"
+      "reason": "辨析题常考，补齐例子约需 35 分钟，预计多拿 6 分。"
     },
     {
       "id": "019a0203-0000-7000-8000-000000000003",
       "name": "教学原则",
-      "expected_score": 3,
-      "exam_probability": 0.65,
+      "expected_score": 5,
+      "exam_probability": 0.74,
       "current_level": 3,
-      "personal_difficulty": "easier",
-      "minutes": 20,
-      "roi_grade": "B",
-      "roi_score": 73,
+      "personal_difficulty": "typical",
+      "minutes": 25,
+      "roi_grade": "A",
+      "roi_score": 74,
       "rank": 3,
-      "reason": "预计用时较少，适合本轮收尾。"
+      "reason": "已经掌握，练两道材料分析到能应用约需 25 分钟，预计多拿 5 分。"
     }
   ],
   "gaps": [
     {
       "source": "not_learned",
-      "score": 12,
-      "action": "先学高贡献的未学知识点"
+      "score": 3,
+      "action": "先学教学评价类型、皮亚杰认知发展阶段"
     },
     {
       "source": "forgot",
-      "score": 8,
-      "action": "完成到期复习"
+      "score": 2,
+      "action": "按时做完到期复习"
     },
     {
       "source": "slip",
-      "score": 5,
-      "action": "回炉错题并补充错因"
-    },
-    {
-      "source": "time_short",
-      "score": 3,
-      "action": "安排限时练习"
+      "score": 1,
+      "action": "辨析题先找被偷换的概念"
     }
   ],
   "weaknesses": [
     {
       "dimension": "chapter",
-      "name": "学习理论",
-      "ratio": 0.38,
-      "action": "补概念后做变式检验"
+      "name": "中学生学习心理",
+      "ratio": 0.45,
+      "action": "最近发展区、学习动机两点正确率低，先做针对练习"
     },
     {
       "dimension": "question_type",
-      "name": "材料题",
-      "ratio": 0.46,
-      "action": "练习采分点表达"
+      "name": "材料分析",
+      "ratio": 0.36,
+      "action": "材料题先列采分点再作答"
     },
     {
       "dimension": "error_pattern",
-      "name": "审题失误",
-      "ratio": 0.52,
-      "action": "先圈限制条件再作答"
+      "name": "偷换概念",
+      "ratio": 0.33,
+      "action": "辨析题先找题干里被替换的概念"
     }
   ],
   "layers": [
     {
       "kind": "investment",
-      "ratio": 0.72,
-      "note": "投入按有效学习片段统计"
+      "ratio": 0.64,
+      "note": "本周有效学习 5.5 小时，在场 7.8 小时"
     },
     {
       "kind": "mastery",
-      "ratio": 0.62,
-      "note": "掌握以证据判定，不等于自评"
+      "ratio": 0.52,
+      "note": "已到手 12 档，共 23 档"
     },
     {
       "kind": "memory",
-      "ratio": 0.68,
-      "note": "复习回忆结果反映保持情况"
+      "ratio": 0.58,
+      "note": "到期复习按时完成 58%"
     },
     {
       "kind": "application",
-      "ratio": 0.48,
-      "note": "需要更多新情境的作答证据"
+      "ratio": 0.41,
+      "note": "材料分析题得分率 41%"
     }
   ],
   "methods": [
     {
-      "name": "主动回忆",
-      "ratio": 0.82
+      "name": "做题练习",
+      "ratio": 0.71
     },
     {
-      "name": "变式练习",
-      "ratio": 0.76
+      "name": "卡片复习",
+      "ratio": 0.69
     },
     {
-      "name": "阅读后即测",
-      "ratio": 0.64
+      "name": "阅读讲义",
+      "ratio": 0.45
     }
   ],
   "periods": [
     {
-      "name": "早间",
+      "name": "晚上 8–10 点",
       "ratio": 0.72
     },
     {
-      "name": "午后",
-      "ratio": 0.58
+      "name": "早上 7–9 点",
+      "ratio": 0.61
     },
     {
-      "name": "晚间",
-      "ratio": 0.8
+      "name": "午休",
+      "ratio": 0.33
     }
   ],
   "confidence": {
-    "overconfident": 8,
-    "underconfident": 5,
-    "note": "先验证自以为会的区域，也给会但不自信的知识点更多检验机会。"
+    "overconfident": 2,
+    "underconfident": 3,
+    "note": "会但不自信的有 3 个知识点，可以少花时间复看，直接做题验证"
   },
   "calibration": {
-    "samples": 126,
-    "mean_error": 4.6,
-    "interval_coverage": 0.83,
+    "samples": 58,
+    "mean_error": 5.8,
+    "interval_coverage": 0.79,
     "history": [
       {
-        "day": "2026-09-20",
+        "day": "2026-09-26",
         "label": "阶段模考",
-        "low": 52,
-        "high": 64,
-        "actual": 59
+        "low": 62,
+        "high": 76,
+        "actual": 70
       }
     ]
+  },
+  "scenarios": {
+    "insufficient_data": {
+      "evidence_count": 3,
+      "forecasts": {
+        "today": {
+          "conservative": 56,
+          "optimistic": 88
+        },
+        "target": {
+          "conservative": 62,
+          "optimistic": 96
+        }
+      }
+    },
+    "restricted": {
+      "blocked_reasons": ["有 2 个知识点缺少目标档"]
+    }
   }
 }

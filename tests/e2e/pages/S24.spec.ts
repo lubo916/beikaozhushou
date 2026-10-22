@@ -3,7 +3,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { formatDateTime, formatRange, formatScore } from "../../../packages/shared/src/format/index.ts";
+import { formatDateTime, formatNumber, formatRange, formatScore } from "../../../packages/shared/src/format/index.ts";
 import { pageById, urlOf } from "../support/catalog.ts";
 import { ABNORMAL_STATES, expectLoaded, expectNoProblems, expectOpened, expectState, watchPage } from "../support/checks.ts";
 import { ROOT } from "../support/env.ts";
@@ -182,6 +182,8 @@ interface ProgressFixture {
   readonly computed_at: string;
   readonly time_zone: string;
   readonly forecasts: Readonly<Record<"today" | "target", ForecastFixture>>;
+  readonly metrics: { readonly health: number; readonly verdict: string };
+  readonly subjects: readonly { readonly name: string; readonly passed: boolean; readonly gap?: number }[];
 }
 
 const progressFixture = JSON.parse(readFileSync(join(ROOT, "fixtures/pages/S24/junior-accounting.json"), "utf8")) as ProgressFixture;
@@ -196,7 +198,8 @@ test("S24 正常查看后重新离线打开，缓存保留三个数和原计算�
   const updated = copy("header.updated").replace("{{time}}", formatDateTime(progressFixture.computed_at, progressFixture.time_zone));
   await expect(mainOf(page).locator(".ui-pagehead")).toContainText(updated);
   await expect
-    .poll(async () => page.evaluate(() => sessionStorage.getItem("S24:sample:v1:kj")))
+    // 地址没写考试：存进“当前目标”这一格（不冒充初级会计，见 data.ts 与单元测试“离线缓存”）。
+    .poll(async () => page.evaluate(() => sessionStorage.getItem("S24:progress:v2:current")))
     .not.toBeNull();
 
   // goto 会重新加载页面模块，确保这里验证的是 sessionStorage，而非本次页面内的查询内存。
@@ -217,10 +220,12 @@ test("S24 体检阻断后，两个时点的预测值及趋势、分值表不再�
   const forecastStat = main.locator(".ui-stat").filter({ hasText: copy("metrics.forecast") }).locator(".ui-stat__value");
   const trend = main.locator(".ui-card").filter({ has: main.getByRole("heading", { name: copy("forecast.trend"), exact: true }) });
 
+  const today = progressFixture.forecasts.today;
   for (const at of ["today", "target"] as const) {
     await main.getByRole("radio", { name: copy("forecast." + at), exact: true }).press("Enter");
     const forecast = progressFixture.forecasts[at];
-    await expect(forecastStat).toHaveText(formatRange(forecast.conservative, forecast.optimistic, copy("common.score")));
+    // R06 R10a：三个数卡片固定显示“按今天的水平”；时点切换只影响预测走势卡。
+    await expect(forecastStat).toHaveText(formatRange(today.conservative, today.optimistic, copy("common.score")));
     for (const value of [forecast.conservative, forecast.likely, forecast.optimistic]) {
       await expect(trend).toContainText(formatScore(value));
     }
@@ -239,4 +244,44 @@ test("S24 体检阻断后，两个时点的预测值及趋势、分值表不再�
   await expect(main.getByRole("table", { name: copy("value.map"), exact: true })).toHaveCount(0);
   await expect(main.locator(".ui-stats")).toHaveCount(0);
   expectNoProblems(watch, "restricted");
+});
+
+test("S24 离线缓存按考试分开：看过初级会计后离线打开六级，不显示初级会计的数字", async ({ page }) => {
+  const watch = await watchPage(page);
+  await watch.open(urlOf(entry, { exam: "kj" }));
+  await expectLoaded(page, entry);
+  await expect.poll(async () => page.evaluate(() => sessionStorage.getItem("S24:progress:v2:kj"))).not.toBeNull();
+  await watch.open(urlOf(entry, { exam: "en", state: "offline" }));
+  await expectState(page, entry, "offline");
+  await expect(mainOf(page).locator(".ui-state--offline")).not.toHaveClass(/ui-state--compact/);
+  await expect(mainOf(page).locator(".ui-stats")).toHaveCount(0);
+  expectNoProblems(watch, "offline");
+});
+
+test("S24 三个数按 R06 显示：健康度是两位小数的比值加判词，各科写离目标线还差几分", async ({ page }) => {
+  const watch = await watchPage(page);
+  await watch.open(urlOf(entry, { view: "overview" }));
+  await expectLoaded(page, entry);
+  const main = mainOf(page);
+  const health = main.locator(".ui-stat").filter({ hasText: copy("metrics.health") });
+  await expect(health.locator(".ui-stat__value")).toHaveText(formatNumber(progressFixture.metrics.health, 2));
+  await expect(health).toContainText(copy("metrics.verdict." + progressFixture.metrics.verdict));
+  const table = main.getByRole("table", { name: copy("overview.subjects"), exact: true });
+  for (const subject of progressFixture.subjects) {
+    const status = subject.passed ? copy("forecast.reached") : copy("overview.short").replace("{{value}}", formatScore(subject.gap ?? 0));
+    await expect(table).toContainText(status);
+  }
+  expectNoProblems(watch, "normal");
+});
+
+test("S24 按计划学到目标日已过目标线时写“已过目标线”，不显示负数差额", async ({ page }) => {
+  const watch = await watchPage(page);
+  await watch.open(urlOf(entry, { exam: "js" }));
+  await expectLoaded(page, entry);
+  const main = mainOf(page);
+  await main.getByRole("radio", { name: copy("forecast.target"), exact: true }).press("Enter");
+  const trend = main.locator(".ui-card").filter({ has: main.getByRole("heading", { name: copy("forecast.trend"), exact: true }) });
+  await expect(trend).toContainText(copy("forecast.reached"));
+  await expect(trend).not.toContainText("-");
+  expectNoProblems(watch, "normal");
 });

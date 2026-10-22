@@ -1,16 +1,48 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { S24Progress } from "@exam-prep/contract";
-import { formatDuration, formatNumber, formatPercent, formatRange, formatScore } from "@exam-prep/shared/format";
-import { AiContent, Button, Card, Columns, DataTable, KeyValueList, Segmented, Stat, StatGroup } from "@exam-prep/ui";
+import type { S24Forecast, S24Progress } from "@exam-prep/contract";
+import { EMPTY_VALUE, formatDuration, formatNumber, formatPercent, formatRange, formatScore } from "@exam-prep/shared/format";
+import { AiContent, Button, Card, Columns, DataTable, KeyValueList, Segmented, Stat, StatGroup, Tag } from "@exam-prep/ui";
 import { ForecastLock } from "../components/ForecastLock.tsx";
+import { GapText } from "../components/GapText.tsx";
 import { Trend } from "../components/Trend.tsx";
+
+type Verdict = S24Progress["metrics"]["verdict"];
+
+/** 健康度判词对应的颜色（判词由接口给，R06 R21）。 */
+const HEALTH_TONE: Readonly<Record<Verdict, "success" | "warning" | "danger">> = { ok: "success", tight: "warning", short: "danger" };
+/** 健康度与两个速度显示两位小数（R06 R21）。 */
+const RATIO_DIGITS = 2;
+
+/** 三个数里“够不够”的说明：按今天的水平、最可能值与离目标线的差额，证据不足时带低置信标记。 */
+function ForecastHint({ forecast, blocked }: { forecast: S24Forecast | undefined; blocked: boolean }) {
+  const { t } = useTranslation("S24");
+  if (forecast === undefined) return <>{t(blocked ? "forecast.locked" : "forecast.none")}</>;
+  return (
+    <>
+      {t("forecast.today_hint", { likely: formatScore(forecast.likely) })}
+      <GapText gap={forecast.gap} />
+      {forecast.low_confidence && <Tag tone="warning">{t("forecast.low")}</Tag>}
+    </>
+  );
+}
+
+/** 各科一行（R06 R4）：到了写“已过目标线”，没到写“差 N 分”；体检不通过时不给差额。 */
+function SubjectStatus({ subject, blocked }: { subject: S24Progress["subjects"][number]; blocked: boolean }) {
+  const { t } = useTranslation("S24");
+  if (blocked || subject.gap === undefined) return <>{t("overview.locked")}</>;
+  return subject.passed ? <>{t("forecast.reached")}</> : <GapText gap={subject.gap} compact />;
+}
 
 export function Overview({ data, soon }: { data: S24Progress; soon: () => void }) {
   const { t } = useTranslation("S24");
   const [basis, setBasis] = useState<"workload" | "weighted">("workload");
-  const [at, setAt] = useState<"today" | "target">("target");
-  const forecast = data.forecasts[at];
+  const [at, setAt] = useState<"today" | "target">("today");
+  const blocked = data.map_check === "blocked";
+  // R06 R10a：三个数里的预测固定按今天的水平；走势卡里才能切到“按计划学到目标日”。
+  const today = blocked ? undefined : data.forecasts.today;
+  const shown = blocked ? undefined : data.forecasts[at];
+  const { metrics } = data;
   return (
     <div className="flex flex-col gap-4">
       {/* feat:S24-01 feat:S24-02 口径切换只选接口字段。 */}
@@ -20,41 +52,43 @@ export function Overview({ data, soon }: { data: S24Progress; soon: () => void }
         onChange={setBasis}
         options={["workload", "weighted"].map((value) => ({ value: value as typeof basis, label: t("metrics." + value) }))}
       />
+      {data.headline_subject !== undefined && (
+        <p className="text-small text-ink-secondary">{t("metrics.subject", { subject: data.headline_subject })}</p>
+      )}
       <StatGroup>
         <Stat
           label={t("metrics.forecast")}
           question={t("metrics.forecast_question")}
-          value={
-            data.map_check === "blocked" || !forecast ? "—" : formatRange(forecast.conservative, forecast.optimistic, t("common.score"))
-          }
-          hint={data.map_check === "blocked" ? t("state.restricted.title") : t("forecast." + at)}
+          value={today === undefined ? EMPTY_VALUE : formatRange(today.conservative, today.optimistic, t("common.score"))}
+          hint={<ForecastHint forecast={today} blocked={blocked} />}
           tone="brand"
         />
         <Stat
           label={t("metrics.completion")}
           question={t("metrics.completion_question")}
-          value={formatPercent(data.metrics[basis])}
+          value={formatPercent(metrics[basis])}
           hint={t("metrics.completion_note")}
           tone="brand"
         />
         <Stat
           label={t("metrics.health")}
           question={t("metrics.health_question")}
-          value={formatPercent(data.metrics.health)}
-          hint={t("metrics." + data.metrics.verdict)}
-          tone="success"
+          value={formatNumber(metrics.health, RATIO_DIGITS)}
+          hint={t("metrics.health_hint", {
+            verdict: t("metrics.verdict." + metrics.verdict),
+            required: formatNumber(metrics.required_daily, RATIO_DIGITS),
+            actual: formatNumber(metrics.recent_daily, RATIO_DIGITS),
+          })}
+          tone={HEALTH_TONE[metrics.verdict]}
         />
       </StatGroup>
-      <p className="text-small text-ink-secondary">
-        {t("metrics.pace", { actual: formatNumber(data.metrics.recent_daily), required: formatNumber(data.metrics.required_daily) })}
-      </p>
-      {/* feat:S24-03 feat:S24-07 feat:S24-19 体检阻断时预测与趋势均不渲染。 */}
+      {/* feat:S24-03 feat:S24-07 feat:S24-19 体检阻断时预测、走势与差额都不渲染。 */}
       <Columns
         main={
-          data.map_check === "blocked" ? (
+          blocked ? (
             <ForecastLock data={data} />
           ) : (
-            forecast && (
+            shown !== undefined && (
               <Card
                 title={t("forecast.trend")}
                 meta={t("forecast.trend_note")}
@@ -69,13 +103,15 @@ export function Overview({ data, soon }: { data: S24Progress; soon: () => void }
               >
                 <Trend data={data} />
                 <AiContent note={t("common.ai_note")}>
+                  {shown.low_confidence && <Tag tone="warning">{t("forecast.low")}</Tag>}
                   <KeyValueList
                     items={[
-                      { key: "conservative", label: t("forecast.conservative"), value: formatScore(forecast.conservative) },
-                      { key: "likely", label: t("forecast.likely"), value: formatScore(forecast.likely) },
-                      { key: "optimistic", label: t("forecast.optimistic"), value: formatScore(forecast.optimistic) },
-                      { key: "gap", label: t("forecast.gap"), value: formatScore(forecast.gap) },
-                      { key: "pass", label: t("forecast.pass"), value: formatPercent(forecast.pass_probability) },
+                      { key: "conservative", label: t("forecast.conservative"), value: formatScore(shown.conservative) },
+                      { key: "likely", label: t("forecast.likely"), value: formatScore(shown.likely) },
+                      { key: "optimistic", label: t("forecast.optimistic"), value: formatScore(shown.optimistic) },
+                      { key: "target_line", label: t("forecast.target_line"), value: formatScore(shown.target_line) },
+                      { key: "gap", label: t("forecast.gap"), value: <GapText gap={shown.gap} /> },
+                      { key: "pass", label: t("forecast.pass"), value: formatPercent(shown.pass_probability) },
                     ]}
                   />
                 </AiContent>
@@ -97,7 +133,7 @@ export function Overview({ data, soon }: { data: S24Progress; soon: () => void }
           </Card>
         }
       />
-      {/* feat:S24-11 feat:S24-13 */}
+      {/* feat:S24-11 feat:S24-13 每科一行，写离目标线还差多少。 */}
       <Card title={t("overview.subjects")}>
         <DataTable
           caption={t("overview.subjects")}
@@ -116,7 +152,7 @@ export function Overview({ data, soon }: { data: S24Progress; soon: () => void }
               key: "status",
               header: t("overview.status"),
               label: t("overview.status"),
-              render: (r) => t(r.passed ? "overview.passed" : "overview.pending"),
+              render: (r) => <SubjectStatus subject={r} blocked={blocked} />,
             },
             {
               key: "suggested",

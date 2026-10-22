@@ -1,154 +1,127 @@
 {
   "exam_id": "ds-final-custom",
-  "exam_name": "自建《数据结构》期末",
+  "exam_name": "《数据结构》期末考",
   "computed_at": "2026-10-22T08:00:00Z",
   "time_zone": "Asia/Shanghai",
   "data_source": "sample",
   "has_progress": true,
   "map_check": "blocked",
-  "blocked_reasons": [
-    "部分知识点缺少目标档",
-    "题量覆盖存在阻断项"
-  ],
+  "blocked_reasons": ["有 4 个知识点缺少目标档", "“图”一章有 2 组疑似重复的知识点"],
   "importance_estimated": true,
-  "evidence_count": 36,
+  "evidence_count": 24,
   "metrics": {
-    "workload": 0.62,
-    "weighted": 0.58,
-    "recent_daily": 4.2,
-    "required_daily": 4,
-    "health": 1.05,
-    "verdict": "steady"
+    "workload": 0.41,
+    "weighted": 0.38,
+    "recent_daily": 1.5,
+    "required_daily": 2.2,
+    "health": 0.68,
+    "verdict": "short"
   },
   "forecasts": {},
   "trend": [],
   "subjects": [
     {
-      "id": "subject-0",
+      "id": "019a0424-0000-7000-8000-000000000001",
       "name": "数据结构",
-      "completion": 0.68,
-      "passed": true,
-      "actual_minutes": 180,
-      "suggested_minutes": 210
+      "completion": 0.41,
+      "passed": false,
+      "actual_minutes": 780,
+      "suggested_minutes": 1320
     }
   ],
   "time": {
-    "effective_minutes": 300,
-    "present_minutes": 420,
-    "pending_minutes": 45
+    "effective_minutes": 264,
+    "present_minutes": 372,
+    "pending_minutes": 48
   },
   "score_bands": [],
   "points": [],
   "path": [],
-  "gaps": [
-    {
-      "source": "not_learned",
-      "score": 12,
-      "action": "先学高贡献的未学知识点"
-    },
-    {
-      "source": "forgot",
-      "score": 8,
-      "action": "完成到期复习"
-    },
-    {
-      "source": "slip",
-      "score": 5,
-      "action": "回炉错题并补充错因"
-    },
-    {
-      "source": "time_short",
-      "score": 3,
-      "action": "安排限时练习"
-    }
-  ],
+  "gaps": [],
   "weaknesses": [
     {
       "dimension": "chapter",
-      "name": "树与二叉树",
+      "name": "图",
       "ratio": 0.38,
-      "action": "补概念后做变式检验"
+      "action": "最短路径与存储结构先各练一组"
     },
     {
       "dimension": "question_type",
-      "name": "材料题",
-      "ratio": 0.46,
-      "action": "练习采分点表达"
+      "name": "算法设计",
+      "ratio": 0.3,
+      "action": "先写思路再写代码"
     },
     {
       "dimension": "error_pattern",
-      "name": "审题失误",
-      "ratio": 0.52,
-      "action": "先圈限制条件再作答"
+      "name": "方法不会",
+      "ratio": 0.34,
+      "action": "先看例题示范，再换一组数据自己走一遍"
     }
   ],
   "layers": [
     {
       "kind": "investment",
-      "ratio": 0.72,
-      "note": "投入按有效学习片段统计"
+      "ratio": 0.55,
+      "note": "本周有效学习 4.4 小时，在场 6.2 小时"
     },
     {
       "kind": "mastery",
-      "ratio": 0.62,
-      "note": "掌握以证据判定，不等于自评"
+      "ratio": 0.41,
+      "note": "已到手 9 档，共 22 档"
     },
     {
       "kind": "memory",
-      "ratio": 0.68,
-      "note": "复习回忆结果反映保持情况"
+      "ratio": 0.5,
+      "note": "到期复习按时完成 50%"
     },
     {
       "kind": "application",
-      "ratio": 0.48,
-      "note": "需要更多新情境的作答证据"
+      "ratio": 0.3,
+      "note": "算法设计题得分率 30%"
     }
   ],
   "methods": [
     {
-      "name": "主动回忆",
-      "ratio": 0.82
+      "name": "做题练习",
+      "ratio": 0.66
     },
     {
-      "name": "变式练习",
-      "ratio": 0.76
+      "name": "阅读讲义",
+      "ratio": 0.52
     },
     {
-      "name": "阅读后即测",
-      "ratio": 0.64
+      "name": "卡片复习",
+      "ratio": 0.47
     }
   ],
   "periods": [
     {
-      "name": "早间",
-      "ratio": 0.72
+      "name": "晚上 8–10 点",
+      "ratio": 0.7
     },
     {
-      "name": "午后",
-      "ratio": 0.58
+      "name": "下午 2–4 点",
+      "ratio": 0.55
     },
     {
-      "name": "晚间",
-      "ratio": 0.8
+      "name": "早上 7–9 点",
+      "ratio": 0.42
     }
   ],
   "confidence": {
-    "overconfident": 8,
-    "underconfident": 5,
-    "note": "先验证自以为会的区域，也给会但不自信的知识点更多检验机会。"
+    "overconfident": 2,
+    "underconfident": 2,
+    "note": "自评与检验大体一致，二叉树遍历可以少花时间复看"
   },
   "calibration": {
-    "samples": 126,
-    "mean_error": 4.6,
-    "interval_coverage": 0.83,
-    "history": [
-      {
-        "day": "2026-09-20",
-        "label": "阶段模考",
-        "low": 52,
-        "high": 64,
-        "actual": 59
-      }
-    ]
+    "samples": 37,
+    "mean_error": 6.2,
+    "interval_coverage": 0.76,
+    "history": []
+  },
+  "scenarios": {
+    "insufficient_data": {
+      "evidence_count": 3
+    }
   }
 }

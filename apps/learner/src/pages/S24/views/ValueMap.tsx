@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
+import { param } from "@exam-prep/params";
 import type { S24Point, S24Progress } from "@exam-prep/contract";
 import { formatDuration, formatNumber, formatPercent, formatScore } from "@exam-prep/shared/format";
 import { Banner, Button, Card, DataTable, Dialog, KeyValueList, Stat, StatGroup, Tag, buttonClass } from "@exam-prep/ui";
@@ -9,6 +10,7 @@ import { ForecastLock } from "../components/ForecastLock.tsx";
 export function ValueMap({ data }: { data: S24Progress }) {
   const { t } = useTranslation("S24");
   const [reason, setReason] = useState<S24Point>();
+  const jump = formatNumber(param("learner.forecast.max_tier_jump"), 0);
   if (data.map_check === "blocked") return <ForecastLock data={data} />;
   return (
     <div className="flex flex-col gap-4">
@@ -21,7 +23,7 @@ export function ValueMap({ data }: { data: S24Progress }) {
         ))}
       </StatGroup>
       {/* feat:S24-04 */}
-      <Card title={t("value.map")} meta={t("value.map_note")} footer={t("value.ladder_note")}>
+      <Card title={t("value.map")} meta={t("value.map_note")} footer={t("value.ladder_note", { levels: jump })}>
         <DataTable
           caption={t("value.map")}
           rows={data.points}

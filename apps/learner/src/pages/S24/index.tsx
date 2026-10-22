@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router";
 import { param } from "@exam-prep/params";
 import { formatCount, formatDateTime } from "@exam-prep/shared/format";
-import { Banner, Button, ContainerScope, Dialog, PageHeader, PageState, Segmented, Skeleton, Tabs, Tag, buttonClass } from "@exam-prep/ui";
+import { Button, ContainerScope, Dialog, PageHeader, PageState, Segmented, Skeleton, Tabs, Tag, buttonClass } from "@exam-prep/ui";
 import { useToast } from "../../app/toast.tsx";
 import { pathTo } from "../../routes.ts";
 import { useProgress } from "./data.ts";
@@ -60,9 +60,9 @@ export default function Page() {
       ) : home.state === "offline" ? (
         <PageState
           state="offline"
-          title={t("state.offline.title")}
-          body={t("state.offline.body")}
-          action={<Button onClick={home.retry}>{t("state.offline.missing")}</Button>}
+          title={t("state.offline.none_title")}
+          body={t("state.offline.body") + " " + t("state.offline.missing")}
+          action={<Button onClick={home.retry}>{t("common.retry")}</Button>}
         />
       ) : home.state === "error" || !data ? (
         <PageState state="error" pageName={t("title")} onRetry={home.retry} onReport={soon} />
@@ -112,12 +112,7 @@ export default function Page() {
             {view === "overview" && <Overview data={data} soon={soon} />}
             {view === "value" && <ValueMap data={data} />}
             {view === "diagnosis" && <Diagnosis data={data} soon={soon} />}
-            {view === "calibration" && (
-              <>
-                <Banner tone="info">{t("common.ai_note")}</Banner>
-                <Calibration data={data} soon={soon} />
-              </>
-            )}
+            {view === "calibration" && <Calibration data={data} soon={soon} />}
           </Tabs>
         </>
       )}

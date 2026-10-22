@@ -16,10 +16,8 @@
   },
   "common": {
     "soon": "即将上线",
-    "details": "查看口径",
     "score": "分",
     "close": "关闭",
-    "view_map": "去修复地图",
     "today": "查看今日清单",
     "plan": "查看学习计划",
     "ai_note": "预测仅供学习决策参考，不作成绩承诺。",
@@ -35,49 +33,53 @@
     "workload": "按工作量",
     "weighted": "按分值",
     "basis": "完成度口径",
-    "steady": "按当前节奏可按期推进",
-    "adjust": "建议调整投入与学习范围",
-    "pace": "近期日均 {{actual}} / 按期需要 {{required}}",
-    "completion_note": "学习范围内，从当前档到目标档的工作量完成情况。"
+    "completion_note": "学习范围内的工作量已完成多少。",
+    "subject": "三个数按“{{subject}}”这一科显示。",
+    "health_hint": "{{verdict}}：按期需要每天 {{required}} 档，近期每天 {{actual}} 档。",
+    "verdict": {
+      "ok": "来得及",
+      "tight": "有点紧",
+      "short": "来不及"
+    }
   },
   "forecast": {
-    "today": "按今天",
-    "target": "到目标日",
-    "basis": "预测口径",
-    "range": "预测分区间",
+    "today": "按今天的水平",
+    "target": "按计划学到目标日",
+    "basis": "预测时点",
     "conservative": "保守",
     "likely": "最可能",
     "optimistic": "乐观",
     "target_line": "目标线",
-    "gap": "最可能值与目标线差额",
+    "gap": "离目标线",
     "pass": "过线概率",
-    "gap_value": "{{value}}",
     "trend": "预测走势",
-    "trend_note": "保守、最可能、乐观三值；展示每次计算的记录。",
+    "trend_note": "阴影为保守到乐观的区间；“按计划学到目标日”是照计划做完的情景，不给通过承诺。",
     "date": "日期",
     "low": "低置信",
-    "evidence": "证据 {{count}} 条",
-    "ai": "结合掌握档、记忆、模考与剩余时间的示例预测。",
     "evidence_label": "作答与复习证据",
     "chart_label": "预测走势，阴影为保守至乐观区间，实线为最可能值",
-    "chart_data": "查看走势原始数据"
+    "chart_data": "查看走势原始数据",
+    "short": "离目标线还差 {{value}}",
+    "reached": "已过目标线",
+    "today_hint": "按今天的水平，最可能 {{likely}}；",
+    "locked": "预测已锁定",
+    "none": "暂无预测"
   },
   "overview": {
-    "subjects": "各科进度与已过线",
+    "subjects": "各科进度与目标线",
     "subject": "科目",
     "completion": "完成度",
-    "status": "过线情况",
-    "passed": "已过线",
-    "pending": "未过线",
+    "status": "离目标线",
     "time": "有效与在场",
     "effective": "有效学习时长",
     "present": "在场时长",
-    "pending_time": "可补做检测的片段",
-    "time_note": "只计产生证据的片段；在场不等于有效学习。",
+    "pending_time": "待检测",
+    "time_note": "只计产生证据的片段；在场不等于有效学习，补做检测后可转为有效。",
     "verify": "补做检测",
-    "investment": "建议与实际投入",
     "suggested": "建议时长",
-    "actual": "已投入"
+    "actual": "已投入",
+    "short": "差 {{value}}",
+    "locked": "预测已锁定"
   },
   "value": {
     "map": "分值地图",
@@ -94,7 +96,7 @@
     "grade": "性价比阶梯",
     "rating": "评分",
     "rank": "排位 {{rank}}",
-    "ladder_note": "S、A、B、C、D 五级；相邻重算的跳档幅度受规则限制。",
+    "ladder_note": "S、A、B、C、D 五级；相邻两次重算最多跳 {{levels}} 级。",
     "estimated": "考情数据不足，当前按重要度估算；不把估算当作真题统计。",
     "bands": {
       "secured": "已稳住",
@@ -122,7 +124,7 @@
     "proposal": "生成计划提议",
     "proposal_note": "仅生成待确认提议，确认前不改变计划。",
     "weak": "薄弱点雷达",
-    "add_today": "加入今日",
+    "add_today": "提议加入今日",
     "layers": "四层学情",
     "layer_detail": "查看 {{name}}",
     "methods": "学习方式效率",
@@ -147,7 +149,9 @@
       "mastery": "掌握",
       "memory": "记忆",
       "application": "应用"
-    }
+    },
+    "add_note": "只生成待你确认的提议，确认前不改变今日清单。",
+    "ai_note": "依据你的作答与复习证据生成"
   },
   "calibration": {
     "global": "全站预测校准公示",
@@ -161,7 +165,8 @@
     "exam": "考试",
     "predicted": "往期预测",
     "actual": "回填成绩",
-    "empty": "还没有回填成绩，登记后可核对往期预测。"
+    "empty": "还没有回填成绩，登记后可核对往期预测。",
+    "target": "目标 {{ratio}}"
   },
   "simulation": {
     "title": "情景模拟",
@@ -182,7 +187,8 @@
     "offline": {
       "title": "正在显示上次计算的结果",
       "body": "离线时可查看已缓存的内容与计算时间；重新计算、导出与提交需要联网。",
-      "missing": "尚未缓存进度结果，请联网后重试。"
+      "missing": "这台设备上还没有缓存过进度结果，联网后点“重试”即可。",
+      "none_title": "现在没有联网，还没有可显示的进度"
     },
     "restricted": {
       "title": "地图体检未通过，预测已锁定",

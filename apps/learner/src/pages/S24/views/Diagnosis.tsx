@@ -37,19 +37,21 @@ export function Diagnosis({ data, soon }: { data: S24Progress; soon: () => void 
       <Columns
         main={
           <div className="flex flex-col gap-4">
-            {/* feat:S24-14 */}
-            <Card title={t("diagnosis.weak")}>
-              <div className="flex flex-col gap-4">
-                {data.weaknesses.map((w) => (
-                  <div key={w.dimension}>
-                    <ProgressBar label={t("diagnosis.dimension." + w.dimension) + " · " + w.name} value={w.ratio} tone="warning" />
-                    <p className="my-2 text-small text-ink-secondary">{w.action}</p>
-                    <Button size="sm" onClick={soon}>
-                      {t("diagnosis.add_today")}
-                    </Button>
-                  </div>
-                ))}
-              </div>
+            {/* feat:S24-14 行动建议只生成待确认的提议，确认前不改今日清单。 */}
+            <Card title={t("diagnosis.weak")} footer={t("diagnosis.add_note")}>
+              <AiContent note={t("diagnosis.ai_note")}>
+                <div className="flex flex-col gap-4">
+                  {data.weaknesses.map((w) => (
+                    <div key={w.dimension}>
+                      <ProgressBar label={t("diagnosis.dimension." + w.dimension) + " · " + w.name} value={w.ratio} tone="warning" />
+                      <p className="my-2 text-small text-ink-secondary">{w.action}</p>
+                      <Button size="sm" onClick={soon}>
+                        {t("diagnosis.add_today")}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </AiContent>
             </Card>
             {/* feat:S24-12 */}
             <Card title={t("diagnosis.layers")}>
