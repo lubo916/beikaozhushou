@@ -2,7 +2,7 @@ import { mountAt, settle } from "../../app/testing.tsx";
 import copy from "../../i18n/zh-CN/O01.json";
 import "./aggregate.test.ts";
 import "./state.test.ts";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { ApiError } from "@exam-prep/contract/errors";
 import * as schemas from "@exam-prep/contract/zod";
 import { handleO01, o01Fixture } from "../../mocks/pages/O01.ts";
@@ -57,9 +57,31 @@ describe("O01 机构工作台", () => {
   });
 });
 
+// 与 S10 样板一致：组件测试直接连接同一 mock handler，不依赖 Vitest 的静态资源目录。
+// 生成钩子和请求适配器仍实际运行；真正 Service Worker 链路由本页 e2e 覆盖。
+function stubPageTransport() {
+  vi.stubEnv("VITE_MOCKS", "off");
+  vi.stubGlobal("fetch", async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    const asked = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+    const outcome = await handleO01({
+      method: init?.method ?? "GET",
+      url: new URL(asked, window.location.origin).href,
+      headers: new Headers(init?.headers),
+      body: undefined,
+    });
+    if (outcome.kind === "hang") return new Promise<Response>(() => undefined);
+    if (outcome.kind !== "json") throw new TypeError("mock network unavailable");
+    return new Response(JSON.stringify(outcome.body), { status: outcome.status, headers: { "content-type": "application/json" } });
+  });
+}
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
+});
 describe("O01 真实页面组件", () => {
   for (const state of ["normal", "empty", "error"]) {
-    it(`${state} 经生成钩子与 MSW 挂载`, async () => {
+    it(`${state} 经生成钩子与模拟接口挂载`, async () => {
+      stubPageTransport();
       const mounted = await mountAt("/workbench?state=" + state);
       try {
         const selector = state === "normal" ? ".ui-cols" : `.ui-state--${state}`;
@@ -68,7 +90,9 @@ describe("O01 真实页面组件", () => {
         expect(mounted.host.querySelector("h1")?.textContent).toBe(copy.title);
         if (state === "empty") expect(mounted.host.textContent).toContain(copy.state.empty.body);
         if (state === "error") expect(mounted.host.textContent).toContain(copy.state.error.body);
-      } finally { await mounted.unmount(); }
+      } finally {
+        await mounted.unmount();
+      }
     });
   }
 });
