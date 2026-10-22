@@ -33,6 +33,7 @@
     "meta": "先做推迟有损失的，再做推迟无损失的",
     "why": "为什么这样排",
     "consolidate_meta": "保底 {{ratio}} 时间 · 约 {{duration}}",
+    "consolidate_floor": "保底 {{ratio}} 时间",
     "advance_meta": "{{mode}}排序 · 约 {{duration}}",
     "closing_meta": "睡前几分钟 · 约 {{duration}}",
     "capped": "到期较多：先给最要紧的一批（考频 × 遗忘风险），其余已顺延",
@@ -85,14 +86,24 @@
     "close": "关闭"
   },
   "state": {
-    "empty": { "title": "今天没有安排", "body": "目标日已过或还没生成计划", "action": "生成计划" },
-    "offline": { "body": "清单与到期复习已缓存，可离线完成；证据联网后补记", "stale": "现在没联网" },
+    "empty": {
+      "title": "今天没有安排",
+      "body": "目标日已过或还没生成计划",
+      "action": "生成计划"
+    },
+    "offline": {
+      "body": "清单与到期复习已缓存，可离线完成；证据联网后补记",
+      "stale": "现在没联网"
+    },
     "restricted": {
       "title": "AI 点数用完了",
       "body": "额度用完时，到期复习、错题回炉与新学照常；只暂停高成本 AI",
       "action": "看会员与权益"
     },
-    "insufficient_data": { "title": "你的实测还不够", "body": "前两周按同类考生的典型节奏排；你的实测足够后改用你的数据" }
+    "insufficient_data": {
+      "title": "你的实测还不够",
+      "body": "前两周按同类考生的典型节奏排；你的实测足够后改用你的数据"
+    }
   },
   "soon": {
     "short": "即将上线：按你说的时间即时重组今天的任务",

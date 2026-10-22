@@ -18,16 +18,20 @@ import { TierSwitch } from "./TierSwitch.tsx";
 function SegmentMeta({ group, data }: { group: S06Segment; data: S06TodayHome }) {
   const { t } = useTranslation("S06");
   const duration = formatDuration(group.minutes);
+  const empty = group.items.length === 0;
   // feat:S06-02 时间预算与配比：每段分到的时间、巩固段保底占比与推进段的配比模式都由接口给
   if (group.segment === "consolidate") {
     return (
       <>
-        {t("list.consolidate_meta", { ratio: formatPercent(data.budget.floor_ratio), duration })}
+        {empty
+          ? t("list.consolidate_floor", { ratio: formatPercent(data.budget.floor_ratio) })
+          : t("list.consolidate_meta", { ratio: formatPercent(data.budget.floor_ratio), duration })}
         {/* feat:S06-24 到期过多保护：只给最要紧的一批，其余顺延，不显示积压数 */}
         {group.capped && <span className="block text-status-warning">{t("list.capped")}</span>}
       </>
     );
   }
+  if (empty) return null;
   if (group.segment === "advance") return <>{t("list.advance_meta", { mode: VOCAB.mix_mode[data.budget.mix_mode], duration })}</>;
   return <>{t("list.closing_meta", { duration })}</>;
 }
