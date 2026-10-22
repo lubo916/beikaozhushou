@@ -48,7 +48,7 @@ export function WorkbenchContent({ data, offline }: { data: O01Workbench; offlin
             counts={[{ key: "sample", label: t("count"), value: formatCount(data.sample_count, t("person")) }]}
           />
         ) : (
-          <StatGroup>
+          <StatGroup className="grid-cols-2 @content-md:grid-cols-4">
             {data.metrics.map((m) => (
               <Stat key={m.id} label={t(`metrics.${m.id}`)} value={metricValue(m)} />
             ))}

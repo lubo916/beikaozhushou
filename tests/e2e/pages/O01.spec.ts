@@ -24,6 +24,15 @@ for (const width of [375, 834, 1280])
     if (width === 1280) expect(b.x).toBeGreaterThanOrEqual(a.x + a.width - 1);
     else expect(b.y).toBeGreaterThanOrEqual(a.y + a.height - 1);
     expect(await main.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(1);
+    const stats = main.locator(".ui-stats .ui-stat");
+    const firstStat = await stats.nth(0).boundingBox();
+    const secondStat = await stats.nth(1).boundingBox();
+    const thirdStat = await stats.nth(2).boundingBox();
+    if (firstStat === null || secondStat === null || thirdStat === null) throw new Error("统计卡未显示");
+    expect(Math.abs(firstStat.y - secondStat.y)).toBeLessThanOrEqual(1);
+    if (width === 1280) expect(Math.abs(firstStat.y - thirdStat.y)).toBeLessThanOrEqual(1);
+    else expect(thirdStat.y).toBeGreaterThan(firstStat.y + firstStat.height - 1);
+
     await page.screenshot({ path: test.info().outputPath(`O01-${width}.png`), fullPage: true });
   });
 test("O01 无多视图，四考试与七态可打开", async ({ page }) => {
