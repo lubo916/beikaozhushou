@@ -54,12 +54,15 @@
       "status": "in_progress",
       "segment": "consolidate",
       "source": "verify_recheck",
-      "title": "待验证复核 2 道",
+      "title": "待验证复核 1 道",
       "minutes": 4,
+      "question_ids": [
+        "019a0104-0000-7000-8000-000000000002"
+      ],
       "reasons": [
         {
           "kind": "guess_correct",
-          "count": 2
+          "count": 1
         }
       ],
       "go": {

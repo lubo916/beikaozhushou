@@ -2,6 +2,8 @@
 // 按今天的作答算进度，到期的错题合成“错题回炉”）；页面专用的示例取 fixtures/pages/S06/<考试 ID>.json：理由、一键开始去哪、
 // 演示用的完成状态、本页另加的几项任务、换档时长、明天第一件事，以及不可学日与中断回归时的任务。
 // 规则还没实现：件数、分钟数、下一项、换档时长只是把演示数据加一加、排一排，整份标 data_source 为 sample。
+// 完成看证据：本页另加的任务写了题目的（如待验证复核），进度和清单里其他任务同一口径，按今天在内存仓库里的作答算；
+// 演示用的完成状态只在还没作答时套用。所以在做题页把题做完，回到今日这一项就记为已完成，英雄区的“继续”接着指向下一项。
 // 视图：页面在开发与测试时把地址里的 ?view= 传来（查询参数 view）；没传时按数据定——都做完了是“全部完成”，否则是“正常”。
 // ?state= 的空、受限、数据不足由下面的 variants 给数据；加载、出错、离线由接口层统一处理（mocks/api.ts），这里不管。
 import { param } from "@exam-prep/params";
@@ -35,6 +37,8 @@ interface TaskEntry {
   readonly source?: string;
   readonly title?: string;
   readonly minutes?: number;
+  /** 这一项的题（如待验证复核要换个问法再考的题）：进度按今天在内存仓库里的作答算。 */
+  readonly question_ids?: readonly string[];
   readonly reasons?: readonly Reason[];
   readonly polished?: string;
   readonly go?: Json;
@@ -92,25 +96,35 @@ function pageFixture(examId: string): PageFixture {
   return hit === undefined ? NO_PAGE : (hit[1] as PageFixture);
 }
 
-/** 本页另加的一项：照公共的今日任务的形状补齐（题目、卡片、知识点先留空）。 */
-function extraTask(entry: TaskEntry): Json {
+/** 今天已作答的题：内存仓库里只追加的作答记录（今日清单算进度用的也是这一份）。 */
+function answeredToday(ctx: MockContext): ReadonlySet<string> {
+  const attempts = ctx.db.attempts(ctx.exam.examId).filter((attempt) => attempt.day === ctx.day);
+  return new Set(attempts.map((attempt) => attempt.questionId));
+}
+
+/** 本页另加的一项：照公共的今日任务的形状补齐（卡片、知识点先留空）。写了题目的，和今日清单里的任务同一口径：
+ * 一道没答是待做，答了一部分是进行中，都答了是完成（完成看证据）；演示用的完成状态只在还没作答时套用。 */
+function extraTask(entry: TaskEntry, answered: ReadonlySet<string>): Json {
+  const questions = entry.question_ids ?? [];
+  const count = questions.filter((id) => answered.has(id)).length;
+  const progress = count === 0 ? "todo" : count < questions.length ? "in_progress" : "done";
   return {
     id: entry.id,
     segment: entry.segment ?? "advance",
     source: entry.source ?? "org_or_custom",
     title: entry.title ?? "",
     minutes: entry.minutes ?? 0,
-    status: entry.status ?? "todo",
-    question_ids: [],
+    status: progress === "todo" ? (entry.status ?? "todo") : progress,
+    question_ids: [...questions],
     card_ids: [],
     knowledge_point_ids: [],
-    question_count: 0,
-    answered_count: 0,
+    question_count: questions.length,
+    answered_count: count,
   };
 }
 
 /** 今日清单：内存仓库里的任务（带真进度）补上页面示例，再加上本页另加的几项。 */
-function todayRows(ctx: MockContext, page: PageFixture): Row[] {
+function todayRows(ctx: MockContext, page: PageFixture, answered: ReadonlySet<string>): Row[] {
   const entries = new Map(page.tasks.map((entry) => [entry.id, entry]));
   const list: unknown = ctx.db.todayList(ctx.exam, ctx.day);
   const groups = isRecord(list) && Array.isArray(list["segments"]) ? (list["segments"] as unknown[]) : [];
@@ -124,7 +138,9 @@ function todayRows(ctx: MockContext, page: PageFixture): Row[] {
       return { task: demo === undefined ? task : { ...task, status: demo }, entry };
     });
   const known = new Set(base.map((row) => String(row.task["id"])));
-  const extra = page.tasks.filter((entry) => !known.has(entry.id) && entry.title !== undefined).map((entry) => ({ task: extraTask(entry), entry }));
+  const extra = page.tasks
+    .filter((entry) => !known.has(entry.id) && entry.title !== undefined)
+    .map((entry) => ({ task: extraTask(entry, answered), entry }));
   return [...base, ...extra];
 }
 
@@ -134,11 +150,12 @@ function withStatus(row: Row, status: string): Row {
 }
 
 /** 各视图的任务：不可学日只留到期复习的最小版，中断回归先给启动任务，首次进入是第一天的清单，全部完成时都已完成。 */
-function rowsFor(view: View, rows: readonly Row[], page: PageFixture): Row[] {
-  const fresh = (entries: readonly TaskEntry[]): Row[] => entries.map((entry) => ({ task: extraTask(entry), entry }));
+function rowsFor(view: View, rows: readonly Row[], page: PageFixture, answered: ReadonlySet<string>): Row[] {
+  const fresh = (entries: readonly TaskEntry[]): Row[] => entries.map((entry) => ({ task: extraTask(entry, answered), entry }));
+  const firstDay = (row: Row): boolean => !page.first_skip.includes(String(row.task["segment"]));
   if (view === "off") return fresh(page.off);
   if (view === "back") return fresh(page.back.tasks);
-  if (view === "first") return rows.filter((row) => !page.first_skip.includes(String(row.task["segment"]))).map((row) => withStatus(row, "todo"));
+  if (view === "first") return rows.filter(firstDay).map((row) => withStatus(row, "todo"));
   if (view === "done") return rows.map((row) => withStatus(row, "done"));
   return [...rows];
 }
@@ -180,10 +197,11 @@ function aiPaused(mode: Mode, view: View): string {
 
 function home(ctx: MockContext, mode: Mode): Json {
   const page = pageFixture(ctx.exam.examId);
-  const all = todayRows(ctx, page);
+  const answered = answeredToday(ctx);
+  const all = todayRows(ctx, page, answered);
   const asked = VIEWS.find((view) => view === ctx.query.get("view"));
   const view: View = asked ?? (all.length > 0 && all.every(isFinished) ? "done" : "normal");
-  const rows = mode === "empty" ? [] : rowsFor(view, all, page);
+  const rows = mode === "empty" ? [] : rowsFor(view, all, page, answered);
   const polish = view !== "noai" && mode !== "restricted";
   const awayDays = page.back.away_days;
   const bySegment = SEGMENTS.map((segment) => ({

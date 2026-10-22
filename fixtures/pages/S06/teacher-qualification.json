@@ -8,7 +8,7 @@
   "first_skip": ["consolidate"],
   "tasks": [
     { "id": "019a0206-0000-7000-8000-000000000001", "order": 10, "status": "done", "reasons": [{ "kind": "due", "count": 12 }], "go": { "page": "S15" } },
-    { "id": "019a0206-0000-7000-8000-000000000061", "order": 30, "segment": "consolidate", "source": "verify_recheck", "title": "待验证复核 1 道", "minutes": 3, "reasons": [{ "kind": "guess_correct", "count": 1 }], "go": { "page": "S18" } },
+    { "id": "019a0206-0000-7000-8000-000000000061", "order": 30, "segment": "consolidate", "source": "verify_recheck", "title": "待验证复核 1 道", "minutes": 3, "question_ids": ["019a0204-0000-7000-8000-000000000002"], "reasons": [{ "kind": "guess_correct", "count": 1 }], "go": { "page": "S18" } },
     { "id": "019a0206-0000-7000-8000-000000000003", "order": 10, "reasons": [{ "kind": "not_learned" }, { "kind": "frequency", "years": 5, "times": 5, "score": 8 }], "go": { "page": "S12" } },
     { "id": "019a0206-0000-7000-8000-000000000002", "order": 20, "reasons": [{ "kind": "accuracy_band", "low": 0.6, "high": 0.8 }], "go": { "page": "S18" } },
     { "id": "019a0206-0000-7000-8000-000000000004", "order": 10, "reasons": [{ "kind": "bedtime_recall" }], "go": { "page": "S16" } }
