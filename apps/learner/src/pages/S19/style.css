@@ -62,3 +62,8 @@
     grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
   }
 }
+
+/* 为公共导师浮标留出空位，手机上的页尾动作可直接点击。 */
+.s19-detail-actions {
+  padding-inline-end: calc(var(--size-space-12) * 2);
+}

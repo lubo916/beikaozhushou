@@ -152,3 +152,19 @@ test("S19 从陷阱对应错题切回今日不残留隐藏筛选", async ({ page
   await expect(page.locator(".s19-row")).toHaveCount(3);
   await expect(page).not.toHaveURL(/trap=/);
 });
+
+test("S19 手机详情的移出按钮不被导师浮标遮挡", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 900 });
+  await page.goto(`${pathTo("S19")}?exam=kj`);
+  const remove = page.locator("main").getByRole("button", { name: text("actions.remove"), exact: true });
+  await remove.scrollIntoViewIfNeeded();
+  expect(
+    await remove.evaluate((el) => {
+      const box = el.getBoundingClientRect();
+      const target = document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2);
+      return target === el || (target !== null && el.contains(target));
+    }),
+  ).toBe(true);
+  await remove.click();
+  await expect(page.getByRole("status").filter({ hasText: text("soon_remove") })).toBeVisible();
+});

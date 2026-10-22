@@ -112,7 +112,7 @@ export function MistakeDetail({ row }: { row: S19MistakeRow }) {
           </li>
         ))}
       </ul>
-      <div className="flex flex-wrap gap-2">
+      <div className="s19-detail-actions flex flex-wrap gap-2">
         <Link className={buttonClass("secondary", "sm")} to={pathTo("S10", { kpId: row.mistake.knowledge_point_ids[0] ?? "demo" })}>
           {t("actions.point")}
         </Link>
