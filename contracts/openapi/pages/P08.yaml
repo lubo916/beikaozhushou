@@ -1,0 +1,156 @@
+# P08 题库审核与质量：审核队列、生成题七道质检、变式题池、报错闭环（阶段 1 只有假数据层，不接真实服务）。
+# x-action 暂用已登记、同属内容域的题目读取动作 content.question.read（含内容审核角色 content_reviewer）作占位；
+# 它也开放给游客与学员，只能当占位：接真实服务前须由整合任务在 contracts/permissions.yaml 登记 admin.question_review.read 后替换（见 W04 交接单）。
+paths:
+  /admin/question-review:
+    get:
+      operationId: getP08QuestionReview
+      x-owner: content
+      x-action: content.question.read
+      summary: 题库审核与质量（示例数据：双人审核队列、七道质检结果与证据上限、变式题池、报错闭环；结论与计数都由接口给）
+      description: exam、state 只在开发与测试时由假数据层使用（演示考试与强制页面状态）；origin 筛审核队列的来源。
+      parameters:
+        - name: exam
+          in: query
+          schema: {type: string}
+        - name: state
+          in: query
+          schema: {type: string}
+        - name: origin
+          in: query
+          schema: {$ref: "#/components/schemas/P08ReviewOrigin"}
+      responses:
+        "200":
+          description: 当前演示考试的题库审核与质量数据
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/P08QuestionReview"}
+        "403": {$ref: "#/components/responses/Error"}
+        "500": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    P08ReviewOrigin:
+      type: string
+      description: 进审核队列的原因：新入库、被修改
+      enum: [new, modified]
+    P08ReviewVerdict:
+      type: string
+      description: 一次人工核对的结论：待审、通过、退回
+      enum: [pending, passed, rejected]
+    P08QuestionReview:
+      type: object
+      required:
+        - data_source
+        - exam_name
+        - generated_at
+        - time_zone
+        - sample_sufficient
+        - sample_count
+        - minimum_sample_size
+        - origin_counts
+        - tasks
+        - checks
+        - variant_pools
+        - reports
+      properties:
+        data_source: {$ref: "#/components/schemas/DataSource"}
+        exam_name: {type: string, description: 考试范围的显示名}
+        generated_at: {$ref: "#/components/schemas/Timestamp"}
+        time_zone: {type: string, description: 显示时间用的时区（IANA 名）}
+        sample_sufficient: {type: boolean, description: 变式题质量结论所需的作答样本是否足够；不足时不返回质量结论}
+        sample_count: {type: integer, minimum: 0, description: 变式题池的作答次数（原始计数）}
+        minimum_sample_size: {type: integer, minimum: 0}
+        origin_counts: {$ref: "#/components/schemas/P08OriginCounts"}
+        tasks:
+          type: array
+          items: {$ref: "#/components/schemas/P08ReviewTask"}
+        checks:
+          type: array
+          items: {$ref: "#/components/schemas/P08GeneratedCheck"}
+        variant_pools:
+          type: array
+          items: {$ref: "#/components/schemas/P08VariantPool"}
+        reports:
+          type: array
+          items: {$ref: "#/components/schemas/P08ErrorReport"}
+    P08OriginCounts:
+      type: object
+      required: [new, modified]
+      properties:
+        new: {type: integer, minimum: 0}
+        modified: {type: integer, minimum: 0}
+    P08ReviewTask:
+      type: object
+      required: [id, question_ref, stem, origin, credibility, answer_review, solution_review, submitted_at]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        question_ref: {type: string, description: 题目编号}
+        stem: {type: string, description: 题干摘要}
+        origin: {$ref: "#/components/schemas/P08ReviewOrigin"}
+        credibility: {$ref: "#/components/schemas/Credibility"}
+        answer_review: {$ref: "#/components/schemas/P08DualReview"}
+        solution_review: {$ref: "#/components/schemas/P08DualReview"}
+        submitted_at: {$ref: "#/components/schemas/Timestamp"}
+    P08DualReview:
+      type: object
+      description: 双人审核：一审与二审由不同的人核对
+      required: [first, second]
+      properties:
+        first: {$ref: "#/components/schemas/P08ReviewVerdict"}
+        second: {$ref: "#/components/schemas/P08ReviewVerdict"}
+    P08GeneratedCheck:
+      type: object
+      required: [id, question_ref, stem, scope, results, evidence_cap]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        question_ref: {type: string}
+        stem: {type: string}
+        scope: {type: string, enum: [platform, learner_instant], description: 平台生成题或学员侧即时生成的题（同一套质检）}
+        results:
+          type: array
+          items: {$ref: "#/components/schemas/P08CheckResult"}
+        evidence_cap: {$ref: "#/components/schemas/EvidenceStrength"}
+    P08CheckResult:
+      type: object
+      required: [check, outcome]
+      properties:
+        check:
+          type: string
+          description: 七道质检：答案唯一、不超纲、不与真题重复、表述无歧义、干扰项合理、难度预估、内容合规
+          enum: [answer_unique, in_syllabus, not_duplicate, unambiguous, distractors_reasonable, difficulty_estimated, content_compliant]
+        outcome: {type: string, enum: [pass, warn, fail]}
+        ai_note: {type: string, description: AI 质检说明（界面须带 AI 标识）}
+    P08VariantPool:
+      type: object
+      required: [id, parent_ref, stem, variant_count, exposure_count, answer_count]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        parent_ref: {type: string, description: 母题编号}
+        stem: {type: string}
+        variant_count: {type: integer, minimum: 0}
+        exposure_count: {type: integer, minimum: 0, description: 曝光次数}
+        answer_count: {type: integer, minimum: 0, description: 作答次数（原始计数）}
+        quality: {type: string, enum: [good, watch, poor], description: 质量结论；作答样本不足时不返回}
+        exposure_level: {type: string, enum: [normal, high], description: 后端标出曝光偏高、需要补变式的母题；样本不足时不返回}
+    P08ErrorReport:
+      type: object
+      required: [id, question_ref, reason, reporter_count, status, due_at, overdue]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        question_ref: {type: string}
+        reason: {type: string, enum: [wrong_answer, ambiguous_stem, wrong_solution, out_of_syllabus]}
+        reporter_count: {type: integer, minimum: 0}
+        status: {type: string, enum: [open, resolved]}
+        due_at: {$ref: "#/components/schemas/Timestamp"}
+        overdue: {type: boolean, description: 是否已过回复时限（由后端判定）}
+        resolution: {$ref: "#/components/schemas/P08Resolution"}
+        ai_summary: {type: string, description: AI 初判（界面须带 AI 标识）}
+    P08Resolution:
+      type: object
+      description: 处理结论与闭环动作：修订或下架后通知做过的用户并重新计分
+      required: [conclusion, rescored_users, mastery_corrected, reporters_notified]
+      properties:
+        conclusion: {type: string, enum: [revised, withdrawn, no_issue]}
+        rescored_users: {type: integer, minimum: 0, description: 重新计分的人数}
+        mastery_corrected: {type: boolean}
+        reporters_notified: {type: boolean}

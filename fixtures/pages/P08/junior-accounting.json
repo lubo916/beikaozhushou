@@ -1,0 +1,416 @@
+{
+  "normal": {
+    "data_source": "sample",
+    "exam_name": "初级会计职称",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "sample_sufficient": true,
+    "sample_count": 26900,
+    "minimum_sample_size": 1000,
+    "origin_counts": {
+      "new": 23,
+      "modified": 9
+    },
+    "tasks": [
+      {
+        "id": "019a0008-0001-7001-8000-000000000001",
+        "question_ref": "#2231",
+        "stem": "分录题：购入交易性金融资产时支付的交易费用应计入哪个科目？",
+        "origin": "new",
+        "credibility": "own",
+        "answer_review": {
+          "first": "passed",
+          "second": "pending"
+        },
+        "solution_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-22T06:10:00Z"
+      },
+      {
+        "id": "019a0008-0001-7002-8000-000000000002",
+        "question_ref": "#1877",
+        "stem": "单选：下列各项中，属于企业流动资产的是……",
+        "origin": "modified",
+        "credibility": "reviewed",
+        "answer_review": {
+          "first": "passed",
+          "second": "passed"
+        },
+        "solution_review": {
+          "first": "passed",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-21T09:30:00Z"
+      },
+      {
+        "id": "019a0008-0001-7003-8000-000000000003",
+        "question_ref": "#2302",
+        "stem": "判断：企业用银行存款购买交易性金融资产，属于投资活动现金流出。",
+        "origin": "new",
+        "credibility": "generated_confirmed",
+        "answer_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "solution_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-20T03:00:00Z"
+      }
+    ],
+    "checks": [
+      {
+        "id": "019a0008-0001-700b-8000-00000000000b",
+        "question_ref": "#G-0418",
+        "stem": "关于交易性金融资产的期末计量，下列说法正确的是……",
+        "scope": "platform",
+        "results": [
+          {
+            "check": "answer_unique",
+            "outcome": "pass"
+          },
+          {
+            "check": "in_syllabus",
+            "outcome": "pass"
+          },
+          {
+            "check": "not_duplicate",
+            "outcome": "pass"
+          },
+          {
+            "check": "unambiguous",
+            "outcome": "warn",
+            "ai_note": "选项 C 的“通常”可能有两种理解，建议写成确定的条件。"
+          },
+          {
+            "check": "distractors_reasonable",
+            "outcome": "pass"
+          },
+          {
+            "check": "difficulty_estimated",
+            "outcome": "pass"
+          },
+          {
+            "check": "content_compliant",
+            "outcome": "pass"
+          }
+        ],
+        "evidence_cap": "medium"
+      },
+      {
+        "id": "019a0008-0001-700c-8000-00000000000c",
+        "question_ref": "#I-2093",
+        "stem": "年数总和法计提折旧时，各年的折旧率……",
+        "scope": "learner_instant",
+        "results": [
+          {
+            "check": "answer_unique",
+            "outcome": "pass"
+          },
+          {
+            "check": "in_syllabus",
+            "outcome": "pass"
+          },
+          {
+            "check": "not_duplicate",
+            "outcome": "fail",
+            "ai_note": "与往年真题中的一道单选几乎一样，只换了数字。"
+          },
+          {
+            "check": "unambiguous",
+            "outcome": "pass"
+          },
+          {
+            "check": "distractors_reasonable",
+            "outcome": "warn",
+            "ai_note": "有两个干扰项明显不成立，区分不出掌握程度。"
+          },
+          {
+            "check": "difficulty_estimated",
+            "outcome": "pass"
+          },
+          {
+            "check": "content_compliant",
+            "outcome": "pass"
+          }
+        ],
+        "evidence_cap": "weak"
+      }
+    ],
+    "variant_pools": [
+      {
+        "id": "019a0008-0001-7015-8000-000000000015",
+        "parent_ref": "#1042",
+        "stem": "交易性金融资产的初始计量",
+        "variant_count": 12,
+        "exposure_count": 18400,
+        "answer_count": 9600,
+        "quality": "good",
+        "exposure_level": "normal"
+      },
+      {
+        "id": "019a0008-0001-7016-8000-000000000016",
+        "parent_ref": "#0877",
+        "stem": "应收账款的坏账准备",
+        "variant_count": 3,
+        "exposure_count": 26100,
+        "answer_count": 15200,
+        "quality": "watch",
+        "exposure_level": "high"
+      },
+      {
+        "id": "019a0008-0001-7017-8000-000000000017",
+        "parent_ref": "#1310",
+        "stem": "存货发出的计价方法",
+        "variant_count": 7,
+        "exposure_count": 5200,
+        "answer_count": 2100,
+        "quality": "good",
+        "exposure_level": "normal"
+      }
+    ],
+    "reports": [
+      {
+        "id": "019a0008-0001-701f-8000-00000000001f",
+        "question_ref": "#1042",
+        "reason": "wrong_answer",
+        "reporter_count": 17,
+        "status": "resolved",
+        "due_at": "2026-10-21T10:00:00Z",
+        "overdue": false,
+        "resolution": {
+          "conclusion": "revised",
+          "rescored_users": 3204,
+          "mastery_corrected": true,
+          "reporters_notified": true
+        }
+      },
+      {
+        "id": "019a0008-0001-7020-8000-000000000020",
+        "question_ref": "#2210",
+        "reason": "ambiguous_stem",
+        "reporter_count": 4,
+        "status": "open",
+        "due_at": "2026-10-24T10:00:00Z",
+        "overdue": false,
+        "ai_summary": "报错集中在选项 B 的“通常情况下”：题干没写清前提，建议补上条件后再判。"
+      },
+      {
+        "id": "019a0008-0001-7021-8000-000000000021",
+        "question_ref": "#1988",
+        "reason": "wrong_solution",
+        "reporter_count": 2,
+        "status": "open",
+        "due_at": "2026-10-22T10:00:00Z",
+        "overdue": true
+      }
+    ]
+  },
+  "insufficient": {
+    "data_source": "sample",
+    "exam_name": "初级会计职称",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "sample_sufficient": false,
+    "sample_count": 246,
+    "minimum_sample_size": 1000,
+    "origin_counts": {
+      "new": 23,
+      "modified": 9
+    },
+    "tasks": [
+      {
+        "id": "019a0008-0001-7001-8000-000000000001",
+        "question_ref": "#2231",
+        "stem": "分录题：购入交易性金融资产时支付的交易费用应计入哪个科目？",
+        "origin": "new",
+        "credibility": "own",
+        "answer_review": {
+          "first": "passed",
+          "second": "pending"
+        },
+        "solution_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-22T06:10:00Z"
+      },
+      {
+        "id": "019a0008-0001-7002-8000-000000000002",
+        "question_ref": "#1877",
+        "stem": "单选：下列各项中，属于企业流动资产的是……",
+        "origin": "modified",
+        "credibility": "reviewed",
+        "answer_review": {
+          "first": "passed",
+          "second": "passed"
+        },
+        "solution_review": {
+          "first": "passed",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-21T09:30:00Z"
+      },
+      {
+        "id": "019a0008-0001-7003-8000-000000000003",
+        "question_ref": "#2302",
+        "stem": "判断：企业用银行存款购买交易性金融资产，属于投资活动现金流出。",
+        "origin": "new",
+        "credibility": "generated_confirmed",
+        "answer_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "solution_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-20T03:00:00Z"
+      }
+    ],
+    "checks": [
+      {
+        "id": "019a0008-0001-700b-8000-00000000000b",
+        "question_ref": "#G-0418",
+        "stem": "关于交易性金融资产的期末计量，下列说法正确的是……",
+        "scope": "platform",
+        "results": [
+          {
+            "check": "answer_unique",
+            "outcome": "pass"
+          },
+          {
+            "check": "in_syllabus",
+            "outcome": "pass"
+          },
+          {
+            "check": "not_duplicate",
+            "outcome": "pass"
+          },
+          {
+            "check": "unambiguous",
+            "outcome": "warn",
+            "ai_note": "选项 C 的“通常”可能有两种理解，建议写成确定的条件。"
+          },
+          {
+            "check": "distractors_reasonable",
+            "outcome": "pass"
+          },
+          {
+            "check": "difficulty_estimated",
+            "outcome": "pass"
+          },
+          {
+            "check": "content_compliant",
+            "outcome": "pass"
+          }
+        ],
+        "evidence_cap": "medium"
+      },
+      {
+        "id": "019a0008-0001-700c-8000-00000000000c",
+        "question_ref": "#I-2093",
+        "stem": "年数总和法计提折旧时，各年的折旧率……",
+        "scope": "learner_instant",
+        "results": [
+          {
+            "check": "answer_unique",
+            "outcome": "pass"
+          },
+          {
+            "check": "in_syllabus",
+            "outcome": "pass"
+          },
+          {
+            "check": "not_duplicate",
+            "outcome": "fail",
+            "ai_note": "与往年真题中的一道单选几乎一样，只换了数字。"
+          },
+          {
+            "check": "unambiguous",
+            "outcome": "pass"
+          },
+          {
+            "check": "distractors_reasonable",
+            "outcome": "warn",
+            "ai_note": "有两个干扰项明显不成立，区分不出掌握程度。"
+          },
+          {
+            "check": "difficulty_estimated",
+            "outcome": "pass"
+          },
+          {
+            "check": "content_compliant",
+            "outcome": "pass"
+          }
+        ],
+        "evidence_cap": "weak"
+      }
+    ],
+    "variant_pools": [
+      {
+        "id": "019a0008-0001-7015-8000-000000000015",
+        "parent_ref": "#1042",
+        "stem": "交易性金融资产的初始计量",
+        "variant_count": 12,
+        "exposure_count": 306,
+        "answer_count": 120
+      },
+      {
+        "id": "019a0008-0001-7016-8000-000000000016",
+        "parent_ref": "#0877",
+        "stem": "应收账款的坏账准备",
+        "variant_count": 3,
+        "exposure_count": 435,
+        "answer_count": 190
+      },
+      {
+        "id": "019a0008-0001-7017-8000-000000000017",
+        "parent_ref": "#1310",
+        "stem": "存货发出的计价方法",
+        "variant_count": 7,
+        "exposure_count": 86,
+        "answer_count": 26
+      }
+    ],
+    "reports": [
+      {
+        "id": "019a0008-0001-701f-8000-00000000001f",
+        "question_ref": "#1042",
+        "reason": "wrong_answer",
+        "reporter_count": 17,
+        "status": "resolved",
+        "due_at": "2026-10-21T10:00:00Z",
+        "overdue": false,
+        "resolution": {
+          "conclusion": "revised",
+          "rescored_users": 3204,
+          "mastery_corrected": true,
+          "reporters_notified": true
+        }
+      },
+      {
+        "id": "019a0008-0001-7020-8000-000000000020",
+        "question_ref": "#2210",
+        "reason": "ambiguous_stem",
+        "reporter_count": 4,
+        "status": "open",
+        "due_at": "2026-10-24T10:00:00Z",
+        "overdue": false,
+        "ai_summary": "报错集中在选项 B 的“通常情况下”：题干没写清前提，建议补上条件后再判。"
+      },
+      {
+        "id": "019a0008-0001-7021-8000-000000000021",
+        "question_ref": "#1988",
+        "reason": "wrong_solution",
+        "reporter_count": 2,
+        "status": "open",
+        "due_at": "2026-10-22T10:00:00Z",
+        "overdue": true
+      }
+    ]
+  }
+}

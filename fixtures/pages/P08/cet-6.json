@@ -1,0 +1,414 @@
+{
+  "normal": {
+    "data_source": "sample",
+    "exam_name": "大学英语六级",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "sample_sufficient": true,
+    "sample_count": 14000,
+    "minimum_sample_size": 1000,
+    "origin_counts": {
+      "new": 18,
+      "modified": 7
+    },
+    "tasks": [
+      {
+        "id": "019a0008-0003-7001-8000-000000000001",
+        "question_ref": "#5120",
+        "stem": "阅读：What does the author imply about remote work?",
+        "origin": "new",
+        "credibility": "own",
+        "answer_review": {
+          "first": "passed",
+          "second": "pending"
+        },
+        "solution_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-22T06:10:00Z"
+      },
+      {
+        "id": "019a0008-0003-7002-8000-000000000002",
+        "question_ref": "#4877",
+        "stem": "词汇：The two sides finally reached a ___ after hours of talks.",
+        "origin": "modified",
+        "credibility": "reviewed",
+        "answer_review": {
+          "first": "passed",
+          "second": "passed"
+        },
+        "solution_review": {
+          "first": "passed",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-21T09:30:00Z"
+      },
+      {
+        "id": "019a0008-0003-7003-8000-000000000003",
+        "question_ref": "#5133",
+        "stem": "听力：Where does the conversation most probably take place?",
+        "origin": "new",
+        "credibility": "generated_confirmed",
+        "answer_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "solution_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-20T03:00:00Z"
+      }
+    ],
+    "checks": [
+      {
+        "id": "019a0008-0003-700b-8000-00000000000b",
+        "question_ref": "#G-1102",
+        "stem": "选出与 reshape 意思最接近的一项……",
+        "scope": "platform",
+        "results": [
+          {
+            "check": "answer_unique",
+            "outcome": "pass"
+          },
+          {
+            "check": "in_syllabus",
+            "outcome": "pass"
+          },
+          {
+            "check": "not_duplicate",
+            "outcome": "pass"
+          },
+          {
+            "check": "unambiguous",
+            "outcome": "pass"
+          },
+          {
+            "check": "distractors_reasonable",
+            "outcome": "warn",
+            "ai_note": "选项 B 在这个语境里也说得通，建议换一个干扰项。"
+          },
+          {
+            "check": "difficulty_estimated",
+            "outcome": "pass"
+          },
+          {
+            "check": "content_compliant",
+            "outcome": "pass"
+          }
+        ],
+        "evidence_cap": "medium"
+      },
+      {
+        "id": "019a0008-0003-700c-8000-00000000000c",
+        "question_ref": "#I-3381",
+        "stem": "根据短文，作者对远程办公的态度是……",
+        "scope": "learner_instant",
+        "results": [
+          {
+            "check": "answer_unique",
+            "outcome": "pass"
+          },
+          {
+            "check": "in_syllabus",
+            "outcome": "pass"
+          },
+          {
+            "check": "not_duplicate",
+            "outcome": "fail",
+            "ai_note": "与往年真题的一道细节题几乎一样，只换了个别词。"
+          },
+          {
+            "check": "unambiguous",
+            "outcome": "pass"
+          },
+          {
+            "check": "distractors_reasonable",
+            "outcome": "pass"
+          },
+          {
+            "check": "difficulty_estimated",
+            "outcome": "pass"
+          },
+          {
+            "check": "content_compliant",
+            "outcome": "pass"
+          }
+        ],
+        "evidence_cap": "weak"
+      }
+    ],
+    "variant_pools": [
+      {
+        "id": "019a0008-0003-7015-8000-000000000015",
+        "parent_ref": "#4877",
+        "stem": "compromise 的用法",
+        "variant_count": 10,
+        "exposure_count": 9800,
+        "answer_count": 5200,
+        "quality": "good",
+        "exposure_level": "normal"
+      },
+      {
+        "id": "019a0008-0003-7016-8000-000000000016",
+        "parent_ref": "#4501",
+        "stem": "段落信息匹配",
+        "variant_count": 2,
+        "exposure_count": 14100,
+        "answer_count": 7300,
+        "quality": "watch",
+        "exposure_level": "high"
+      },
+      {
+        "id": "019a0008-0003-7017-8000-000000000017",
+        "parent_ref": "#4690",
+        "stem": "长篇阅读的定位",
+        "variant_count": 5,
+        "exposure_count": 3600,
+        "answer_count": 1500,
+        "quality": "good",
+        "exposure_level": "normal"
+      }
+    ],
+    "reports": [
+      {
+        "id": "019a0008-0003-701f-8000-00000000001f",
+        "question_ref": "#4501",
+        "reason": "wrong_answer",
+        "reporter_count": 6,
+        "status": "resolved",
+        "due_at": "2026-10-21T10:00:00Z",
+        "overdue": false,
+        "resolution": {
+          "conclusion": "revised",
+          "rescored_users": 1240,
+          "mastery_corrected": true,
+          "reporters_notified": true
+        }
+      },
+      {
+        "id": "019a0008-0003-7020-8000-000000000020",
+        "question_ref": "#5012",
+        "reason": "ambiguous_stem",
+        "reporter_count": 2,
+        "status": "open",
+        "due_at": "2026-10-24T10:00:00Z",
+        "overdue": false,
+        "ai_summary": "两位报错人都说选项 C 和 D 在原文里都能找到依据，建议重新核对出处段落。"
+      },
+      {
+        "id": "019a0008-0003-7021-8000-000000000021",
+        "question_ref": "#4933",
+        "reason": "wrong_solution",
+        "reporter_count": 1,
+        "status": "open",
+        "due_at": "2026-10-22T10:00:00Z",
+        "overdue": true
+      }
+    ]
+  },
+  "insufficient": {
+    "data_source": "sample",
+    "exam_name": "大学英语六级",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "sample_sufficient": false,
+    "sample_count": 150,
+    "minimum_sample_size": 1000,
+    "origin_counts": {
+      "new": 18,
+      "modified": 7
+    },
+    "tasks": [
+      {
+        "id": "019a0008-0003-7001-8000-000000000001",
+        "question_ref": "#5120",
+        "stem": "阅读：What does the author imply about remote work?",
+        "origin": "new",
+        "credibility": "own",
+        "answer_review": {
+          "first": "passed",
+          "second": "pending"
+        },
+        "solution_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-22T06:10:00Z"
+      },
+      {
+        "id": "019a0008-0003-7002-8000-000000000002",
+        "question_ref": "#4877",
+        "stem": "词汇：The two sides finally reached a ___ after hours of talks.",
+        "origin": "modified",
+        "credibility": "reviewed",
+        "answer_review": {
+          "first": "passed",
+          "second": "passed"
+        },
+        "solution_review": {
+          "first": "passed",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-21T09:30:00Z"
+      },
+      {
+        "id": "019a0008-0003-7003-8000-000000000003",
+        "question_ref": "#5133",
+        "stem": "听力：Where does the conversation most probably take place?",
+        "origin": "new",
+        "credibility": "generated_confirmed",
+        "answer_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "solution_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-20T03:00:00Z"
+      }
+    ],
+    "checks": [
+      {
+        "id": "019a0008-0003-700b-8000-00000000000b",
+        "question_ref": "#G-1102",
+        "stem": "选出与 reshape 意思最接近的一项……",
+        "scope": "platform",
+        "results": [
+          {
+            "check": "answer_unique",
+            "outcome": "pass"
+          },
+          {
+            "check": "in_syllabus",
+            "outcome": "pass"
+          },
+          {
+            "check": "not_duplicate",
+            "outcome": "pass"
+          },
+          {
+            "check": "unambiguous",
+            "outcome": "pass"
+          },
+          {
+            "check": "distractors_reasonable",
+            "outcome": "warn",
+            "ai_note": "选项 B 在这个语境里也说得通，建议换一个干扰项。"
+          },
+          {
+            "check": "difficulty_estimated",
+            "outcome": "pass"
+          },
+          {
+            "check": "content_compliant",
+            "outcome": "pass"
+          }
+        ],
+        "evidence_cap": "medium"
+      },
+      {
+        "id": "019a0008-0003-700c-8000-00000000000c",
+        "question_ref": "#I-3381",
+        "stem": "根据短文，作者对远程办公的态度是……",
+        "scope": "learner_instant",
+        "results": [
+          {
+            "check": "answer_unique",
+            "outcome": "pass"
+          },
+          {
+            "check": "in_syllabus",
+            "outcome": "pass"
+          },
+          {
+            "check": "not_duplicate",
+            "outcome": "fail",
+            "ai_note": "与往年真题的一道细节题几乎一样，只换了个别词。"
+          },
+          {
+            "check": "unambiguous",
+            "outcome": "pass"
+          },
+          {
+            "check": "distractors_reasonable",
+            "outcome": "pass"
+          },
+          {
+            "check": "difficulty_estimated",
+            "outcome": "pass"
+          },
+          {
+            "check": "content_compliant",
+            "outcome": "pass"
+          }
+        ],
+        "evidence_cap": "weak"
+      }
+    ],
+    "variant_pools": [
+      {
+        "id": "019a0008-0003-7015-8000-000000000015",
+        "parent_ref": "#4877",
+        "stem": "compromise 的用法",
+        "variant_count": 10,
+        "exposure_count": 163,
+        "answer_count": 65
+      },
+      {
+        "id": "019a0008-0003-7016-8000-000000000016",
+        "parent_ref": "#4501",
+        "stem": "段落信息匹配",
+        "variant_count": 2,
+        "exposure_count": 235,
+        "answer_count": 91
+      },
+      {
+        "id": "019a0008-0003-7017-8000-000000000017",
+        "parent_ref": "#4690",
+        "stem": "长篇阅读的定位",
+        "variant_count": 5,
+        "exposure_count": 60,
+        "answer_count": 18
+      }
+    ],
+    "reports": [
+      {
+        "id": "019a0008-0003-701f-8000-00000000001f",
+        "question_ref": "#4501",
+        "reason": "wrong_answer",
+        "reporter_count": 6,
+        "status": "resolved",
+        "due_at": "2026-10-21T10:00:00Z",
+        "overdue": false,
+        "resolution": {
+          "conclusion": "revised",
+          "rescored_users": 1240,
+          "mastery_corrected": true,
+          "reporters_notified": true
+        }
+      },
+      {
+        "id": "019a0008-0003-7020-8000-000000000020",
+        "question_ref": "#5012",
+        "reason": "ambiguous_stem",
+        "reporter_count": 2,
+        "status": "open",
+        "due_at": "2026-10-24T10:00:00Z",
+        "overdue": false,
+        "ai_summary": "两位报错人都说选项 C 和 D 在原文里都能找到依据，建议重新核对出处段落。"
+      },
+      {
+        "id": "019a0008-0003-7021-8000-000000000021",
+        "question_ref": "#4933",
+        "reason": "wrong_solution",
+        "reporter_count": 1,
+        "status": "open",
+        "due_at": "2026-10-22T10:00:00Z",
+        "overdue": true
+      }
+    ]
+  }
+}

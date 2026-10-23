@@ -1,0 +1,347 @@
+{
+  "normal": {
+    "data_source": "sample",
+    "exam_name": "中学教师资格笔试",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "sample_sufficient": true,
+    "sample_count": 840,
+    "minimum_sample_size": 50,
+    "queue": {
+      "parse_pending": 96,
+      "review_pending": 41
+    },
+    "materials": [
+      {
+        "id": "019a0007-0002-7001-8000-000000000001",
+        "title": "《教育知识与能力》第二章 教育与社会发展",
+        "material_kind": "textbook",
+        "stage": "mounting",
+        "page_count": 38,
+        "slice_count": 96,
+        "mounted_count": 80,
+        "duplicate_count": 2,
+        "updated_at": "2026-10-23T01:00:00Z",
+        "ai_note": "“教育的相对独立性”在两个切片里重复出现，建议合并后再挂到同一个知识点。"
+      },
+      {
+        "id": "019a0007-0002-7002-8000-000000000002",
+        "title": "讲义：中学生学习动机",
+        "material_kind": "handout",
+        "stage": "slicing",
+        "page_count": 10,
+        "slice_count": 16,
+        "mounted_count": 0,
+        "duplicate_count": 0,
+        "updated_at": "2026-10-23T02:00:00Z"
+      },
+      {
+        "id": "019a0007-0002-7003-8000-000000000003",
+        "title": "《综合素质》第一章 职业理念",
+        "material_kind": "textbook",
+        "stage": "layout",
+        "page_count": 30,
+        "slice_count": 0,
+        "mounted_count": 0,
+        "duplicate_count": 0,
+        "updated_at": "2026-10-23T03:00:00Z"
+      }
+    ],
+    "productions": [
+      {
+        "id": "019a0007-0002-700b-8000-00000000000b",
+        "kind": "layered_solution",
+        "title": "第二章 教育与社会发展 分层解析",
+        "item_count": 48,
+        "reviewed_count": 30,
+        "status": "in_review",
+        "ai_generated": true,
+        "file_marked": true
+      },
+      {
+        "id": "019a0007-0002-700c-8000-00000000000c",
+        "kind": "official_deck",
+        "title": "学习动机 官方卡组",
+        "item_count": 36,
+        "reviewed_count": 36,
+        "status": "ready",
+        "ai_generated": true,
+        "file_marked": true
+      },
+      {
+        "id": "019a0007-0002-700d-8000-00000000000d",
+        "kind": "official_deck",
+        "title": "教育法律法规 官方卡组",
+        "item_count": 52,
+        "reviewed_count": 52,
+        "status": "published",
+        "ai_generated": true,
+        "file_marked": true
+      },
+      {
+        "id": "019a0007-0002-700e-8000-00000000000e",
+        "kind": "layered_solution",
+        "title": "职业理念 分层解析",
+        "item_count": 24,
+        "reviewed_count": 0,
+        "status": "drafting",
+        "ai_generated": true,
+        "file_marked": false
+      }
+    ],
+    "review": {
+      "sort": "confidence",
+      "total_count": 41,
+      "kind_counts": {
+        "solution": 22,
+        "card": 13,
+        "slice_mount": 6
+      },
+      "items": [
+        {
+          "id": "019a0007-0002-7015-8000-000000000015",
+          "kind": "solution",
+          "title": "教育的相对独立性",
+          "knowledge_point": "教育与社会发展的关系",
+          "confidence": 0.91,
+          "source_text": "教育具有相对独立性，表现为教育具有自身的继承性……",
+          "draft": [
+            {
+              "text": "要点：教育有自身的继承性",
+              "change": "same"
+            },
+            {
+              "text": "，与政治经济的发展不完全同步",
+              "change": "added"
+            },
+            {
+              "text": "。",
+              "change": "same"
+            }
+          ],
+          "queued_at": "2026-10-22T06:10:00Z",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0007-0002-7016-8000-000000000016",
+          "kind": "card",
+          "title": "学习动机的两类",
+          "knowledge_point": "学习动机",
+          "confidence": 0.78,
+          "source_text": "根据学习动机的动力来源，可以分为内部学习动机和外部学习动机……",
+          "draft": [
+            {
+              "text": "问：按动力来源，学习动机分哪两类？答：内部学习动机和外部学习动机",
+              "change": "same"
+            },
+            {
+              "text": "，例如求知欲属于内部动机",
+              "change": "added"
+            },
+            {
+              "text": "。",
+              "change": "same"
+            }
+          ],
+          "queued_at": "2026-10-21T09:30:00Z",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0007-0002-7017-8000-000000000017",
+          "kind": "slice_mount",
+          "title": "第二章第一节第 6 段",
+          "knowledge_point": "教育的社会制约性",
+          "confidence": 0.6,
+          "source_text": "生产力的发展水平制约着教育的规模和速度……",
+          "draft": [
+            {
+              "text": "建议挂到“教育的社会制约性”",
+              "change": "same"
+            },
+            {
+              "text": "，并关联“生产力与教育”",
+              "change": "added"
+            },
+            {
+              "text": "。",
+              "change": "same"
+            }
+          ],
+          "queued_at": "2026-10-20T03:00:00Z",
+          "ai_generated": true
+        }
+      ]
+    }
+  },
+  "insufficient": {
+    "data_source": "sample",
+    "exam_name": "中学教师资格笔试",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "sample_sufficient": false,
+    "sample_count": 12,
+    "minimum_sample_size": 50,
+    "queue": {
+      "parse_pending": 96,
+      "review_pending": 41
+    },
+    "materials": [
+      {
+        "id": "019a0007-0002-7001-8000-000000000001",
+        "title": "《教育知识与能力》第二章 教育与社会发展",
+        "material_kind": "textbook",
+        "stage": "mounting",
+        "page_count": 38,
+        "slice_count": 96,
+        "mounted_count": 80,
+        "duplicate_count": 2,
+        "updated_at": "2026-10-23T01:00:00Z",
+        "ai_note": "“教育的相对独立性”在两个切片里重复出现，建议合并后再挂到同一个知识点。"
+      },
+      {
+        "id": "019a0007-0002-7002-8000-000000000002",
+        "title": "讲义：中学生学习动机",
+        "material_kind": "handout",
+        "stage": "slicing",
+        "page_count": 10,
+        "slice_count": 16,
+        "mounted_count": 0,
+        "duplicate_count": 0,
+        "updated_at": "2026-10-23T02:00:00Z"
+      },
+      {
+        "id": "019a0007-0002-7003-8000-000000000003",
+        "title": "《综合素质》第一章 职业理念",
+        "material_kind": "textbook",
+        "stage": "layout",
+        "page_count": 30,
+        "slice_count": 0,
+        "mounted_count": 0,
+        "duplicate_count": 0,
+        "updated_at": "2026-10-23T03:00:00Z"
+      }
+    ],
+    "productions": [
+      {
+        "id": "019a0007-0002-700b-8000-00000000000b",
+        "kind": "layered_solution",
+        "title": "第二章 教育与社会发展 分层解析",
+        "item_count": 48,
+        "reviewed_count": 30,
+        "status": "in_review",
+        "ai_generated": true,
+        "file_marked": true
+      },
+      {
+        "id": "019a0007-0002-700c-8000-00000000000c",
+        "kind": "official_deck",
+        "title": "学习动机 官方卡组",
+        "item_count": 36,
+        "reviewed_count": 36,
+        "status": "ready",
+        "ai_generated": true,
+        "file_marked": true
+      },
+      {
+        "id": "019a0007-0002-700d-8000-00000000000d",
+        "kind": "official_deck",
+        "title": "教育法律法规 官方卡组",
+        "item_count": 52,
+        "reviewed_count": 52,
+        "status": "published",
+        "ai_generated": true,
+        "file_marked": true
+      },
+      {
+        "id": "019a0007-0002-700e-8000-00000000000e",
+        "kind": "layered_solution",
+        "title": "职业理念 分层解析",
+        "item_count": 24,
+        "reviewed_count": 0,
+        "status": "drafting",
+        "ai_generated": true,
+        "file_marked": false
+      }
+    ],
+    "review": {
+      "sort": "queued_at",
+      "total_count": 41,
+      "kind_counts": {
+        "solution": 22,
+        "card": 13,
+        "slice_mount": 6
+      },
+      "items": [
+        {
+          "id": "019a0007-0002-7017-8000-000000000017",
+          "kind": "slice_mount",
+          "title": "第二章第一节第 6 段",
+          "knowledge_point": "教育的社会制约性",
+          "source_text": "生产力的发展水平制约着教育的规模和速度……",
+          "draft": [
+            {
+              "text": "建议挂到“教育的社会制约性”",
+              "change": "same"
+            },
+            {
+              "text": "，并关联“生产力与教育”",
+              "change": "added"
+            },
+            {
+              "text": "。",
+              "change": "same"
+            }
+          ],
+          "queued_at": "2026-10-20T03:00:00Z",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0007-0002-7016-8000-000000000016",
+          "kind": "card",
+          "title": "学习动机的两类",
+          "knowledge_point": "学习动机",
+          "source_text": "根据学习动机的动力来源，可以分为内部学习动机和外部学习动机……",
+          "draft": [
+            {
+              "text": "问：按动力来源，学习动机分哪两类？答：内部学习动机和外部学习动机",
+              "change": "same"
+            },
+            {
+              "text": "，例如求知欲属于内部动机",
+              "change": "added"
+            },
+            {
+              "text": "。",
+              "change": "same"
+            }
+          ],
+          "queued_at": "2026-10-21T09:30:00Z",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0007-0002-7015-8000-000000000015",
+          "kind": "solution",
+          "title": "教育的相对独立性",
+          "knowledge_point": "教育与社会发展的关系",
+          "source_text": "教育具有相对独立性，表现为教育具有自身的继承性……",
+          "draft": [
+            {
+              "text": "要点：教育有自身的继承性",
+              "change": "same"
+            },
+            {
+              "text": "，与政治经济的发展不完全同步",
+              "change": "added"
+            },
+            {
+              "text": "。",
+              "change": "same"
+            }
+          ],
+          "queued_at": "2026-10-22T06:10:00Z",
+          "ai_generated": true
+        }
+      ]
+    }
+  }
+}

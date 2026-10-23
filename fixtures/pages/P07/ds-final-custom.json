@@ -1,0 +1,347 @@
+{
+  "normal": {
+    "data_source": "sample",
+    "exam_name": "《数据结构》期末",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "sample_sufficient": true,
+    "sample_count": 160,
+    "minimum_sample_size": 50,
+    "queue": {
+      "parse_pending": 22,
+      "review_pending": 9
+    },
+    "materials": [
+      {
+        "id": "019a0007-0004-7001-8000-000000000001",
+        "title": "《数据结构》第六章 树与二叉树",
+        "material_kind": "textbook",
+        "stage": "mounting",
+        "page_count": 32,
+        "slice_count": 54,
+        "mounted_count": 40,
+        "duplicate_count": 1,
+        "updated_at": "2026-10-23T01:00:00Z",
+        "ai_note": "“二叉树的中序遍历”在课件和教材里各有一段，建议合并后挂到同一个知识点。"
+      },
+      {
+        "id": "019a0007-0004-7002-8000-000000000002",
+        "title": "课堂讲义：线索二叉树",
+        "material_kind": "handout",
+        "stage": "slicing",
+        "page_count": 8,
+        "slice_count": 12,
+        "mounted_count": 0,
+        "duplicate_count": 0,
+        "updated_at": "2026-10-23T02:00:00Z"
+      },
+      {
+        "id": "019a0007-0004-7003-8000-000000000003",
+        "title": "《数据结构》第七章 图",
+        "material_kind": "textbook",
+        "stage": "layout",
+        "page_count": 40,
+        "slice_count": 0,
+        "mounted_count": 0,
+        "duplicate_count": 0,
+        "updated_at": "2026-10-23T03:00:00Z"
+      }
+    ],
+    "productions": [
+      {
+        "id": "019a0007-0004-700b-8000-00000000000b",
+        "kind": "layered_solution",
+        "title": "第六章 树与二叉树 分层解析",
+        "item_count": 18,
+        "reviewed_count": 10,
+        "status": "in_review",
+        "ai_generated": true,
+        "file_marked": true
+      },
+      {
+        "id": "019a0007-0004-700c-8000-00000000000c",
+        "kind": "official_deck",
+        "title": "二叉树遍历 官方卡组",
+        "item_count": 24,
+        "reviewed_count": 24,
+        "status": "ready",
+        "ai_generated": true,
+        "file_marked": true
+      },
+      {
+        "id": "019a0007-0004-700d-8000-00000000000d",
+        "kind": "official_deck",
+        "title": "线性表 官方卡组",
+        "item_count": 30,
+        "reviewed_count": 30,
+        "status": "published",
+        "ai_generated": true,
+        "file_marked": true
+      },
+      {
+        "id": "019a0007-0004-700e-8000-00000000000e",
+        "kind": "layered_solution",
+        "title": "第七章 图 分层解析",
+        "item_count": 16,
+        "reviewed_count": 0,
+        "status": "drafting",
+        "ai_generated": true,
+        "file_marked": false
+      }
+    ],
+    "review": {
+      "sort": "confidence",
+      "total_count": 9,
+      "kind_counts": {
+        "solution": 5,
+        "card": 3,
+        "slice_mount": 1
+      },
+      "items": [
+        {
+          "id": "019a0007-0004-7015-8000-000000000015",
+          "kind": "solution",
+          "title": "二叉树的中序遍历",
+          "knowledge_point": "二叉树的遍历",
+          "confidence": 0.88,
+          "source_text": "中序遍历二叉树：若二叉树为空，则空操作；否则中序遍历左子树，访问根结点，中序遍历右子树……",
+          "draft": [
+            {
+              "text": "要点：先左子树、再根结点、后右子树",
+              "change": "same"
+            },
+            {
+              "text": "；对二叉排序树做中序遍历得到递增序列",
+              "change": "added"
+            },
+            {
+              "text": "。",
+              "change": "same"
+            }
+          ],
+          "queued_at": "2026-10-22T06:10:00Z",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0007-0004-7016-8000-000000000016",
+          "kind": "card",
+          "title": "满二叉树与完全二叉树",
+          "knowledge_point": "特殊的二叉树",
+          "confidence": 0.76,
+          "source_text": "深度为 k 且结点数达到最大的二叉树称为满二叉树……",
+          "draft": [
+            {
+              "text": "问：满二叉树和完全二叉树有什么区别？答：满二叉树每层都是满的",
+              "change": "same"
+            },
+            {
+              "text": "，完全二叉树只要求除最后一层外都满、最后一层的结点靠左连续",
+              "change": "changed"
+            },
+            {
+              "text": "。",
+              "change": "same"
+            }
+          ],
+          "queued_at": "2026-10-21T09:30:00Z",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0007-0004-7017-8000-000000000017",
+          "kind": "slice_mount",
+          "title": "第六章第三节第 4 段",
+          "knowledge_point": "线索二叉树",
+          "confidence": 0.55,
+          "source_text": "利用二叉链表中的空指针域存放结点的前驱和后继……",
+          "draft": [
+            {
+              "text": "建议挂到“线索二叉树”",
+              "change": "same"
+            },
+            {
+              "text": "，并关联“二叉树的遍历”",
+              "change": "added"
+            },
+            {
+              "text": "。",
+              "change": "same"
+            }
+          ],
+          "queued_at": "2026-10-20T03:00:00Z",
+          "ai_generated": true
+        }
+      ]
+    }
+  },
+  "insufficient": {
+    "data_source": "sample",
+    "exam_name": "《数据结构》期末",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "sample_sufficient": false,
+    "sample_count": 6,
+    "minimum_sample_size": 50,
+    "queue": {
+      "parse_pending": 22,
+      "review_pending": 9
+    },
+    "materials": [
+      {
+        "id": "019a0007-0004-7001-8000-000000000001",
+        "title": "《数据结构》第六章 树与二叉树",
+        "material_kind": "textbook",
+        "stage": "mounting",
+        "page_count": 32,
+        "slice_count": 54,
+        "mounted_count": 40,
+        "duplicate_count": 1,
+        "updated_at": "2026-10-23T01:00:00Z",
+        "ai_note": "“二叉树的中序遍历”在课件和教材里各有一段，建议合并后挂到同一个知识点。"
+      },
+      {
+        "id": "019a0007-0004-7002-8000-000000000002",
+        "title": "课堂讲义：线索二叉树",
+        "material_kind": "handout",
+        "stage": "slicing",
+        "page_count": 8,
+        "slice_count": 12,
+        "mounted_count": 0,
+        "duplicate_count": 0,
+        "updated_at": "2026-10-23T02:00:00Z"
+      },
+      {
+        "id": "019a0007-0004-7003-8000-000000000003",
+        "title": "《数据结构》第七章 图",
+        "material_kind": "textbook",
+        "stage": "layout",
+        "page_count": 40,
+        "slice_count": 0,
+        "mounted_count": 0,
+        "duplicate_count": 0,
+        "updated_at": "2026-10-23T03:00:00Z"
+      }
+    ],
+    "productions": [
+      {
+        "id": "019a0007-0004-700b-8000-00000000000b",
+        "kind": "layered_solution",
+        "title": "第六章 树与二叉树 分层解析",
+        "item_count": 18,
+        "reviewed_count": 10,
+        "status": "in_review",
+        "ai_generated": true,
+        "file_marked": true
+      },
+      {
+        "id": "019a0007-0004-700c-8000-00000000000c",
+        "kind": "official_deck",
+        "title": "二叉树遍历 官方卡组",
+        "item_count": 24,
+        "reviewed_count": 24,
+        "status": "ready",
+        "ai_generated": true,
+        "file_marked": true
+      },
+      {
+        "id": "019a0007-0004-700d-8000-00000000000d",
+        "kind": "official_deck",
+        "title": "线性表 官方卡组",
+        "item_count": 30,
+        "reviewed_count": 30,
+        "status": "published",
+        "ai_generated": true,
+        "file_marked": true
+      },
+      {
+        "id": "019a0007-0004-700e-8000-00000000000e",
+        "kind": "layered_solution",
+        "title": "第七章 图 分层解析",
+        "item_count": 16,
+        "reviewed_count": 0,
+        "status": "drafting",
+        "ai_generated": true,
+        "file_marked": false
+      }
+    ],
+    "review": {
+      "sort": "queued_at",
+      "total_count": 9,
+      "kind_counts": {
+        "solution": 5,
+        "card": 3,
+        "slice_mount": 1
+      },
+      "items": [
+        {
+          "id": "019a0007-0004-7017-8000-000000000017",
+          "kind": "slice_mount",
+          "title": "第六章第三节第 4 段",
+          "knowledge_point": "线索二叉树",
+          "source_text": "利用二叉链表中的空指针域存放结点的前驱和后继……",
+          "draft": [
+            {
+              "text": "建议挂到“线索二叉树”",
+              "change": "same"
+            },
+            {
+              "text": "，并关联“二叉树的遍历”",
+              "change": "added"
+            },
+            {
+              "text": "。",
+              "change": "same"
+            }
+          ],
+          "queued_at": "2026-10-20T03:00:00Z",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0007-0004-7016-8000-000000000016",
+          "kind": "card",
+          "title": "满二叉树与完全二叉树",
+          "knowledge_point": "特殊的二叉树",
+          "source_text": "深度为 k 且结点数达到最大的二叉树称为满二叉树……",
+          "draft": [
+            {
+              "text": "问：满二叉树和完全二叉树有什么区别？答：满二叉树每层都是满的",
+              "change": "same"
+            },
+            {
+              "text": "，完全二叉树只要求除最后一层外都满、最后一层的结点靠左连续",
+              "change": "changed"
+            },
+            {
+              "text": "。",
+              "change": "same"
+            }
+          ],
+          "queued_at": "2026-10-21T09:30:00Z",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0007-0004-7015-8000-000000000015",
+          "kind": "solution",
+          "title": "二叉树的中序遍历",
+          "knowledge_point": "二叉树的遍历",
+          "source_text": "中序遍历二叉树：若二叉树为空，则空操作；否则中序遍历左子树，访问根结点，中序遍历右子树……",
+          "draft": [
+            {
+              "text": "要点：先左子树、再根结点、后右子树",
+              "change": "same"
+            },
+            {
+              "text": "；对二叉排序树做中序遍历得到递增序列",
+              "change": "added"
+            },
+            {
+              "text": "。",
+              "change": "same"
+            }
+          ],
+          "queued_at": "2026-10-22T06:10:00Z",
+          "ai_generated": true
+        }
+      ]
+    }
+  }
+}

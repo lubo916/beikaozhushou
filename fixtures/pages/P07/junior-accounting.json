@@ -1,0 +1,347 @@
+{
+  "normal": {
+    "data_source": "sample",
+    "exam_name": "初级会计职称",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "sample_sufficient": true,
+    "sample_count": 1260,
+    "minimum_sample_size": 50,
+    "queue": {
+      "parse_pending": 128,
+      "review_pending": 64
+    },
+    "materials": [
+      {
+        "id": "019a0007-0001-7001-8000-000000000001",
+        "title": "《初级会计实务》第七章 金融资产",
+        "material_kind": "textbook",
+        "stage": "mounting",
+        "page_count": 46,
+        "slice_count": 138,
+        "mounted_count": 112,
+        "duplicate_count": 3,
+        "updated_at": "2026-10-23T01:00:00Z",
+        "ai_note": "有 3 个切片都在讲“交易性金融资产的期末计量”，建议并到同一个知识点下；挂载前请人确认。"
+      },
+      {
+        "id": "019a0007-0001-7002-8000-000000000002",
+        "title": "第七章随堂讲义：公允价值计量",
+        "material_kind": "handout",
+        "stage": "slicing",
+        "page_count": 12,
+        "slice_count": 20,
+        "mounted_count": 0,
+        "duplicate_count": 0,
+        "updated_at": "2026-10-23T02:00:00Z"
+      },
+      {
+        "id": "019a0007-0001-7003-8000-000000000003",
+        "title": "《经济法基础》第三章 支付结算",
+        "material_kind": "textbook",
+        "stage": "layout",
+        "page_count": 58,
+        "slice_count": 0,
+        "mounted_count": 0,
+        "duplicate_count": 0,
+        "updated_at": "2026-10-23T03:00:00Z"
+      }
+    ],
+    "productions": [
+      {
+        "id": "019a0007-0001-700b-8000-00000000000b",
+        "kind": "layered_solution",
+        "title": "第七章 金融资产 分层解析",
+        "item_count": 86,
+        "reviewed_count": 52,
+        "status": "in_review",
+        "ai_generated": true,
+        "file_marked": true
+      },
+      {
+        "id": "019a0007-0001-700c-8000-00000000000c",
+        "kind": "official_deck",
+        "title": "金融资产 官方卡组",
+        "item_count": 40,
+        "reviewed_count": 40,
+        "status": "ready",
+        "ai_generated": true,
+        "file_marked": true
+      },
+      {
+        "id": "019a0007-0001-700d-8000-00000000000d",
+        "kind": "official_deck",
+        "title": "第二章 会计基础 官方卡组",
+        "item_count": 64,
+        "reviewed_count": 64,
+        "status": "published",
+        "ai_generated": true,
+        "file_marked": true
+      },
+      {
+        "id": "019a0007-0001-700e-8000-00000000000e",
+        "kind": "layered_solution",
+        "title": "第三章 支付结算 分层解析",
+        "item_count": 30,
+        "reviewed_count": 0,
+        "status": "drafting",
+        "ai_generated": true,
+        "file_marked": false
+      }
+    ],
+    "review": {
+      "sort": "confidence",
+      "total_count": 64,
+      "kind_counts": {
+        "solution": 38,
+        "card": 17,
+        "slice_mount": 9
+      },
+      "items": [
+        {
+          "id": "019a0007-0001-7015-8000-000000000015",
+          "kind": "solution",
+          "title": "交易性金融资产的期末计量",
+          "knowledge_point": "交易性金融资产",
+          "confidence": 0.93,
+          "source_text": "资产负债表日，交易性金融资产应当按照公允价值计量……",
+          "draft": [
+            {
+              "text": "要点：期末按公允价值计量",
+              "change": "same"
+            },
+            {
+              "text": "；差额计入公允价值变动损益",
+              "change": "added"
+            },
+            {
+              "text": "。",
+              "change": "same"
+            }
+          ],
+          "queued_at": "2026-10-22T06:10:00Z",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0007-0001-7016-8000-000000000016",
+          "kind": "card",
+          "title": "金融资产的三个类别",
+          "knowledge_point": "金融资产的分类",
+          "confidence": 0.81,
+          "source_text": "企业应当根据管理金融资产的业务模式和合同现金流量特征，对金融资产进行分类……",
+          "draft": [
+            {
+              "text": "问：金融资产按什么分类？答：按业务模式和合同现金流量特征分为",
+              "change": "same"
+            },
+            {
+              "text": "以摊余成本计量、以公允价值计量且其变动计入其他综合收益、以公允价值计量且其变动计入当期损益",
+              "change": "added"
+            },
+            {
+              "text": "三类。",
+              "change": "same"
+            }
+          ],
+          "queued_at": "2026-10-21T09:30:00Z",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0007-0001-7017-8000-000000000017",
+          "kind": "slice_mount",
+          "title": "第七章第二节第 14 段",
+          "knowledge_point": "以摊余成本计量的金融资产",
+          "confidence": 0.64,
+          "source_text": "以摊余成本计量的金融资产，应当采用实际利率法，按摊余成本进行后续计量……",
+          "draft": [
+            {
+              "text": "建议挂到“以摊余成本计量的金融资产”",
+              "change": "same"
+            },
+            {
+              "text": "，并关联“实际利率法”",
+              "change": "added"
+            },
+            {
+              "text": "。",
+              "change": "same"
+            }
+          ],
+          "queued_at": "2026-10-20T03:00:00Z",
+          "ai_generated": true
+        }
+      ]
+    }
+  },
+  "insufficient": {
+    "data_source": "sample",
+    "exam_name": "初级会计职称",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "sample_sufficient": false,
+    "sample_count": 18,
+    "minimum_sample_size": 50,
+    "queue": {
+      "parse_pending": 128,
+      "review_pending": 64
+    },
+    "materials": [
+      {
+        "id": "019a0007-0001-7001-8000-000000000001",
+        "title": "《初级会计实务》第七章 金融资产",
+        "material_kind": "textbook",
+        "stage": "mounting",
+        "page_count": 46,
+        "slice_count": 138,
+        "mounted_count": 112,
+        "duplicate_count": 3,
+        "updated_at": "2026-10-23T01:00:00Z",
+        "ai_note": "有 3 个切片都在讲“交易性金融资产的期末计量”，建议并到同一个知识点下；挂载前请人确认。"
+      },
+      {
+        "id": "019a0007-0001-7002-8000-000000000002",
+        "title": "第七章随堂讲义：公允价值计量",
+        "material_kind": "handout",
+        "stage": "slicing",
+        "page_count": 12,
+        "slice_count": 20,
+        "mounted_count": 0,
+        "duplicate_count": 0,
+        "updated_at": "2026-10-23T02:00:00Z"
+      },
+      {
+        "id": "019a0007-0001-7003-8000-000000000003",
+        "title": "《经济法基础》第三章 支付结算",
+        "material_kind": "textbook",
+        "stage": "layout",
+        "page_count": 58,
+        "slice_count": 0,
+        "mounted_count": 0,
+        "duplicate_count": 0,
+        "updated_at": "2026-10-23T03:00:00Z"
+      }
+    ],
+    "productions": [
+      {
+        "id": "019a0007-0001-700b-8000-00000000000b",
+        "kind": "layered_solution",
+        "title": "第七章 金融资产 分层解析",
+        "item_count": 86,
+        "reviewed_count": 52,
+        "status": "in_review",
+        "ai_generated": true,
+        "file_marked": true
+      },
+      {
+        "id": "019a0007-0001-700c-8000-00000000000c",
+        "kind": "official_deck",
+        "title": "金融资产 官方卡组",
+        "item_count": 40,
+        "reviewed_count": 40,
+        "status": "ready",
+        "ai_generated": true,
+        "file_marked": true
+      },
+      {
+        "id": "019a0007-0001-700d-8000-00000000000d",
+        "kind": "official_deck",
+        "title": "第二章 会计基础 官方卡组",
+        "item_count": 64,
+        "reviewed_count": 64,
+        "status": "published",
+        "ai_generated": true,
+        "file_marked": true
+      },
+      {
+        "id": "019a0007-0001-700e-8000-00000000000e",
+        "kind": "layered_solution",
+        "title": "第三章 支付结算 分层解析",
+        "item_count": 30,
+        "reviewed_count": 0,
+        "status": "drafting",
+        "ai_generated": true,
+        "file_marked": false
+      }
+    ],
+    "review": {
+      "sort": "queued_at",
+      "total_count": 64,
+      "kind_counts": {
+        "solution": 38,
+        "card": 17,
+        "slice_mount": 9
+      },
+      "items": [
+        {
+          "id": "019a0007-0001-7017-8000-000000000017",
+          "kind": "slice_mount",
+          "title": "第七章第二节第 14 段",
+          "knowledge_point": "以摊余成本计量的金融资产",
+          "source_text": "以摊余成本计量的金融资产，应当采用实际利率法，按摊余成本进行后续计量……",
+          "draft": [
+            {
+              "text": "建议挂到“以摊余成本计量的金融资产”",
+              "change": "same"
+            },
+            {
+              "text": "，并关联“实际利率法”",
+              "change": "added"
+            },
+            {
+              "text": "。",
+              "change": "same"
+            }
+          ],
+          "queued_at": "2026-10-20T03:00:00Z",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0007-0001-7016-8000-000000000016",
+          "kind": "card",
+          "title": "金融资产的三个类别",
+          "knowledge_point": "金融资产的分类",
+          "source_text": "企业应当根据管理金融资产的业务模式和合同现金流量特征，对金融资产进行分类……",
+          "draft": [
+            {
+              "text": "问：金融资产按什么分类？答：按业务模式和合同现金流量特征分为",
+              "change": "same"
+            },
+            {
+              "text": "以摊余成本计量、以公允价值计量且其变动计入其他综合收益、以公允价值计量且其变动计入当期损益",
+              "change": "added"
+            },
+            {
+              "text": "三类。",
+              "change": "same"
+            }
+          ],
+          "queued_at": "2026-10-21T09:30:00Z",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0007-0001-7015-8000-000000000015",
+          "kind": "solution",
+          "title": "交易性金融资产的期末计量",
+          "knowledge_point": "交易性金融资产",
+          "source_text": "资产负债表日，交易性金融资产应当按照公允价值计量……",
+          "draft": [
+            {
+              "text": "要点：期末按公允价值计量",
+              "change": "same"
+            },
+            {
+              "text": "；差额计入公允价值变动损益",
+              "change": "added"
+            },
+            {
+              "text": "。",
+              "change": "same"
+            }
+          ],
+          "queued_at": "2026-10-22T06:10:00Z",
+          "ai_generated": true
+        }
+      ]
+    }
+  }
+}

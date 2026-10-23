@@ -1,0 +1,414 @@
+{
+  "normal": {
+    "data_source": "sample",
+    "exam_name": "中学教师资格笔试",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "sample_sufficient": true,
+    "sample_count": 15200,
+    "minimum_sample_size": 1000,
+    "origin_counts": {
+      "new": 15,
+      "modified": 6
+    },
+    "tasks": [
+      {
+        "id": "019a0008-0002-7001-8000-000000000001",
+        "question_ref": "#3108",
+        "stem": "单选：最早提出“教学具有教育性”的教育家是……",
+        "origin": "new",
+        "credibility": "own",
+        "answer_review": {
+          "first": "passed",
+          "second": "pending"
+        },
+        "solution_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-22T06:10:00Z"
+      },
+      {
+        "id": "019a0008-0002-7002-8000-000000000002",
+        "question_ref": "#2954",
+        "stem": "简答：简述激发中学生学习动机的措施。",
+        "origin": "modified",
+        "credibility": "reviewed",
+        "answer_review": {
+          "first": "passed",
+          "second": "passed"
+        },
+        "solution_review": {
+          "first": "passed",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-21T09:30:00Z"
+      },
+      {
+        "id": "019a0008-0002-7003-8000-000000000003",
+        "question_ref": "#3120",
+        "stem": "单选：下列属于内部学习动机的是……",
+        "origin": "new",
+        "credibility": "generated_confirmed",
+        "answer_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "solution_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-20T03:00:00Z"
+      }
+    ],
+    "checks": [
+      {
+        "id": "019a0008-0002-700b-8000-00000000000b",
+        "question_ref": "#G-0731",
+        "stem": "关于教育的相对独立性，下列理解正确的是……",
+        "scope": "platform",
+        "results": [
+          {
+            "check": "answer_unique",
+            "outcome": "warn",
+            "ai_note": "选项 A 与 D 都部分正确，答案可能不唯一，建议改写其中一个选项。"
+          },
+          {
+            "check": "in_syllabus",
+            "outcome": "pass"
+          },
+          {
+            "check": "not_duplicate",
+            "outcome": "pass"
+          },
+          {
+            "check": "unambiguous",
+            "outcome": "pass"
+          },
+          {
+            "check": "distractors_reasonable",
+            "outcome": "pass"
+          },
+          {
+            "check": "difficulty_estimated",
+            "outcome": "pass"
+          },
+          {
+            "check": "content_compliant",
+            "outcome": "pass"
+          }
+        ],
+        "evidence_cap": "medium"
+      },
+      {
+        "id": "019a0008-0002-700c-8000-00000000000c",
+        "question_ref": "#I-1187",
+        "stem": "下列教学方法中，以语言传递信息为主的是……",
+        "scope": "learner_instant",
+        "results": [
+          {
+            "check": "answer_unique",
+            "outcome": "pass"
+          },
+          {
+            "check": "in_syllabus",
+            "outcome": "warn",
+            "ai_note": "题目里的“导学案”不在本次考纲范围内，建议换一个例子。"
+          },
+          {
+            "check": "not_duplicate",
+            "outcome": "pass"
+          },
+          {
+            "check": "unambiguous",
+            "outcome": "pass"
+          },
+          {
+            "check": "distractors_reasonable",
+            "outcome": "pass"
+          },
+          {
+            "check": "difficulty_estimated",
+            "outcome": "pass"
+          },
+          {
+            "check": "content_compliant",
+            "outcome": "pass"
+          }
+        ],
+        "evidence_cap": "weak"
+      }
+    ],
+    "variant_pools": [
+      {
+        "id": "019a0008-0002-7015-8000-000000000015",
+        "parent_ref": "#2954",
+        "stem": "学习动机的激发措施",
+        "variant_count": 9,
+        "exposure_count": 12800,
+        "answer_count": 6100,
+        "quality": "good",
+        "exposure_level": "normal"
+      },
+      {
+        "id": "019a0008-0002-7016-8000-000000000016",
+        "parent_ref": "#2711",
+        "stem": "教育的社会制约性",
+        "variant_count": 4,
+        "exposure_count": 15900,
+        "answer_count": 8800,
+        "quality": "watch",
+        "exposure_level": "high"
+      },
+      {
+        "id": "019a0008-0002-7017-8000-000000000017",
+        "parent_ref": "#3002",
+        "stem": "中学生的认知发展",
+        "variant_count": 6,
+        "exposure_count": 4300,
+        "answer_count": 1900,
+        "quality": "good",
+        "exposure_level": "normal"
+      }
+    ],
+    "reports": [
+      {
+        "id": "019a0008-0002-701f-8000-00000000001f",
+        "question_ref": "#2711",
+        "reason": "wrong_answer",
+        "reporter_count": 9,
+        "status": "resolved",
+        "due_at": "2026-10-21T10:00:00Z",
+        "overdue": false,
+        "resolution": {
+          "conclusion": "revised",
+          "rescored_users": 1860,
+          "mastery_corrected": true,
+          "reporters_notified": true
+        }
+      },
+      {
+        "id": "019a0008-0002-7020-8000-000000000020",
+        "question_ref": "#3011",
+        "reason": "ambiguous_stem",
+        "reporter_count": 3,
+        "status": "open",
+        "due_at": "2026-10-24T10:00:00Z",
+        "overdue": false,
+        "ai_summary": "题干里的“一般而言”让两个选项都能成立，建议写明具体情境。"
+      },
+      {
+        "id": "019a0008-0002-7021-8000-000000000021",
+        "question_ref": "#2890",
+        "reason": "out_of_syllabus",
+        "reporter_count": 2,
+        "status": "open",
+        "due_at": "2026-10-22T10:00:00Z",
+        "overdue": true
+      }
+    ]
+  },
+  "insufficient": {
+    "data_source": "sample",
+    "exam_name": "中学教师资格笔试",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "sample_sufficient": false,
+    "sample_count": 180,
+    "minimum_sample_size": 1000,
+    "origin_counts": {
+      "new": 15,
+      "modified": 6
+    },
+    "tasks": [
+      {
+        "id": "019a0008-0002-7001-8000-000000000001",
+        "question_ref": "#3108",
+        "stem": "单选：最早提出“教学具有教育性”的教育家是……",
+        "origin": "new",
+        "credibility": "own",
+        "answer_review": {
+          "first": "passed",
+          "second": "pending"
+        },
+        "solution_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-22T06:10:00Z"
+      },
+      {
+        "id": "019a0008-0002-7002-8000-000000000002",
+        "question_ref": "#2954",
+        "stem": "简答：简述激发中学生学习动机的措施。",
+        "origin": "modified",
+        "credibility": "reviewed",
+        "answer_review": {
+          "first": "passed",
+          "second": "passed"
+        },
+        "solution_review": {
+          "first": "passed",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-21T09:30:00Z"
+      },
+      {
+        "id": "019a0008-0002-7003-8000-000000000003",
+        "question_ref": "#3120",
+        "stem": "单选：下列属于内部学习动机的是……",
+        "origin": "new",
+        "credibility": "generated_confirmed",
+        "answer_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "solution_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-20T03:00:00Z"
+      }
+    ],
+    "checks": [
+      {
+        "id": "019a0008-0002-700b-8000-00000000000b",
+        "question_ref": "#G-0731",
+        "stem": "关于教育的相对独立性，下列理解正确的是……",
+        "scope": "platform",
+        "results": [
+          {
+            "check": "answer_unique",
+            "outcome": "warn",
+            "ai_note": "选项 A 与 D 都部分正确，答案可能不唯一，建议改写其中一个选项。"
+          },
+          {
+            "check": "in_syllabus",
+            "outcome": "pass"
+          },
+          {
+            "check": "not_duplicate",
+            "outcome": "pass"
+          },
+          {
+            "check": "unambiguous",
+            "outcome": "pass"
+          },
+          {
+            "check": "distractors_reasonable",
+            "outcome": "pass"
+          },
+          {
+            "check": "difficulty_estimated",
+            "outcome": "pass"
+          },
+          {
+            "check": "content_compliant",
+            "outcome": "pass"
+          }
+        ],
+        "evidence_cap": "medium"
+      },
+      {
+        "id": "019a0008-0002-700c-8000-00000000000c",
+        "question_ref": "#I-1187",
+        "stem": "下列教学方法中，以语言传递信息为主的是……",
+        "scope": "learner_instant",
+        "results": [
+          {
+            "check": "answer_unique",
+            "outcome": "pass"
+          },
+          {
+            "check": "in_syllabus",
+            "outcome": "warn",
+            "ai_note": "题目里的“导学案”不在本次考纲范围内，建议换一个例子。"
+          },
+          {
+            "check": "not_duplicate",
+            "outcome": "pass"
+          },
+          {
+            "check": "unambiguous",
+            "outcome": "pass"
+          },
+          {
+            "check": "distractors_reasonable",
+            "outcome": "pass"
+          },
+          {
+            "check": "difficulty_estimated",
+            "outcome": "pass"
+          },
+          {
+            "check": "content_compliant",
+            "outcome": "pass"
+          }
+        ],
+        "evidence_cap": "weak"
+      }
+    ],
+    "variant_pools": [
+      {
+        "id": "019a0008-0002-7015-8000-000000000015",
+        "parent_ref": "#2954",
+        "stem": "学习动机的激发措施",
+        "variant_count": 9,
+        "exposure_count": 213,
+        "answer_count": 76
+      },
+      {
+        "id": "019a0008-0002-7016-8000-000000000016",
+        "parent_ref": "#2711",
+        "stem": "教育的社会制约性",
+        "variant_count": 4,
+        "exposure_count": 265,
+        "answer_count": 110
+      },
+      {
+        "id": "019a0008-0002-7017-8000-000000000017",
+        "parent_ref": "#3002",
+        "stem": "中学生的认知发展",
+        "variant_count": 6,
+        "exposure_count": 71,
+        "answer_count": 23
+      }
+    ],
+    "reports": [
+      {
+        "id": "019a0008-0002-701f-8000-00000000001f",
+        "question_ref": "#2711",
+        "reason": "wrong_answer",
+        "reporter_count": 9,
+        "status": "resolved",
+        "due_at": "2026-10-21T10:00:00Z",
+        "overdue": false,
+        "resolution": {
+          "conclusion": "revised",
+          "rescored_users": 1860,
+          "mastery_corrected": true,
+          "reporters_notified": true
+        }
+      },
+      {
+        "id": "019a0008-0002-7020-8000-000000000020",
+        "question_ref": "#3011",
+        "reason": "ambiguous_stem",
+        "reporter_count": 3,
+        "status": "open",
+        "due_at": "2026-10-24T10:00:00Z",
+        "overdue": false,
+        "ai_summary": "题干里的“一般而言”让两个选项都能成立，建议写明具体情境。"
+      },
+      {
+        "id": "019a0008-0002-7021-8000-000000000021",
+        "question_ref": "#2890",
+        "reason": "out_of_syllabus",
+        "reporter_count": 2,
+        "status": "open",
+        "due_at": "2026-10-22T10:00:00Z",
+        "overdue": true
+      }
+    ]
+  }
+}

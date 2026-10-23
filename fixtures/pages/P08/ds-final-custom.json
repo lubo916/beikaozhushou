@@ -1,0 +1,414 @@
+{
+  "normal": {
+    "data_source": "sample",
+    "exam_name": "《数据结构》期末",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "sample_sufficient": true,
+    "sample_count": 1180,
+    "minimum_sample_size": 1000,
+    "origin_counts": {
+      "new": 6,
+      "modified": 2
+    },
+    "tasks": [
+      {
+        "id": "019a0008-0004-7001-8000-000000000001",
+        "question_ref": "#0412",
+        "stem": "选择：一棵有 n 个结点的二叉树，其二叉链表中空指针域的个数是……",
+        "origin": "new",
+        "credibility": "own",
+        "answer_review": {
+          "first": "passed",
+          "second": "pending"
+        },
+        "solution_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-22T06:10:00Z"
+      },
+      {
+        "id": "019a0008-0004-7002-8000-000000000002",
+        "question_ref": "#0398",
+        "stem": "简答：写出二叉树中序遍历的非递归算法思路。",
+        "origin": "modified",
+        "credibility": "reviewed",
+        "answer_review": {
+          "first": "passed",
+          "second": "passed"
+        },
+        "solution_review": {
+          "first": "passed",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-21T09:30:00Z"
+      },
+      {
+        "id": "019a0008-0004-7003-8000-000000000003",
+        "question_ref": "#0421",
+        "stem": "判断：完全二叉树一定是满二叉树。",
+        "origin": "new",
+        "credibility": "generated_confirmed",
+        "answer_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "solution_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-20T03:00:00Z"
+      }
+    ],
+    "checks": [
+      {
+        "id": "019a0008-0004-700b-8000-00000000000b",
+        "question_ref": "#G-0077",
+        "stem": "对一棵二叉排序树做中序遍历，得到的序列……",
+        "scope": "platform",
+        "results": [
+          {
+            "check": "answer_unique",
+            "outcome": "pass"
+          },
+          {
+            "check": "in_syllabus",
+            "outcome": "pass"
+          },
+          {
+            "check": "not_duplicate",
+            "outcome": "pass"
+          },
+          {
+            "check": "unambiguous",
+            "outcome": "pass"
+          },
+          {
+            "check": "distractors_reasonable",
+            "outcome": "pass"
+          },
+          {
+            "check": "difficulty_estimated",
+            "outcome": "warn",
+            "ai_note": "这门课的作答记录还少，难度先按同类题估计。"
+          },
+          {
+            "check": "content_compliant",
+            "outcome": "pass"
+          }
+        ],
+        "evidence_cap": "medium"
+      },
+      {
+        "id": "019a0008-0004-700c-8000-00000000000c",
+        "question_ref": "#I-0153",
+        "stem": "下列关于线索二叉树的说法，错误的是……",
+        "scope": "learner_instant",
+        "results": [
+          {
+            "check": "answer_unique",
+            "outcome": "pass"
+          },
+          {
+            "check": "in_syllabus",
+            "outcome": "pass"
+          },
+          {
+            "check": "not_duplicate",
+            "outcome": "pass"
+          },
+          {
+            "check": "unambiguous",
+            "outcome": "warn",
+            "ai_note": "“前驱”没说明是哪种遍历次序下的前驱，建议写明。"
+          },
+          {
+            "check": "distractors_reasonable",
+            "outcome": "pass"
+          },
+          {
+            "check": "difficulty_estimated",
+            "outcome": "pass"
+          },
+          {
+            "check": "content_compliant",
+            "outcome": "pass"
+          }
+        ],
+        "evidence_cap": "weak"
+      }
+    ],
+    "variant_pools": [
+      {
+        "id": "019a0008-0004-7015-8000-000000000015",
+        "parent_ref": "#0398",
+        "stem": "中序遍历的非递归算法",
+        "variant_count": 4,
+        "exposure_count": 860,
+        "answer_count": 420,
+        "quality": "good",
+        "exposure_level": "normal"
+      },
+      {
+        "id": "019a0008-0004-7016-8000-000000000016",
+        "parent_ref": "#0355",
+        "stem": "二叉链表的空指针域",
+        "variant_count": 1,
+        "exposure_count": 1240,
+        "answer_count": 610,
+        "quality": "watch",
+        "exposure_level": "high"
+      },
+      {
+        "id": "019a0008-0004-7017-8000-000000000017",
+        "parent_ref": "#0367",
+        "stem": "哈夫曼树的构造",
+        "variant_count": 3,
+        "exposure_count": 380,
+        "answer_count": 150,
+        "quality": "good",
+        "exposure_level": "normal"
+      }
+    ],
+    "reports": [
+      {
+        "id": "019a0008-0004-701f-8000-00000000001f",
+        "question_ref": "#0355",
+        "reason": "wrong_answer",
+        "reporter_count": 3,
+        "status": "resolved",
+        "due_at": "2026-10-21T10:00:00Z",
+        "overdue": false,
+        "resolution": {
+          "conclusion": "revised",
+          "rescored_users": 96,
+          "mastery_corrected": true,
+          "reporters_notified": true
+        }
+      },
+      {
+        "id": "019a0008-0004-7020-8000-000000000020",
+        "question_ref": "#0409",
+        "reason": "ambiguous_stem",
+        "reporter_count": 1,
+        "status": "open",
+        "due_at": "2026-10-24T10:00:00Z",
+        "overdue": false,
+        "ai_summary": "报错人认为题干没说明深度从哪一层起算，起算层不同答案不同，建议在题干写明。"
+      },
+      {
+        "id": "019a0008-0004-7021-8000-000000000021",
+        "question_ref": "#0388",
+        "reason": "wrong_solution",
+        "reporter_count": 1,
+        "status": "open",
+        "due_at": "2026-10-22T10:00:00Z",
+        "overdue": true
+      }
+    ]
+  },
+  "insufficient": {
+    "data_source": "sample",
+    "exam_name": "《数据结构》期末",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "sample_sufficient": false,
+    "sample_count": 40,
+    "minimum_sample_size": 1000,
+    "origin_counts": {
+      "new": 6,
+      "modified": 2
+    },
+    "tasks": [
+      {
+        "id": "019a0008-0004-7001-8000-000000000001",
+        "question_ref": "#0412",
+        "stem": "选择：一棵有 n 个结点的二叉树，其二叉链表中空指针域的个数是……",
+        "origin": "new",
+        "credibility": "own",
+        "answer_review": {
+          "first": "passed",
+          "second": "pending"
+        },
+        "solution_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-22T06:10:00Z"
+      },
+      {
+        "id": "019a0008-0004-7002-8000-000000000002",
+        "question_ref": "#0398",
+        "stem": "简答：写出二叉树中序遍历的非递归算法思路。",
+        "origin": "modified",
+        "credibility": "reviewed",
+        "answer_review": {
+          "first": "passed",
+          "second": "passed"
+        },
+        "solution_review": {
+          "first": "passed",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-21T09:30:00Z"
+      },
+      {
+        "id": "019a0008-0004-7003-8000-000000000003",
+        "question_ref": "#0421",
+        "stem": "判断：完全二叉树一定是满二叉树。",
+        "origin": "new",
+        "credibility": "generated_confirmed",
+        "answer_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "solution_review": {
+          "first": "pending",
+          "second": "pending"
+        },
+        "submitted_at": "2026-10-20T03:00:00Z"
+      }
+    ],
+    "checks": [
+      {
+        "id": "019a0008-0004-700b-8000-00000000000b",
+        "question_ref": "#G-0077",
+        "stem": "对一棵二叉排序树做中序遍历，得到的序列……",
+        "scope": "platform",
+        "results": [
+          {
+            "check": "answer_unique",
+            "outcome": "pass"
+          },
+          {
+            "check": "in_syllabus",
+            "outcome": "pass"
+          },
+          {
+            "check": "not_duplicate",
+            "outcome": "pass"
+          },
+          {
+            "check": "unambiguous",
+            "outcome": "pass"
+          },
+          {
+            "check": "distractors_reasonable",
+            "outcome": "pass"
+          },
+          {
+            "check": "difficulty_estimated",
+            "outcome": "warn",
+            "ai_note": "这门课的作答记录还少，难度先按同类题估计。"
+          },
+          {
+            "check": "content_compliant",
+            "outcome": "pass"
+          }
+        ],
+        "evidence_cap": "medium"
+      },
+      {
+        "id": "019a0008-0004-700c-8000-00000000000c",
+        "question_ref": "#I-0153",
+        "stem": "下列关于线索二叉树的说法，错误的是……",
+        "scope": "learner_instant",
+        "results": [
+          {
+            "check": "answer_unique",
+            "outcome": "pass"
+          },
+          {
+            "check": "in_syllabus",
+            "outcome": "pass"
+          },
+          {
+            "check": "not_duplicate",
+            "outcome": "pass"
+          },
+          {
+            "check": "unambiguous",
+            "outcome": "warn",
+            "ai_note": "“前驱”没说明是哪种遍历次序下的前驱，建议写明。"
+          },
+          {
+            "check": "distractors_reasonable",
+            "outcome": "pass"
+          },
+          {
+            "check": "difficulty_estimated",
+            "outcome": "pass"
+          },
+          {
+            "check": "content_compliant",
+            "outcome": "pass"
+          }
+        ],
+        "evidence_cap": "weak"
+      }
+    ],
+    "variant_pools": [
+      {
+        "id": "019a0008-0004-7015-8000-000000000015",
+        "parent_ref": "#0398",
+        "stem": "中序遍历的非递归算法",
+        "variant_count": 4,
+        "exposure_count": 14,
+        "answer_count": 5
+      },
+      {
+        "id": "019a0008-0004-7016-8000-000000000016",
+        "parent_ref": "#0355",
+        "stem": "二叉链表的空指针域",
+        "variant_count": 1,
+        "exposure_count": 20,
+        "answer_count": 7
+      },
+      {
+        "id": "019a0008-0004-7017-8000-000000000017",
+        "parent_ref": "#0367",
+        "stem": "哈夫曼树的构造",
+        "variant_count": 3,
+        "exposure_count": 6,
+        "answer_count": 1
+      }
+    ],
+    "reports": [
+      {
+        "id": "019a0008-0004-701f-8000-00000000001f",
+        "question_ref": "#0355",
+        "reason": "wrong_answer",
+        "reporter_count": 3,
+        "status": "resolved",
+        "due_at": "2026-10-21T10:00:00Z",
+        "overdue": false,
+        "resolution": {
+          "conclusion": "revised",
+          "rescored_users": 96,
+          "mastery_corrected": true,
+          "reporters_notified": true
+        }
+      },
+      {
+        "id": "019a0008-0004-7020-8000-000000000020",
+        "question_ref": "#0409",
+        "reason": "ambiguous_stem",
+        "reporter_count": 1,
+        "status": "open",
+        "due_at": "2026-10-24T10:00:00Z",
+        "overdue": false,
+        "ai_summary": "报错人认为题干没说明深度从哪一层起算，起算层不同答案不同，建议在题干写明。"
+      },
+      {
+        "id": "019a0008-0004-7021-8000-000000000021",
+        "question_ref": "#0388",
+        "reason": "wrong_solution",
+        "reporter_count": 1,
+        "status": "open",
+        "due_at": "2026-10-22T10:00:00Z",
+        "overdue": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,136 @@
+# P07 内容生产流水线：教材与讲义处理、解析与卡片生产、审核台（阶段 1 只有假数据层，不接真实服务）。
+# x-action 暂用已登记、同属内容域的卡片读取动作 content.card.read（含内容审核角色 content_reviewer）作占位；
+# 它也开放给游客与学员，只能当占位：接真实服务前须由整合任务在 contracts/permissions.yaml 登记 admin.pipeline.read 后替换（见 W04 交接单）。
+paths:
+  /admin/pipeline:
+    get:
+      operationId: getP07Pipeline
+      x-owner: content
+      x-action: content.card.read
+      summary: 内容生产流水线（示例数据：待办数、教材与讲义处理、解析与卡片生产、审核台；排序、计数与差异分段都由接口给）
+      description: exam、state 只在开发与测试时由假数据层使用（演示考试与强制页面状态）；kind 筛审核台的条目类型。
+      parameters:
+        - name: exam
+          in: query
+          schema: {type: string}
+        - name: state
+          in: query
+          schema: {type: string}
+        - name: kind
+          in: query
+          schema: {$ref: "#/components/schemas/P07ReviewKind"}
+      responses:
+        "200":
+          description: 当前演示考试的流水线数据
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/P07Pipeline"}
+        "403": {$ref: "#/components/responses/Error"}
+        "500": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    P07ReviewKind:
+      type: string
+      description: 审核台条目类型：分层解析、卡片、讲义切片的知识点挂载
+      enum: [solution, card, slice_mount]
+    P07Pipeline:
+      type: object
+      required:
+        - data_source
+        - exam_name
+        - generated_at
+        - time_zone
+        - sample_sufficient
+        - sample_count
+        - minimum_sample_size
+        - queue
+        - materials
+        - productions
+        - review
+      properties:
+        data_source: {$ref: "#/components/schemas/DataSource"}
+        exam_name: {type: string, description: 考试范围的显示名}
+        generated_at: {$ref: "#/components/schemas/Timestamp"}
+        time_zone: {type: string, description: 显示时间用的时区（IANA 名）}
+        sample_sufficient: {type: boolean, description: 置信度校准样本（人工复核过的条数）是否足够；不足时不返回置信度，改按入队时间排序}
+        sample_count: {type: integer, minimum: 0, description: 已人工复核的条数}
+        minimum_sample_size: {type: integer, minimum: 0}
+        queue: {$ref: "#/components/schemas/P07QueueSummary"}
+        materials:
+          type: array
+          items: {$ref: "#/components/schemas/P07Material"}
+        productions:
+          type: array
+          items: {$ref: "#/components/schemas/P07Production"}
+        review: {$ref: "#/components/schemas/P07ReviewDesk"}
+    P07QueueSummary:
+      type: object
+      required: [parse_pending, review_pending]
+      properties:
+        parse_pending: {type: integer, minimum: 0, description: 待解析：还没做完版面分析、切片或挂载的教材与讲义页数}
+        review_pending: {type: integer, minimum: 0, description: 待审核：等人核对的 AI 草稿条数}
+    P07Material:
+      type: object
+      required: [id, title, material_kind, stage, page_count, slice_count, mounted_count, duplicate_count, updated_at]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        title: {type: string}
+        material_kind: {type: string, enum: [textbook, handout]}
+        stage: {type: string, enum: [layout, slicing, mounting, done], description: 当前步骤：版面分析、切片、知识点挂载、已完成}
+        page_count: {type: integer, minimum: 0}
+        slice_count: {type: integer, minimum: 0}
+        mounted_count: {type: integer, minimum: 0}
+        duplicate_count: {type: integer, minimum: 0, description: AI 查重标出的疑似重复切片数}
+        updated_at: {$ref: "#/components/schemas/Timestamp"}
+        ai_note: {type: string, description: AI 生成的挂载建议（界面须带 AI 标识）}
+    P07Production:
+      type: object
+      required: [id, kind, title, item_count, reviewed_count, status, ai_generated, file_marked]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        kind: {type: string, enum: [layered_solution, official_deck], description: 分层解析或官方卡组}
+        title: {type: string}
+        item_count: {type: integer, minimum: 0}
+        reviewed_count: {type: integer, minimum: 0, description: 已人审的条数}
+        status: {type: string, enum: [drafting, in_review, ready, published], description: AI 起草中、审核中、待发布（审完才能发布）、已发布}
+        ai_generated: {type: boolean, description: 由 AI 起草（界面须带 AI 标识）}
+        file_marked: {type: boolean, description: 发布与导出的文件里已带“AI 生成”文件标识}
+    P07ReviewDesk:
+      type: object
+      required: [sort, total_count, kind_counts, items]
+      properties:
+        sort: {type: string, enum: [confidence, queued_at], description: 接口排序依据；校准样本不足时按入队时间}
+        total_count: {type: integer, minimum: 0, description: 当前筛选下的待审条数}
+        kind_counts: {$ref: "#/components/schemas/P07ReviewKindCounts"}
+        items:
+          type: array
+          items: {$ref: "#/components/schemas/P07ReviewItem"}
+    P07ReviewKindCounts:
+      type: object
+      required: [solution, card, slice_mount]
+      properties:
+        solution: {type: integer, minimum: 0}
+        card: {type: integer, minimum: 0}
+        slice_mount: {type: integer, minimum: 0}
+    P07ReviewItem:
+      type: object
+      required: [id, kind, title, knowledge_point, source_text, draft, queued_at, ai_generated]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        kind: {$ref: "#/components/schemas/P07ReviewKind"}
+        title: {type: string}
+        knowledge_point: {type: string, description: 挂载的知识点名称}
+        confidence: {type: number, minimum: 0, maximum: 1, description: AI 置信度（用人工复核结果校准）；校准样本不足时不返回}
+        source_text: {type: string, description: 原文}
+        draft:
+          type: array
+          description: AI 草稿，按与原文的差异分段
+          items: {$ref: "#/components/schemas/P07DraftSegment"}
+        queued_at: {$ref: "#/components/schemas/Timestamp"}
+        ai_generated: {type: boolean}
+    P07DraftSegment:
+      type: object
+      required: [text, change]
+      properties:
+        text: {type: string}
+        change: {type: string, enum: [same, added, changed], description: same 与原文一致；added 原文没有、AI 补写；changed AI 改写（界面高亮，请人重点核对）}
