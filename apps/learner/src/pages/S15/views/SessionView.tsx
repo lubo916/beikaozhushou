@@ -63,7 +63,7 @@ export function SessionView({ data, onExit }: { data: S15ReviewHome; onExit: () 
           <Button onClick={() => setFlipped(true)}>{t("session.flip")}</Button>
         </>
       ) : (
-        <div className="s15-ratings sticky bottom-0 flex flex-col gap-3 rounded-md border border-line-soft bg-bg-surface p-4">
+        <div className="s15-ratings sticky bottom-[0] flex flex-col gap-3 rounded-md border border-line-soft bg-bg-surface p-4">
           <p className="font-bold">{t("session.rate")}</p>
           <p className="text-small text-ink-secondary">{t("session.guard")}</p>
           <div className="grid grid-cols-2 gap-2 @tablet:grid-cols-4">
