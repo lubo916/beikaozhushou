@@ -252,5 +252,95 @@
         }
       }
     ]
+  },
+  "side": {
+    "metrics": {
+      "forecast_gap": {
+        "status": "ok",
+        "low": 57,
+        "likely": 61,
+        "high": 65,
+        "target": 70,
+        "gap_to_target": 9,
+        "week_change": 2
+      },
+      "completion": {
+        "status": "ok",
+        "ratio": 0.46
+      },
+      "health": {
+        "status": "ok",
+        "ratio": 1.18,
+        "need_per_day": 1.4,
+        "actual_per_day": 1.65,
+        "recent_days": 7
+      }
+    },
+    "insufficient": {
+      "forecast_gap": {
+        "have": 18,
+        "missing": 22
+      },
+      "health": {
+        "have": 3,
+        "missing": 4
+      }
+    },
+    "carryovers": [
+      {
+        "id": "019a0106-0000-7000-8000-0000000000c1",
+        "title": "「增值税的核算」的读后即测",
+        "spent_minutes": 20,
+        "from_offset": -2,
+        "moved_offset": -1
+      }
+    ],
+    "proposals": [
+      {
+        "id": "019a0106-0000-7000-8000-0000000000d1",
+        "kind": "calibrate",
+        "ai_generated": false,
+        "hours_ago": 8,
+        "change": "近 {{weeks}} 周实测每周 7.2 小时，计划按 9 小时排；把第 1 轮结束日从 12 月 20 日推到 12 月 27 日，“负债”后 3 节顺延",
+        "reason": "声明与实测连续 {{weeks}} 周相差 {{gap}} 以上",
+        "cost": "第 2 轮攻重点少 1 周，练习量减少约 8%",
+        "if_declined": "按 9 小时排下去，每周都会有约 1.8 小时的任务被顺延"
+      }
+    ],
+    "restart_proposal": {
+      "kind": "reconnect_reorganize",
+      "days": 14,
+      "ai_generated": false,
+      "hours_ago": 1,
+      "change": "把中断期间的新学顺延到后 {{days}} 天，第 1 轮结束日推后 3 天；这 {{days}} 天里复习上限临时提到 100 项",
+      "reason": "中断 {{away_days}} 天，原来的排期已经排不下",
+      "cost": "第 1 轮少 3 天缓冲",
+      "if_declined": "接下来每天都会有任务被顺延，清单会越来越长",
+      "id": "019a0106-0000-7000-8000-0000000000d9"
+    },
+    "milestones": {
+      "window_days": 30,
+      "items": [
+        {
+          "kind": "registration_open",
+          "in_days": 18,
+          "status": "estimated",
+          "basis": "按往年 11 月上旬开放报名推算，公告后核对"
+        }
+      ]
+    },
+    "inbox": {
+      "pending": 4,
+      "minutes": 3
+    },
+    "onboarding": {
+      "done": [
+        "goal",
+        "materials",
+        "diagnosis"
+      ],
+      "collapse_at": 6
+    },
+    "ai_eta_minutes": 20
   }
 }

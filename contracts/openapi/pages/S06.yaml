@@ -1,14 +1,15 @@
-# S06 今日的接口（U06a 上半：英雄区、三段清单与任务条；U06b 接着补三个数、计划调整、提议与节点提醒）。api-rules 第 2、3 节。
-# 一次取齐英雄区与今日清单要显示的数据；件数、用时、天数、理由里的数字都由服务端算好，页面只显示（红线 5）。
+# S06 今日的接口（U06a 上半：英雄区、三段清单与任务条；U06b 下半：三个数、计划调整、提议、节点提醒、收件箱、上手清单与导师恢复时间）。api-rules 第 2、3 节。
+# 一次取齐今日页要显示的数据（左栏英雄区与今日清单、右栏三个数与计划调整等）；件数、用时、天数、理由里的数字都由服务端算好，页面只显示（红线 5）。
 # 公共形状引用 schemas/（今日任务、三段、任务来源、配比模式）；本页私有的形状用 S06 作前缀。规则还没实现时，假数据层返回演示数据并标 data_source 为 sample。
-# 短时重组、换档、手动记为看过、今天不想学这个、今天其实能学、加练这些写操作还没有登记权限动作（contracts/permissions.yaml），先在界面上做成“即将上线”。
+# 短时重组、换档、手动记为看过、今天不想学这个、今天其实能学、加练，以及确认提议、不改、撤销顺延、去归档、跳过上手清单这些写操作
+# 还没有登记权限动作（contracts/permissions.yaml 里 plan 只有读），先在界面上做成“即将上线”（F08-Q4）。
 paths:
   /plan/today/home:
     get:
       operationId: getTodayHome
       x-owner: plan
       x-action: plan.today.read
-      summary: 今日页：英雄区（日期、轮次与周、倒计时、一句话、继续）与今日清单（三段任务条、换档、完成口径）
+      summary: 今日页：英雄区（日期、轮次与周、倒计时、一句话、继续）、今日清单（三段任务条、换档、完成口径）、三个数、计划调整与节点提醒
       parameters:
         - name: view
           in: query
@@ -33,8 +34,8 @@ components:
       enum: [normal, first, done, off, back, noai]
     S06TodayHome:
       type: object
-      description: 今日页一次要显示的数据（英雄区与今日清单）
-      required: [view, day, countdown, summary, budget, segments, pace, ai_paused, data_source]
+      description: 今日页一次要显示的数据（英雄区与今日清单；右栏三个数、计划调整、节点提醒与收件箱；各视图的专属部件）
+      required: [view, day, countdown, summary, budget, segments, pace, ai_paused, metrics, data_source]
       properties:
         view: {$ref: "#/components/schemas/S06View"}
         day: {$ref: "#/components/schemas/LearningDay"}
@@ -61,6 +62,18 @@ components:
           description: 中断回归时给：中断了几天
         pace: {$ref: "#/components/schemas/S06Pace"}
         ai_paused: {$ref: "#/components/schemas/S06AiPause"}
+        ai_eta_minutes:
+          type: integer
+          minimum: 1
+          description: 导师不可用时给：预计多少分钟内恢复；说不准时不给
+        onboarding: {$ref: "#/components/schemas/S06Onboarding"}
+        metrics: {$ref: "#/components/schemas/S06Metrics"}
+        adjustments: {$ref: "#/components/schemas/S06Adjustments"}
+        restart_proposal:
+          $ref: "#/components/schemas/S06ProposalItem"
+          description: 中断回归时给：重组接下来一段时间的提议（确认后才生效）
+        milestones: {$ref: "#/components/schemas/S06Milestones"}
+        inbox: {$ref: "#/components/schemas/S06Inbox"}
         data_source: {$ref: "#/components/schemas/DataSource"}
     S06Round:
       type: object
@@ -205,3 +218,158 @@ components:
       type: string
       description: AI 是否暂停：没有暂停（none）、额度用完只暂停高成本 AI（quota）、导师不可用（unavailable）；暂停时理由显示模板句
       enum: [none, quota, unavailable]
+    S06Onboarding:
+      type: object
+      description: 上手清单（只在首次进入的头几天给）：逐项打勾；再完成几项就自动收起（项数由服务端按参数算好，参数待登记）
+      required: [items, collapse_in]
+      properties:
+        items:
+          type: array
+          items: {$ref: "#/components/schemas/S06OnboardingItem"}
+        collapse_in:
+          type: integer
+          minimum: 0
+          description: 再完成几项就自动收起
+    S06OnboardingItem:
+      type: object
+      required: [step, done]
+      properties:
+        step: {$ref: "#/components/schemas/S06OnboardingStep"}
+        done: {type: boolean}
+    S06OnboardingStep:
+      type: string
+      description: 上手清单六项：定目标、接资料、摸底、看懂今日清单、在阅读器里标注一次、问一次导师
+      enum: [goal, materials, diagnosis, today, annotate, ask_tutor]
+    S06Metrics:
+      type: object
+      description: 三个数（今日页常驻，各答一问，不互相代替）：预测与差额（够不够）、完成度（走了多远）、健康度（来不来得及）；数都由服务端算好
+      required: [forecast_gap, completion, health]
+      properties:
+        forecast_gap: {$ref: "#/components/schemas/S06Forecast"}
+        completion: {$ref: "#/components/schemas/S06Completion"}
+        health: {$ref: "#/components/schemas/S06Health"}
+    S06MetricStatus:
+      type: string
+      description: 这个数能不能下结论：能（ok）；样本不足，只给原始计数（insufficient）；地图体检不通过，预测类锁定（locked）
+      enum: [ok, insufficient, locked]
+    S06Shortfall:
+      type: object
+      description: 数据不足时的原始计数：已有多少、还差多少（预测按作答次数，健康度按天）
+      required: [have, missing]
+      properties:
+        have: {type: integer, minimum: 0}
+        missing: {type: integer, minimum: 1}
+    S06Forecast:
+      type: object
+      description: 预测与差额（够不够）：预测分区间（保守、最可能、乐观）与最可能值离目标线的差；status 为 ok 时给数，数据不足时给 shortfall
+      required: [status]
+      properties:
+        status: {$ref: "#/components/schemas/S06MetricStatus"}
+        low: {type: number, description: 保守}
+        likely: {type: number, description: 最可能}
+        high: {type: number, description: 乐观}
+        target: {type: number, description: 目标线}
+        gap_to_target:
+          type: number
+          description: 目标线减最可能值：正数是还差几分，0 或负数是已到目标线
+        week_change:
+          type: number
+          description: 最可能值较上周的变化（正数是升了）
+        shortfall: {$ref: "#/components/schemas/S06Shortfall"}
+    S06Completion:
+      type: object
+      description: 完成度（走了多远）：学习范围内的工作量已完成多少
+      required: [status]
+      properties:
+        status: {$ref: "#/components/schemas/S06MetricStatus"}
+        ratio: {type: number, minimum: 0, maximum: 1}
+    S06Health:
+      type: object
+      description: 健康度（来不来得及）：近期实际推进速度 ÷ 按期需要的速度；status 为 ok 时给数，数据不足时给 shortfall
+      required: [status]
+      properties:
+        status: {$ref: "#/components/schemas/S06MetricStatus"}
+        ratio: {type: number, minimum: 0}
+        need_per_day:
+          type: number
+          minimum: 0
+          description: 按期需要每天推进多少档
+        actual_per_day:
+          type: number
+          minimum: 0
+          description: 近期实际每天推进多少档
+        recent_days:
+          type: integer
+          minimum: 1
+          description: 实际速度按最近几天算
+        shortfall: {$ref: "#/components/schemas/S06Shortfall"}
+    S06Adjustments:
+      type: object
+      description: 计划调整：只挪时间的自动做（自动顺延，次日告知，参数 plan.proposal.undo_days 天内可撤销）；改目标、范围、轮次的先问你（待确认的提议）
+      required: [carryovers, proposals]
+      properties:
+        carryovers:
+          type: array
+          items: {$ref: "#/components/schemas/S06Carryover"}
+        proposals:
+          type: array
+          description: 提议，新的在前
+          items: {$ref: "#/components/schemas/S06ProposalItem"}
+    S06Carryover:
+      type: object
+      description: 一次自动顺延（只有计划引擎能做；只挪时间、不超当天预算）
+      required: [id, moved_on, from_day, to_day, title, undo_until]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        moved_on:
+          $ref: "#/components/schemas/LearningDay"
+          description: 哪天凌晨顺延的
+        from_day:
+          $ref: "#/components/schemas/LearningDay"
+          description: 原定哪天
+        to_day:
+          $ref: "#/components/schemas/LearningDay"
+          description: 挪到哪天
+        title:
+          type: string
+          description: 挪的是什么（如某一节的读后即测）
+        spent_minutes:
+          type: integer
+          minimum: 0
+          description: 原定那天实际学了多少分钟（说明为什么挪）；不给就不说
+        undo_until: {$ref: "#/components/schemas/Timestamp"}
+    S06ProposalItem:
+      type: object
+      description: 一条提议：公共的提议（固定四行与状态），加上本页按种类显示的标题、标题里的天数与是不是 AI 提出的（AI 提出的带显式标识）
+      required: [kind, ai_generated, proposal]
+      properties:
+        kind: {$ref: "#/components/schemas/S06ProposalKind"}
+        days:
+          type: integer
+          minimum: 1
+          description: 标题里的天数（如重组接下来多少天），由服务端按参数给
+        ai_generated: {type: boolean}
+        proposal: {$ref: "#/components/schemas/Proposal"}
+    S06ProposalKind:
+      type: string
+      description: 提议的种类（叫法对齐规则卡 plan-today）：按实测重排、中断后重组、排不下、时间预算冲突、收窄学习范围、进入下一轮、重排剩下的轮次
+      enum: [calibrate, reconnect_reorganize, cannot_place, budget_conflict, compress_scope, switch_round, replan_remaining_rounds]
+    S06Milestones:
+      type: object
+      description: 节点提醒：与我相关的报名、公告等节点；只给离今天不超过 window_days 天的，一个都没有就不给
+      required: [window_days, items]
+      properties:
+        window_days:
+          type: integer
+          minimum: 1
+          description: 多少天内的节点才在今日页出现（参数待登记，先用演示值）
+        items:
+          type: array
+          items: {$ref: "#/components/schemas/ExamKeyDate"}
+    S06Inbox:
+      type: object
+      description: 学习收件箱里待归档的条数与预计用时（拍照、语音与粘贴的内容）；没有待归档的不给
+      required: [pending, minutes]
+      properties:
+        pending: {type: integer, minimum: 1}
+        minutes: {type: integer, minimum: 1}

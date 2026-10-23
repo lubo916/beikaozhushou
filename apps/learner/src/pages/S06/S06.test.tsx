@@ -3,11 +3,16 @@
 // ② data.ts：七态判断只看请求结果；重试策略；?view= 只认页面登记的六个视图；一键开始的去向用路由表。
 // ③ 整个学员端挂在 /today，假数据接口接到生成的钩子上：正常、?view= 切视图、空态、出错各走一遍。
 // ④ 第 2 轮修的两处：生成的请求地址带上 view（?view= 才生效）；“待验证复核”按今天的作答算进度，做完英雄区接着指向下一项。
+// ⑤ U06b 下半：三个数各视图都有（数据不足只给原始计数、体检不通过预测锁定）；计划调整、提议、节点提醒、收件箱、上手清单、导师恢复时间
+//    各在该出现的视图出现；页面上右栏、上手清单、重组提议、导师不可用说明都显示出来，跳转用路由表。
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getGetTodayHomeUrl, type S06TodayHome } from "@exam-prep/contract";
 import { ApiError } from "@exam-prep/contract/errors";
 import * as zodSchemas from "@exam-prep/contract/zod";
+import { param } from "@exam-prep/params";
+import { diffDays } from "@exam-prep/shared/today";
 import { VOCAB } from "@exam-prep/shared/vocab";
+import { COPY } from "@exam-prep/ui";
 import { App } from "../../App.tsx";
 import { linkByText, mountAt, settle } from "../../app/testing.tsx";
 import copy from "../../i18n/zh-CN/S06.json";
@@ -16,6 +21,7 @@ import { DevControl } from "../../mocks/control.ts";
 import { MockDb } from "../../mocks/db.ts";
 import { loadDemoFixtures } from "../../mocks/fixtures.ts";
 import { collectRoutes, loadRouteModules } from "../../mocks/registry.ts";
+import { pathTo } from "../../routes.ts";
 import { PAGE_BY_ID } from "../../router/pages.ts";
 import { TODAY_VIEWS, forcedView, goPath, isEmptyToday, nextTask, shouldRetry, todayView, type TodayQuery } from "./data.ts";
 
@@ -291,6 +297,132 @@ describe("S06 页面（整个学员端挂在 /today）", () => {
     const { host, unmount } = await mountAt("/today", <App />);
     await settle(() => host.querySelector(".ui-state--error") !== null);
     expect(host.querySelector(".ui-state--error")).not.toBeNull();
+    await unmount();
+  });
+});
+
+describe("S06 下半的假数据（三个数、计划调整、提议、节点提醒、收件箱、上手清单）", () => {
+  it("四个演示考试的六个视图都给三个数；正常视图有自动顺延与待确认的提议，提议文字里的规则数字已按参数填好", async () => {
+    const { control, today } = setup();
+    for (const exam of fixtures.exams) {
+      control.setExam(exam.key);
+      for (const view of TODAY_VIEWS) {
+        const data = await today(view);
+        expect(Object.keys(data.metrics).sort(), `${exam.key} ${view}：三个数常驻`).toEqual(["completion", "forecast_gap", "health"]);
+      }
+    }
+    control.setExam(fixtures.defaultKey);
+    const normal = await today("normal");
+    const proposals = normal.adjustments?.proposals ?? [];
+    expect(normal.adjustments?.carryovers.length, "正常视图有一次自动顺延").toBeGreaterThan(0);
+    expect(proposals.map((item) => [item.kind, item.proposal.status, item.ai_generated])).toEqual([["calibrate", "pending", false]]);
+    const text = JSON.stringify(proposals);
+    expect(text, "提议文字里不留占位符").not.toContain("{{");
+    expect(text, "“近几周”取参数 plan.calibrate.weeks").toContain(`${param("plan.calibrate.weeks")} 周`);
+  });
+
+  it("首次进入：有上手清单，还没有计划调整与收件箱；中断回归另给重组提议；导师不可用给预计恢复时间", async () => {
+    const { today } = setup();
+    const first = await today("first");
+    expect(first.onboarding?.items.map((item) => item.step)).toEqual(["goal", "materials", "diagnosis", "today", "annotate", "ask_tutor"]);
+    expect([first.adjustments, first.inbox, first.restart_proposal]).toEqual([undefined, undefined, undefined]);
+    const back = await today("back");
+    expect([back.restart_proposal?.kind, back.restart_proposal?.proposal.status]).toEqual(["reconnect_reorganize", "pending"]);
+    expect(back.restart_proposal?.proposal.reason, "理由里是这次中断的天数").toContain(`${back.away_days ?? ""} 天`);
+    const normal = await today("normal");
+    expect([normal.restart_proposal, normal.onboarding, normal.ai_eta_minutes]).toEqual([undefined, undefined, undefined]);
+    expect((await today("noai")).ai_eta_minutes).toBeGreaterThan(0);
+  });
+
+  it("数据不足：预测与健康度不下结论，只给原始计数，完成度照常；《数据结构》期末地图体检不通过，预测锁定", async () => {
+    const short = (await setup("insufficient_data").today()).metrics;
+    expect([short.forecast_gap.status, short.health.status, short.completion.status]).toEqual(["insufficient", "insufficient", "ok"]);
+    expect([short.forecast_gap.low, short.forecast_gap.high]).toEqual([undefined, undefined]);
+    expect(short.forecast_gap.shortfall?.missing).toBeGreaterThan(0);
+    const { control, today } = setup();
+    control.setExam("ds");
+    expect((await today()).metrics.forecast_gap.status).toBe("locked");
+  });
+
+  it("节点提醒只给窗口期内的；英语六级的节点都在窗口外，不给", async () => {
+    const { control, today } = setup();
+    const kj = await today();
+    const window = kj.milestones?.window_days ?? 0;
+    expect(kj.milestones?.items.length).toBeGreaterThan(0);
+    for (const item of kj.milestones?.items ?? []) {
+      const days = diffDays(kj.day, item.date);
+      expect(days >= 0 && days <= window, `${item.kind} ${item.date} 应在 ${window} 天内`).toBe(true);
+    }
+    control.setExam("en");
+    expect((await today()).milestones).toBeUndefined();
+  });
+});
+
+describe("S06 下半的页面（整个学员端挂在 /today）", () => {
+  const buttonByText = (root: ParentNode, text: string): HTMLButtonElement | undefined =>
+    [...root.querySelectorAll<HTMLButtonElement>("button")].find((button) => button.textContent?.trim() === text);
+
+  it("正常：右栏有三个数、计划调整（自动顺延与待确认提议）、节点提醒与收件箱；“详情”去进度与预测，“考试日历”去 S25", async () => {
+    stubFetch(setup().api);
+    const { host, unmount } = await mountAt("/today", <App />);
+    await settle(() => host.textContent?.includes(copy.plan_adjust.title) === true);
+    const text = host.textContent ?? "";
+    const parts = [
+      copy.metrics.title,
+      copy.metrics.forecast.question,
+      copy.metrics.completion.question,
+      copy.metrics.health.question,
+      copy.proposal.kind.calibrate,
+      copy.milestones.title,
+      copy.inbox.action,
+    ];
+    for (const part of parts) expect(text).toContain(part);
+    expect(linkByText(host, copy.metrics.detail)?.getAttribute("href")).toBe(pathTo("S24"));
+    expect(linkByText(host, copy.milestones.calendar)?.getAttribute("href")).toBe(pathTo("S25"));
+    for (const label of [COPY.action.undo, COPY.action.confirm, COPY.action.decline])
+      expect(buttonByText(host, label), label).toBeDefined();
+    await unmount();
+  });
+
+  it("?view=first：英雄区里有上手清单，没做的项直达对应页面；还没有计划调整", async () => {
+    stubFetch(setup().api);
+    const { host, unmount } = await mountAt("/today?view=first", <App />);
+    await settle(() => host.textContent?.includes(copy.onboarding.title) === true);
+    const hero = host.querySelector(`section[aria-label="${copy.hero.label}"]`);
+    expect(hero?.textContent).toContain(copy.onboarding.title);
+    expect(linkByText(hero, copy.onboarding.step.annotate)?.getAttribute("href")).toBe(pathTo("S12"));
+    expect(linkByText(hero, copy.onboarding.step.ask_tutor)?.getAttribute("href")).toBe(pathTo("S28"));
+    expect(host.textContent).not.toContain(copy.plan_adjust.title);
+    await unmount();
+  });
+
+  it("?view=back：启动任务下面是重组提议，按钮只有“确认”和“不改”", async () => {
+    stubFetch(setup().api);
+    const { host, unmount } = await mountAt("/today?view=back", <App />);
+    const title = copy.proposal.kind.reconnect_reorganize.split("{{")[0] ?? "";
+    await settle(() => host.textContent?.includes(title) === true);
+    const card = [...host.querySelectorAll(".ui-proposal")].find((node) => node.textContent?.includes(title));
+    expect(card, "重组提议用公共提议卡").toBeDefined();
+    expect(buttonByText(card ?? host, COPY.action.confirm)).toBeDefined();
+    expect(buttonByText(card ?? host, COPY.action.decline)).toBeDefined();
+    await unmount();
+  });
+
+  it("?view=noai：最上面说明导师暂时不可用与暂停范围", async () => {
+    stubFetch(setup().api);
+    const { host, unmount } = await mountAt("/today?view=noai", <App />);
+    await settle(() => host.textContent?.includes(copy.noai.title) === true);
+    expect(host.textContent).toContain(copy.noai.body);
+    await unmount();
+  });
+
+  it("《数据结构》期末：预测锁定，写明原因并给“去修复”（去知识地图看体检）", async () => {
+    const { control, api } = setup();
+    control.setExam("ds");
+    stubFetch(api);
+    const { host, unmount } = await mountAt("/today", <App />);
+    await settle(() => host.textContent?.includes(copy.metrics.forecast.locked) === true);
+    expect(linkByText(host, copy.metrics.fix)?.getAttribute("href")).toBe(pathTo("S09"));
     await unmount();
   });
 });
