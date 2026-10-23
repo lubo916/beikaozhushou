@@ -1,0 +1,133 @@
+# S15 复习与卡片：只读页面演示契约。写入评分、制卡、确认、暂停等动作尚未登记，前端明确提示即将上线。
+paths:
+  /review/home:
+    get:
+      operationId: getReviewHome
+      x-owner: content
+      x-action: content.card.read
+      summary: 复习队列、卡组、待确认卡片、日历与沉浸会话示例
+      responses:
+        "200":
+          description: 本页演示数据；所有业务数字均由接口给出
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S15ReviewHome"}
+        "403": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S15ReviewHome:
+      type: object
+      required: [state, data_source, exam_name, queue, memory, policy, groups, pending_cards, calendar, session]
+      properties:
+        state:
+          type: string
+          enum: [normal, empty, restricted, insufficient_data]
+        data_source: {$ref: "#/components/schemas/DataSource"}
+        exam_name: {type: string}
+        queue: {$ref: "#/components/schemas/S15Queue"}
+        memory: {$ref: "#/components/schemas/S15Memory"}
+        policy: {$ref: "#/components/schemas/S15Policy"}
+        groups:
+          type: array
+          items: {$ref: "#/components/schemas/S15Group"}
+        pending_cards:
+          type: array
+          description: 仅为待确认提议，不会自动加入复习队列
+          items: {$ref: "#/components/schemas/S15Card"}
+        calendar:
+          type: array
+          items: {$ref: "#/components/schemas/S15CalendarDay"}
+        session: {$ref: "#/components/schemas/S15Session"}
+    S15Queue:
+      type: object
+      required: [due, new_cards, minutes, relearning, tomorrow]
+      properties:
+        due: {type: integer, minimum: 0}
+        new_cards: {type: integer, minimum: 0}
+        minutes: {type: integer, minimum: 0}
+        relearning: {type: integer, minimum: 0}
+        tomorrow: {type: integer, minimum: 0}
+    S15Memory:
+      type: object
+      required: [retention, target_retention, daily_load, warning]
+      properties:
+        retention:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: 保持率实测；数据不足时界面不展示结论
+        target_retention: {type: number, minimum: 0, maximum: 1}
+        daily_load: {type: integer, minimum: 0}
+        warning: {type: boolean}
+    S15Policy:
+      type: object
+      required: [daily_cap, insufficient_threshold, flip_guard_ms]
+      properties:
+        daily_cap:
+          type: integer
+          description: 参数 plan.review.daily_cap 的当前值
+        insufficient_threshold:
+          type: integer
+          description: 参数 learner.memory.min_cards_for_personal 的当前值
+        flip_guard_ms:
+          type: number
+          description: 参数 learner.memory.min_rating_seconds 转成毫秒；翻面后的防误触时间
+    S15Group:
+      type: object
+      required: [id, title, total, due, status]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        title: {type: string}
+        total: {type: integer, minimum: 0}
+        due: {type: integer, minimum: 0}
+        status:
+          type: string
+          enum: [active, paused, buried]
+    S15Card:
+      description: 引用公共卡片内容；附加来源和生成标识，生成卡必须等学员确认
+      allOf:
+        - {$ref: "#/components/schemas/Card"}
+        - type: object
+          required: [material_id, source_title, origin, ai_generated]
+          properties:
+            material_id: {$ref: "#/components/schemas/Id"}
+            source_title: {type: string}
+            origin:
+              type: string
+              enum: [knowledge_point, explanation, selection, note, mistake]
+            ai_generated: {type: boolean}
+    S15CalendarDay:
+      type: object
+      required: [day, due, completed, overloaded]
+      properties:
+        day: {$ref: "#/components/schemas/LearningDay"}
+        due: {type: integer, minimum: 0}
+        completed: {type: integer, minimum: 0}
+        overloaded: {type: boolean}
+    S15Session:
+      type: object
+      required: [position, total, progress_ratio, card, ratings]
+      properties:
+        position: {type: integer, minimum: 1}
+        total: {type: integer, minimum: 0}
+        progress_ratio:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: 接口给出的会话进度，页面不重新计算
+        card: {$ref: "#/components/schemas/S15Card"}
+        ratings:
+          type: array
+          minItems: 4
+          maxItems: 4
+          items: {$ref: "#/components/schemas/S15Rating"}
+    S15Rating:
+      type: object
+      required: [id, interval_text]
+      properties:
+        id:
+          type: string
+          enum: [again, hard, good, easy]
+        interval_text:
+          type: string
+          description: 当前卡片的预计间隔示例；真实排程接后端时由规则服务返回

@@ -1,0 +1,11 @@
+.s15-cardface {
+  min-block-size: calc(var(--size-space-8) * 8);
+  cursor: pointer;
+}
+.s15-cardface:focus-visible {
+  outline: var(--size-stroke-thick) solid var(--color-brand-primary);
+  outline-offset: var(--size-space-1);
+}
+.s15-ratings .ui-btn {
+  min-block-size: calc(var(--size-space-8) + var(--size-space-6));
+}
