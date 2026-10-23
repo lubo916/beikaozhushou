@@ -45,6 +45,48 @@ describe("P02 假数据与七态判断", () => {
         }
   });
 
+  // R01 R19/E26、R06 R9/R24 与已拍板 R06-Q4/Q7：字典不能另造一套统计口径。
+  for (const exam of ["kj", "js", "en", "ds"]) {
+    const definition = async (metric: string) => {
+      const item = (await body(`exam=${exam}`)).items.find((entry) => entry.metric_id === metric);
+      expect(item, `${exam} 缺少指标 ${metric}`).toBeDefined();
+      return item?.definition ?? "";
+    };
+
+    it(`${exam} 已学口径包含只有待验证证据的零档知识点`, async () => {
+      const learned = await definition("learned_points");
+      expect(learned).toContain("未撤回证据");
+      expect(learned).toContain("待验证");
+      expect(learned).toContain("负");
+      expect(learned).toContain("地图知识点总数");
+      expect(learned).not.toContain("达到“已了解”");
+    });
+
+    it(`${exam} 已达标口径同时要求范围内、证据充分和达到目标档`, async () => {
+      const reached = await definition("target_reached");
+      expect(reached).toContain("学习范围内");
+      expect(reached).toContain("证据充分");
+      expect(reached).toContain("系统判定档不低于目标档");
+    });
+
+    it(`${exam} 有效学习按未撤回证据判定，检测通过只决定该节完成`, async () => {
+      const effective = await definition("effective_learning");
+      expect(effective).toContain("未撤回证据");
+      expect(effective).toContain("负证据");
+      expect(effective).toContain("待验证");
+      expect(effective).toContain("通过检测才算该节完成");
+      expect(effective).not.toContain("阅读通过读后即测");
+    });
+
+    it(`${exam} 预测达线比较学员目标分，地图体检失败时锁定`, async () => {
+      const passed = await definition("passed_line");
+      expect(passed).toContain("目标分");
+      expect(passed).toContain("已过目标线");
+      expect(passed).toContain("地图体检不通过");
+      expect(passed).not.toMatch(/不低于(?:各科)?合格线/);
+    });
+  }
+
   it("分类与搜索由接口筛选；分类数是字典总数，不随筛选变", async () => {
     const cost = await body("category=cost");
     expect(cost.items.map((item) => item.metric_id)).toEqual(["tutor_cost_per_active"]);
@@ -97,14 +139,36 @@ describe("P02 挂在本页地址", () => {
       expect(host.querySelectorAll("details").length).toBe(p02Fixture().dictionary.items.length);
       const chip = [...host.querySelectorAll("button")].find((button) => button.textContent?.trim().startsWith(copy.categories.cost));
       await click(chip);
-      await settle(() => host.textContent?.includes("周有效学习用户") === false);
+      await settle(() => host.textContent?.includes("单活跃用户导师成本") === true);
       expect(host.textContent).toContain("单活跃用户导师成本");
+      expect(host.textContent).not.toContain("周有效学习用户");
       await type(host.querySelector<HTMLInputElement>('input[type="search"]'), "没有这个指标");
       await settle(() => host.querySelector(".ui-state--empty") !== null);
       expect(host.textContent).toContain(copy.state.empty.body);
       await click([...host.querySelectorAll("button")].find((button) => button.textContent?.trim() === copy.state.empty.action));
       await settle(() => host.textContent?.includes("周有效学习用户") === true);
       expect(host.querySelector(".ui-state--empty")).toBeNull();
+    } finally {
+      await unmount();
+    }
+  });
+
+  it("连续输入搜索时控件保持挂载和焦点，加载期间不显示旧分类结果", async () => {
+    const { host, unmount } = await mountAt("/data-hub");
+    try {
+      await settle(() => host.textContent?.includes("周有效学习用户") === true);
+      const input = host.querySelector<HTMLInputElement>('input[type="search"]');
+      if (input === null) throw new Error("找不到搜索框");
+      input.focus();
+      await type(input, "留");
+      await settle(() => host.textContent?.includes("第 N 日留存") === true);
+      expect(host.querySelector('input[type="search"]')).toBe(input);
+      expect(document.activeElement).toBe(input);
+      await type(input, "留存");
+      await settle(() => host.textContent?.includes("第 N 日留存") === true);
+      expect(input.value).toBe("留存");
+      expect(document.activeElement).toBe(input);
+      expect(host.textContent).not.toContain("周有效学习用户");
     } finally {
       await unmount();
     }

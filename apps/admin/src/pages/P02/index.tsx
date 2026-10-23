@@ -41,6 +41,9 @@ export default function Page() {
           )
         }
       />
+      {dictionary.state !== "restricted" && (
+        <DictionaryFilters data={data} category={category} keyword={keyword} onCategory={setCategory} onKeyword={setKeyword} />
+      )}
       {dictionary.state === "loading" ? (
         <PageState
           state="loading"
@@ -79,7 +82,6 @@ export default function Page() {
       ) : (
         <>
           {dictionary.stale && <Banner tone="warning" title={t("state.offline.stale")} />}
-          <DictionaryFilters data={data} category={category} keyword={keyword} onCategory={setCategory} onKeyword={setKeyword} />
           {dictionary.state === "empty" ? (
             <PageState
               state="empty"

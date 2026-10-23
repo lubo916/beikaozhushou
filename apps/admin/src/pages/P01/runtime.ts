@@ -16,6 +16,15 @@ export interface PageQuery<T> {
   readonly fetchStatus: "fetching" | "paused" | "idle";
 }
 
+/** 缓存必须绑定完整查询键，考试或筛选改变后不能把旧范围的数据当成当前结果。 */
+interface QuerySnapshot<T> extends PageQuery<T> {
+  readonly key: string;
+}
+
+function pendingQuery<T>(key: string): QuerySnapshot<T> {
+  return { key, data: undefined, error: null, status: "pending", fetchStatus: "fetching" };
+}
+
 /** 重试前等一会儿：网络或服务异常再试一次，约一秒出结果（F08-Q3）。 */
 const RETRY_DELAY_MS = 1000;
 const HTTP_OK_FIRST = 200;
@@ -62,27 +71,25 @@ export function usePageQuery<T>(
   load: (key: string, signal: AbortSignal) => Promise<T>,
   retry: (failureCount: number, error: unknown) => boolean,
 ): PageQuery<T> & { readonly refetch: () => void } {
-  const [result, setResult] = useState<PageQuery<T>>({ data: undefined, error: null, status: "pending", fetchStatus: "fetching" });
+  const [result, setResult] = useState<QuerySnapshot<T>>(() => pendingQuery<T>(key));
   const [round, setRound] = useState(0);
   useEffect(() => {
     const reconnect = () => setRound((value) => value + 1);
+    window.addEventListener("online", reconnect);
     if (!navigator.onLine) {
-      setResult((previous) => ({ ...previous, fetchStatus: "paused" }));
-      window.addEventListener("online", reconnect, { once: true });
+      setResult((previous) => ({ ...(previous.key === key ? previous : pendingQuery<T>(key)), fetchStatus: "paused" }));
       return () => window.removeEventListener("online", reconnect);
     }
     const controller = new AbortController();
     let timer: ReturnType<typeof setTimeout> | undefined;
-    setResult((previous) => ({
-      ...previous,
-      error: null,
-      fetchStatus: "fetching",
-      status: previous.data === undefined ? "pending" : previous.status,
-    }));
+    setResult((previous) => {
+      const current = previous.key === key ? previous : pendingQuery<T>(key);
+      return { ...current, error: null, fetchStatus: "fetching", status: current.data === undefined ? "pending" : "success" };
+    });
     const attempt = (failures: number) => {
       load(key, controller.signal).then(
         (data) => {
-          if (!controller.signal.aborted) setResult({ data, error: null, status: "success", fetchStatus: "idle" });
+          if (!controller.signal.aborted) setResult({ key, data, error: null, status: "success", fetchStatus: "idle" });
         },
         (error: unknown) => {
           if (controller.signal.aborted) return;
@@ -90,16 +97,23 @@ export function usePageQuery<T>(
             timer = setTimeout(() => attempt(failures + 1), RETRY_DELAY_MS);
             return;
           }
-          setResult((previous) => ({ data: previous.data, error, status: "error", fetchStatus: "idle" }));
+          setResult((previous) => ({
+            key,
+            data: previous.key === key ? previous.data : undefined,
+            error,
+            status: "error",
+            fetchStatus: "idle",
+          }));
         },
       );
     };
     attempt(0);
     return () => {
+      window.removeEventListener("online", reconnect);
       controller.abort();
       if (timer !== undefined) clearTimeout(timer);
     };
   }, [key, round, load, retry]);
   const refetch = useCallback(() => setRound((value) => value + 1), []);
-  return { ...result, refetch };
+  return { ...(result.key === key ? result : pendingQuery<T>(key)), refetch };
 }

@@ -54,7 +54,7 @@
         "metric_id": "effective_learning",
         "name": "有效学习",
         "category": "learning",
-        "definition": "一次学习行为产生了可核验的证据才算有效学习：卡片完成回忆、题目完成作答或阅读通过读后即测；只停留不作答不算。",
+        "definition": "一段学习中产生了至少一条未撤回证据才计为有效学习；负证据、待验证证据也算。阅读在参数规定期限内补做检测并产生证据后，原片段可转为有效，通过检测才算该节完成；只停留、手动勾选“看过”和未确认的即时题不计入。",
         "version": "v2",
         "status": "active",
         "updated_at": "2026-09-28T02:00:00Z",
@@ -62,7 +62,7 @@
           {
             "version": "v2",
             "effective_from": "2026-09-28",
-            "change_note": "读后即测通过才计入"
+            "change_note": "按未撤回证据计入有效学习；检测通过只决定该节完成"
           }
         ]
       },
@@ -70,7 +70,7 @@
         "metric_id": "learned_points",
         "name": "已学知识点",
         "category": "learning",
-        "definition": "系统判定档达到“已了解”及以上的知识点数；自评不计入。",
+        "definition": "有过任一条未撤回证据（含待验证、负）的知识点数；“已学”比例的分母是地图知识点总数（含范围外），自评不计入。",
         "version": "v2",
         "status": "active",
         "updated_at": "2026-08-17T02:00:00Z",
@@ -87,7 +87,7 @@
         "metric_id": "target_reached",
         "name": "达标知识点",
         "category": "learning",
-        "definition": "系统判定档不低于目标档的知识点数，与学员端“已达标”同一口径。",
+        "definition": "学习范围内、证据充分且系统判定档不低于目标档的知识点数；“已达标”比例的分母是学习范围内知识点数。",
         "version": "v1",
         "status": "active",
         "updated_at": "2026-06-01T02:00:00Z",
@@ -101,9 +101,9 @@
       },
       {
         "metric_id": "passed_line",
-        "name": "已过线",
+        "name": "已过目标线",
         "category": "learning",
-        "definition": "预测分区间的最可能值不低于合格线；与学员端三个数里的“预测与差额”同一口径。",
+        "definition": "按科评价的考试：各科分别比较；预测分区间的最可能值不低于学员自己的目标分时显示“已过目标线”，不以合格线代替目标分；地图体检不通过时不出这个指标。",
         "version": "v1",
         "status": "active",
         "updated_at": "2026-06-01T02:00:00Z",

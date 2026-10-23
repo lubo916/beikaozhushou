@@ -22,6 +22,8 @@ export function shouldRetry(failureCount: number, error: unknown): boolean {
 export function dictionaryView(query: PageQuery<P02MetricDictionary>): DictionaryView {
   if (query.status === "error" && isApiError(query.error) && query.error.code === "COMMON_FORBIDDEN")
     return { state: "restricted", data: undefined, stale: false };
+  // 服务端明确报错时展示错误与重试，不能把缓存伪装成一次成功刷新。
+  if (query.status === "error" && isApiError(query.error)) return { state: "error", data: undefined, stale: false };
   const offline = query.fetchStatus === "paused" || (query.status === "error" && !isApiError(query.error));
   const data = query.data;
   if (data !== undefined) {

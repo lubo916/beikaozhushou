@@ -1,22 +1,28 @@
 import { useTranslation } from "react-i18next";
-import type { P02MetricDictionary } from "@exam-prep/contract";
+import type { P02MetricCategory, P02MetricDictionary } from "@exam-prep/contract";
 import { FilterChips } from "@exam-prep/ui";
 import type { CategoryFilter } from "../data.ts";
 
 interface DictionaryFiltersProps {
-  readonly data: P02MetricDictionary;
+  readonly data: P02MetricDictionary | undefined;
   readonly category: CategoryFilter;
   readonly keyword: string;
   readonly onCategory: (category: CategoryFilter) => void;
   readonly onKeyword: (keyword: string) => void;
 }
 
-/** 分类与搜索：条件交给接口筛选，分类旁的数也是接口给的。 */
+const CATEGORIES: readonly P02MetricCategory[] = ["learning", "conversion", "retention", "quality", "cost"];
+
+/** 分类与搜索始终保持挂载；加载时不展示上一查询的计数。 */
 export function DictionaryFilters({ data, category, keyword, onCategory, onKeyword }: DictionaryFiltersProps) {
   const { t } = useTranslation("P02");
   const options = [
-    { value: "all" as const, label: t("filters.all"), count: data.total_count },
-    ...data.categories.map((entry) => ({ value: entry.category, label: t(`categories.${entry.category}`), count: entry.count })),
+    { value: "all" as const, label: t("filters.all"), count: data?.total_count },
+    ...CATEGORIES.map((category) => ({
+      value: category,
+      label: t(`categories.${category}`),
+      count: data?.categories.find((entry) => entry.category === category)?.count,
+    })),
   ];
   return (
     <div className="flex flex-col gap-3 rounded-md border border-line-soft bg-bg-surface p-3">
