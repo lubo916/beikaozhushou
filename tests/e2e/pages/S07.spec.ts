@@ -286,6 +286,21 @@ test("S07 沙盘可填输入并试算，采用前保持待确认，关闭后不�
   expectNoProblems(watch, "normal");
 });
 
+test("S07 请假生成反馈显示在活动对话框内", async ({ page }) => {
+  const watch = await watchPage(page);
+  await watch.open(urlOf(entry));
+  await expectLoaded(page, entry);
+  await button(page, "header.leave").press("Enter");
+  const dialog = page.locator("dialog[open]");
+  await expect(dialog).toBeVisible();
+  await dialog.getByLabel(copy("leave.start"), { exact: true }).fill("2026-10-23");
+  await dialog.getByLabel(copy("leave.end"), { exact: true }).fill("2026-10-25");
+  await dialog.getByRole("textbox", { name: copy("leave.reason"), exact: true }).fill("出差期间保留到期复习");
+  await dialog.getByRole("button", { name: copy("leave.preview"), exact: true }).press("Enter");
+  await expect(dialog.getByRole("status").filter({ hasText: copy("soon") })).toBeVisible();
+  expectNoProblems(watch, "normal");
+});
+
 test("S07 自定考试地图未通过时仅锁定预测，沙盘提议与学习入口仍可用", async ({ page }) => {
   const fixture = fixtureOf("ds-final-custom");
   expect(fixture.forecast_available).toBe(false);
