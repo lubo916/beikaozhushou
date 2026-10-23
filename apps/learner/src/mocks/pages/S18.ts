@@ -1,8 +1,10 @@
-// S18 做题与解析的假数据（U18a；api-rules 第 3、4 节）。题目取 fixtures/exams/ 与 fixtures/pages/S18/<考试 ID>.json（页面专用的演示题与两个示范题组：
+// S18 做题与解析的假数据（U18a 上半、U18b 下半；api-rules 第 3、4 节）。题目取 fixtures/exams/ 与 fixtures/pages/S18/<考试 ID>.json（页面专用的演示题与两个示范题组：
 // objective 题库、generated 导师出题）；prefill 是断点续做前已经做过的题。题组里新交的作答记在内存里（按内存仓库实例分开）；
 // 考试数据里本来就有的题同时写进内存仓库的作答，错题本、今日清单跟着变。
 // 规则还没实现：对错按示例答案比，证据强度与原因按 fixtures 里的 sample_rules 给，整份标 data_source 为 sample。
 // ?state= 的空、受限、数据不足由下面的 variants 给数据（受限＝测评态：不能切换模式、不能看提示）；加载、出错、离线由接口层统一处理（mocks/api.ts）。
+// U18b：提示阶梯由这里记用了几级（题目里不再带提示原文，提交前一级一级给，用过提示最高记弱证据）；错因确认记在内存里、可以改选，进小结；
+// 分层解析的分步、资料定位、导师建议错因取 fixtures 的 solution_layers（没写分步时用逐级提示连起来，和原型一样）；讲解与追问按 fixtures 的 tutor 示例话术拼回复。
 import { ApiError } from "@exam-prep/contract/errors";
 import { DEMO_PARAM } from "../../routes.ts";
 import type { MockDb } from "../db.ts";
@@ -17,9 +19,15 @@ type Kind = "objective" | "generated";
 const DEMO_GENERATED = `${DEMO_PARAM}-gen`;
 const CONFIDENCES: readonly string[] = ["sure", "vague", "guess", "off"];
 const VERDICTS: readonly string[] = ["ok", "problem"];
+const CAUSES: readonly string[] = ["not_learned", "forgot", "concept_unclear", "method_unknown", "misread", "slip", "time_short"];
+const EXPLAIN_MODES: readonly string[] = ["explain", "guided"];
+const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+/** 讲解里引用草稿时最多带几个字（示例话术用）。 */
+const SCRATCH_QUOTE_CHARS = 30;
 const STRENGTH_ORDER: readonly string[] = ["weak", "medium", "strong"];
 const MS_PER_SECOND = 1000;
-const QUESTION_OPTIONAL_KEYS = ["options", "label", "hints"] as const;
+// 提示原文不随题目下发：提示阶梯一级一级给（S18-16），见 hintsOf。
+const QUESTION_OPTIONAL_KEYS = ["options", "label"] as const;
 const SOLUTION_KEYS = [
   "answer",
   "explanation",
@@ -64,10 +72,36 @@ interface SampleRules {
   readonly next_steps_limit: number;
 }
 
+/** 一题的分层解析（演示数据）：分步推导、资料定位、导师建议错因（AI 初判），wrong_step 是引导式纠错时指出的那一步。 */
+interface LayerFixture {
+  readonly steps?: readonly string[];
+  readonly sources?: readonly Json[];
+  readonly suggested_cause?: string;
+  readonly wrong_step?: number;
+}
+
+/** 讲解与追问的示例话术（导师还没接上时用）；available 为 false 演示导师暂不可用。 */
+interface TutorFixture {
+  readonly available: boolean;
+  readonly confidence_labels: Readonly<Record<string, string>>;
+  readonly no_answer: string;
+  readonly explain_open: string;
+  readonly explain_steps: string;
+  readonly explain_close: string;
+  readonly scratch: string;
+  readonly follow_up: string;
+  readonly guided_open: string;
+  readonly guided_wrong: string;
+  readonly guided_right: string;
+  readonly follow_ups: readonly string[];
+}
+
 interface PageFixture {
   readonly sample_rules: SampleRules;
   readonly sessions: Readonly<Record<Kind, SessionFixture>>;
   readonly questions: readonly QuestionFixture[];
+  readonly solution_layers?: Readonly<Record<string, LayerFixture>>;
+  readonly tutor?: TutorFixture;
 }
 
 /** 一题的作答（只追加：揭晓后不再收；测评态交卷前可以重交，以最后一次为准）。 */
@@ -84,6 +118,10 @@ interface Live {
   readonly answers: Map<string, Answer>;
   readonly checks: Map<string, string>;
   readonly handedIn: Set<string>;
+  /** 提示阶梯：每题已经给出几级。 */
+  readonly hints: Map<string, number>;
+  /** 错因确认：每题最后一次选的错因。 */
+  readonly causes: Map<string, string>;
 }
 
 interface Verdict {
@@ -147,7 +185,7 @@ function sameSet(given: readonly number[], expected: readonly number[]): boolean
 function live(db: MockDb): Live {
   const found = LIVE.get(db);
   if (found !== undefined) return found;
-  const created: Live = { answers: new Map(), checks: new Map(), handedIn: new Set() };
+  const created: Live = { answers: new Map(), checks: new Map(), handedIn: new Set(), hints: new Map(), causes: new Map() };
   LIVE.set(db, created);
   return created;
 }
@@ -179,6 +217,21 @@ function pointName(exam: DemoExam, pointId: string): string {
     if (point !== undefined) return point.name;
   }
   return "";
+}
+
+/** 这题的逐级提示原文。 */
+const hintsOf = (question: QuestionFixture): string[] => strings(question["hints"]);
+
+/** 分层解析的其余几层：分步推导（没写时用逐级提示连起来，和原型的“分步看”一样）、资料定位、导师建议错因。 */
+function layerOf(page: PageFixture, question: QuestionFixture): LayerFixture & { readonly steps: readonly string[] } {
+  const found = page.solution_layers?.[question.id];
+  return { ...found, steps: found?.steps ?? hintsOf(question) };
+}
+
+function fill(template: string, values: Readonly<Record<string, string | number>>): string {
+  return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (whole: string, name: string) =>
+    values[name] === undefined ? whole : String(values[name]),
+  );
 }
 
 function questionView(exam: DemoExam, question: QuestionFixture, credibility: string): Json {
@@ -285,6 +338,15 @@ function buildRow(where: Located, state: Live, mode: Mode, index: number, fixtur
   const evidence =
     verdict === null || answer === undefined ? null : evidenceOf(where.page.sample_rules, credibility, verdict, answer, check);
   const sampleMistake = stored === undefined && where.kind === "objective" && verdict?.correct === false ? storeKey : null;
+  // feat:S18-16 提示阶梯：给过几级以服务端记录为准（交上来的作答也带着用量，取较大的那个）
+  const hintTexts = hintsOf(question);
+  const hintsUsed = Math.min(
+    hintTexts.length,
+    Math.max(state.hints.get(storeKey) ?? fixture.prefill?.hint_level ?? 0, answer?.hint_level ?? 0),
+  );
+  // feat:S18-08 错因确认：最后一次选的为准；只有做错的题有错因
+  const cause = verdict?.correct === false ? (state.causes.get(storeKey) ?? answer?.error_cause ?? null) : null;
+  const layer = layerOf(where.page, question);
   const mistakeId = answer?.mistake_id ?? sampleMistake;
   const pointId = question.knowledge_point_ids[0] ?? "";
   const material = text(question["material"]);
@@ -320,9 +382,16 @@ function buildRow(where: Located, state: Live, mode: Mode, index: number, fixtur
             evidence_counted: evidence.counted,
             mistake_id: mistakeId,
             solution: solutionOf(question, mode),
+            layers: {
+              steps: [...layer.steps],
+              sources: [...(layer.sources ?? [])],
+              ...(verdict.correct === false && layer.suggested_cause !== undefined ? { suggested_cause: layer.suggested_cause } : {}),
+            },
+            ...(cause === null ? {} : { error_cause: cause }),
           },
         }),
     check,
+    hints: { total: hintTexts.length, shown: hintTexts.slice(0, hintsUsed) },
     ...(fixture.revised === true && verdict !== null ? { revised: true } : {}),
   };
   return {
@@ -332,7 +401,7 @@ function buildRow(where: Located, state: Live, mode: Mode, index: number, fixtur
     evidence,
     seconds: answer === undefined ? null : Math.round(answer.duration_ms / MS_PER_SECOND),
     suggested: fixture.suggested_seconds,
-    cause: answer?.error_cause ?? null,
+    cause,
     pointId,
     pointName: pointName(where.exam, pointId),
     mistake: mistakeId !== null,
@@ -475,7 +544,8 @@ function submit(ctx: MockContext, mode: Mode): Json {
     response: isRecord(body["response"]) ? body["response"] : {},
     confidence,
     duration_ms: typeof duration === "number" && Number.isInteger(duration) ? duration : 0,
-    hint_level: typeof hints === "number" && Number.isInteger(hints) ? hints : 0,
+    // 用过几级提示以提示阶梯的记录为准（取较大的那个），用过提示最高记弱证据
+    hint_level: Math.max(typeof hints === "number" && Number.isInteger(hints) ? hints : 0, state.hints.get(storeKey) ?? 0),
     mistake_id: null,
   };
   // 测评态交卷前不揭晓、也不写进内存仓库（交卷时一起写）
@@ -514,6 +584,120 @@ function finish(ctx: MockContext, mode: Mode): Json {
   return sessionBody(ctx, mode);
 }
 
+/** 请求里的题：题组位置、这一题现在的样子、题目原文。 */
+function itemRequest(ctx: MockContext, mode: Mode) {
+  const where = locate(ctx);
+  const body = isRecord(ctx.body) ? ctx.body : {};
+  const itemId = text(body["item_id"]) ?? "";
+  const index = itemAt(where, itemId);
+  const fixture = where.fixture.items[index];
+  if (fixture === undefined) throw new ApiError("COMMON_NOT_FOUND", { item_id: itemId });
+  return { where, body, itemId, index, current: itemBody(ctx, mode, index), question: questionOf(where, fixture.question_id) };
+}
+
+/** 提示阶梯（S18-16）：给下一级提示；测评态不能看提示，交了（或揭晓了）就不再给。 */
+function takeHint(ctx: MockContext, mode: Mode): Json {
+  const { where, itemId, index, current, question } = itemRequest(ctx, mode);
+  if (isAssessment(where, mode)) throw new ApiError("COMMON_FORBIDDEN", { item_id: itemId, reason: "hints_locked" });
+  const state = live(ctx.db);
+  if (current["status"] !== "unanswered" || state.handedIn.has(where.key)) throw new ApiError("PRAC_REVEAL_LOCKED", { item_id: itemId });
+  const storeKey = `${where.key}:${itemId}`;
+  const given = isRecord(current["hints"]) ? strings(current["hints"]["shown"]).length : 0;
+  if (given >= hintsOf(question).length) throw new ApiError("COMMON_VALIDATION", { field: "item_id", reason: "no_more_hints" });
+  state.hints.set(storeKey, given + 1);
+  return itemBody(ctx, mode, index);
+}
+
+/** 错因确认（S18-08）：揭晓后、做错的题才收；七类之一，可以改选，按最后一次算。 */
+function saveCause(ctx: MockContext, mode: Mode): Json {
+  const { where, body, itemId, index, current } = itemRequest(ctx, mode);
+  const cause = text(body["cause"]) ?? "";
+  if (!CAUSES.includes(cause)) throw new ApiError("COMMON_VALIDATION", { field: "cause" });
+  const result = isRecord(current["result"]) ? current["result"] : {};
+  if (current["status"] !== "revealed" || result["correct"] !== false)
+    throw new ApiError("COMMON_VALIDATION", { field: "item_id", reason: "not_revealed_wrong" });
+  live(ctx.db).causes.set(`${where.key}:${itemId}`, cause);
+  return itemBody(ctx, mode, index);
+}
+
+/** 讲解里说“你的作答”：选择题写选项字母与原文，实操自评写打勾的项，文字题把各段连起来。 */
+function answerText(question: QuestionFixture, current: Json, none: string): string {
+  const answer = isRecord(current["answer"]) ? current["answer"] : {};
+  const response = isRecord(answer["response"]) ? answer["response"] : {};
+  const selected = numbers(response["selected"]);
+  const options = question.options ?? [];
+  if (selected.length > 0 && options.length > 0) return selected.map((i) => `${LETTERS.charAt(i)}「${options[i] ?? ""}」`).join("、");
+  const parts = strings(question["parts"]);
+  if (selected.length > 0 && parts.length > 0) return selected.map((i) => `「${parts[i] ?? ""}」`).join("、");
+  const written = (text(response["text"]) ?? "")
+    .split("\n")
+    .map((part) => part.trim())
+    .filter((part) => part !== "");
+  return written.length === 0 ? none : `「${written.join("；")}」`;
+}
+
+/** 讲解与追问（S18-13）、引导我想（S18-17）：揭晓后才讲；回复按示例话术拼（规则与导师还没接上），页面标 AI 生成。 */
+function explain(ctx: MockContext, mode: Mode): Json {
+  const { where, body, itemId, current, question } = itemRequest(ctx, mode);
+  const how = text(body["mode"]) ?? "";
+  const scratch = text(body["scratch"]);
+  if (!EXPLAIN_MODES.includes(how) || scratch === undefined)
+    throw new ApiError("COMMON_VALIDATION", { field: scratch === undefined ? "scratch" : "mode" });
+  if (current["status"] !== "revealed") throw new ApiError("PRAC_REVEAL_LOCKED", { item_id: itemId, reason: "not_revealed" });
+  const base = {
+    item_id: itemId,
+    thread_id: text(body["thread_id"]) ?? `${where.sessionId}:${itemId}:${how}`,
+    mode: how,
+    data_source: "sample",
+  };
+  const tutor = where.page.tutor;
+  // 导师不可用：照常回 200，页面说明讲解先暂停，解析照常看（ui-rules 第 7 节）
+  if (tutor === undefined || !tutor.available) return { ...base, tutor_available: false, reply: "", follow_ups: [] };
+  const layer = layerOf(where.page, question);
+  const result = isRecord(current["result"]) ? current["result"] : {};
+  const explanation = question["explanation"];
+  const conclusion = (isRecord(explanation) ? text(explanation["conclusion"]) : undefined) ?? text(question["sample_answer"]) ?? "";
+  const wrong = result["correct"] === false;
+  const steps = layer.steps;
+  const step = wrong ? Math.min(Math.max(1, layer.wrong_step ?? 1), Math.max(1, steps.length)) : null;
+  const focus = (step === null ? steps[steps.length - 1] : steps[step - 1]) ?? conclusion;
+  const followUp = (text(body["follow_up"]) ?? "").trim();
+  const answer = isRecord(current["answer"]) ? current["answer"] : {};
+  const confidence = text(answer["confidence"]) ?? "";
+  const quoted = [...scratch.trim()];
+  const scratchNote =
+    quoted.length === 0
+      ? ""
+      : fill(tutor.scratch, { scratch: quoted.slice(0, SCRATCH_QUOTE_CHARS).join("") + (quoted.length > SCRATCH_QUOTE_CHARS ? "…" : "") });
+  let reply: string;
+  if (how === "guided") {
+    reply = followUp === "" ? tutor.guided_open : fill(wrong ? tutor.guided_wrong : tutor.guided_right, { step: step ?? 1, focus });
+  } else if (followUp !== "") {
+    reply = fill(tutor.follow_up, { question: followUp, focus });
+  } else {
+    reply = [
+      fill(tutor.explain_open, {
+        point: pointName(where.exam, question.knowledge_point_ids[0] ?? ""),
+        answer: answerText(question, current, tutor.no_answer),
+        confidence: tutor.confidence_labels[confidence] ?? confidence,
+        scratch: scratchNote,
+      }),
+      steps.length === 0 ? "" : fill(tutor.explain_steps, { steps: steps.map((entry, i) => `${i + 1}. ${entry}`).join(" ") }),
+      fill(tutor.explain_close, { conclusion }),
+    ]
+      .filter((line) => line !== "")
+      .join("\n");
+  }
+  const asking = how === "guided" && followUp === "";
+  return {
+    ...base,
+    tutor_available: true,
+    reply,
+    ...(how === "guided" && !asking && step !== null ? { wrong_step: step } : {}),
+    follow_ups: asking ? [] : [...tutor.follow_ups],
+  };
+}
+
 export const routes = [
   defineRoute("getQuizSession", (ctx) => sessionBody(ctx, "normal"), {
     variants: {
@@ -530,5 +714,26 @@ export const routes = [
   }),
   defineRoute("finishQuizSession", (ctx) => finish(ctx, "normal"), {
     variants: { restricted: (ctx) => finish(ctx, "restricted"), insufficient_data: (ctx) => finish(ctx, "insufficient_data") },
+  }),
+  defineRoute("takeQuizHint", (ctx) => takeHint(ctx, "normal"), {
+    variants: {
+      empty: (ctx) => takeHint(ctx, "empty"),
+      restricted: (ctx) => takeHint(ctx, "restricted"),
+      insufficient_data: (ctx) => takeHint(ctx, "insufficient_data"),
+    },
+  }),
+  defineRoute("saveQuizErrorCause", (ctx) => saveCause(ctx, "normal"), {
+    variants: {
+      empty: (ctx) => saveCause(ctx, "empty"),
+      restricted: (ctx) => saveCause(ctx, "restricted"),
+      insufficient_data: (ctx) => saveCause(ctx, "insufficient_data"),
+    },
+  }),
+  defineRoute("askQuizTutor", (ctx) => explain(ctx, "normal"), {
+    variants: {
+      empty: (ctx) => explain(ctx, "empty"),
+      restricted: (ctx) => explain(ctx, "restricted"),
+      insufficient_data: (ctx) => explain(ctx, "insufficient_data"),
+    },
   }),
 ];

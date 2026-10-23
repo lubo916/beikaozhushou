@@ -1,5 +1,5 @@
 {
-  "note": "S18 做题与解析的页面演示数据（U18a）：两个示范题组（objective 题库、generated 导师出题）与页面专用的演示题；prefill 是断点续做前已经做过的题；sample_rules 是规则还没实现时假数据层用的示例做法。",
+  "note": "S18 做题与解析的页面演示数据（U18a、U18b）：两个示范题组（objective 题库、generated 导师出题）与页面专用的演示题；prefill 是断点续做前已经做过的题；sample_rules 是规则还没实现时假数据层用的示例做法；solution_layers 按题给分层解析的分步推导、资料定位与导师建议错因（AI 初判，wrong_step 给引导式纠错用）；tutor 是讲解与追问的示例话术。",
   "sample_rules": {
     "fast_answer_ms": 3000,
     "credibility_caps": {
@@ -416,5 +416,301 @@
         "conclusion": "出售差额记投资收益。"
       }
     }
-  ]
+  ],
+  "solution_layers": {
+    "019a0118-0000-7000-8000-000000000001": {
+      "steps": [
+        "先看取得时：交易费用记投资收益，不进成本。",
+        "再看已宣告未发放的股利：单独记应收股利，也不进成本。",
+        "最后看期末：按公允价值计量，变动记公允价值变动损益，不进其他综合收益。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0110-0000-7000-8000-000000000001",
+          "title": "《初级会计实务》官方教材（电子版）",
+          "locator": "第 3 章 资产 › 金融资产"
+        },
+        {
+          "kind": "video",
+          "ref_id": "junior-accounting-video",
+          "title": "讲解：资产",
+          "locator": "12:40"
+        }
+      ],
+      "suggested_cause": "concept_unclear",
+      "wrong_step": 3
+    },
+    "019a0118-0000-7000-8000-000000000002": {
+      "steps": [
+        "先看这笔股利是什么时候宣告的：取得时就已宣告。",
+        "取得时已记“应收股利”，收到时只是收回这笔债权。",
+        "所以收到时冲减应收股利，不确认投资收益。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0110-0000-7000-8000-000000000001",
+          "title": "《初级会计实务》官方教材（电子版）",
+          "locator": "第 3 章 资产 › 金融资产"
+        },
+        {
+          "kind": "video",
+          "ref_id": "junior-accounting-video",
+          "title": "讲解：资产",
+          "locator": "12:40"
+        }
+      ],
+      "suggested_cause": "concept_unclear",
+      "wrong_step": 1
+    },
+    "019a0118-0000-7000-8000-000000000003": {
+      "steps": [
+        "成本 ＝ 支付价款 − 已宣告未发放的股利 ＝ 206 − 6 ＝ 200。",
+        "交易费用 1 万元不进成本，记投资收益借方。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0110-0000-7000-8000-000000000001",
+          "title": "《初级会计实务》官方教材（电子版）",
+          "locator": "第 3 章 资产 › 金融资产"
+        },
+        {
+          "kind": "video",
+          "ref_id": "junior-accounting-video",
+          "title": "讲解：资产",
+          "locator": "12:40"
+        }
+      ],
+      "suggested_cause": "method_unknown",
+      "wrong_step": 1
+    },
+    "019a0104-0000-7000-8000-000000000001": {
+      "steps": [
+        "先分清：哪些钱买的是资产本身，哪些不是。",
+        "已宣告未发放的股利 6 万元单独记“应收股利”。",
+        "交易费用 1 万元记“投资收益”借方，不进成本。",
+        "入账金额 ＝ 206 − 6 ＝ 200。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0110-0000-7000-8000-000000000001",
+          "title": "《初级会计实务》官方教材（电子版）",
+          "locator": "第 3 章 资产 › 金融资产"
+        },
+        {
+          "kind": "video",
+          "ref_id": "junior-accounting-video",
+          "title": "讲解：资产",
+          "locator": "12:40"
+        }
+      ],
+      "suggested_cause": "concept_unclear",
+      "wrong_step": 3
+    },
+    "019a0118-0000-7000-8000-000000000004": {
+      "steps": [
+        "取得时按公允价值入账。",
+        "持有期间收到宣告的现金股利。",
+        "资产负债表日确认公允价值变动。",
+        "出售时结转损益。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0110-0000-7000-8000-000000000001",
+          "title": "《初级会计实务》官方教材（电子版）",
+          "locator": "第 3 章 资产 › 金融资产"
+        },
+        {
+          "kind": "video",
+          "ref_id": "junior-accounting-video",
+          "title": "讲解：资产",
+          "locator": "12:40"
+        }
+      ],
+      "suggested_cause": "forgot",
+      "wrong_step": 2
+    },
+    "019a0118-0000-7000-8000-000000000005": {
+      "steps": [
+        "出售价款扣除手续费：260 − 1 ＝ 259。",
+        "减去出售时的账面价值 230。",
+        "投资收益 ＝ 259 − 230 ＝ 29 万元。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0110-0000-7000-8000-000000000001",
+          "title": "《初级会计实务》官方教材（电子版）",
+          "locator": "第 3 章 资产 › 金融资产"
+        },
+        {
+          "kind": "video",
+          "ref_id": "junior-accounting-video",
+          "title": "讲解：资产",
+          "locator": "12:40"
+        }
+      ],
+      "suggested_cause": "slip",
+      "wrong_step": 2
+    },
+    "019a0118-0000-7000-8000-000000000006": {
+      "steps": [
+        "入账成本 ＝ 515 − 15 ＝ 500，交易费用 2 万元不进成本。",
+        "6 月 30 日的公允价值是 520 万元。",
+        "公允价值变动 ＝ 520 − 500 ＝ 20 万元。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0110-0000-7000-8000-000000000001",
+          "title": "《初级会计实务》官方教材（电子版）",
+          "locator": "第 3 章 资产 › 金融资产"
+        },
+        {
+          "kind": "video",
+          "ref_id": "junior-accounting-video",
+          "title": "讲解：资产",
+          "locator": "12:40"
+        }
+      ],
+      "suggested_cause": "misread",
+      "wrong_step": 1
+    },
+    "019a0104-0000-7000-8000-000000000002": {
+      "steps": [
+        "购入：借交易性金融资产—成本 200、应收股利 6、投资收益 1，贷其他货币资金 207。",
+        "月末公允价值上升 12：借交易性金融资产—公允价值变动 12，贷公允价值变动损益 12。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0110-0000-7000-8000-000000000001",
+          "title": "《初级会计实务》官方教材（电子版）",
+          "locator": "第 3 章 资产 › 金融资产"
+        },
+        {
+          "kind": "video",
+          "ref_id": "junior-accounting-video",
+          "title": "讲解：资产",
+          "locator": "12:40"
+        }
+      ]
+    },
+    "019a0118-0000-7000-8000-000000000011": {
+      "steps": [
+        "交易费用不是买资产本身的钱。",
+        "交易性金融资产的交易费用直接记投资收益借方。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0110-0000-7000-8000-000000000001",
+          "title": "《初级会计实务》官方教材（电子版）",
+          "locator": "第 3 章 资产 › 金融资产"
+        },
+        {
+          "kind": "video",
+          "ref_id": "junior-accounting-video",
+          "title": "讲解：资产",
+          "locator": "12:40"
+        }
+      ],
+      "suggested_cause": "concept_unclear",
+      "wrong_step": 1
+    },
+    "019a0118-0000-7000-8000-000000000012": {
+      "steps": [
+        "公允价值变动记“公允价值变动损益”。",
+        "它是损益类科目，影响当期利润。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0110-0000-7000-8000-000000000001",
+          "title": "《初级会计实务》官方教材（电子版）",
+          "locator": "第 3 章 资产 › 金融资产"
+        },
+        {
+          "kind": "video",
+          "ref_id": "junior-accounting-video",
+          "title": "讲解：资产",
+          "locator": "12:40"
+        }
+      ],
+      "suggested_cause": "concept_unclear",
+      "wrong_step": 1
+    },
+    "019a0118-0000-7000-8000-000000000013": {
+      "steps": [
+        "已到付息期但尚未领取的利息，是单独的一笔债权。",
+        "记“应收利息”，不进成本。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0110-0000-7000-8000-000000000001",
+          "title": "《初级会计实务》官方教材（电子版）",
+          "locator": "第 3 章 资产 › 金融资产"
+        },
+        {
+          "kind": "video",
+          "ref_id": "junior-accounting-video",
+          "title": "讲解：资产",
+          "locator": "12:40"
+        }
+      ],
+      "suggested_cause": "concept_unclear",
+      "wrong_step": 1
+    },
+    "019a0118-0000-7000-8000-000000000014": {
+      "steps": [
+        "出售时售价与账面价值的差额是处置损益。",
+        "这笔差额记投资收益。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0110-0000-7000-8000-000000000001",
+          "title": "《初级会计实务》官方教材（电子版）",
+          "locator": "第 3 章 资产 › 金融资产"
+        },
+        {
+          "kind": "video",
+          "ref_id": "junior-accounting-video",
+          "title": "讲解：资产",
+          "locator": "12:40"
+        }
+      ],
+      "suggested_cause": "forgot",
+      "wrong_step": 2
+    }
+  },
+  "tutor": {
+    "note": "讲解与追问的示例话术：导师还没接上时假数据层按这里拼回复，页面上标“AI 生成”。",
+    "confidence_labels": {
+      "sure": "确定",
+      "vague": "模糊",
+      "guess": "蒙的",
+      "off": "已关闭"
+    },
+    "explain_open": "这道题考「{{point}}」。我看了你的作答：{{answer}}，把握度“{{confidence}}”{{scratch}}。",
+    "explain_steps": "按这几步想：{{steps}}",
+    "explain_close": "一句话：{{conclusion}}",
+    "scratch": "，也看了你草稿里写的“{{scratch}}”",
+    "follow_up": "你问“{{question}}”。关键在这一步：{{focus}}",
+    "guided_open": "先不讲答案。说说你为什么这样答？当时第一步是怎么想的？",
+    "guided_wrong": "你的思路从第 {{step}} 步开始偏了。回到这一步再想想：{{focus}}",
+    "guided_right": "思路是对的。再把关键的一步说清楚：{{focus}}",
+    "follow_ups": [
+      "为什么不能那样算？",
+      "换个例子讲讲",
+      "这个点还会怎么考？"
+    ],
+    "available": true,
+    "no_answer": "还没有作答"
+  }
 }

@@ -1,8 +1,10 @@
-# S18 做题与解析的接口（U18a 上半，api-rules 第 2、3 节）：一组题一次取齐——题目（揭晓前不含答案）、我的作答与揭晓结果、本组进度、断点续做的位置、小结与限制。
+# S18 做题与解析的接口（U18a 上半、U18b 下半，api-rules 第 2、3 节）：一组题一次取齐——题目（揭晓前不含答案）、我的作答与揭晓结果、本组进度、断点续做的位置、小结与限制。
 # 写操作三个：在题组里提交一题、生成题核对（先做后核）、测评态交卷。作答只追加，揭晓后不能改（INV-24）。对错、证据、进度、小结都由服务端算好，页面只显示（红线 5）。
 # 公共形状引用 schemas/；本页私有的形状用 S18 作前缀。规则还没实现时，假数据层返回演示数据并标 data_source 为 sample。
 # 生成题核对与测评态交卷暂挂在 practice.answer.submit 动作下（U18a-Q2＝A，见决定卡 D-2026-10-23-U18a-r1）；要不要单列动作由整合任务定。
 # 开始一组、再来一组属于练习中心 S17，这里不写。
+# U18b 加三个：提示阶梯（服务端记用了几级，用过提示最高记弱证据）、错因确认（七类、可改选）、讲解与追问（导师回复是 AI 生成；导师不可用时照常回 200，tutor_available 为 false）。
+# 讲解与追问暂挂在 content.solution.read 动作下（同 U18a-Q2 的做法）；导师的动作由整合任务登记。
 paths:
   /practice/sessions/{sessionId}:
     get:
@@ -89,6 +91,80 @@ paths:
               schema: {$ref: "#/components/schemas/S18QuizSession"}
         "404": {$ref: "#/components/responses/Error"}
         "422": {$ref: "#/components/responses/Error"}
+  /practice/sessions/{sessionId}/hints:
+    post:
+      operationId: takeQuizHint
+      x-owner: practice
+      x-action: practice.answer.submit
+      x-errors: [PRAC_REVEAL_LOCKED, COMMON_FORBIDDEN, COMMON_VALIDATION]
+      x-invalidates: [getQuizSession]
+      summary: 提示阶梯：给这一题的下一级提示（提交前才给、不给答案；测评态不能看提示；用过提示这一题最高记弱证据）
+      parameters:
+        - {name: sessionId, in: path, required: true, schema: {type: string}}
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/S18HintInput"}
+      responses:
+        "200":
+          description: 给出下一级提示后的这一题
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S18QuizItem"}
+        "403": {$ref: "#/components/responses/Error"}
+        "404": {$ref: "#/components/responses/Error"}
+        "409": {$ref: "#/components/responses/Error"}
+        "422": {$ref: "#/components/responses/Error"}
+  /practice/sessions/{sessionId}/causes:
+    post:
+      operationId: saveQuizErrorCause
+      x-owner: practice
+      x-action: practice.answer.submit
+      x-errors: [COMMON_VALIDATION]
+      x-invalidates: [getQuizSession, listMistakes]
+      summary: 错因确认：揭晓后给做错的题选错因（七类之一，无默认，可以跳过）；可以改选，按最后一次算，进练习小结与错题本
+      parameters:
+        - {name: sessionId, in: path, required: true, schema: {type: string}}
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/S18CauseInput"}
+      responses:
+        "200":
+          description: 记下错因后的这一题
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S18QuizItem"}
+        "404": {$ref: "#/components/responses/Error"}
+        "422": {$ref: "#/components/responses/Error"}
+  /practice/sessions/{sessionId}/explanations:
+    post:
+      operationId: askQuizTutor
+      x-owner: tutor
+      x-action: content.solution.read
+      x-errors: [PRAC_REVEAL_LOCKED, COMMON_VALIDATION]
+      summary: 讲解与追问：导师按这一题、我的作答、把握度和带上的草稿直接讲，或先问我怎么想的（揭晓后才可用；回复是 AI 生成）
+      parameters:
+        - {name: sessionId, in: path, required: true, schema: {type: string}}
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/S18ExplainInput"}
+      responses:
+        "200":
+          description: 导师这一轮的回复
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S18Explanation"}
+        "404": {$ref: "#/components/responses/Error"}
+        "409": {$ref: "#/components/responses/Error"}
+        "422": {$ref: "#/components/responses/Error"}
 components:
   schemas:
     S18QuizSession:
@@ -134,7 +210,7 @@ components:
     S18QuizItem:
       type: object
       description: 题组里的一题：题目、我的作答、揭晓结果与生成题核对
-      required: [id, index, question, knowledge_point_name, suggested_seconds, status, flagged, check]
+      required: [id, index, question, knowledge_point_name, suggested_seconds, status, flagged, check, hints]
       properties:
         id: {type: string}
         index: {type: integer, minimum: 0}
@@ -160,6 +236,7 @@ components:
         answer: {$ref: "#/components/schemas/S18MyAnswer"}
         result: {$ref: "#/components/schemas/S18ItemResult"}
         check: {$ref: "#/components/schemas/S18CheckState"}
+        hints: {$ref: "#/components/schemas/S18HintState"}
         revised:
           type: boolean
           description: 题目事后改了答案：由它产生的证据已撤回并重算（S18-26）
@@ -178,8 +255,8 @@ components:
         hint_level: {type: integer, minimum: 0}
     S18ItemResult:
       type: object
-      description: 揭晓结果：判分、这次记了什么证据与原因、答案与解析
-      required: [graded, correct, evidence_strength, evidence_reason, evidence_counted, mistake_id, solution]
+      description: 揭晓结果：判分、这次记了什么证据与原因、答案与解析、分层解析的其余几层，以及我确认的错因（做错且选过才有，可改选）
+      required: [graded, correct, evidence_strength, evidence_reason, evidence_counted, mistake_id, solution, layers]
       properties:
         graded:
           type: boolean
@@ -194,6 +271,8 @@ components:
           type: [string, "null"]
           description: 这次作答进了错题本时为错题 ID
         solution: {$ref: "#/components/schemas/QuestionSolution"}
+        layers: {$ref: "#/components/schemas/S18SolutionLayers"}
+        error_cause: {$ref: "#/components/schemas/S18ErrorCause"}
     S18EvidenceReason:
       type: string
       description: "这次为什么记这个证据：sure_correct 标确定且做对；vague_correct 标模糊做对；guess_correct 蒙对（待验证，稍后换问法再考）；too_fast 用时过短（待验证）；hint_used 用过提示（弱证据）；confidence_off 把握度已关闭（做对最高记中）；wrong 做错；awaiting_check 生成题还没确认（确认前不计）；question_problem 报了题目有问题（不计）；ungraded 主观题等批改或自评"
@@ -299,7 +378,10 @@ components:
         response: {$ref: "#/components/schemas/AnswerResponse"}
         confidence: {$ref: "#/components/schemas/Confidence"}
         duration_ms: {type: integer, minimum: 0}
-        hint_level: {type: integer, minimum: 0}
+        hint_level:
+          type: integer
+          minimum: 0
+          description: 用了几级提示（服务端以提示阶梯的记录为准，取较大的那个）
     S18CheckInput:
       type: object
       description: 生成题核对：题目没问题（ok）或有问题（problem）
@@ -307,3 +389,92 @@ components:
       properties:
         item_id: {type: string}
         verdict: {$ref: "#/components/schemas/S18CheckVerdict"}
+    S18HintState:
+      type: object
+      description: 提示阶梯（S18-16）：这一题一共几级提示、已经给出的几级（提交前只给分级提示、不给答案）
+      required: [total, shown]
+      properties:
+        total: {type: integer, minimum: 0}
+        shown:
+          type: array
+          description: 已经给出的提示，从第 1 级起按顺序
+          items: {type: string}
+    S18HintInput:
+      type: object
+      description: 要这一题的下一级提示
+      required: [item_id]
+      properties:
+        item_id: {type: string}
+    S18SolutionLayers:
+      type: object
+      description: 分层解析里一句话结论之外的几层（S18-06、S18-08）：分步推导、资料定位，以及做错时导师建议的错因（AI 初判，只供采纳，不替学员选）
+      required: [steps, sources]
+      properties:
+        steps:
+          type: array
+          description: 分步推导，按先后
+          items: {type: string}
+        sources:
+          type: array
+          description: 资料定位：讲这一点的资料与视频位置
+          items: {$ref: "#/components/schemas/S18SourceRef"}
+        suggested_cause: {$ref: "#/components/schemas/S18ErrorCause"}
+    S18SourceRef:
+      type: object
+      description: 资料定位的一处：material 是资料（去阅读器），video 是视频片段（去视听课堂）；locator 是给人看的位置（章节或时间点）
+      required: [kind, ref_id, title, locator]
+      properties:
+        kind: {$ref: "#/components/schemas/S18SourceKind"}
+        ref_id: {type: string}
+        title: {type: string}
+        locator: {type: string}
+    S18SourceKind:
+      type: string
+      description: material 资料；video 视频片段
+      enum: [material, video]
+    S18CauseInput:
+      type: object
+      description: 错因确认（错因七类之一）
+      required: [item_id, cause]
+      properties:
+        item_id: {type: string}
+        cause: {$ref: "#/components/schemas/S18ErrorCause"}
+    S18ExplainMode:
+      type: string
+      description: explain 直接讲；guided 先问我怎么想的（引导式纠错，S18-17）
+      enum: [explain, guided]
+    S18ExplainInput:
+      type: object
+      description: 讲解与追问（S18-13）：题目、我的作答与把握度由服务端按 item_id 取，页面带上草稿；follow_up 是追问或回答导师的问题，第一次不填
+      required: [item_id, mode, scratch]
+      properties:
+        item_id: {type: string}
+        mode: {$ref: "#/components/schemas/S18ExplainMode"}
+        scratch:
+          type: string
+          description: 草稿纸上的内容，没写就是空字符串
+        follow_up: {type: string}
+        thread_id:
+          type: string
+          description: 接着同一段讲解追问时带上
+    S18Explanation:
+      type: object
+      description: 导师这一轮的回复（AI 生成，页面带显式标识）；导师不可用时 tutor_available 为 false、reply 为空，页面照常、不报错
+      required: [item_id, thread_id, mode, tutor_available, reply, follow_ups, data_source]
+      properties:
+        item_id: {type: string}
+        thread_id: {type: string}
+        mode: {$ref: "#/components/schemas/S18ExplainMode"}
+        tutor_available: {type: boolean}
+        reply:
+          type: string
+          description: 导师的回复，分段用换行
+        wrong_step:
+          type: integer
+          minimum: 1
+          description: 引导式纠错时导师指出思路从第几步开始出了问题
+        follow_ups:
+          type: array
+          description: 可以接着问的话
+          items: {type: string}
+        data_source: {$ref: "#/components/schemas/DataSource"}

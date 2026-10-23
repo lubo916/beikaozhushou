@@ -1,5 +1,5 @@
 {
-  "note": "S18 做题与解析的页面演示数据（U18a）：两个示范题组（objective 题库、generated 导师出题）与页面专用的演示题；prefill 是断点续做前已经做过的题；sample_rules 是规则还没实现时假数据层用的示例做法。",
+  "note": "S18 做题与解析的页面演示数据（U18a、U18b）：两个示范题组（objective 题库、generated 导师出题）与页面专用的演示题；prefill 是断点续做前已经做过的题；sample_rules 是规则还没实现时假数据层用的示例做法；solution_layers 按题给分层解析的分步推导、资料定位与导师建议错因（AI 初判，wrong_step 给引导式纠错用）；tutor 是讲解与追问的示例话术。",
   "sample_rules": {
     "fast_answer_ms": 3000,
     "credibility_caps": {
@@ -153,5 +153,166 @@
         "conclusion": "满二叉树一定是完全二叉树，反过来不成立。"
       }
     }
-  ]
+  ],
+  "solution_layers": {
+    "019a0418-0000-7000-8000-000000000001": {
+      "steps": [
+        "先序的第一个结点就是根。",
+        "在中序里找到根，分出左右子树。",
+        "对左右子树递归用同样的做法。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0410-0000-7000-8000-000000000001",
+          "title": "《数据结构》课程讲义（我上传的）",
+          "locator": "第 6 章 树和二叉树 › 遍历"
+        },
+        {
+          "kind": "video",
+          "ref_id": "ds-final-custom-video",
+          "title": "课堂录屏：二叉树遍历",
+          "locator": "23:05"
+        }
+      ],
+      "suggested_cause": "method_unknown",
+      "wrong_step": 1
+    },
+    "019a0404-0000-7000-8000-000000000001": {
+      "steps": [
+        "先序第一个 A 是根。",
+        "中序里 A 左边 DBE 是左子树，右边 C 是右子树。",
+        "左子树先序是 BDE：根 B，左 D 右 E。",
+        "后序：D、E、B、C、A。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0410-0000-7000-8000-000000000001",
+          "title": "《数据结构》课程讲义（我上传的）",
+          "locator": "第 6 章 树和二叉树 › 遍历"
+        },
+        {
+          "kind": "video",
+          "ref_id": "ds-final-custom-video",
+          "title": "课堂录屏：二叉树遍历",
+          "locator": "23:05"
+        }
+      ],
+      "suggested_cause": "method_unknown",
+      "wrong_step": 3
+    },
+    "019a0418-0000-7000-8000-000000000002": {
+      "steps": [
+        "先写递归出口：结点为空就返回。",
+        "递归遍历左子树、右子树。",
+        "最后访问根结点。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0410-0000-7000-8000-000000000001",
+          "title": "《数据结构》课程讲义（我上传的）",
+          "locator": "第 6 章 树和二叉树 › 遍历"
+        },
+        {
+          "kind": "video",
+          "ref_id": "ds-final-custom-video",
+          "title": "课堂录屏：二叉树遍历",
+          "locator": "23:05"
+        }
+      ]
+    },
+    "019a0404-0000-7000-8000-000000000002": {
+      "steps": [
+        "用栈保存走过的结点。",
+        "一路向左压栈，弹出时访问。",
+        "再转向右子树，重复这一步。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0410-0000-7000-8000-000000000001",
+          "title": "《数据结构》课程讲义（我上传的）",
+          "locator": "第 6 章 树和二叉树 › 遍历"
+        },
+        {
+          "kind": "video",
+          "ref_id": "ds-final-custom-video",
+          "title": "课堂录屏：二叉树遍历",
+          "locator": "23:05"
+        }
+      ]
+    },
+    "019a0418-0000-7000-8000-000000000011": {
+      "steps": [
+        "n 个结点共有 2n 个指针域。",
+        "除根以外每个结点被指一次，非空指针域有 n − 1 个。",
+        "空指针域 ＝ 2n −（n − 1）＝ n + 1。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0410-0000-7000-8000-000000000001",
+          "title": "《数据结构》课程讲义（我上传的）",
+          "locator": "第 6 章 树和二叉树 › 遍历"
+        },
+        {
+          "kind": "video",
+          "ref_id": "ds-final-custom-video",
+          "title": "课堂录屏：二叉树遍历",
+          "locator": "23:05"
+        }
+      ],
+      "suggested_cause": "method_unknown",
+      "wrong_step": 2
+    },
+    "019a0418-0000-7000-8000-000000000012": {
+      "steps": [
+        "满二叉树每一层都是满的。",
+        "完全二叉树只要求按层从左到右排，最后一层可以不满。",
+        "所以完全二叉树不一定是满二叉树。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0410-0000-7000-8000-000000000001",
+          "title": "《数据结构》课程讲义（我上传的）",
+          "locator": "第 6 章 树和二叉树 › 遍历"
+        },
+        {
+          "kind": "video",
+          "ref_id": "ds-final-custom-video",
+          "title": "课堂录屏：二叉树遍历",
+          "locator": "23:05"
+        }
+      ],
+      "suggested_cause": "concept_unclear",
+      "wrong_step": 2
+    }
+  },
+  "tutor": {
+    "note": "讲解与追问的示例话术：导师还没接上时假数据层按这里拼回复，页面上标“AI 生成”。",
+    "confidence_labels": {
+      "sure": "确定",
+      "vague": "模糊",
+      "guess": "蒙的",
+      "off": "已关闭"
+    },
+    "explain_open": "这道题考「{{point}}」。我看了你的作答：{{answer}}，把握度“{{confidence}}”{{scratch}}。",
+    "explain_steps": "按这几步想：{{steps}}",
+    "explain_close": "一句话：{{conclusion}}",
+    "scratch": "，也看了你草稿里写的“{{scratch}}”",
+    "follow_up": "你问“{{question}}”。关键在这一步：{{focus}}",
+    "guided_open": "先不讲答案。说说你为什么这样答？当时第一步是怎么想的？",
+    "guided_wrong": "你的思路从第 {{step}} 步开始偏了。回到这一步再想想：{{focus}}",
+    "guided_right": "思路是对的。再把关键的一步说清楚：{{focus}}",
+    "follow_ups": [
+      "为什么不能那样算？",
+      "换个例子讲讲",
+      "这个点还会怎么考？"
+    ],
+    "available": false,
+    "no_answer": "还没有作答"
+  }
 }

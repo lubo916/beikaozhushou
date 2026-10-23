@@ -1,8 +1,9 @@
 // 做题主流程（S18-02、S18-03、S18-21）：打开时停在断点续做的那一题；作答 → 选把握度 → 提交 → 揭晓（随堂、限时逐题揭晓；
 // 快刷答对自动下一题；测评态交卷后一起揭晓）。作答草稿、把握度、草稿纸、划掉的选项只在这次打开时记在页面里；交上去的以接口为准。
+// U18b：提示阶梯、错因确认经接口记下（成功后按 x-invalidates 刷新本组）；揭晓放进题目卡里（原型）；讲解与追问、引导我想在页面里开面板（U18b-Q1＝A）。
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import type { S18AnswerInput, S18CheckVerdict, S18QuizSession } from "@exam-prep/contract";
+import type { S18AnswerInput, S18CheckVerdict, S18ErrorCause, S18ExplainMode, S18QuizSession } from "@exam-prep/contract";
 import { Button, Columns, Dialog } from "@exam-prep/ui";
 import {
   emptyResponse,
@@ -13,8 +14,10 @@ import {
   type QuizResponse,
 } from "../../../../../../packages/ui/src/quiz/index.ts";
 import { useToast } from "../../../app/toast.tsx";
+import { useNarrow } from "../../../app/useNarrow.ts";
 import { nextOpenIndex, shapeOf, useQuizActions } from "../data.ts";
 import { useQuestionTiming } from "../timing.ts";
+import { ExplainPanel } from "./ExplainPanel.tsx";
 import { ProgressCard } from "./ProgressCard.tsx";
 import { QuestionCard } from "./QuestionCard.tsx";
 import { RevealPanel } from "./RevealPanel.tsx";
@@ -44,7 +47,7 @@ type Store<T> = Readonly<Record<string, T>>;
 export function QuizRunner({ session, sessionId, onStarted, rule, intro }: QuizRunnerProps) {
   const { t } = useTranslation("S18");
   const toast = useToast();
-  const { submit, check, finish } = useQuizActions();
+  const { submit, check, finish, hint, cause } = useQuizActions();
   const last = Math.max(0, session.items.length - 1);
   // feat:S18-21 断点续做：从接口给的那一题接着做
   const [current, setCurrent] = useState(() => Math.min(session.resume_index, last));
@@ -56,6 +59,17 @@ export function QuizRunner({ session, sessionId, onStarted, rule, intro }: QuizR
   const [strikeMode, setStrikeMode] = useState(false);
   const [handInOpen, setHandInOpen] = useState(false);
   const [elapsed, setElapsed] = useState(session.time.elapsed_seconds);
+  // 断点续做的提示只说打开时停在哪一题；这次打开后交过题就不再显示（不随接口给的下一题变）
+  const [opening] = useState(() => ({
+    index: Math.min(session.resume_index, last),
+    resumed: session.items.some((entry) => entry.status !== "unanswered"),
+  }));
+  const [answeredHere, setAnsweredHere] = useState(false);
+  // 刚点的错因（还在记或刚记下）：先按它显示，记不上再退回接口给的
+  const [causePicks, setCausePicks] = useState<Store<S18ErrorCause>>({});
+  const [explain, setExplain] = useState<{ readonly itemId: string; readonly mode: S18ExplainMode } | null>(null);
+  const frameRef = useRef<HTMLDivElement | null>(null);
+  const narrow = useNarrow(frameRef);
   const item = session.items[Math.min(current, last)];
   const { seconds, refresh, pauseForSubmit, resumeAfterFailure } = useQuestionTiming(
     item === undefined ? undefined : `${sessionId}:${item.id}`,
@@ -86,7 +100,6 @@ export function QuizRunner({ session, sessionId, onStarted, rule, intro }: QuizR
   const confidence = confidences[item.id] ?? (saved === undefined || saved === "off" ? null : saved);
   const flagged = flags[item.id] ?? item.flagged;
   const nextOpen = nextOpenIndex(session.items, current, session.finished);
-  const resumed = session.items.some((entry) => entry.status !== "unanswered");
 
   const goNext = () => {
     if (nextOpen !== null) setCurrent(nextOpen);
@@ -105,6 +118,7 @@ export function QuizRunner({ session, sessionId, onStarted, rule, intro }: QuizR
     )
       return;
     onStarted();
+    setAnsweredHere(true);
     const data: S18AnswerInput = {
       item_id: item.id,
       question_id: item.question.id,
@@ -112,7 +126,7 @@ export function QuizRunner({ session, sessionId, onStarted, rule, intro }: QuizR
       response: toWireResponse(shape, response),
       confidence: session.confidence_enabled && confidence !== null ? confidence : "off",
       duration_ms: pauseForSubmit(),
-      hint_level: 0,
+      hint_level: item.hints.shown.length,
     };
     submit.mutate(
       { sessionId, data },
@@ -143,6 +157,29 @@ export function QuizRunner({ session, sessionId, onStarted, rule, intro }: QuizR
       },
     );
 
+  // feat:S18-16 提示阶梯：要下一级提示（测评态不能看提示；交了就不再给）
+  const takeHint = () => {
+    if (hint.isPending || item.status !== "unanswered" || session.finished || session.restrictions.hints_locked) return;
+    hint.mutate({ sessionId, data: { item_id: item.id } }, { onError: () => toast(t("question.hint_failed")) });
+  };
+
+  // feat:S18-08 错因确认：选了就记下，可以改选；记不上退回原来的并提示
+  const chooseCause = (value: S18ErrorCause) => {
+    const id = item.id;
+    setCausePicks((all) => ({ ...all, [id]: value }));
+    cause.mutate(
+      { sessionId, data: { item_id: id, cause: value } },
+      {
+        onError: () => {
+          setCausePicks((all) => Object.fromEntries(Object.entries(all).filter(([key]) => key !== id)));
+          toast(t("reveal.cause_failed"));
+        },
+      },
+    );
+  };
+
+  const explainItem = explain === null ? undefined : session.items.find((entry) => entry.id === explain.itemId);
+
   const handIn = () =>
     finish.mutate(
       { sessionId },
@@ -167,50 +204,77 @@ export function QuizRunner({ session, sessionId, onStarted, rule, intro }: QuizR
     <>
       <SessionBar session={session} current={current} onSelect={setCurrent} elapsed={elapsed} flags={flags} />
       <SessionHeader session={session} />
-      {resumed && !session.finished && (
-        <p className="text-small text-ink-secondary">{t("question.resume", { n: session.resume_index + 1 })}</p>
+      {opening.resumed && !answeredHere && !session.finished && (
+        <p className="text-small text-ink-secondary">{t("question.resume", { n: opening.index + 1 })}</p>
       )}
       {intro}
-      <Columns
-        main={
-          <div className="flex flex-col gap-4">
-            <QuestionCard
-              session={session}
-              item={item}
-              response={response}
-              onResponse={(value) => setDrafts((all) => ({ ...all, [item.id]: value }))}
-              confidence={confidence}
-              onConfidence={(value) => setConfidences((all) => ({ ...all, [item.id]: value }))}
-              scratch={scratch[item.id] ?? ""}
-              onScratch={(text) => setScratch((all) => ({ ...all, [item.id]: text }))}
-              struck={struck[item.id] ?? []}
-              onStrike={(index) =>
-                setStruck((all) => {
-                  const list = all[item.id] ?? [];
-                  return { ...all, [item.id]: list.includes(index) ? list.filter((value) => value !== index) : [...list, index] };
-                })
-              }
-              strikeMode={strikeMode}
-              onStrikeMode={setStrikeMode}
-              flagged={flagged}
-              onFlag={() => setFlags((all) => ({ ...all, [item.id]: !flagged }))}
-              seconds={seconds}
-              busy={submit.isPending}
-              onSubmit={send}
-              after={after}
-            />
-            {revealed && <RevealPanel item={item} onCheck={confirm} checking={check.isPending} />}
-          </div>
-        }
-        aside={
-          <div className="flex flex-col gap-4">
-            <ProgressCard session={session} current={current} rule={rule} onHandIn={() => setHandInOpen(true)} />
-            <div ref={summaryRef} tabIndex={-1} className="rounded-md focus:outline-2 focus:outline-brand-primary">
-              <SummaryCard session={session} />
+      <div ref={frameRef}>
+        <Columns
+          main={
+            <div className="flex flex-col gap-4">
+              <QuestionCard
+                session={session}
+                item={item}
+                response={response}
+                onResponse={(value) => setDrafts((all) => ({ ...all, [item.id]: value }))}
+                confidence={confidence}
+                onConfidence={(value) => setConfidences((all) => ({ ...all, [item.id]: value }))}
+                scratch={scratch[item.id] ?? ""}
+                onScratch={(text) => setScratch((all) => ({ ...all, [item.id]: text }))}
+                struck={struck[item.id] ?? []}
+                onStrike={(index) =>
+                  setStruck((all) => {
+                    const list = all[item.id] ?? [];
+                    return { ...all, [item.id]: list.includes(index) ? list.filter((value) => value !== index) : [...list, index] };
+                  })
+                }
+                strikeMode={strikeMode}
+                onStrikeMode={setStrikeMode}
+                flagged={flagged}
+                onFlag={() => setFlags((all) => ({ ...all, [item.id]: !flagged }))}
+                seconds={seconds}
+                busy={submit.isPending}
+                onSubmit={send}
+                after={after}
+                onHint={takeHint}
+                hinting={hint.isPending}
+                reveal={
+                  revealed ? (
+                    <RevealPanel
+                      key={item.id}
+                      item={item}
+                      onCheck={confirm}
+                      checking={check.isPending}
+                      cause={causePicks[item.id] ?? item.result?.error_cause ?? null}
+                      onCause={chooseCause}
+                      onExplain={(mode) => setExplain({ itemId: item.id, mode })}
+                    />
+                  ) : undefined
+                }
+              />
             </div>
-          </div>
-        }
-      />
+          }
+          aside={
+            <div className="flex flex-col gap-4">
+              <ProgressCard session={session} current={current} rule={rule} onHandIn={() => setHandInOpen(true)} />
+              <div ref={summaryRef} tabIndex={-1} className="rounded-md focus:outline-2 focus:outline-brand-primary">
+                <SummaryCard session={session} />
+              </div>
+            </div>
+          }
+        />
+      </div>
+      {explain !== null && explainItem !== undefined && (
+        <ExplainPanel
+          key={`${explain.itemId}:${explain.mode}`}
+          onClose={() => setExplain(null)}
+          mode={explain.mode}
+          sessionId={sessionId}
+          item={explainItem}
+          scratch={scratch[explainItem.id] ?? ""}
+          narrow={narrow}
+        />
+      )}
       <Dialog
         open={handInOpen}
         onClose={() => setHandInOpen(false)}

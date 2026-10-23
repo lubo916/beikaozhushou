@@ -1,5 +1,5 @@
 {
-  "note": "S18 做题与解析的页面演示数据（U18a）：两个示范题组（objective 题库、generated 导师出题）与页面专用的演示题；prefill 是断点续做前已经做过的题；sample_rules 是规则还没实现时假数据层用的示例做法。",
+  "note": "S18 做题与解析的页面演示数据（U18a、U18b）：两个示范题组（objective 题库、generated 导师出题）与页面专用的演示题；prefill 是断点续做前已经做过的题；sample_rules 是规则还没实现时假数据层用的示例做法；solution_layers 按题给分层解析的分步推导、资料定位与导师建议错因（AI 初判，wrong_step 给引导式纠错用）；tutor 是讲解与追问的示例话术。",
   "sample_rules": {
     "fast_answer_ms": 3000,
     "credibility_caps": {
@@ -163,5 +163,163 @@
         "conclusion": "先行组织者在学习任务之前呈现，所以叫“先行”。"
       }
     }
-  ]
+  ],
+  "solution_layers": {
+    "019a0218-0000-7000-8000-000000000001": {
+      "steps": [
+        "“学而不思则罔”：只学不思考会迷惑。",
+        "这句话强调学习中要调动学生主动思考。",
+        "调动思考对应启发性原则。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0210-0000-7000-8000-000000000001",
+          "title": "《教育知识与能力》考试讲义（电子版）",
+          "locator": "第 4 章 教学 › 教学原则"
+        },
+        {
+          "kind": "video",
+          "ref_id": "teacher-qualification-video",
+          "title": "讲解：教学原则",
+          "locator": "08:15"
+        }
+      ],
+      "suggested_cause": "concept_unclear",
+      "wrong_step": 2
+    },
+    "019a0204-0000-7000-8000-000000000001": {
+      "steps": [
+        "“跳一跳”：任务略高于学生现有水平。",
+        "“摘桃子”：在帮助下够得着。",
+        "这正是维果茨基的最近发展区。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0210-0000-7000-8000-000000000001",
+          "title": "《教育知识与能力》考试讲义（电子版）",
+          "locator": "第 4 章 教学 › 教学原则"
+        },
+        {
+          "kind": "video",
+          "ref_id": "teacher-qualification-video",
+          "title": "讲解：教学原则",
+          "locator": "08:15"
+        }
+      ],
+      "suggested_cause": "concept_unclear",
+      "wrong_step": 3
+    },
+    "019a0204-0000-7000-8000-000000000002": {
+      "steps": [
+        "从内部动机讲：激发兴趣、设置适度难度。",
+        "从外部动机讲：及时反馈、恰当奖励。",
+        "结合归因训练，增强自我效能感。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0210-0000-7000-8000-000000000001",
+          "title": "《教育知识与能力》考试讲义（电子版）",
+          "locator": "第 4 章 教学 › 教学原则"
+        },
+        {
+          "kind": "video",
+          "ref_id": "teacher-qualification-video",
+          "title": "讲解：教学原则",
+          "locator": "08:15"
+        }
+      ]
+    },
+    "019a0218-0000-7000-8000-000000000002": {
+      "steps": [
+        "先表态：关注每一个学生。",
+        "再分析原因：基础、方法还是兴趣。",
+        "最后给办法：分层任务、课后辅导、家校沟通。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0210-0000-7000-8000-000000000001",
+          "title": "《教育知识与能力》考试讲义（电子版）",
+          "locator": "第 4 章 教学 › 教学原则"
+        },
+        {
+          "kind": "video",
+          "ref_id": "teacher-qualification-video",
+          "title": "讲解：教学原则",
+          "locator": "08:15"
+        }
+      ]
+    },
+    "019a0218-0000-7000-8000-000000000011": {
+      "steps": [
+        "维果茨基认为教学要创造最近发展区。",
+        "所以教学应当走在发展的前面。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0210-0000-7000-8000-000000000001",
+          "title": "《教育知识与能力》考试讲义（电子版）",
+          "locator": "第 4 章 教学 › 教学原则"
+        },
+        {
+          "kind": "video",
+          "ref_id": "teacher-qualification-video",
+          "title": "讲解：教学原则",
+          "locator": "08:15"
+        }
+      ],
+      "suggested_cause": "concept_unclear",
+      "wrong_step": 1
+    },
+    "019a0218-0000-7000-8000-000000000012": {
+      "steps": [
+        "先行组织者是在学习任务之前呈现的引导材料。",
+        "说它在任务之后呈现不对，所以判断为错误。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0210-0000-7000-8000-000000000001",
+          "title": "《教育知识与能力》考试讲义（电子版）",
+          "locator": "第 4 章 教学 › 教学原则"
+        },
+        {
+          "kind": "video",
+          "ref_id": "teacher-qualification-video",
+          "title": "讲解：教学原则",
+          "locator": "08:15"
+        }
+      ],
+      "suggested_cause": "concept_unclear",
+      "wrong_step": 1
+    }
+  },
+  "tutor": {
+    "note": "讲解与追问的示例话术：导师还没接上时假数据层按这里拼回复，页面上标“AI 生成”。",
+    "confidence_labels": {
+      "sure": "确定",
+      "vague": "模糊",
+      "guess": "蒙的",
+      "off": "已关闭"
+    },
+    "explain_open": "这道题考「{{point}}」。我看了你的作答：{{answer}}，把握度“{{confidence}}”{{scratch}}。",
+    "explain_steps": "按这几步想：{{steps}}",
+    "explain_close": "一句话：{{conclusion}}",
+    "scratch": "，也看了你草稿里写的“{{scratch}}”",
+    "follow_up": "你问“{{question}}”。关键在这一步：{{focus}}",
+    "guided_open": "先不讲答案。说说你为什么这样答？当时第一步是怎么想的？",
+    "guided_wrong": "你的思路从第 {{step}} 步开始偏了。回到这一步再想想：{{focus}}",
+    "guided_right": "思路是对的。再把关键的一步说清楚：{{focus}}",
+    "follow_ups": [
+      "为什么不能那样算？",
+      "换个例子讲讲",
+      "这个点还会怎么考？"
+    ],
+    "available": true,
+    "no_answer": "还没有作答"
+  }
 }
