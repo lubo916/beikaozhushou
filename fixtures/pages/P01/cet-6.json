@@ -11,7 +11,7 @@
       "sample_sufficient": true,
       "sample_count": 96000,
       "minimum_sample_size": 200,
-      "open_alert_count": 0,
+      "open_alert_count": 1,
       "north_star": {
         "metric_id": "weekly_effective_learners",
         "value": 128700,
@@ -97,7 +97,7 @@
           "change_ratio": 0.12,
           "severity": "medium",
           "raised_at": "2026-10-23T02:30:00Z",
-          "status": "acknowledged",
+          "status": "open",
           "related_page": "P12",
           "ai_summary": "超支主要来自即时出题调用次数上升，单次成本没有明显变化；建议先核对出题场景的调用上限。"
         }
@@ -191,7 +191,7 @@
       "sample_sufficient": false,
       "sample_count": 36,
       "minimum_sample_size": 200,
-      "open_alert_count": 0,
+      "open_alert_count": 1,
       "north_star": {
         "metric_id": "weekly_effective_learners",
         "value": 60,
@@ -264,7 +264,7 @@
           "change_ratio": 0.12,
           "severity": "medium",
           "raised_at": "2026-10-23T02:30:00Z",
-          "status": "acknowledged",
+          "status": "open",
           "related_page": "P12",
           "ai_summary": "超支主要来自即时出题调用次数上升，单次成本没有明显变化；建议先核对出题场景的调用上限。"
         }

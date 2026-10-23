@@ -11,7 +11,7 @@
       "sample_sufficient": true,
       "sample_count": 68000,
       "minimum_sample_size": 200,
-      "open_alert_count": 2,
+      "open_alert_count": 1,
       "north_star": {
         "metric_id": "weekly_effective_learners",
         "value": 96300,
@@ -103,7 +103,7 @@
           "change_ratio": -0.08,
           "severity": "low",
           "raised_at": "2026-10-22T23:40:00Z",
-          "status": "open",
+          "status": "acknowledged",
           "ai_summary": "下降集中在本周新开放的渠道入口，这批用户完成摸底的比例偏低；其他渠道基本持平。"
         }
       ]
@@ -190,7 +190,7 @@
       "sample_sufficient": false,
       "sample_count": 36,
       "minimum_sample_size": 200,
-      "open_alert_count": 2,
+      "open_alert_count": 1,
       "north_star": {
         "metric_id": "weekly_effective_learners",
         "value": 60,
@@ -270,7 +270,7 @@
           "change_ratio": -0.08,
           "severity": "low",
           "raised_at": "2026-10-22T23:40:00Z",
-          "status": "open",
+          "status": "acknowledged",
           "ai_summary": "下降集中在本周新开放的渠道入口，这批用户完成摸底的比例偏低；其他渠道基本持平。"
         }
       ]
