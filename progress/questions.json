@@ -1866,6 +1866,21 @@
       "asked": "v0037",
       "answer": "A",
       "answered": "v0037"
+    },
+    {
+      "id": "U06b-Q1",
+      "task": "U06b",
+      "q": "手机上“几条调整待你确认”那一行在哪些视图出现？",
+      "options": [
+        "A：只要有待确认的提议就出现，照 bk spec 写的“若有”，由数据决定。",
+        "B：只在正常视图出现，照原型截图。"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0038",
+      "answer": "A",
+      "answered": "v0038"
     }
   ]
 }
