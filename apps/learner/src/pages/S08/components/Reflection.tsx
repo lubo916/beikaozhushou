@@ -22,7 +22,7 @@ export function Reflection({ data, offline }: { data: S08Report; offline: boolea
   };
   const nextTitle = data.view === "week" ? t("sections.decision") : t("decision.next_period");
   return (
-    <div className="flex min-w-0 flex-col gap-4">
+    <div className="flex min-w-[0] flex-col gap-4">
       {/* feat:S08-10 教练点评必须带样本量；受限只收起导师部分。 */}
       <Card title={t("sections.coach")}>
         {data.availability === "restricted" ? (

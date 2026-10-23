@@ -11,7 +11,7 @@ export function ReportData({ data }: { data: S08Report }) {
   const enough = data.availability !== "insufficient_data";
   const unit = (key: string) => t(`unit.${key}`);
   return (
-    <div className="flex min-w-0 flex-col gap-4" data-testid="s08-data">
+    <div className="flex min-w-[0] flex-col gap-4" data-testid="s08-data">
       {/* feat:S08-01 固定结构报告；feat:S08-02 只展示接口的投入产出；feat:S08-05 只与自己比较。 */}
       <Card title={t("sections.summary")} tone="brand">
         {enough && (
@@ -107,7 +107,7 @@ export function ReportData({ data }: { data: S08Report }) {
         ) : (
           <ul aria-label={t("rhythm_axis")} className="flex items-end gap-2">
             {data.rhythm.map((item) => (
-              <li key={item.day} className="flex min-w-0 flex-1 flex-col items-center gap-2 text-center text-small">
+              <li key={item.day} className="flex min-w-[0] flex-1 flex-col items-center gap-2 text-center text-small">
                 <span className="break-words text-ink-secondary">{formatDuration(item.minutes)}</span>
                 <span className="flex h-12 w-full items-end rounded-sm bg-bg-sunk" aria-hidden="true">
                   <span className="w-full rounded-sm bg-brand-primary" style={{ height: `${item.height_percent}%` }} />
