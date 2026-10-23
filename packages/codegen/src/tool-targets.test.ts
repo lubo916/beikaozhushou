@@ -110,3 +110,64 @@ describe("pnpm gen 接管令牌与词汇生成", () => {
     expect(hashes(root)).toEqual(first);
   });
 });
+
+const mswSource = "packages/contract/node_modules/msw/lib/mockServiceWorker.js";
+const mswOutputs = ["apps/learner/public/mockServiceWorker.js", "apps/org/public/mockServiceWorker.js"] as const;
+const mswStamps = ".cache/codegen/stamps.json";
+
+function mswFixture(): string {
+  const root = fixture();
+  for (const rel of ["packages/contract/node_modules/msw/package.json", mswSource]) {
+    mkdirSync(dirname(join(root, rel)), { recursive: true });
+    cpSync(join(ROOT, rel), join(root, rel));
+  }
+  return root;
+}
+
+function generateMsw(root: string, check = false) {
+  return spawnSync(process.execPath, ["packages/codegen/src/main.ts", "--only=msw", ...(check ? ["--check"] : [])], {
+    cwd: root,
+    encoding: "utf8",
+  });
+}
+
+describe("pnpm gen 接管 MSW 浏览器工作线程", () => {
+  it("没有 public 目录和缓存时一次生成学员端与机构端，字节均与已安装来源一致", () => {
+    const root = mswFixture();
+    for (const rel of mswOutputs) expect(existsSync(dirname(join(root, rel)))).toBe(false);
+    expect(existsSync(join(root, mswStamps))).toBe(false);
+    expectSuccess(generateMsw(root));
+    const source = readFileSync(join(root, mswSource));
+    for (const rel of mswOutputs) expect(readFileSync(join(root, rel))).toEqual(source);
+    expect(existsSync(join(root, mswStamps))).toBe(true);
+  });
+
+  it("重复生成与检查都成功，两个工作线程和缓存内容保持不变", () => {
+    const root = mswFixture();
+    expectSuccess(generateMsw(root));
+    const first = mswOutputs.map((rel) => readFileSync(join(root, rel)));
+    const stamps = readFileSync(join(root, mswStamps));
+    expectSuccess(generateMsw(root));
+    expectSuccess(generateMsw(root, true));
+    expect(mswOutputs.map((rel) => readFileSync(join(root, rel)))).toEqual(first);
+    expect(readFileSync(join(root, mswStamps))).toEqual(stamps);
+  });
+
+  it("只删除机构端工作线程时检查失败且不写盘，保留学员端与缓存并可重新生成", () => {
+    const root = mswFixture();
+    expectSuccess(generateMsw(root));
+    const learner = readFileSync(join(root, mswOutputs[0]));
+    const stamps = readFileSync(join(root, mswStamps));
+    rmSync(join(root, mswOutputs[1]));
+    const check = generateMsw(root, true);
+    expect(check.status).toBe(1);
+    expect(check.stdout).toContain("生成物检查：1 处不一致");
+    expect(existsSync(join(root, mswOutputs[1]))).toBe(false);
+    expect(readFileSync(join(root, mswOutputs[0]))).toEqual(learner);
+    expect(readFileSync(join(root, mswStamps))).toEqual(stamps);
+    expectSuccess(generateMsw(root));
+    const source = readFileSync(join(root, mswSource));
+    for (const rel of mswOutputs) expect(readFileSync(join(root, rel))).toEqual(source);
+    expectSuccess(generateMsw(root, true));
+  });
+});

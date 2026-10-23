@@ -1,8 +1,8 @@
 // pnpm gen 的生成目标。files 类由本包读来源直接生成；tool 类复用令牌、词汇、Orval 与 Prisma 的生成器。
 // 生成物都不进 git（.gitignore），由 main.ts 在 dev、test、build、typecheck、lint 之前自动生成。
 import { spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { basename, join } from "node:path";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
 import { header, literal, normalize, sha12 } from "./emit.ts";
 import { Num, parseYaml, type YamlValue } from "./yaml.ts";
 
@@ -504,9 +504,9 @@ const orval: ToolTarget = {
   run: (root) => exec(root, process.execPath, ["scripts/engineering/contract-gen.mjs"], "接口代码生成"),
 };
 
-/** 学员端假数据层的 MSW 浏览器工作线程（F04）：从本仓库安装的 msw 复制到 public/，版本跟着依赖走，不进 git。 */
+/** 学员端与机构端假数据层的 MSW 浏览器工作线程（F04）：从本仓库安装的 msw 复制到 public/，版本跟着依赖走，不进 git。 */
 const MSW_WORKER_SOURCE = "packages/contract/node_modules/msw/lib/mockServiceWorker.js";
-const MSW_WORKER_TARGET = "apps/learner/public/mockServiceWorker.js";
+const MSW_WORKER_TARGETS = ["apps/learner/public/mockServiceWorker.js", "apps/org/public/mockServiceWorker.js"] as const;
 
 const mswWorker: ToolTarget = {
   kind: "tool",
@@ -514,9 +514,14 @@ const mswWorker: ToolTarget = {
   title: "MSW 浏览器工作线程",
   inputs: () => ["packages/contract/node_modules/msw/package.json"],
   outDir: "apps/learner/public",
-  outputs: [MSW_WORKER_TARGET],
+  outputs: MSW_WORKER_TARGETS,
   bin: MSW_WORKER_SOURCE,
-  run: (root) => copyFileSync(join(root, MSW_WORKER_SOURCE), join(root, MSW_WORKER_TARGET)),
+  run: (root) => {
+    for (const target of MSW_WORKER_TARGETS) {
+      mkdirSync(dirname(join(root, target)), { recursive: true });
+      copyFileSync(join(root, MSW_WORKER_SOURCE), join(root, target));
+    }
+  },
 };
 
 const prisma: ToolTarget = {
