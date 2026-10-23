@@ -1,1 +1,145 @@
-{}
+{
+  "header": {
+    "title": "先摸个底",
+    "subtitle": "用尽量少的题估出整张地图上的掌握分布。先选方式，再开始；测评中只剩题目。",
+    "sample": "示例数据"
+  },
+  "retake": { "title": "这是再次诊断", "body": "只更新这次测到的知识点；结果比现有证据低时不降级。" },
+  "resume": { "title": "上次的摸底还没做完", "body": "已答 {{n}} 题，答过的都保留，接着做就行。", "action": "接着做" },
+  "refresh": {
+    "title": "隔了一阵子没来，可以先做一次补充诊断",
+    "body": "共 {{items}} 题，约 {{minutes}} 分钟；只抽你已经掌握的知识点，结果只升不降。",
+    "action": "做补充诊断"
+  },
+  "mode": {
+    "label": "选一种方式",
+    "length_minutes": "约 {{minutes}} 分钟",
+    "recommended": "题来自{{source}}；推荐",
+    "adaptive": { "title": "自适应诊断", "length": "约 {{items}} 题，{{minutes}} 分钟", "cost": "代价：最费时，但区间最窄" },
+    "quick": { "title": "快速定位", "length": "{{minutes}} 分钟，按章自评为主", "cost": "代价：区间更宽，起点报告会写明" },
+    "chapter": {
+      "title": "章节抽测",
+      "length": "每章 {{min}} 至 {{max}} 题，约 {{minutes}} 分钟",
+      "length_plain": "选几章做，约 {{minutes}} 分钟",
+      "cost": "代价：只更新测到的章节"
+    },
+    "refresh": { "title": "补充诊断", "length": "约 {{items}} 题，{{minutes}} 分钟", "cost": "只抽已经掌握的知识点" },
+    "source": { "reviewed": "审定题", "own": "你的自有题", "mixed": "审定题和你的自有题" },
+    "unavailable": {
+      "custom_map": { "length": "需要审定题，当前不可用", "cost": "你的地图是自建的，没有审定题池" },
+      "few_reviewed": { "length": "需要审定题，当前不可用", "cost": "带难度标定的审定题还不够" },
+      "pool_too_small": { "length": "可用的题不够，当前不可用", "cost": "先导入题目，或改用快速定位" }
+    }
+  },
+  "source": {
+    "title": "题从哪来",
+    "level": "{{label}}题",
+    "reviewed": "平台、机构或模板审核过的题与真题，可记强证据",
+    "own": "你导入的带标准答案的题，可记强证据",
+    "short_title": "题不足 {{n}} 道时",
+    "short_body": "改用快速定位，或先导入题目"
+  },
+  "rules": {
+    "title": "规则",
+    "no_reveal": { "title": "不显示对错，不出现导师与提示", "body": "诊断只为找起点，不是考试" },
+    "confidence": { "title": "每题选把握度；不会就选“不会”", "body": "用来识别蒙对，不影响其他题的估计" },
+    "subjective": { "title": "主观题先作答，再对照得分点勾选", "body": "题目里不会出现与当前题有关的提示" },
+    "resume": { "title": "可以分次完成；以后可再诊断", "body": "再次诊断只升不降，摸底错题不自动进错题本" }
+  },
+  "action": { "prev": "上一步", "start": "开始", "again": "再诊断一次" },
+  "action_failed": "没操作成功：网络或服务异常，再点一次试试。",
+  "test": {
+    "badge": "测评中",
+    "note": "不显示对错，导师与提示关闭",
+    "position": "第 {{n}} 题，约 {{total}} 题",
+    "rating": "按章自评",
+    "finished": "摸底完成",
+    "remaining": "预计剩余 {{minutes}} 分钟",
+    "pause": "暂停并退出",
+    "module": "模块：{{name}}",
+    "source": "题源：{{label}}",
+    "answer_label": "作答",
+    "switch_quick": "改用快速定位（已答的题保留）",
+    "submit_failed": "没交上：网络或服务异常，答案还在，再点一次“提交”。",
+    "qtype": {
+      "single_choice": "单选",
+      "multi_choice": "多选",
+      "true_false": "判断",
+      "indefinite_choice": "不定项",
+      "choice": "选择",
+      "fill_blank": "填空",
+      "discrimination": "辨析",
+      "short_answer": "简答",
+      "material_analysis": "材料分析",
+      "writing": "写作",
+      "translation": "翻译",
+      "listening": "听力",
+      "reading": "阅读",
+      "calculation": "计算",
+      "algorithm_design": "算法设计",
+      "case_analysis": "案例分析",
+      "oral": "口头作答",
+      "practical": "实操"
+    }
+  },
+  "confidence": { "title": "你有多大把握", "required": "必选", "unknown": "不会" },
+  "self_check": {
+    "title": "对照得分点自评",
+    "wait": "先作答，或想一想再看得分点（至少 {{seconds}} 秒）",
+    "hint": "做到的项打勾；只用来估起点，不记证据。"
+  },
+  "rating": {
+    "title": "按章自评",
+    "body": "每章选一项，大约 {{minutes}} 分钟；之后最多再做 {{items}} 道核对题。",
+    "cost": "代价：区间比做题诊断更宽，起点报告会写明。",
+    "levels": { "not_learned": "没学过", "unfamiliar": "学过但不熟", "basic": "基本会", "proficient": "很熟练" },
+    "submit": "提交自评",
+    "blocker": "每章都选一项才能提交"
+  },
+  "modules": {
+    "title": "分模块进度",
+    "drawer": "模块进度",
+    "note": "没测到的模块先用同类人群数据代替，并在起点报告里标注。",
+    "status": { "estimated": "已估计", "in_progress": "进行中", "not_started": "未开始", "prior": "同类数据", "no_basis": "无依据" },
+    "estimate": "{{low}}～{{high}}",
+    "estimate_prior": "{{range}}（同类数据）"
+  },
+  "finish": {
+    "title": "摸底完成",
+    "summary": "共答 {{n}} 题。下一步看起点报告：现在在哪、差多少、时间够不够。",
+    "reason": {
+      "precise_enough": "估计已经够准，提前结束了。",
+      "max_items": "题都答完了。",
+      "switched_quick": "改用了快速定位：没测到的章按自评算。",
+      "quick_finished": "快速定位做完了：区间比做题诊断更宽，起点报告会写明。",
+      "learner_ended": "你提前结束了，按已答的题估计。"
+    },
+    "modules": "分模块估计",
+    "report": "去看起点报告",
+    "mistakes": {
+      "title": "诊断错题",
+      "body": "摸底里做错的题不会自动进错题本；想以后回炉的，勾上再加入。",
+      "empty": "这次没有做错或选“不会”的题。",
+      "outcome": { "wrong": "做错", "unknown": "选了“不会”" },
+      "answer": "正确答案：{{answer}}",
+      "added": "已加入错题本",
+      "add": "把勾选的 {{n}} 道加入错题本",
+      "done": "已加入错题本：{{n}} 道",
+      "failed": "没加上：网络或服务异常，再点一次试试。"
+    }
+  },
+  "state": {
+    "empty": { "title": "题源不足", "body": "可用的题不足 {{n}} 道：先导入题目，或改用快速定位", "action": "改用快速定位" },
+    "offline": { "body": "已下载的题可离线作答，交卷在联网后提交；中途断网不丢答案", "stale": "现在没联网" },
+    "restricted": { "title": "测评中，导师、提示与推送都暂停", "body": "测评中不出现导师、提示与推送" },
+    "insufficient": {
+      "title": "部分模块先用同类数据",
+      "body": "未测到的模块先用同类人群数据代替，并在起点报告里标注",
+      "no_basis_title": "部分模块没有依据",
+      "no_basis": "自建考试没有同类考生的数据：没测到的模块标为“无依据”，起点报告里会写明",
+      "prior_count": "用同类数据代替的模块",
+      "no_basis_count": "无依据的模块"
+    }
+  },
+  "soon": { "report": "反馈问题即将上线", "play": "听力播放即将上线" }
+}

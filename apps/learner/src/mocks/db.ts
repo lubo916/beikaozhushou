@@ -51,6 +51,7 @@ interface MistakeRecord {
 }
 
 interface ExamState {
+  readonly diagnosisQuestions: Map<string, QuestionFixture>;
   readonly attempts: AttemptRecord[];
   readonly mistakes: Map<string, MistakeRecord>;
 }
@@ -84,6 +85,8 @@ function isDue(mistake: MistakeRecord, day: LearningDay): boolean {
   if (mistake.status === "graduated" || mistake.createdDay === day) return false;
   return mistake.nextDueDay <= day || mistake.lastRetryDay === day;
 }
+
+const mistakeKey = (question: QuestionFixture): string => `${question.id}:${question.version}`;
 
 function newestFirst(a: MistakeRecord, b: MistakeRecord): number {
   return b.createdAt.localeCompare(a.createdAt);
@@ -142,9 +145,15 @@ export class MockDb {
   readonly #states = new Map<string, ExamState>();
   readonly #events: unknown[] = [];
   readonly #replies = new Map<string, Promise<unknown>>();
+  #resetToken: object = Object.freeze({});
 
   constructor(fixtures: DemoFixtures) {
     this.fixtures = fixtures;
+  }
+
+  /** 页面自有会话用此只读标识识别演示重置；同一次数据生命周期内引用稳定。 */
+  get resetToken(): object {
+    return this.#resetToken;
   }
 
   /** 清掉作答、错题、埋点与幂等记录，回到刚装入演示数据时的样子。 */
@@ -152,6 +161,7 @@ export class MockDb {
     this.#states.clear();
     this.#events.length = 0;
     this.#replies.clear();
+    this.#resetToken = Object.freeze({});
   }
 
   /** 幂等（api-rules 第 1 节）：同一个键只执行一次；正在执行的也算，并发的重复请求拿到同一个结果。 */
@@ -192,7 +202,7 @@ export class MockDb {
   #state(examId: string): ExamState {
     let state = this.#states.get(examId);
     if (state === undefined) {
-      state = { attempts: [], mistakes: new Map() };
+      state = { diagnosisQuestions: new Map(), attempts: [], mistakes: new Map() };
       this.#states.set(examId, state);
     }
     return state;
@@ -240,7 +250,7 @@ export class MockDb {
 
   findQuestion(questionId: string): { readonly exam: DemoExam; readonly question: QuestionFixture } {
     for (const exam of this.fixtures.exams) {
-      const question = exam.questions.find((q) => q.id === questionId);
+      const question = this.#states.get(exam.examId)?.diagnosisQuestions.get(questionId) ?? exam.questions.find((q) => q.id === questionId);
       if (question !== undefined) return { exam, question };
     }
     throw new ApiError("COMMON_NOT_FOUND", { question_id: questionId });
@@ -327,6 +337,36 @@ export class MockDb {
     };
   }
 
+  /** feat:S04-13 手动加入诊断错题：共享错题本按题版本去重，不追加作答、不改掌握证据或已有回炉进度。 */
+  addDiagnosisMistake(exam: DemoExam, question: QuestionFixture, now: number): Body {
+    const target = this.examById(exam.examId);
+    const state = this.#state(target.examId);
+    // 诊断页可提供内联题；加入后也必须能从共用题目接口打开，重置演示数据时一起清掉。
+    state.diagnosisQuestions.set(question.id, question);
+    const existing = state.mistakes.get(mistakeKey(question));
+    return mistakeView(existing ?? this.#insertMistake(state, target, question, this.learningDay(now), new Date(now).toISOString()));
+  }
+
+  #insertMistake(state: ExamState, exam: DemoExam, question: QuestionFixture, day: LearningDay, at: string): MistakeRecord {
+    const firstInterval = param("practice.mistake.review_intervals")[0] ?? 0;
+    const created: MistakeRecord = {
+      id: uuidv7(Date.parse(at)),
+      questionId: question.id,
+      examId: exam.examId,
+      knowledgePointIds: [...question.knowledge_point_ids],
+      createdAt: at,
+      createdDay: day,
+      status: "new",
+      wrongCount: 1,
+      correctStreak: 0,
+      lastAnsweredAt: at,
+      nextDueDay: addDays(day, firstInterval),
+      lastRetryDay: null,
+    };
+    state.mistakes.set(mistakeKey(question), created);
+    return created;
+  }
+
   /** 错题的占位做法（示例；正式规则见规则卡 R03）：做错进错题本，按参数 practice.mistake.review_intervals 安排回炉。 */
   #recordMistake(
     state: ExamState,
@@ -338,25 +378,10 @@ export class MockDb {
   ): MistakeRecord | null {
     const intervals = param("practice.mistake.review_intervals");
     const gap = (step: number): number => intervals[Math.min(step, intervals.length - 1)] ?? 0;
-    const existing = state.mistakes.get(question.id);
+    const existing = state.mistakes.get(mistakeKey(question));
     if (existing === undefined) {
       if (correct) return null;
-      const created: MistakeRecord = {
-        id: uuidv7(Date.parse(at)),
-        questionId: question.id,
-        examId: exam.examId,
-        knowledgePointIds: [...question.knowledge_point_ids],
-        createdAt: at,
-        createdDay: day,
-        status: "new",
-        wrongCount: 1,
-        correctStreak: 0,
-        lastAnsweredAt: at,
-        nextDueDay: addDays(day, gap(0)),
-        lastRetryDay: null,
-      };
-      state.mistakes.set(question.id, created);
-      return created;
+      return this.#insertMistake(state, exam, question, day, at);
     }
     if (existing.status === "graduated") return existing;
     if (existing.nextDueDay <= day) existing.lastRetryDay = day;

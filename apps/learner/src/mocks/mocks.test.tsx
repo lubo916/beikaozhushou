@@ -275,3 +275,70 @@ describe("示范接口与数据刷新", () => {
     expect(param("account.day.start_hour")).toBe(DEFAULT_DAY_SETTINGS.dayStartHour);
   });
 });
+
+describe("诊断错题手动加入（U04 整合）", () => {
+  const exam = fixtures.exams[0];
+  const seed = exam?.questions[0];
+  if (exam === undefined || seed === undefined) throw new Error("演示考试缺少题目");
+  const inline = { ...seed, id: "019a0144-0000-7000-8000-000000000099" };
+
+  it("内联诊断题加入共享错题本，但不追加作答、不改今日完成状态或掌握档", () => {
+    const db = new MockDb(fixtures);
+    const mastery = db.masteryGrid(exam.map.map_id);
+    const todayList = db.todayList(exam, db.learningDay(NOW));
+    const added = db.addDiagnosisMistake(exam, inline, NOW);
+    expect(added).toMatchObject({ question_id: inline.id, status: "new", wrong_count: 1 });
+    expect(db.listMistakes(exam, null, null)["items"]).toEqual([added]);
+    expect(db.findQuestion(inline.id)).toEqual({ exam, question: inline });
+    expect(db.questionView(inline.id)).toMatchObject({ id: inline.id, version: inline.version });
+    expect(() => db.solution(inline.id)).toThrow(/PRAC_REVEAL_LOCKED/);
+    expect(db.attempts(exam.examId)).toHaveLength(0);
+    expect(db.todayList(exam, db.learningDay(NOW))).toEqual(todayList);
+    expect(db.masteryGrid(exam.map.map_id)).toEqual(mastery);
+  });
+
+  it("同一题版本重复加入只保留一条，也不修改已有错题的回炉信息", () => {
+    const db = new MockDb(fixtures);
+    const first = db.addDiagnosisMistake(exam, seed, NOW);
+    expect(db.addDiagnosisMistake(exam, seed, NOW + 1000)).toEqual(first);
+    expect(db.listMistakes(exam, null, null)["items"]).toEqual([first]);
+    const wrong = seed.answer?.includes(0) === true ? 1 : 0;
+    db.submitAnswer(choice(seed.id, [wrong]), NOW + 2000);
+    const before = db.listMistakes(exam, null, null);
+    db.addDiagnosisMistake(exam, seed, NOW + 3000);
+    expect(db.listMistakes(exam, null, null)).toEqual(before);
+    expect(db.attempts(exam.examId)).toHaveLength(1);
+  });
+
+  it("不同题版本分别保存，同一版本重试不重复", () => {
+    const db = new MockDb(fixtures);
+    const first = db.addDiagnosisMistake(exam, inline, NOW);
+    const revised = { ...inline, version: inline.version + 1 };
+    const second = db.addDiagnosisMistake(exam, revised, NOW + 1000);
+    expect(second["id"]).not.toBe(first["id"]);
+    expect(db.addDiagnosisMistake(exam, revised, NOW + 2000)).toEqual(second);
+    expect(db.listMistakes(exam, null, null)["items"]).toEqual([second, first]);
+    expect(db.attempts(exam.examId)).toHaveLength(0);
+  });
+
+  it("只读重置标识在两次重置之间稳定，每次重置后换新", () => {
+    const db = new MockDb(fixtures);
+    const initial = db.resetToken;
+    expect(initial).toEqual({});
+    expect(db.resetToken).toBe(initial);
+    db.reset();
+    const next = db.resetToken;
+    expect(next).not.toBe(initial);
+    expect(db.resetToken).toBe(next);
+    db.reset();
+    expect(db.resetToken).not.toBe(next);
+  });
+
+  it("重置演示数据会清掉手动加入的错题与内联题登记", () => {
+    const db = new MockDb(fixtures);
+    db.addDiagnosisMistake(exam, inline, NOW);
+    db.reset();
+    expect(db.listMistakes(exam, null, null)["items"]).toEqual([]);
+    expect(() => db.findQuestion(inline.id)).toThrow(/COMMON_NOT_FOUND/);
+  });
+});
