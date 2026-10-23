@@ -17,6 +17,18 @@
 
 ## 用户决定
 
-浮标采用 A，见上述决定卡；属于后续整合任务，不扩大 U12 修改范围。第 2 轮正式交接单应携带下列 answers。
+浮标采用 A，见决定卡；属于后续整合任务，不扩大 U12 修改范围。第 2 轮正式交接单应携带下列 answers。
 
-
+```json
+{
+  "task": "U12",
+  "round": 1,
+  "result": "needs_fix",
+  "answers": {
+    "U12-Q1": "A"
+  },
+  "decisions": [
+    "docs/decisions/D-2026-10-23-U12-mentor-entry.md"
+  ]
+}
+```
