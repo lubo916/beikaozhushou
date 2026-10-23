@@ -7,14 +7,23 @@ import { AiBadge, Banner, Button, Drawer, ProposalCard, Stat, StatGroup, buttonC
 import { pathTo } from "../../../routes.ts";
 
 // feat:S07-13 feat:S07-16 沙盘仅展示接口预设的试算结果；未经确认不改计划。
-export function Sandbox({ data, open, onClose, soon }: { data: S07PlanOverview; open: boolean; onClose: () => void; soon: () => void }) {
+export function Sandbox({ data, open, onClose }: { data: S07PlanOverview; open: boolean; onClose: () => void }) {
   const { t } = useTranslation("S07");
   const [preset, setPreset] = useState(data.sandbox[0]?.id ?? "");
   const [draft, setDraft] = useState("");
   const [calculated, setCalculated] = useState(false);
+  const [notice, setNotice] = useState(false);
+  const showSoon = () => setNotice(true);
   const scenario = data.sandbox.find((item) => item.id === preset);
   return (
-    <Drawer open={open} onClose={onClose} title={t("sandbox.title")}>
+    <Drawer
+      open={open}
+      onClose={() => {
+        setNotice(false);
+        onClose();
+      }}
+      title={t("sandbox.title")}
+    >
       <div className="flex flex-col gap-4">
         <p className="text-ink-secondary">{t("sandbox.description")}</p>
         <label className="s07-field">
@@ -24,6 +33,7 @@ export function Sandbox({ data, open, onClose, soon }: { data: S07PlanOverview; 
             onChange={(event) => {
               setPreset(event.target.value);
               setCalculated(false);
+              setNotice(false);
             }}
           >
             {data.sandbox.map((item) => (
@@ -40,14 +50,27 @@ export function Sandbox({ data, open, onClose, soon }: { data: S07PlanOverview; 
             onChange={(event) => {
               setDraft(event.target.value);
               setCalculated(false);
+              setNotice(false);
             }}
             placeholder={t("sandbox.placeholder")}
           />
         </label>
         <p className="text-small text-ink-secondary">{t("sandbox.hint")}</p>
-        <Button variant="primary" onClick={() => setCalculated(true)} disabled={scenario === undefined}>
+        <Button
+          variant="primary"
+          onClick={() => {
+            setNotice(false);
+            setCalculated(true);
+          }}
+          disabled={scenario === undefined}
+        >
           {t("sandbox.calculate")}
         </Button>
+        {notice && (
+          <p role="status" className="text-small text-ink-secondary">
+            {t("soon")}
+          </p>
+        )}
         {calculated && scenario !== undefined && (
           <section className="flex flex-col gap-4" aria-label={t("sandbox.preview")}>
             <h3 className="font-medium">{t("sandbox.preview")}</h3>
@@ -79,10 +102,10 @@ export function Sandbox({ data, open, onClose, soon }: { data: S07PlanOverview; 
               cost={scenario.proposal.cost}
               ifNot={scenario.proposal.if_declined}
               aiGenerated
-              onConfirm={soon}
-              onDecline={soon}
+              onConfirm={showSoon}
+              onDecline={showSoon}
             />
-            <Button variant="primary" onClick={soon}>
+            <Button variant="primary" onClick={showSoon}>
               {t("sandbox.adopt")}
             </Button>
             <p className="text-small text-ink-secondary">{t("sandbox.noChange")}</p>

@@ -22,6 +22,7 @@ export default function Page() {
   const data = home.data;
   const [panel, setPanel] = useState<"sandbox" | "leave" | null>(null);
   const [menu, setMenu] = useState(false);
+  const [leaveNotice, setLeaveNotice] = useState(false);
   const soon = () => toast(t("soon"));
   const selectView = (next: PlanView) =>
     setSearch((previous) => {
@@ -46,7 +47,13 @@ export default function Page() {
         }
         actions={
           <>
-            <Button onClick={() => setPanel("leave")} disabled={offline || data === undefined || !data.has_plan}>
+            <Button
+              onClick={() => {
+                setLeaveNotice(false);
+                setPanel("leave");
+              }}
+              disabled={offline || data === undefined || !data.has_plan}
+            >
               {t("header.leave")}
             </Button>
             <Button variant="primary" onClick={() => setPanel("sandbox")} disabled={offline || data === undefined || !data.has_plan}>
@@ -192,23 +199,30 @@ export default function Page() {
               setPanel(null);
               if (view === "sandbox") selectView("week");
             }}
-            soon={soon}
           />
         </>
       )}
       {/* feat:S07-09 请假先提议，尚未接入后端时不修改已有安排。 */}
       <Dialog
         open={panel === "leave"}
-        onClose={() => setPanel(null)}
+        onClose={() => {
+          setLeaveNotice(false);
+          setPanel(null);
+        }}
         title={t("leave.title")}
         description={t("leave.body")}
         actions={
-          <Button variant="primary" onClick={soon}>
+          <Button variant="primary" onClick={() => setLeaveNotice(true)}>
             {t("leave.preview")}
           </Button>
         }
       >
         <div className="flex flex-col gap-3">
+          {leaveNotice && (
+            <p role="status" className="text-small text-ink-secondary">
+              {t("soon")}
+            </p>
+          )}
           <label className="s07-field">
             {t("leave.start")}
             <input type="date" />

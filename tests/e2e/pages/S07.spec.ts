@@ -137,8 +137,12 @@ for (const { view, fields } of STACKED_TABLES) {
       await expect(cells).toHaveCount(fields.length);
       const labels = await cells.evaluateAll((elements) =>
         elements.map((element) => {
-          const content = getComputedStyle(element, "::before").content;
-          return content === "none" || content === "normal" ? content : (JSON.parse(content) as unknown);
+          const before = getComputedStyle(element, "::before");
+          if (before.display === "none" || before.visibility === "hidden") return null;
+          const content = before.content;
+          // Firefox 保留 attr()，Chromium/WebKit 返回插值后的字符串；两者都检查实际使用的字段标签。
+          if (content === "attr(data-label)") return element.getAttribute("data-label");
+          return content.startsWith('"') ? (JSON.parse(content) as unknown) : content;
         }),
       );
       expect(labels, `${view} 第 ${index + 1} 行：每个值旁应显示对应中文字段名`).toEqual(expected);
@@ -260,6 +264,7 @@ test("S07 沙盘可填输入并试算，采用前保持待确认，关闭后不�
   await expect(dialog.locator(".ui-proposal")).toBeVisible();
   await expect(dialog.getByText("待确认", { exact: true })).toBeVisible();
   await dialog.getByRole("button", { name: copy("sandbox.adopt"), exact: true }).press("Enter");
+  await expect(dialog.getByRole("status").filter({ hasText: copy("soon") })).toBeVisible();
   await expect(
     page
       .getByRole("status")

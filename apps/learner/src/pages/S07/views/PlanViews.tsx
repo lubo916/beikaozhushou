@@ -147,6 +147,7 @@ export function Scope({ data, soon, offline }: Props) {
             {
               key: "name",
               header: t("scope.name"),
+              label: t("scope.name"),
               render: (row) => (
                 <>
                   <Link to={pathTo("S10", { kpId: row.id })} className="text-brand-primary">
@@ -159,14 +160,16 @@ export function Scope({ data, soon, offline }: Props) {
             {
               key: "state",
               header: t("scope.state"),
+              label: t("scope.state"),
               render: (row) => <Tag tone={row.state === "added" ? "brand" : "neutral"}>{t(`scope.${row.state}`)}</Tag>,
             },
-            { key: "target", header: t("scope.target"), render: (row) => row.target },
-            { key: "gap", header: t("scope.gap"), render: (row) => formatTierGap(row.gap) },
-            { key: "minutes", header: t("scope.minutes"), render: (row) => formatDuration(row.minutes) },
+            { key: "target", header: t("scope.target"), label: t("scope.target"), render: (row) => row.target },
+            { key: "gap", header: t("scope.gap"), label: t("scope.gap"), render: (row) => formatTierGap(row.gap) },
+            { key: "minutes", header: t("scope.minutes"), label: t("scope.minutes"), render: (row) => formatDuration(row.minutes) },
             {
               key: "action",
               header: t("scope.action"),
+              label: t("scope.action"),
               render: (row) => (
                 <div className="flex flex-wrap gap-1">
                   <Button size="sm" disabled={offline} onClick={soon}>
@@ -214,26 +217,33 @@ export function Ranking({ data }: Props) {
         rowKey={(row) => row.id}
         stackOnNarrow
         columns={[
-          { key: "rank", header: t("ranking.rank"), render: (row) => formatCount(row.rank) },
+          { key: "rank", header: t("ranking.rank"), label: t("ranking.rank"), render: (row) => formatCount(row.rank) },
           {
             key: "name",
             header: t("ranking.name"),
+            label: t("ranking.name"),
             render: (row) => (
               <Link to={pathTo("S10", { kpId: row.id })} className="text-brand-primary">
                 {row.name}
               </Link>
             ),
           },
-          { key: "score", header: t("ranking.score"), render: (row) => formatScore(row.score) },
+          { key: "score", header: t("ranking.score"), label: t("ranking.score"), render: (row) => formatScore(row.score) },
           {
             key: "frequency",
             header: t("ranking.frequency"),
+            label: t("ranking.frequency"),
             render: (row) => (data.forecast_available ? row.frequency : t("sandbox.locked")),
           },
-          { key: "gap", header: t("ranking.gap"), render: (row) => formatTierGap(row.gap) },
-          { key: "prerequisite", header: t("ranking.prerequisite"), render: (row) => row.prerequisite },
-          { key: "minutes", header: t("ranking.minutes"), render: (row) => formatDuration(row.minutes) },
-          { key: "star", header: t("ranking.star"), render: (row) => t(row.starred ? "ranking.yes" : "ranking.no") },
+          { key: "gap", header: t("ranking.gap"), label: t("ranking.gap"), render: (row) => formatTierGap(row.gap) },
+          { key: "prerequisite", header: t("ranking.prerequisite"), label: t("ranking.prerequisite"), render: (row) => row.prerequisite },
+          { key: "minutes", header: t("ranking.minutes"), label: t("ranking.minutes"), render: (row) => formatDuration(row.minutes) },
+          {
+            key: "star",
+            header: t("ranking.star"),
+            label: t("ranking.star"),
+            render: (row) => t(row.starred ? "ranking.yes" : "ranking.no"),
+          },
         ]}
       />
     </Card>
