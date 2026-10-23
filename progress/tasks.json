@@ -512,7 +512,16 @@
       ],
       "title": "S02 备考目标（前端，假数据）",
       "goal": "照原型做出 S02 备考目标：所有视图、七态、三档宽度，数据来自假数据层。",
-      "status": "todo"
+      "status": "done",
+      "history": [
+        {
+          "round": 1,
+          "version": "v0043",
+          "tool": "local",
+          "date": "2026-10-24 05:12",
+          "status": "done"
+        }
+      ]
     },
     {
       "id": "U03",
