@@ -1,0 +1,141 @@
+{
+  "data_source": "sample",
+  "exam_name": "《数据结构》期末考",
+  "availability": "normal",
+  "recommendation": {
+    "title": "巩固薄弱处，换个问法再练",
+    "reason": "优先练习「二叉树的遍历」，结合近期错题与目标档安排题目；适中难度更便于发现还没掌握的地方。",
+    "question_count": 12,
+    "minutes": 18,
+    "accuracy_label": "建议正确率 65%–80%",
+    "session_id": "019a0017-0004-7000-8000-000000000001",
+    "point_id": "019a0403-0000-7000-8000-000000000006",
+    "point_name": "二叉树的遍历"
+  },
+  "daily": {
+    "title": "每日一练",
+    "question_count": 5,
+    "minutes": 8,
+    "session_id": "019a0017-0004-7000-8000-000000000002"
+  },
+  "banks": [
+    {
+      "id": "019a0017-0004-7000-8000-000000000010",
+      "title": "《数据结构》期末考 · 基础题库",
+      "source": "审定题库 · 解析原创",
+      "credibility": "reviewed",
+      "question_count": 168,
+      "done_count": 42,
+      "accuracy_label": "76%"
+    },
+    {
+      "id": "019a0017-0004-7000-8000-000000000011",
+      "title": "我的笔记配套题",
+      "source": "个人录入",
+      "credibility": "own",
+      "question_count": 24,
+      "done_count": 12,
+      "accuracy_label": "83%"
+    },
+    {
+      "id": "019a0017-0004-7000-8000-000000000012",
+      "title": "导师变式练习 · 已确认",
+      "source": "AI 生成 · 先做后核、质检通过且有出处",
+      "credibility": "generated_confirmed",
+      "question_count": 16,
+      "done_count": 8,
+      "accuracy_label": "75%"
+    },
+    {
+      "id": "019a0017-0004-7000-8000-000000000013",
+      "title": "导师即时练习 · 待核对",
+      "source": "AI 生成 · 未确认",
+      "credibility": "generated_instant",
+      "question_count": 6,
+      "done_count": 0,
+      "accuracy_label": "尚无作答"
+    }
+  ],
+  "questions": [
+    {
+      "id": "019a0404-0000-7000-8000-000000000001",
+      "title": "已知一棵二叉树的先序序列为 ABDEC，中序序列为 DBEAC，则其后序序列为（　）。",
+      "type_label": "选择",
+      "credibility": "own",
+      "point_name": "二叉树的遍历",
+      "point_id": "019a0403-0000-7000-8000-000000000006",
+      "tag": "重点复习",
+      "peer_accuracy_label": ""
+    },
+    {
+      "id": "019a0404-0000-7000-8000-000000000002",
+      "title": "写出二叉树中序遍历的非递归算法，并说明栈的作用。",
+      "type_label": "简答",
+      "credibility": "own",
+      "point_name": "二叉树的遍历",
+      "point_id": "019a0403-0000-7000-8000-000000000006",
+      "tag": "待巩固",
+      "peer_accuracy_label": ""
+    }
+  ],
+  "records": [
+    {
+      "id": "019a0017-0004-7000-8000-000000000020",
+      "title": "二叉树的遍历 · 弱项专项",
+      "day": "2026-10-22",
+      "progress_label": "已做 7 / 12 题",
+      "accuracy_label": "71%",
+      "mastery_snapshot": "练习时系统判定：已熟悉；目标档：已掌握",
+      "status": "in_progress",
+      "session_id": "019a0017-0004-7000-8000-000000000003"
+    },
+    {
+      "id": "019a0017-0004-7000-8000-000000000021",
+      "title": "每日一练",
+      "day": "2026-10-21",
+      "progress_label": "已做 5 / 5 题",
+      "accuracy_label": "80%",
+      "mastery_snapshot": "练习时系统判定：已熟悉；目标档：已掌握",
+      "status": "completed",
+      "session_id": "019a0017-0004-7000-8000-000000000004"
+    }
+  ],
+  "presets": [
+    {
+      "id": "019a0017-0004-7000-8000-000000000030",
+      "title": "弱项专项",
+      "description": "围绕距目标档还有差距的知识点组卷",
+      "question_count": 12,
+      "minutes": 18
+    },
+    {
+      "id": "019a0017-0004-7000-8000-000000000031",
+      "title": "错题重练",
+      "description": "换个问法检验，避免只记住答案",
+      "question_count": 8,
+      "minutes": 12
+    },
+    {
+      "id": "019a0017-0004-7000-8000-000000000032",
+      "title": "真题模考",
+      "description": "按试卷结构与考试节奏完整练习",
+      "question_count": 30,
+      "minutes": 60
+    },
+    {
+      "id": "019a0017-0004-7000-8000-000000000033",
+      "title": "随机练习",
+      "description": "在选定范围内均衡抽取题目",
+      "question_count": 10,
+      "minutes": 15
+    }
+  ],
+  "notice": {
+    "prerequisite": "练习「二叉树的遍历」前，可先回看相关前置知识；先补基础会更顺。",
+    "illusion": "反复刷已掌握的题容易产生熟练错觉，试试变式题或限时训练。"
+  },
+  "ai": {
+    "cost_label": "执行前展示 AI 点数消耗，确认后再生成",
+    "available": true
+  }
+}
