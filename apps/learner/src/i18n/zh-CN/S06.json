@@ -1,1 +1,117 @@
-{}
+{
+  "sample": "示例数据",
+  "hero": {
+    "label": "今天的安排",
+    "round": "第 {{index}} 轮 {{name}} · 第 {{week}} 周",
+    "day_no": "第 {{n}} 天",
+    "countdown_unit": "天后考试",
+    "countdown_estimated": "（预计）",
+    "line": {
+      "normal": "今天 {{tasks}} 件事，约 {{duration}}，已完成 {{done}} 件。",
+      "next": "下一步：{{task}}。",
+      "first": "第一天：清单已按摸底结果排好，{{tasks}} 件事，约 {{duration}}。先从第一项开始。",
+      "done": "今天 {{tasks}} 件事都做完了，有效学习 {{spent}}。明天第一件事已经排好。",
+      "off": "今天是你标的不可学日。只保留约 {{duration}}的到期复习，其余已顺延，不影响任何进度数字。",
+      "back": "欢迎回来。先做约 {{duration}}的启动任务，做完再看接下来怎么排。"
+    },
+    "continue": "继续：{{source}}",
+    "start": "开始：{{source}}",
+    "short": "我只有 {{minutes}} 分钟",
+    "tomorrow": "看明天第一件事",
+    "off_start": "开始 {{duration}}复习",
+    "off_cancel": "今天其实能学",
+    "back_start": "开始 {{duration}}启动任务"
+  },
+  "tomorrow": {
+    "title": "明天第一件事",
+    "body": "{{source}}：{{title}}，约 {{duration}}。明天打开今日页就从这一项开始。",
+    "extra": "可选加练一组",
+    "close": "关闭"
+  },
+  "list": {
+    "title": "今日清单",
+    "meta": "先做推迟有损失的，再做推迟无损失的",
+    "why": "为什么这样排",
+    "consolidate_meta": "保底 {{ratio}} 时间 · 约 {{duration}}",
+    "consolidate_floor": "保底 {{ratio}} 时间",
+    "advance_meta": "{{mode}}排序 · 约 {{duration}}",
+    "closing_meta": "睡前几分钟 · 约 {{duration}}",
+    "capped": "到期较多：先给最要紧的一批（考频 × 遗忘风险），其余已顺延",
+    "empty_segment": "这一段今天没有任务",
+    "tiers": "剩下的可以换档",
+    "tier": "{{tier}} {{duration}}",
+    "evidence": "完成看证据：卡片要回忆、题目要作答、阅读要过读后即测。手动勾选只记为“看过”。",
+    "adjust": "手动勾选或剔除",
+    "continue": "继续",
+    "off_meta": "不可学日：只保留到期复习",
+    "off_note": "请假与忙季在学习计划里设置；不可学日不计入健康度。",
+    "off_plan": "去学习计划",
+    "back_title": "启动任务",
+    "back_meta": "中断 {{days}} 天：先做一个很短的启动任务，回来先做能做对的"
+  },
+  "reason": {
+    "due": "今天到期 {{n}} 项，推迟就会忘得更多",
+    "mistake_due": "{{n}} 道错题到了回炉的日子",
+    "guess_correct": "标“蒙的”却答对的 {{n}} 题，档位暂时不更新",
+    "gap": "还差 {{gap}} 档达标",
+    "roi_tier": "本周性价比 {{tier}} 级",
+    "not_learned": "你还没学",
+    "frequency": "近 {{years}} 年考了 {{times}} 次，年均约 {{score}}",
+    "new_rank": "新学中性价比第 {{rank}}",
+    "accuracy_band": "这些知识点当前正确率在 {{low}}–{{high}} 之间，这个区间练习收益最大",
+    "weak_match": "与你的薄弱项一致",
+    "shared_budget": "机构与学校的任务和个人计划共用一份时间预算",
+    "goal_deadline": "距{{name}} {{days}} 天",
+    "no_pass": "「{{name}}」还没有通过记录",
+    "bedtime_recall": "睡前回顾能提高第二天的回忆率",
+    "weekly": "每周只出现一次；不做也不会累积",
+    "off_day_moved": "不可学日只保留到期复习；其余 {{n}} 件已在 {{days}} 天内找好空位",
+    "restart_due": "中断 {{days}} 天，积压的到期项按“考频 × 遗忘风险”取最要紧的一批，其余顺延，不删除",
+    "restart_easy": "回来先做一次能做对的，再进入新学"
+  },
+  "order": {
+    "title": "今日清单为什么这样排",
+    "segments": "先做推迟有损失的（{{consolidate}}），再做推迟无损失的（{{advance}}），最后是当天的短任务（{{closing}}）。",
+    "floor": "{{consolidate}}段至少占当天时间的 {{ratio}}，不被新学挤占；冲刺期还会提高。",
+    "budget": "当天可用时间来自你的时间预算，在三段之间分配；{{advance}}段按“{{mode}}”排序。",
+    "plan": "配比模式在学习计划里设置",
+    "close": "知道了"
+  },
+  "adjust": {
+    "title": "手动勾选或剔除",
+    "description": "手动勾选只记为“看过”，不算有证据的完成；“今天不想学这个”只对今天有效，会记下原因用来改进推荐。",
+    "seen": "记为看过",
+    "skip": "今天不想学这个",
+    "none": "今天的任务都做完了",
+    "close": "关闭"
+  },
+  "state": {
+    "empty": {
+      "title": "今天没有安排",
+      "body": "目标日已过或还没生成计划",
+      "action": "生成计划"
+    },
+    "offline": {
+      "body": "清单与到期复习已缓存，可离线完成；证据联网后补记",
+      "stale": "现在没联网"
+    },
+    "restricted": {
+      "title": "AI 点数用完了",
+      "body": "额度用完时，到期复习、错题回炉与新学照常；只暂停高成本 AI",
+      "action": "看会员与权益"
+    },
+    "insufficient_data": {
+      "title": "你的实测还不够",
+      "body": "前两周按同类考生的典型节奏排；你的实测足够后改用你的数据"
+    }
+  },
+  "soon": {
+    "short": "即将上线：按你说的时间即时重组今天的任务",
+    "tier": "即将上线：换档会把剩下的任务换成这一档",
+    "seen": "即将上线：手动勾选只记为“看过”",
+    "skip": "即将上线：今天不想学这个（只对今天有效，记下原因）",
+    "off_cancel": "即将上线：把今天改回可学日",
+    "extra": "即将上线：可选加练",
+    "report": "即将上线：反馈问题"
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "note": "S18 做题与解析的页面演示数据（U18a）：两个示范题组（objective 题库、generated 导师出题）与页面专用的演示题；prefill 是断点续做前已经做过的题；sample_rules 是规则还没实现时假数据层用的示例做法。",
+  "sample_rules": {
+    "fast_answer_ms": 3000,
+    "credibility_caps": {
+      "reviewed": "strong",
+      "own": "strong",
+      "generated_confirmed": "medium",
+      "generated_instant": "weak"
+    },
+    "next_steps_limit": 3
+  },
+  "sessions": {
+    "objective": {
+      "title": "智能练习：词汇与听力 4 题",
+      "mode": "quick",
+      "confidence_enabled": true,
+      "elapsed_seconds": 75,
+      "items": [
+        {
+          "question_id": "019a0318-0000-7000-8000-000000000001",
+          "suggested_seconds": 40,
+          "prefill": {
+            "text": "unexpected",
+            "confidence": "vague",
+            "duration_ms": 19000,
+            "error_cause": "slip"
+          }
+        },
+        {
+          "question_id": "019a0304-0000-7000-8000-000000000001",
+          "suggested_seconds": 40
+        },
+        {
+          "question_id": "019a0318-0000-7000-8000-000000000002",
+          "suggested_seconds": 60
+        },
+        {
+          "question_id": "019a0304-0000-7000-8000-000000000002",
+          "suggested_seconds": 1800
+        }
+      ]
+    },
+    "generated": {
+      "title": "导师出题：词汇辨析 2 道",
+      "mode": "in_class",
+      "confidence_enabled": true,
+      "elapsed_seconds": 0,
+      "items": [
+        {
+          "question_id": "019a0318-0000-7000-8000-000000000011",
+          "suggested_seconds": 30
+        },
+        {
+          "question_id": "019a0318-0000-7000-8000-000000000012",
+          "suggested_seconds": 30
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "id": "019a0318-0000-7000-8000-000000000001",
+      "version": 1,
+      "question_type": "fill_blank",
+      "response_form": "fill",
+      "credibility": "reviewed",
+      "knowledge_point_ids": [
+        "019a0303-0000-7000-8000-000000000002"
+      ],
+      "stem": "Fill in the blank with the correct form of the word in brackets: The results were ______ (expect) good.",
+      "parts": [
+        "expect"
+      ],
+      "answer_texts": [
+        "unexpectedly"
+      ],
+      "sample_answer": "unexpectedly",
+      "group_miss_rate": 0.35,
+      "explanation": {
+        "conclusion": "修饰形容词 good 要用副词，意思是“出乎意料地”，所以是 unexpectedly。"
+      }
+    },
+    {
+      "id": "019a0318-0000-7000-8000-000000000002",
+      "version": 1,
+      "question_type": "listening",
+      "response_form": "listening",
+      "credibility": "reviewed",
+      "knowledge_point_ids": [
+        "019a0303-0000-7000-8000-000000000002"
+      ],
+      "stem": "Listen to the short conversation. What does the woman suggest?",
+      "options": [
+        "Taking the subway",
+        "Driving to work",
+        "Working from home",
+        "Leaving earlier"
+      ],
+      "answer": [
+        0
+      ],
+      "common_wrong_option": 3,
+      "group_miss_rate": 0.26,
+      "explanation": {
+        "conclusion": "女士说路上太堵，建议改坐地铁。"
+      },
+      "option_notes": {
+        "3": {
+          "note": "早点出门是男士自己的想法，女士接着建议的是坐地铁。",
+          "trap": "主体混淆（把男士的话当成女士的建议）"
+        }
+      }
+    },
+    {
+      "id": "019a0318-0000-7000-8000-000000000011",
+      "version": 1,
+      "question_type": "single_choice",
+      "response_form": "choice",
+      "credibility": "generated_instant",
+      "knowledge_point_ids": [
+        "019a0303-0000-7000-8000-000000000002"
+      ],
+      "stem": "Choose the word closest in meaning to “alleviate”.",
+      "options": [
+        "relieve",
+        "worsen",
+        "ignore",
+        "delay"
+      ],
+      "answer": [
+        0
+      ],
+      "group_miss_rate": null,
+      "explanation": {
+        "conclusion": "alleviate 意为减轻、缓解，与 relieve 最接近。"
+      }
+    },
+    {
+      "id": "019a0318-0000-7000-8000-000000000012",
+      "version": 1,
+      "question_type": "single_choice",
+      "response_form": "choice",
+      "credibility": "generated_instant",
+      "knowledge_point_ids": [
+        "019a0303-0000-7000-8000-000000000002"
+      ],
+      "stem": "The new policy aims to ______ traffic congestion.",
+      "options": [
+        "ease",
+        "raise",
+        "grow",
+        "rise"
+      ],
+      "answer": [
+        0
+      ],
+      "group_miss_rate": null,
+      "explanation": {
+        "conclusion": "ease congestion 是缓解拥堵的常见搭配。"
+      }
+    }
+  ]
+}

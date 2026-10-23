@@ -3,7 +3,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router";
+import { vi } from "vitest";
 import { getGetMeContextQueryKey, type MeContext } from "@exam-prep/contract";
+import { createMockApi } from "../mocks/api.ts";
+import { DevControl } from "../mocks/control.ts";
+import { MockDb } from "../mocks/db.ts";
+import { loadDemoFixtures } from "../mocks/fixtures.ts";
+import { collectRoutes, loadRouteModules } from "../mocks/registry.ts";
 import "../i18n/index.ts";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -31,6 +37,34 @@ export const DEMO_CONTEXT: MeContext = {
     map_id: "0190a000-0000-7000-8000-000000000002",
   },
 };
+
+/** 外壳测试接上页面实际使用的假接口；地址里的 ?state= 同步给假接口控制，不绕过生成的请求钩子。 */
+export function stubDemoApi(path: string): void {
+  const fixtures = loadDemoFixtures();
+  const control = new DevControl({
+    examKeys: fixtures.exams.map((exam) => exam.key),
+    defaultExamKey: fixtures.defaultKey,
+    search: () => new URL(path, "http://localhost").search,
+    clock: () => Date.parse(DEMO_CONTEXT.now),
+  });
+  const api = createMockApi({
+    db: new MockDb(fixtures),
+    control,
+    routes: collectRoutes(loadRouteModules()),
+  });
+  vi.stubGlobal("fetch", async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+    const outcome = await api.handle({
+      method: init?.method ?? "GET",
+      url: new URL(url, "http://localhost").href,
+      headers: new Headers(init?.headers),
+      body: undefined,
+    });
+    if (outcome.kind === "hang") return new Promise<Response>(() => undefined);
+    if (outcome.kind !== "json") throw new TypeError("Failed to fetch");
+    return new Response(JSON.stringify(outcome.body), { status: outcome.status, headers: { "content-type": "application/json" } });
+  });
+}
 
 export interface Mounted {
   readonly host: HTMLElement;

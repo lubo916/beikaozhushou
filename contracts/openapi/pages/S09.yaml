@@ -1,0 +1,227 @@
+# S09 知识地图的接口（U09，api-rules 第 2、3 节）：一次取齐整张地图要显示的数据，方格、大纲树、关系图、列表四个视图共用。
+# 业务数字（掌握档、档位差、是否达标、考情级、遗忘风险、性价比阶梯、各项计数与达标比例）由服务端算好，页面只显示（红线 5）。
+# 公共形状引用 schemas/；本页私有的形状用 S09 作前缀。规则还没实现时，假数据层返回演示数据并标 data_source 为 sample。
+# 新建、改名、合并、拆分、移动、标注类型、编辑与采纳关系、批量调整范围、加入今日这些写操作还没有登记权限动作（contracts/permissions.yaml），先在界面上做成“即将上线”。
+paths:
+  /learner/map-overview:
+    get:
+      operationId: getKnowledgeMapOverview
+      x-owner: learner
+      x-action: learner.mastery.read
+      summary: 知识地图：当前目标考试每个知识点的掌握情况与六种着色要用的值、各章达标进度、四个常驻数、需要注意的计数、关系图、地图来源与体检
+      responses:
+        "200":
+          description: 知识地图一次要显示的全部数据（开发时由假数据层按当前演示考试给）
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S09MapOverview"}
+        "403": {$ref: "#/components/responses/Error"}
+        "404": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S09MapOverview:
+      type: object
+      description: 知识地图一次要显示的全部数据
+      required: [map, access, evidence_sufficient, stats, attention, chapters, relations, sources, typing, health, data_source]
+      properties:
+        map: {$ref: "#/components/schemas/S09MapInfo"}
+        access: {$ref: "#/components/schemas/S09Access"}
+        evidence_sufficient:
+          type: boolean
+          description: 整张地图的证据够不够下结论；不够时页面顶上提示“数据不足”（证据不足的格子画成虚线，与未学分开显示）
+        stats: {$ref: "#/components/schemas/S09Stats"}
+        attention: {$ref: "#/components/schemas/S09Attention"}
+        chapters:
+          type: array
+          description: 按章排好的知识点；地图还没启用时为空
+          items: {$ref: "#/components/schemas/S09Chapter"}
+        focus_point_id: {$ref: "#/components/schemas/Id"}
+        relations: {$ref: "#/components/schemas/S09Relations"}
+        sources:
+          type: array
+          description: 地图来源四行：官方、机构、模板、我的
+          items: {$ref: "#/components/schemas/S09SourceRow"}
+        typing: {$ref: "#/components/schemas/S09Typing"}
+        health: {$ref: "#/components/schemas/S09Health"}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+    S09MapInfo:
+      type: object
+      description: 地图本身：所属考试、来源（官方、模板、自建）与底图版本
+      required: [map_id, exam_id, source, version]
+      properties:
+        map_id: {$ref: "#/components/schemas/Id"}
+        exam_id: {type: string}
+        source: {$ref: "#/components/schemas/MapSource"}
+        version: {type: integer, minimum: 1}
+    S09Access:
+      type: string
+      description: full 为能改地图结构；extension_only 为受限：底图只读，只能在个人扩展层增加知识点
+      enum: [full, extension_only]
+    S09Stats:
+      type: object
+      description: 四个常驻数（S09-09）：已学、已达标、范围内、地图总数
+      required: [learned, reached, in_scope, total]
+      properties:
+        learned: {type: integer, minimum: 0, description: 有过任一证据的知识点数}
+        reached: {type: integer, minimum: 0, description: 范围内、证据足够且档位不低于目标档的知识点数}
+        in_scope: {type: integer, minimum: 0, description: 学习范围内的知识点数}
+        total: {type: integer, minimum: 0, description: 地图里的知识点总数}
+    S09Attention:
+      type: object
+      description: 需要你注意的三个计数（只数学习范围内的）
+      required: [evidence_insufficient, pending_verification, no_material]
+      properties:
+        evidence_insufficient: {type: integer, minimum: 0}
+        pending_verification: {type: integer, minimum: 0}
+        no_material: {type: integer, minimum: 0}
+    S09Chapter:
+      type: object
+      description: 一章：达标数与比例由服务端算；知识点很多时服务端建议默认折叠（S09-19）
+      required: [id, name, total, reached, reached_ratio, collapsed_by_default, points]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        total: {type: integer, minimum: 0}
+        reached: {type: integer, minimum: 0}
+        reached_ratio: {type: number, minimum: 0, maximum: 1}
+        collapsed_by_default: {type: boolean}
+        points:
+          type: array
+          items: {$ref: "#/components/schemas/S09Point"}
+    S09Point:
+      type: object
+      description: 方格里的一格；六种着色、筛选与列表要用的值都由服务端给，页面只按值选颜色与文字
+      required: [id, name, knowledge_types, layer, level, reached, evidence_sufficient, pending_verification, in_scope, importance, material, flags]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        knowledge_types:
+          type: array
+          minItems: 1
+          maxItems: 2
+          items: {$ref: "#/components/schemas/KnowledgeType"}
+        layer: {$ref: "#/components/schemas/S09Layer"}
+        level: {type: integer, minimum: 0, maximum: 5, description: 系统判定的掌握档（0 未学，5 能迁移）}
+        self_level: {type: integer, minimum: 0, maximum: 5, description: 自评；没有就不给}
+        target_level: {type: integer, minimum: 0, maximum: 5, description: 目标档；不设目标档时不给}
+        gap: {type: integer, description: 目标档减系统判定；不大于 0 为已达标；不设目标档时不给}
+        reached: {type: boolean, description: 在范围内、证据足够且不低于目标档}
+        evidence_sufficient: {type: boolean, description: 证据不足画虚线格，不等于不会}
+        pending_verification: {type: boolean, description: 有蒙对或秒答的作答在等复考}
+        in_scope: {type: boolean, description: 范围外画斜纹格}
+        importance: {type: integer, minimum: 1, maximum: 4}
+        exam_level: {type: integer, minimum: 1, maximum: 4, description: 考情级；考情数据还不够时不给}
+        forgetting_risk: {$ref: "#/components/schemas/S09ForgettingRisk"}
+        roi_tier: {$ref: "#/components/schemas/S09RoiTier"}
+        material: {$ref: "#/components/schemas/S09MaterialCoverage"}
+        flags:
+          type: array
+          description: 服务端打的标记，筛选用
+          items: {$ref: "#/components/schemas/S09PointFlag"}
+    S09Layer:
+      type: string
+      description: 这个点在底图还是扩展层（机构、个人）
+      enum: [base, org, personal]
+    S09ForgettingRisk:
+      type: string
+      description: 遗忘风险；还没学或没有记忆数据时不给
+      enum: [low, medium, high]
+    S09RoiTier:
+      type: string
+      description: 性价比阶梯（S 到 D）；范围外或地图体检不通过（锁定）时不给
+      enum: [s, a, b, c, d]
+    S09MaterialCoverage:
+      type: string
+      description: 资料覆盖：能在阅读器里读、只有页码或链接、没有资料
+      enum: [readable, mapped, none]
+    S09PointFlag:
+      type: string
+      description: 薄弱、高频、待复习、有错题
+      enum: [weak, high_frequency, due_review, has_mistakes]
+    S09Relations:
+      type: object
+      description: 关系图：以默认选中的知识点为中心的一圈关系
+      required: [nodes, edges]
+      properties:
+        center_id: {$ref: "#/components/schemas/Id"}
+        nodes:
+          type: array
+          items: {$ref: "#/components/schemas/S09RelationNode"}
+        edges:
+          type: array
+          items: {$ref: "#/components/schemas/S09RelationEdge"}
+    S09RelationNode:
+      type: object
+      required: [id, name]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+    S09RelationEdge:
+      type: object
+      description: 一条关系；导师建议的带置信度，学员采纳后才生效（S09-12）
+      required: [from, to, type, strength, origin]
+      properties:
+        from: {$ref: "#/components/schemas/Id"}
+        to: {$ref: "#/components/schemas/Id"}
+        type: {$ref: "#/components/schemas/S09RelationType"}
+        strength: {$ref: "#/components/schemas/S09RelationStrength"}
+        origin: {$ref: "#/components/schemas/S09RelationOrigin"}
+        confidence: {type: number, minimum: 0, maximum: 1}
+        high_confidence: {type: boolean, description: 服务端按参数判定的高置信，可一键采纳}
+    S09RelationType:
+      type: string
+      description: 知识点关系八类：前置、易混、上下位、并列、因果、案例、边界、例外
+      enum: [prerequisite, confusable, hierarchy, parallel, causal, case, boundary, exception]
+    S09RelationStrength:
+      type: string
+      enum: [strong, medium, weak]
+    S09RelationOrigin:
+      type: string
+      description: 地图自带、我加的、导师建议
+      enum: [map, mine, tutor]
+    S09SourceRow:
+      type: object
+      description: 地图来源的一行；没有这一类时不给 count，界面显示“—”
+      required: [kind]
+      properties:
+        kind: {$ref: "#/components/schemas/S09SourceKind"}
+        count: {type: integer, minimum: 0}
+        org_name: {type: string}
+        mine_custom: {type: boolean, description: 我的这一行是不是自建底图（否则是个人扩展层）}
+    S09SourceKind:
+      type: string
+      enum: [official, org, template, mine]
+    S09Typing:
+      type: object
+      description: 类型标注率与为主的几种类型（S09-07）
+      required: [ratio, main_types]
+      properties:
+        ratio: {type: number, minimum: 0, maximum: 1}
+        main_types:
+          type: array
+          maxItems: 4
+          items: {$ref: "#/components/schemas/KnowledgeType"}
+    S09Health:
+      type: object
+      description: 地图体检（S09-13）：有阻断项即不通过，不通过时性价比阶梯锁定（S09-10）
+      required: [passed, default_pass, issues]
+      properties:
+        passed: {type: boolean}
+        default_pass: {type: boolean, description: 官方地图默认通过}
+        issues:
+          type: array
+          items: {$ref: "#/components/schemas/S09HealthIssue"}
+    S09HealthIssue:
+      type: object
+      required: [kind, severity, count]
+      properties:
+        kind: {$ref: "#/components/schemas/S09HealthIssueKind"}
+        severity: {$ref: "#/components/schemas/S09HealthSeverity"}
+        count: {type: integer, minimum: 1}
+    S09HealthIssueKind:
+      type: string
+      description: 检查粒度、题量覆盖、缺目标档、孤立点与疑似重复
+      enum: [granularity, question_coverage, missing_target, isolated, duplicate]
+    S09HealthSeverity:
+      type: string
+      enum: [blocking, hint]
