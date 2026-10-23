@@ -653,8 +653,8 @@
         0
       ],
       "extension": false,
-      "status": "shell",
-      "updated": "v0012"
+      "status": "ui",
+      "updated": "v0039"
     },
     {
       "id": "O02",
@@ -670,8 +670,8 @@
         2
       ],
       "extension": false,
-      "status": "shell",
-      "updated": "v0012"
+      "status": "ui",
+      "updated": "v0039"
     },
     {
       "id": "O03",
