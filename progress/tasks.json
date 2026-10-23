@@ -824,7 +824,16 @@
       ],
       "title": "S15 复习与卡片（前端，假数据）",
       "goal": "照原型做出 S15 复习与卡片：所有视图、七态、三档宽度，数据来自假数据层。",
-      "status": "todo"
+      "status": "done",
+      "history": [
+        {
+          "round": 1,
+          "version": "v0047",
+          "tool": "local",
+          "date": "2026-10-24 07:02",
+          "status": "done"
+        }
+      ]
     },
     {
       "id": "U16",
