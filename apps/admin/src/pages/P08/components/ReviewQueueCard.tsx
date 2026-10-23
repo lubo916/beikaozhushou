@@ -35,11 +35,11 @@ export function ReviewQueueCard({ data, origin, onOrigin, onSoon }: ReviewQueueC
     { value: "all", label: t("queue.origins.all") },
     ...ORIGINS.map((value) => ({ value, label: t(`queue.origins.${value}`), count: data.origin_counts[value] })),
   ];
+  // 窄屏叠成小卡时，第一列（题号与题干）不带名称，当作小卡的标题（与原型手机版一致）。
   const columns: TableColumn<P08ReviewTask>[] = [
     {
       key: "question",
       header: t("queue.columns.question"),
-      label: t("queue.columns.question"),
       render: (task) => (
         <span className="flex flex-col gap-1">
           <strong>{task.question_ref}</strong>

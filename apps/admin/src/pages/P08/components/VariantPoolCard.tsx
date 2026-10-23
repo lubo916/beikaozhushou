@@ -10,11 +10,11 @@ const QUALITY_TONE: Readonly<Record<Quality, TagTone>> = { good: "success", watc
 // 数据不足只和质量结论有关，所以只在这张卡片里提示（F08-Q1）。
 export function VariantPoolCard({ data, onSoon }: { data: P08QuestionReview; onSoon: () => void }) {
   const { t } = useTranslation("P08");
+  // 窄屏叠成小卡时，第一列（题号与题干）不带名称，当作小卡的标题（与原型手机版一致）。
   const columns: TableColumn<P08VariantPool>[] = [
     {
       key: "parent",
       header: t("variants.columns.parent"),
-      label: t("variants.columns.parent"),
       render: (pool) => (
         <span className="flex flex-col gap-1">
           <strong>{pool.parent_ref}</strong>
