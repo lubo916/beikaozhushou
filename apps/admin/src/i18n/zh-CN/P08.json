@@ -1,1 +1,142 @@
-{}
+{
+  "title": "题库审核与质量",
+  "description": "题目上线才是质量管理的开始：新题与改过的题双人审核，生成题过七道质检，报错有时限、有结论。",
+  "sample": "示例数据",
+  "scope": "考试范围：{{exam}}",
+  "updated": "更新于 {{time}}",
+  "soon": "即将上线",
+  "times": "{{n}} 次",
+  "queue": {
+    "title": "审核队列",
+    "meta": "双人审核，答案与解析分别核对",
+    "filter": "进队原因",
+    "origins": {
+      "all": "全部",
+      "new": "新入库",
+      "modified": "被修改"
+    },
+    "columns": {
+      "question": "题目",
+      "origin": "原因与可信度",
+      "answer": "答案核对",
+      "solution": "解析核对",
+      "action": "操作"
+    },
+    "first": "一审{{verdict}}",
+    "second": "二审{{verdict}}",
+    "verdicts": {
+      "pending": "待审",
+      "passed": "通过",
+      "rejected": "退回"
+    },
+    "check": "去核对",
+    "none": "当前筛选下没有待审的题。"
+  },
+  "checks": {
+    "title": "生成题七道质检",
+    "meta": "质检结果决定证据上限",
+    "items": "七道质检结果",
+    "scopes": {
+      "platform": "平台生成题",
+      "learner_instant": "学员侧即时生成题"
+    },
+    "cap": "证据上限：{{level}}",
+    "names": {
+      "answer_unique": "答案唯一",
+      "in_syllabus": "不超纲",
+      "not_duplicate": "不与真题重复",
+      "unambiguous": "表述无歧义",
+      "distractors_reasonable": "干扰项合理",
+      "difficulty_estimated": "难度预估",
+      "content_compliant": "内容合规"
+    },
+    "outcomes": {
+      "pass": "通过",
+      "warn": "存疑",
+      "fail": "不通过"
+    },
+    "footer": "同一套质检也用于学员侧即时生成的题；证据上限由质检结果决定。",
+    "none": "暂时没有待质检的生成题。"
+  },
+  "variants": {
+    "title": "变式题池",
+    "meta": "每道母题的变式数量、质量与曝光",
+    "columns": {
+      "parent": "母题",
+      "count": "变式数",
+      "quality": "质量",
+      "exposure": "曝光次数",
+      "action": "操作"
+    },
+    "quality": {
+      "good": "良好",
+      "watch": "需关注",
+      "poor": "需重做"
+    },
+    "qualityPending": "样本不足，暂不评",
+    "exposureHigh": "曝光偏高，宜补变式",
+    "manage": "管理变式",
+    "none": "暂时没有变式题池。"
+  },
+  "reports": {
+    "title": "报错闭环",
+    "heading": "{{ref}} {{reason}}",
+    "reasons": {
+      "wrong_answer": "答案有误",
+      "ambiguous_stem": "题干有歧义",
+      "wrong_solution": "解析有误",
+      "out_of_syllabus": "超出考纲"
+    },
+    "status": {
+      "open": "待处理",
+      "overdue": "已过时限",
+      "resolved": "已处理"
+    },
+    "meta": "{{n}} 人报错 · 回复时限 {{due}}",
+    "conclusions": {
+      "revised": "已修订",
+      "withdrawn": "已下架",
+      "no_issue": "核实无误"
+    },
+    "rescored": "重新计分 {{n}} 人",
+    "masteryCorrected": "修正掌握",
+    "notified": "通知报错人",
+    "separator": "；",
+    "aiNote": "AI 初判，结论以人工核实为准",
+    "reply": "回复结论",
+    "revise": "修订",
+    "withdraw": "下架",
+    "footer": "报错有时限、有结论；修订或下架后通知做过的人并重新计分。",
+    "none": "暂时没有用户报错。"
+  },
+  "state": {
+    "empty": {
+      "title": "题库审核与质量暂无数据",
+      "body": "当前筛选下没有记录，换个筛选条件试试",
+      "action": "恢复默认筛选"
+    },
+    "error": {
+      "body": "服务暂时异常，已保存的内容不受影响；重试或稍后再来。"
+    },
+    "offline": {
+      "title": "后台需要联网",
+      "body": "题库审核与质量的数据要联网才能取到，恢复网络后点“重新连接”。",
+      "action": "重新连接",
+      "stale": "网络断开了，下面是断网前取到的数据。"
+    },
+    "restricted": {
+      "title": "需要相应的后台角色",
+      "body": "须相应后台角色；敏感操作先重验身份，再按风险分档确认，只有不可逆操作双人复核",
+      "action": "去系统、参数与权限"
+    },
+    "insufficient_data": {
+      "title": "样本不足，暂不出结论",
+      "body": "样本不足时不出结论，只显示原始计数"
+    }
+  },
+  "insufficient": {
+    "sample": "作答样本",
+    "minimum": "评质量至少需要",
+    "missing": "作答样本够了以后显示变式题的质量结论；下面的变式数与曝光次数都是原始计数。"
+  }
+}
