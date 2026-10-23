@@ -1,0 +1,264 @@
+{
+  "exam_id": "ds-final-custom",
+  "data_source": "sample",
+  "default_method": "segments",
+  "default_level": "keywords",
+  "default_source": "user",
+  "default_segment": "part-1",
+  "default_profile": "balanced",
+  "oral_available": true,
+  "order_min_samples": 3,
+  "items": [
+    {
+      "id": "019a0b00-0000-7000-8000-000000000316",
+      "title": "二分查找的基本步骤",
+      "knowledge_type": "procedure",
+      "origin": "数据结构复习笔记",
+      "reference": "二分查找要求查找表有序，并使用顺序存储结构。\n每次将目标值与中间元素比较，缩小到可能存在目标的一半区间，直到找到目标或区间为空。",
+      "outline": [
+        "确认有序与顺序存储前提",
+        "比较中间元素并更新区间",
+        "检查找到目标或区间为空的终止条件"
+      ],
+      "segments": [
+        {
+          "id": "part-1",
+          "label": "第一段",
+          "reference": "二分查找要求查找表有序，并使用顺序存储结构。"
+        },
+        {
+          "id": "part-2",
+          "label": "第二段",
+          "reference": "每次将目标值与中间元素比较，缩小到可能存在目标的一半区间，直到找到目标或区间为空。"
+        },
+        {
+          "id": "all",
+          "label": "合并背诵",
+          "reference": "二分查找要求查找表有序，并使用顺序存储结构。\n每次将目标值与中间元素比较，缩小到可能存在目标的一半区间，直到找到目标或区间为空。"
+        }
+      ],
+      "variants": [
+        {
+          "id": "019a0b00-0000-7000-8000-000000000316-user-keywords-part-1",
+          "level": "keywords",
+          "source": "user",
+          "segment_id": "part-1",
+          "prompt": "＿＿要求查找表有序，并使用顺序存储结构。",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000316-user-keywords-part-2",
+          "level": "keywords",
+          "source": "user",
+          "segment_id": "part-2",
+          "prompt": "每次将＿＿与中间元素比较，缩小到＿＿，直到＿＿或区间为空。",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000316-user-keywords-all",
+          "level": "keywords",
+          "source": "user",
+          "segment_id": "all",
+          "prompt": "＿＿要求查找表有序，并使用顺序存储结构。\n每次将＿＿与中间元素比较，缩小到＿＿，直到＿＿或区间为空。",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000316-user-initials-part-1",
+          "level": "initials",
+          "source": "user",
+          "segment_id": "part-1",
+          "prompt": "二分查找要求查找表有＿＿，并使用顺＿＿存储结构。",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000316-user-initials-part-2",
+          "level": "initials",
+          "source": "user",
+          "segment_id": "part-2",
+          "prompt": "每次将目标值与中＿＿比较，缩小到可＿＿的区间，直到找＿＿或区＿＿。",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000316-user-initials-all",
+          "level": "initials",
+          "source": "user",
+          "segment_id": "all",
+          "prompt": "二分查找要求查找表有＿＿，并使用顺＿＿存储结构。\n每次将目标值与中＿＿比较，缩小到可＿＿的区间，直到找＿＿或区＿＿。",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000316-user-full-part-1",
+          "level": "full",
+          "source": "user",
+          "segment_id": "part-1",
+          "prompt": "",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000316-user-full-part-2",
+          "level": "full",
+          "source": "user",
+          "segment_id": "part-2",
+          "prompt": "",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000316-user-full-all",
+          "level": "full",
+          "source": "user",
+          "segment_id": "all",
+          "prompt": "\n",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000316-tutor-keywords-part-1",
+          "level": "keywords",
+          "source": "tutor",
+          "segment_id": "part-1",
+          "prompt": "二分查找要求查找表＿＿，并使用＿＿存储结构。",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000316-tutor-keywords-part-2",
+          "level": "keywords",
+          "source": "tutor",
+          "segment_id": "part-2",
+          "prompt": "每次将目标值与＿＿比较，缩小到可能存在目标的＿＿区间，直到找到目标或区间＿＿。",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000316-tutor-keywords-all",
+          "level": "keywords",
+          "source": "tutor",
+          "segment_id": "all",
+          "prompt": "二分查找要求查找表＿＿，并使用＿＿存储结构。\n每次将目标值与＿＿比较，缩小到可能存在目标的＿＿区间，直到找到目标或区间＿＿。",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000316-tutor-initials-part-1",
+          "level": "initials",
+          "source": "tutor",
+          "segment_id": "part-1",
+          "prompt": "二分查找要求查找表有＿＿，并使用顺＿＿存储结构。",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000316-tutor-initials-part-2",
+          "level": "initials",
+          "source": "tutor",
+          "segment_id": "part-2",
+          "prompt": "每次将目标值与中＿＿比较，缩小到可＿＿的区间，直到找＿＿或区＿＿。",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000316-tutor-initials-all",
+          "level": "initials",
+          "source": "tutor",
+          "segment_id": "all",
+          "prompt": "二分查找要求查找表有＿＿，并使用顺＿＿存储结构。\n每次将目标值与中＿＿比较，缩小到可＿＿的区间，直到找＿＿或区＿＿。",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000316-tutor-full-part-1",
+          "level": "full",
+          "source": "tutor",
+          "segment_id": "part-1",
+          "prompt": "",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000316-tutor-full-part-2",
+          "level": "full",
+          "source": "tutor",
+          "segment_id": "part-2",
+          "prompt": "",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000316-tutor-full-all",
+          "level": "full",
+          "source": "tutor",
+          "segment_id": "all",
+          "prompt": "\n",
+          "ai_generated": true
+        }
+      ]
+    }
+  ],
+  "last_result": {
+    "coverage": 0.8,
+    "accuracy": 0.92,
+    "order": 0.75,
+    "grade": "basic",
+    "missing": [
+      "终止条件"
+    ],
+    "oral_samples": 5,
+    "ai_generated": true
+  },
+  "match_profiles": [
+    {
+      "id": "lenient",
+      "bands": [
+        {
+          "grade": "exact",
+          "minimum_match": 1
+        },
+        {
+          "grade": "basic",
+          "minimum_match": 0.8
+        },
+        {
+          "grade": "partial",
+          "minimum_match": 0.5
+        },
+        {
+          "grade": "wrong",
+          "minimum_match": 0
+        }
+      ]
+    },
+    {
+      "id": "balanced",
+      "bands": [
+        {
+          "grade": "exact",
+          "minimum_match": 1
+        },
+        {
+          "grade": "basic",
+          "minimum_match": 0.9
+        },
+        {
+          "grade": "partial",
+          "minimum_match": 0.7
+        },
+        {
+          "grade": "wrong",
+          "minimum_match": 0
+        }
+      ]
+    },
+    {
+      "id": "strict",
+      "bands": [
+        {
+          "grade": "exact",
+          "minimum_match": 1
+        },
+        {
+          "grade": "basic",
+          "minimum_match": 0.95
+        },
+        {
+          "grade": "partial",
+          "minimum_match": 0.8
+        },
+        {
+          "grade": "wrong",
+          "minimum_match": 0
+        }
+      ]
+    }
+  ]
+}

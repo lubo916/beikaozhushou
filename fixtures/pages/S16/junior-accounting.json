@@ -1,0 +1,265 @@
+{
+  "exam_id": "junior-accounting",
+  "data_source": "sample",
+  "default_method": "cloze",
+  "default_level": "keywords",
+  "default_source": "user",
+  "default_segment": "part-1",
+  "default_profile": "balanced",
+  "oral_available": true,
+  "order_min_samples": 3,
+  "items": [
+    {
+      "id": "019a0b00-0000-7000-8000-000000000016",
+      "title": "会计信息质量要求",
+      "knowledge_type": "statute",
+      "origin": "《初级会计实务》标注段落",
+      "reference": "会计信息质量要求包括可靠性、相关性、可理解性和可比性。\n还包括实质重于形式、重要性、谨慎性和及时性。",
+      "outline": [
+        "列出各项质量要求",
+        "区分实质重于形式与形式",
+        "结合情境理解谨慎性"
+      ],
+      "segments": [
+        {
+          "id": "part-1",
+          "label": "第一段",
+          "reference": "会计信息质量要求包括可靠性、相关性、可理解性和可比性。"
+        },
+        {
+          "id": "part-2",
+          "label": "第二段",
+          "reference": "还包括实质重于形式、重要性、谨慎性和及时性。"
+        },
+        {
+          "id": "all",
+          "label": "合并背诵",
+          "reference": "会计信息质量要求包括可靠性、相关性、可理解性和可比性。\n还包括实质重于形式、重要性、谨慎性和及时性。"
+        }
+      ],
+      "variants": [
+        {
+          "id": "019a0b00-0000-7000-8000-000000000016-user-keywords-part-1",
+          "level": "keywords",
+          "source": "user",
+          "segment_id": "part-1",
+          "prompt": "会计信息质量要求包括可靠性、＿＿、可理解性和＿＿。",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000016-user-keywords-part-2",
+          "level": "keywords",
+          "source": "user",
+          "segment_id": "part-2",
+          "prompt": "还包括实质重于形式、＿＿、谨慎性和＿＿。",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000016-user-keywords-all",
+          "level": "keywords",
+          "source": "user",
+          "segment_id": "all",
+          "prompt": "会计信息质量要求包括可靠性、＿＿、可理解性和＿＿。\n还包括实质重于形式、＿＿、谨慎性和＿＿。",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000016-user-initials-part-1",
+          "level": "initials",
+          "source": "user",
+          "segment_id": "part-1",
+          "prompt": "会计信息质量要求包括可＿＿、相＿＿、可＿＿和可＿＿。",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000016-user-initials-part-2",
+          "level": "initials",
+          "source": "user",
+          "segment_id": "part-2",
+          "prompt": "还包括实＿＿、重＿＿、谨＿＿和及＿＿。",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000016-user-initials-all",
+          "level": "initials",
+          "source": "user",
+          "segment_id": "all",
+          "prompt": "会计信息质量要求包括可＿＿、相＿＿、可＿＿和可＿＿。\n还包括实＿＿、重＿＿、谨＿＿和及＿＿。",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000016-user-full-part-1",
+          "level": "full",
+          "source": "user",
+          "segment_id": "part-1",
+          "prompt": "",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000016-user-full-part-2",
+          "level": "full",
+          "source": "user",
+          "segment_id": "part-2",
+          "prompt": "",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000016-user-full-all",
+          "level": "full",
+          "source": "user",
+          "segment_id": "all",
+          "prompt": "\n",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000016-tutor-keywords-part-1",
+          "level": "keywords",
+          "source": "tutor",
+          "segment_id": "part-1",
+          "prompt": "会计信息质量要求包括＿＿、相关性、＿＿和可比性。",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000016-tutor-keywords-part-2",
+          "level": "keywords",
+          "source": "tutor",
+          "segment_id": "part-2",
+          "prompt": "还包括＿＿、重要性、＿＿和及时性。",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000016-tutor-keywords-all",
+          "level": "keywords",
+          "source": "tutor",
+          "segment_id": "all",
+          "prompt": "会计信息质量要求包括＿＿、相关性、＿＿和可比性。\n还包括＿＿、重要性、＿＿和及时性。",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000016-tutor-initials-part-1",
+          "level": "initials",
+          "source": "tutor",
+          "segment_id": "part-1",
+          "prompt": "会计信息质量要求包括可＿＿、相＿＿、可＿＿和可＿＿。",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000016-tutor-initials-part-2",
+          "level": "initials",
+          "source": "tutor",
+          "segment_id": "part-2",
+          "prompt": "还包括实＿＿、重＿＿、谨＿＿和及＿＿。",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000016-tutor-initials-all",
+          "level": "initials",
+          "source": "tutor",
+          "segment_id": "all",
+          "prompt": "会计信息质量要求包括可＿＿、相＿＿、可＿＿和可＿＿。\n还包括实＿＿、重＿＿、谨＿＿和及＿＿。",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000016-tutor-full-part-1",
+          "level": "full",
+          "source": "tutor",
+          "segment_id": "part-1",
+          "prompt": "",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000016-tutor-full-part-2",
+          "level": "full",
+          "source": "tutor",
+          "segment_id": "part-2",
+          "prompt": "",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000016-tutor-full-all",
+          "level": "full",
+          "source": "tutor",
+          "segment_id": "all",
+          "prompt": "\n",
+          "ai_generated": true
+        }
+      ]
+    }
+  ],
+  "last_result": {
+    "coverage": 0.8,
+    "accuracy": 0.92,
+    "order": 0.75,
+    "grade": "basic",
+    "missing": [
+      "可比性",
+      "及时性"
+    ],
+    "oral_samples": 5,
+    "ai_generated": true
+  },
+  "match_profiles": [
+    {
+      "id": "lenient",
+      "bands": [
+        {
+          "grade": "exact",
+          "minimum_match": 1
+        },
+        {
+          "grade": "basic",
+          "minimum_match": 0.8
+        },
+        {
+          "grade": "partial",
+          "minimum_match": 0.5
+        },
+        {
+          "grade": "wrong",
+          "minimum_match": 0
+        }
+      ]
+    },
+    {
+      "id": "balanced",
+      "bands": [
+        {
+          "grade": "exact",
+          "minimum_match": 1
+        },
+        {
+          "grade": "basic",
+          "minimum_match": 0.9
+        },
+        {
+          "grade": "partial",
+          "minimum_match": 0.7
+        },
+        {
+          "grade": "wrong",
+          "minimum_match": 0
+        }
+      ]
+    },
+    {
+      "id": "strict",
+      "bands": [
+        {
+          "grade": "exact",
+          "minimum_match": 1
+        },
+        {
+          "grade": "basic",
+          "minimum_match": 0.95
+        },
+        {
+          "grade": "partial",
+          "minimum_match": 0.8
+        },
+        {
+          "grade": "wrong",
+          "minimum_match": 0
+        }
+      ]
+    }
+  ]
+}

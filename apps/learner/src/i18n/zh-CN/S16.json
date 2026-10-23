@@ -1,1 +1,123 @@
-{}
+{
+  "title": "背诵训练",
+  "description": "捂住书，自己背一遍。先回忆，再核对。",
+  "morning": "今日晨读包",
+  "sample": "示例数据",
+  "methodLabel": "背诵方式",
+  "method": {
+    "cloze": "渐进挖空",
+    "points": "要点背诵",
+    "oral": "口述检测",
+    "segments": "分段背诵"
+  },
+  "levelLabel": "挖空程度",
+  "level": {
+    "keywords": "挖关键词",
+    "initials": "只留首字",
+    "full": "全文默写"
+  },
+  "sourceLabel": "挖空来源",
+  "source": {
+    "user": "我标的挖空",
+    "tutor": "导师自动挖空"
+  },
+  "segmentLabel": "背诵段落",
+  "segmentHint": "先分段回忆，再合并背诵。切换段落会清空本次草稿。",
+  "origin": "来自 {{origin}}",
+  "content": "当前背诵内容",
+  "recall": "先回忆，再揭晓原文",
+  "draft": "我的回忆",
+  "placeholder": "在这里写下你能回忆的内容……",
+  "pointsPlaceholder": "用自己的话写出得分点，不要求逐字一致……",
+  "pointsHint": "只背得分点骨架，不要求逐字复述。",
+  "outline": "得分点骨架",
+  "showOutline": "查看要点提示",
+  "hideOutline": "收起要点提示",
+  "reveal": "查看原文",
+  "hide": "收起原文",
+  "reference": "参考原文",
+  "check": "检查本次回忆",
+  "queue": "加入统一复习",
+  "queueTitle": "统一到期队列",
+  "queueHint": "背诵结果接通后端后，与卡片进入同一条到期队列。",
+  "draftHint": "草稿仅在当前页面临时保留；切换训练内容会清空。",
+  "oral": {
+    "title": "口述后核对要点",
+    "body": "说完后转写文字，再检查要点覆盖、关键词与顺序。",
+    "start": "开始口述检测",
+    "demo": "简版暂不启用麦克风；语音转写与评分即将上线。",
+    "transcript": "转写内容",
+    "placeholder": "语音转写即将上线，也可以先键入你要说的内容……"
+  },
+  "last": {
+    "title": "上次结果",
+    "hint": "以下为历史示例，与本次输入无关。",
+    "coverage": "要点覆盖",
+    "accuracy": "关键词准确",
+    "order": "顺序",
+    "missing": "漏项",
+    "noMissing": "没有漏项",
+    "samples": "口述样本 {{value}} 次",
+    "grade": "比对结果"
+  },
+  "grade": {
+    "exact": "完全正确",
+    "basic": "基本正确",
+    "partial": "部分正确",
+    "wrong": "错误"
+  },
+  "compare": {
+    "title": "逐级宽松比对",
+    "hint": "可接受同义表达；这里展示接口给出的示例阈值，实际评分与调整即将上线。",
+    "label": "比对宽松度",
+    "profile": {
+      "lenient": "宽松",
+      "balanced": "适中",
+      "strict": "严格"
+    },
+    "band": "匹配度 ≥ {{value}}",
+    "lowest": "低于以上阈值",
+    "save": "应用比对设置"
+  },
+  "privacy": {
+    "title": "录音隐私",
+    "body": "录音默认只用于本次评分，不保存。简版没有启用麦克风，也不会上传或保存录音。",
+    "link": "查看数据与隐私"
+  },
+  "soon": {
+    "default": "即将上线",
+    "morning": "今日晨读包即将上线",
+    "check": "评分即将上线；本次内容尚未提交，上次结果仍是历史示例。",
+    "oral": "口述检测即将上线；本次没有启用麦克风。",
+    "queue": "统一调度即将上线；本次尚未加入到期队列。",
+    "profile": "比对设置即将上线；本次只预览示例阈值。",
+    "report": "问题反馈即将上线"
+  },
+  "state": {
+    "empty": {
+      "title": "还没有要背的内容",
+      "body": "在阅读器里标注“要背”的段落会出现在这里",
+      "action": "去阅读器"
+    },
+    "error": {
+      "title": "背诵训练没能加载",
+      "body": "背诵训练的数据暂时没取到：网络或服务异常。已保存的内容不受影响，点“重试”即可；连续失败会自动上报。"
+    },
+    "offline": {
+      "title": "当前处于离线状态",
+      "body": "挖空与默写可离线；口述检测需要联网",
+      "uncached": "当前没有可用的训练缓存，请联网载入内容；本页已载入的挖空与默写可继续使用。",
+      "stale": "正在使用上次打开的训练内容",
+      "retry": "重试"
+    },
+    "restricted": {
+      "title": "口述检测额度受限",
+      "body": "口述检测按次计入 AI 额度；挖空与默写不限",
+      "action": "查看会员与权益"
+    },
+    "insufficient": {
+      "title": "暂不提供顺序评分",
+      "body": "口述样本少于 {{value}} 次时不给顺序评分"
+    }
+  }
+}

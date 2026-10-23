@@ -1,0 +1,115 @@
+# S16 简版：只读训练内容与历史示例；评分、录音与调度写入留待后端登记权限后启用。
+paths:
+  /content/recitation/training:
+    get:
+      operationId: getRecitationTraining
+      x-owner: content
+      x-action: content.card.read
+      summary: 背诵训练的内容、挖空版本、分段与上次结果
+      responses:
+        "200":
+          description: 训练页面数据；业务数字来自接口，模拟层标记示例数据
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S16Training"}
+        "403": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S16Method:
+      type: string
+      enum: [cloze, points, oral, segments]
+    S16Level:
+      type: string
+      enum: [keywords, initials, full]
+    S16Source:
+      type: string
+      enum: [user, tutor]
+    S16Grade:
+      type: string
+      enum: [exact, basic, partial, wrong]
+    S16Training:
+      type: object
+      required: [exam_id, data_source, default_method, default_level, default_source, default_segment, items, oral_available, order_min_samples, last_result, match_profiles, default_profile]
+      properties:
+        exam_id: {type: string}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+        default_method: {$ref: "#/components/schemas/S16Method"}
+        default_level: {$ref: "#/components/schemas/S16Level"}
+        default_source: {$ref: "#/components/schemas/S16Source"}
+        default_segment: {type: string}
+        default_profile: {type: string}
+        oral_available: {type: boolean}
+        order_min_samples: {type: integer, minimum: 1}
+        items:
+          type: array
+          items: {$ref: "#/components/schemas/S16Item"}
+        last_result: {$ref: "#/components/schemas/S16LastResult"}
+        match_profiles:
+          type: array
+          items: {$ref: "#/components/schemas/S16MatchProfile"}
+    S16Item:
+      type: object
+      required: [id, title, knowledge_type, origin, reference, outline, segments, variants]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        title: {type: string}
+        knowledge_type: {$ref: "#/components/schemas/KnowledgeType"}
+        origin: {type: string}
+        reference: {type: string}
+        outline:
+          type: array
+          items: {type: string}
+        segments:
+          type: array
+          items: {$ref: "#/components/schemas/S16Segment"}
+        variants:
+          type: array
+          items: {$ref: "#/components/schemas/S16Variant"}
+    S16Segment:
+      type: object
+      required: [id, label, reference]
+      properties:
+        id: {type: string}
+        label: {type: string}
+        reference: {type: string}
+    S16Variant:
+      type: object
+      required: [id, level, source, segment_id, prompt, ai_generated]
+      properties:
+        id: {type: string}
+        level: {$ref: "#/components/schemas/S16Level"}
+        source: {$ref: "#/components/schemas/S16Source"}
+        segment_id: {type: string}
+        prompt: {type: string}
+        ai_generated: {type: boolean}
+    S16LastResult:
+      type: object
+      description: 历史示例，绝不作为本次作答评分；样本不足时不返回 order
+      required: [coverage, accuracy, grade, missing, oral_samples, ai_generated]
+      properties:
+        coverage: {type: number, minimum: 0, maximum: 1}
+        accuracy: {type: number, minimum: 0, maximum: 1}
+        order: {type: number, minimum: 0, maximum: 1}
+        grade: {$ref: "#/components/schemas/S16Grade"}
+        missing:
+          type: array
+          items: {type: string}
+        oral_samples: {type: integer, minimum: 0}
+        ai_generated: {type: boolean}
+    S16MatchProfile:
+      type: object
+      description: 接口给出的示例阈值，页面只展示，不计算或实际修改评分规则
+      required: [id, bands]
+      properties:
+        id:
+          type: string
+          enum: [lenient, balanced, strict]
+        bands:
+          type: array
+          items: {$ref: "#/components/schemas/S16Band"}
+    S16Band:
+      type: object
+      required: [grade, minimum_match]
+      properties:
+        grade: {$ref: "#/components/schemas/S16Grade"}
+        minimum_match: {type: number, minimum: 0, maximum: 1}

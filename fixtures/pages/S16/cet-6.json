@@ -1,0 +1,264 @@
+{
+  "exam_id": "cet-6",
+  "data_source": "sample",
+  "default_method": "points",
+  "default_level": "keywords",
+  "default_source": "user",
+  "default_segment": "part-1",
+  "default_profile": "balanced",
+  "oral_available": true,
+  "order_min_samples": 3,
+  "items": [
+    {
+      "id": "019a0b00-0000-7000-8000-000000000216",
+      "title": "议论文的论证骨架",
+      "knowledge_type": "essay",
+      "origin": "英语写作笔记",
+      "reference": "A clear argument begins with a claim supported by reasons and evidence.\nA counterargument can be acknowledged before the conclusion returns to the central claim.",
+      "outline": [
+        "提出明确观点",
+        "给出理由与证据",
+        "回应反方观点并收束结论"
+      ],
+      "segments": [
+        {
+          "id": "part-1",
+          "label": "第一段",
+          "reference": "A clear argument begins with a claim supported by reasons and evidence."
+        },
+        {
+          "id": "part-2",
+          "label": "第二段",
+          "reference": "A counterargument can be acknowledged before the conclusion returns to the central claim."
+        },
+        {
+          "id": "all",
+          "label": "合并背诵",
+          "reference": "A clear argument begins with a claim supported by reasons and evidence.\nA counterargument can be acknowledged before the conclusion returns to the central claim."
+        }
+      ],
+      "variants": [
+        {
+          "id": "019a0b00-0000-7000-8000-000000000216-user-keywords-part-1",
+          "level": "keywords",
+          "source": "user",
+          "segment_id": "part-1",
+          "prompt": "A clear ＿＿ begins with a claim supported by ＿＿ and evidence.",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000216-user-keywords-part-2",
+          "level": "keywords",
+          "source": "user",
+          "segment_id": "part-2",
+          "prompt": "A counterargument can be ＿＿ before the ＿＿ returns to the central claim.",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000216-user-keywords-all",
+          "level": "keywords",
+          "source": "user",
+          "segment_id": "all",
+          "prompt": "A clear ＿＿ begins with a claim supported by ＿＿ and evidence.\nA counterargument can be ＿＿ before the ＿＿ returns to the central claim.",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000216-user-initials-part-1",
+          "level": "initials",
+          "source": "user",
+          "segment_id": "part-1",
+          "prompt": "A clear argument begins with a c＿＿ supported by r＿＿ and e＿＿.",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000216-user-initials-part-2",
+          "level": "initials",
+          "source": "user",
+          "segment_id": "part-2",
+          "prompt": "A c＿＿ can be acknowledged before the c＿＿ returns to the central c＿＿.",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000216-user-initials-all",
+          "level": "initials",
+          "source": "user",
+          "segment_id": "all",
+          "prompt": "A clear argument begins with a c＿＿ supported by r＿＿ and e＿＿.\nA c＿＿ can be acknowledged before the c＿＿ returns to the central c＿＿.",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000216-user-full-part-1",
+          "level": "full",
+          "source": "user",
+          "segment_id": "part-1",
+          "prompt": "",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000216-user-full-part-2",
+          "level": "full",
+          "source": "user",
+          "segment_id": "part-2",
+          "prompt": "",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000216-user-full-all",
+          "level": "full",
+          "source": "user",
+          "segment_id": "all",
+          "prompt": "\n",
+          "ai_generated": false
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000216-tutor-keywords-part-1",
+          "level": "keywords",
+          "source": "tutor",
+          "segment_id": "part-1",
+          "prompt": "A clear argument begins with a ＿＿ supported by reasons and ＿＿.",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000216-tutor-keywords-part-2",
+          "level": "keywords",
+          "source": "tutor",
+          "segment_id": "part-2",
+          "prompt": "A ＿＿ can be acknowledged before the conclusion returns to the ＿＿.",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000216-tutor-keywords-all",
+          "level": "keywords",
+          "source": "tutor",
+          "segment_id": "all",
+          "prompt": "A clear argument begins with a ＿＿ supported by reasons and ＿＿.\nA ＿＿ can be acknowledged before the conclusion returns to the ＿＿.",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000216-tutor-initials-part-1",
+          "level": "initials",
+          "source": "tutor",
+          "segment_id": "part-1",
+          "prompt": "A clear argument begins with a c＿＿ supported by r＿＿ and e＿＿.",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000216-tutor-initials-part-2",
+          "level": "initials",
+          "source": "tutor",
+          "segment_id": "part-2",
+          "prompt": "A c＿＿ can be acknowledged before the c＿＿ returns to the central c＿＿.",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000216-tutor-initials-all",
+          "level": "initials",
+          "source": "tutor",
+          "segment_id": "all",
+          "prompt": "A clear argument begins with a c＿＿ supported by r＿＿ and e＿＿.\nA c＿＿ can be acknowledged before the c＿＿ returns to the central c＿＿.",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000216-tutor-full-part-1",
+          "level": "full",
+          "source": "tutor",
+          "segment_id": "part-1",
+          "prompt": "",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000216-tutor-full-part-2",
+          "level": "full",
+          "source": "tutor",
+          "segment_id": "part-2",
+          "prompt": "",
+          "ai_generated": true
+        },
+        {
+          "id": "019a0b00-0000-7000-8000-000000000216-tutor-full-all",
+          "level": "full",
+          "source": "tutor",
+          "segment_id": "all",
+          "prompt": "\n",
+          "ai_generated": true
+        }
+      ]
+    }
+  ],
+  "last_result": {
+    "coverage": 0.8,
+    "accuracy": 0.92,
+    "order": 0.75,
+    "grade": "basic",
+    "missing": [
+      "回应反方观点"
+    ],
+    "oral_samples": 5,
+    "ai_generated": true
+  },
+  "match_profiles": [
+    {
+      "id": "lenient",
+      "bands": [
+        {
+          "grade": "exact",
+          "minimum_match": 1
+        },
+        {
+          "grade": "basic",
+          "minimum_match": 0.8
+        },
+        {
+          "grade": "partial",
+          "minimum_match": 0.5
+        },
+        {
+          "grade": "wrong",
+          "minimum_match": 0
+        }
+      ]
+    },
+    {
+      "id": "balanced",
+      "bands": [
+        {
+          "grade": "exact",
+          "minimum_match": 1
+        },
+        {
+          "grade": "basic",
+          "minimum_match": 0.9
+        },
+        {
+          "grade": "partial",
+          "minimum_match": 0.7
+        },
+        {
+          "grade": "wrong",
+          "minimum_match": 0
+        }
+      ]
+    },
+    {
+      "id": "strict",
+      "bands": [
+        {
+          "grade": "exact",
+          "minimum_match": 1
+        },
+        {
+          "grade": "basic",
+          "minimum_match": 0.95
+        },
+        {
+          "grade": "partial",
+          "minimum_match": 0.8
+        },
+        {
+          "grade": "wrong",
+          "minimum_match": 0
+        }
+      ]
+    }
+  ]
+}
