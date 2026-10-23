@@ -23,7 +23,7 @@
       {
         "question_id": "019a0501-0000-7000-8000-000000000001",
         "year": 2025,
-        "subject": "初级会计实务",
+        "subject": "实务",
         "number": 12,
         "source": "official_public",
         "knowledge_point": {
@@ -48,7 +48,7 @@
       {
         "question_id": "019a0501-0000-7000-8000-000000000002",
         "year": 2025,
-        "subject": "初级会计实务",
+        "subject": "实务",
         "number": 31,
         "source": "official_public",
         "knowledge_point": {
@@ -69,7 +69,7 @@
       {
         "question_id": "019a0501-0000-7000-8000-000000000003",
         "year": 2024,
-        "subject": "初级会计实务",
+        "subject": "实务",
         "number": 45,
         "source": "licensed",
         "knowledge_point": {
@@ -94,7 +94,7 @@
       {
         "question_id": "019a0501-0000-7000-8000-000000000004",
         "year": 2024,
-        "subject": "初级会计实务",
+        "subject": "实务",
         "number": 18,
         "source": "recalled",
         "knowledge_point": {
@@ -115,7 +115,7 @@
       {
         "question_id": "019a0501-0000-7000-8000-000000000005",
         "year": 2023,
-        "subject": "初级会计实务",
+        "subject": "实务",
         "number": 27,
         "source": "official_public",
         "knowledge_point": {
@@ -140,7 +140,7 @@
       {
         "question_id": "019a0501-0000-7000-8000-000000000006",
         "year": 2025,
-        "subject": "初级会计实务",
+        "subject": "实务",
         "number": 52,
         "source": "recalled",
         "knowledge_point": {
