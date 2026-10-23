@@ -1,1 +1,147 @@
-{}
+{
+  "title": "成长档案",
+  "description": "每一份努力，都留下真实的进步。",
+  "sample": "示例数据",
+  "profile": {
+    "joined": "{{date}} 加入",
+    "identity": "个人学员",
+    "guest": "游客体验",
+    "member": {
+      "free": "免费版",
+      "pass": "考期通行证",
+      "subscription": "时长订阅"
+    },
+    "membership": "会员与权益",
+    "export": "导出档案"
+  },
+  "stats": {
+    "goals": "备考目标",
+    "effective_weeks": "有效学习周",
+    "graduated_mistakes": "错题已毕业",
+    "mastered_points": "知识点已达标"
+  },
+  "shortcuts": {
+    "title": "常用入口",
+    "page": {
+      "S08": "复盘与报告",
+      "S11": "我的资料",
+      "S31": "会员与权益",
+      "S32": "数据与隐私",
+      "S33": "设置",
+      "S35": "消息与帮助"
+    },
+    "status": {
+      "ready": "可查看",
+      "connected": "已接入",
+      "private": "仅自己可见",
+      "unread": "{{n}} 条未读"
+    }
+  },
+  "goals": {
+    "title": "我的备考目标",
+    "add": "新增目标",
+    "hint": "新增目标时，重新走一遍入门。",
+    "target": "目标日 {{date}}",
+    "completion": "完成度 {{value}}",
+    "status": {
+      "active": "进行中",
+      "paused": "已暂停",
+      "archived": "已归档"
+    },
+    "pause": "暂停",
+    "resume": "恢复",
+    "archive": "归档",
+    "manage": "管理目标"
+  },
+  "milestones": {
+    "title": "里程碑",
+    "hint": "只认真实进步，不设经验值、等级与连续打卡。",
+    "kind": {
+      "mistakes": "{{n}} 道错题已毕业",
+      "mastery": "{{n}} 个知识点已达标",
+      "phase": "完成一个学习阶段",
+      "mock": "模考达到目标线",
+      "weeks": "完成 {{n}} 个有效学习周"
+    },
+    "none": "新的真实进步，会在这里留下记录。"
+  },
+  "abilities": {
+    "title": "能力画像",
+    "hint": "跨考试的知识与技能分布；覆盖情况来自学习证据。",
+    "label": "知识与技能覆盖",
+    "none": "完成学习与练习后，逐步形成能力画像。"
+  },
+  "comparison": {
+    "title": "跨次备考对比",
+    "previous": "上次",
+    "current": "本次",
+    "caption": "历次备考的原始记录对比",
+    "attempts": "已记录 {{n}} 次备考",
+    "count_label": "已记录备考次数"
+  },
+  "packages": {
+    "title": "我的学习包",
+    "manage": "管理学习包",
+    "hint": "我创建与分享的内容",
+    "status": {
+      "private": "仅自己可见",
+      "reviewing": "审核中",
+      "published": "已发布",
+      "withdrawn": "已下架"
+    },
+    "imports": "被导入 {{n}} 次",
+    "updated": "更新于 {{date}}",
+    "update": "更新",
+    "withdraw": "下架",
+    "none": "还没有创建学习包，可从我的资料开始整理。",
+    "materials": "去我的资料"
+  },
+  "history": {
+    "title": "历次备考",
+    "status": {
+      "passed": "已达目标",
+      "completed": "已完成"
+    },
+    "completed": "{{date}} 归档",
+    "duration": "有效学习 {{duration}}",
+    "score": "{{name}}：{{score}}",
+    "report": "查看报告",
+    "none": "完成一次备考后，这里会留下档案。"
+  },
+  "state": {
+    "empty": {
+      "title": "还没有备考记录",
+      "body": "完成一次备考后，这里会留下档案",
+      "action": "去今日"
+    },
+    "offline": {
+      "title": "当前未联网",
+      "body": "可查看档案；导出需要联网",
+      "action": "重新连接",
+      "cached": "现在没有联网，下面是上次取到的档案"
+    },
+    "restricted": {
+      "title": "成长档案无档位限制",
+      "body": "受限：不适用。成长档案可照常查看，下面展示你的备考记录。"
+    },
+    "insufficient": {
+      "title": "跨次对比的数据还不够",
+      "body": "只有一次备考时不显示跨次对比",
+      "count": "已记录 {{n}} 次备考；再完成一次备考后，可查看跨次对比。"
+    },
+    "access_denied": {
+      "title": "成长档案暂时看不了",
+      "body": "当前账号暂时无法读取档案，请重试或到消息与帮助反馈问题。"
+    }
+  },
+  "soon": {
+    "export": "档案导出即将上线：将提供通用格式。",
+    "pause": "暂停目标即将上线。",
+    "resume": "恢复目标即将上线。",
+    "archive": "归档目标即将上线：学习记录会保留在成长档案。",
+    "packages": "管理学习包即将上线。",
+    "update": "更新学习包即将上线：分享内容更新后会重新审核。",
+    "withdraw": "下架学习包即将上线。",
+    "report": "反馈问题即将上线；连续失败会自动上报。"
+  }
+}

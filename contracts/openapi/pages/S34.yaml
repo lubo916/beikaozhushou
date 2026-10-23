@@ -1,0 +1,120 @@
+# S34 成长档案：业务计数、能力分布与对比是否可用由接口返回；前端仅展示。
+# 暂借已登记的本人账号读取动作；目标、学习包、导出写权限待后端任务登记，本轮按钮提示即将上线。
+paths:
+  /account/growth:
+    get:
+      operationId: getGrowthProfile
+      x-owner: account
+      x-action: account.context.read
+      summary: 我的成长档案、备考目标、真实进步里程碑、能力画像与学习包
+      responses:
+        "200":
+          description: 当前学员的成长档案（本轮为示例数据）
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S34GrowthProfile"}
+        "403": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S34GrowthProfile:
+      type: object
+      required: [user, member, joined_on, stats, shortcuts, goals, milestones, abilities, comparison, packages, history, data_source]
+      properties:
+        restriction_not_applicable: {type: boolean, description: 本页受限不适用，仅开发态提示}
+        user: {$ref: "#/components/schemas/MeUser"}
+        member: {type: string, enum: [free, pass, subscription]}
+        joined_on: {$ref: "#/components/schemas/LearningDay"}
+        stats: {$ref: "#/components/schemas/S34Stats"}
+        shortcuts: {type: array, items: {$ref: "#/components/schemas/S34Shortcut"}}
+        goals: {type: array, items: {$ref: "#/components/schemas/S34Goal"}}
+        milestones: {type: array, items: {$ref: "#/components/schemas/S34Milestone"}}
+        abilities: {type: array, items: {$ref: "#/components/schemas/S34Ability"}}
+        comparison: {$ref: "#/components/schemas/S34Comparison"}
+        packages: {type: array, items: {$ref: "#/components/schemas/S34Package"}}
+        history: {type: array, items: {$ref: "#/components/schemas/S34History"}}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+    S34Stats:
+      type: object
+      required: [goals, effective_weeks, graduated_mistakes, mastered_points]
+      properties:
+        goals: {type: integer, minimum: 0}
+        effective_weeks: {type: integer, minimum: 0}
+        graduated_mistakes: {type: integer, minimum: 0}
+        mastered_points: {type: integer, minimum: 0}
+    S34Shortcut:
+      type: object
+      required: [page, status, count]
+      properties:
+        page: {type: string, enum: [S08, S11, S31, S32, S33, S35]}
+        status: {type: string, enum: [ready, connected, private, unread]}
+        count: {type: integer, minimum: 0}
+    S34Goal:
+      type: object
+      required: [id, name, target_date, status, completion]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        target_date: {$ref: "#/components/schemas/LearningDay"}
+        status: {type: string, enum: [active, paused, archived]}
+        completion: {type: number, minimum: 0, maximum: 1}
+    S34Milestone:
+      type: object
+      description: 只记录真实进步；没有经验值、等级或连续打卡
+      required: [id, kind, value, achieved_on]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        kind: {type: string, enum: [mistakes, mastery, phase, mock, weeks]}
+        value: {type: integer, minimum: 0}
+        achieved_on: {$ref: "#/components/schemas/LearningDay"}
+        detail: {type: string}
+    S34Ability:
+      type: object
+      description: 接口返回的跨考试知识与技能分布，页面不计算能力评分
+      required: [id, name, scope, coverage]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        scope: {type: string}
+        coverage: {type: number, minimum: 0, maximum: 1}
+    S34Comparison:
+      type: object
+      required: [available, attempts, items]
+      properties:
+        available: {type: boolean, description: 只有一次备考时返回 false，不显示跨次对比}
+        attempts: {type: integer, minimum: 0}
+        items: {type: array, items: {$ref: "#/components/schemas/S34ComparisonItem"}}
+    S34ComparisonItem:
+      type: object
+      required: [name, previous, current]
+      properties:
+        name: {type: string}
+        previous: {type: integer, minimum: 0}
+        current: {type: integer, minimum: 0}
+    S34Package:
+      type: object
+      required: [id, name, status, imports, updated_on]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        status: {type: string, enum: [private, reviewing, published, withdrawn]}
+        imports: {type: integer, minimum: 0}
+        updated_on: {$ref: "#/components/schemas/LearningDay"}
+    S34History:
+      type: object
+      required: [id, name, completed_on, status, minutes, scores]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        completed_on: {$ref: "#/components/schemas/LearningDay"}
+        status: {type: string, enum: [passed, completed]}
+        minutes: {type: integer, minimum: 0}
+        scores:
+          type: array
+          items: {$ref: "#/components/schemas/S34Score"}
+    S34Score:
+      type: object
+      required: [name, value, total]
+      properties:
+        name: {type: string}
+        value: {type: number, minimum: 0}
+        total: {type: number, minimum: 0}
