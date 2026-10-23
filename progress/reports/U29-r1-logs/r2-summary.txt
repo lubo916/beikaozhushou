@@ -1,0 +1,6 @@
+gen exit=0 16s
+typecheck exit=0 27s
+eslint exit=0 6s
+prettier exit=0 4s
+vitest exit=0 16s
+e2e exit=1 107s

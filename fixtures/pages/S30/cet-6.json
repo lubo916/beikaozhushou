@@ -1,0 +1,24 @@
+{
+  "group_size": 6,
+  "rooms": [
+    {
+      "id": "01900000-0030-7000-8000-000000000005",
+      "name": "六级安静自习室",
+      "kind": "quiet",
+      "participants": 18,
+      "capacity": 30
+    },
+    {
+      "id": "01900000-0030-7000-8000-000000000006",
+      "name": "六级冲刺自习室",
+      "kind": "sprint",
+      "participants": 8,
+      "capacity": 20
+    }
+  ],
+  "focus": {
+    "minutes": 25,
+    "today_minutes": 50,
+    "task_id": "019a0306-0000-7000-8000-000000000002"
+  }
+}

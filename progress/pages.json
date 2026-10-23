@@ -139,8 +139,8 @@
         0
       ],
       "extension": false,
-      "status": "shell",
-      "updated": "v0012"
+      "status": "ui",
+      "updated": "v0032"
     },
     {
       "id": "S08",
@@ -534,8 +534,8 @@
         3
       ],
       "extension": false,
-      "status": "shell",
-      "updated": "v0012"
+      "status": "ui",
+      "updated": "v0033"
     },
     {
       "id": "S30",
@@ -551,8 +551,8 @@
         6
       ],
       "extension": false,
-      "status": "shell",
-      "updated": "v0012"
+      "status": "ui",
+      "updated": "v0033"
     },
     {
       "id": "S31",

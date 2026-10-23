@@ -1,0 +1,49 @@
+Scope: all 31 workspace projects
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+Done in 1.8s using pnpm v11.0.0
+
+ RUN  v4.0.0 /home/claude/work/repo
+
+ ❯  browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx (14 tests | 1 failed | 13 skipped) 3720ms
+     ↓ junior-accounting：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点
+     ↓ teacher-qualification：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点
+     ↓ cet-6：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点
+     ↓ ds-final-custom：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点
+     ↓ 地址带关键词、类型和速查表时，接口只回该类型的结果并选中那张表
+     ↓ 搜不到的关键词进入“没找到”；最近访问视图不带关键词，进入空态
+     ↓ 判断函数：有缓存时被拒绝显示受限、服务出错显示出错，都不再带旧数据；断网仍保留缓存并标明离线
+     ↓ 页面：已显示结果后接口拒绝访问，个人结果全部收起，显示账号受限的说明与出路（不是拍照额度）
+     ↓ 页面：拍照额度受限（本页假数据的受限示例，不是接口拒绝）只停拍照，文本搜索和结果照常可用
+     ↓ 断网时保留已缓存的结果并标明离线；拍照搜题要联网，按钮不可用
+     ↓ 接口按请求里的考试返回；不认识的考试回 404
+     × 切到六级后，新结果还没回来时不显示初级会计的结果；回来后显示六级自己的结果 3718ms
+     ↓ 导师答过的结果与 AI 速查表用公共 AI 内容组件包起来，复制出去的文字开头带“【AI 生成】”（回归：只有标签、复制不带标识）
+     ↓ 拍照搜题先选用途才能继续；取消后重新打开要重新选；继续只提示即将上线，不假装上传
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx > S29 同页切换考试不串数据（回归：查询键不含考试，切换后仍显示上一考试的结果） > 切到六级后，新结果还没回来时不显示初级会计的结果；回来后显示六级自己的结果
+AssertionError: 目标已换成六级，不能再显示初级会计的结果: expected [ '交易性金融资产的后续计量', …(5) ] to not include '交易性金融资产的后续计量'
+
+Failure screenshot:
+  - apps/learner/src/pages/S29/__screenshots__/S29.regression.test.tsx/S29----------------------------------------------------------------------------1.png
+
+ ❯ apps/learner/src/pages/S29/S29.regression.test.tsx:383:61
+    381|       await settle(() => h.client.getQueryData<MeContext>(getGetMeCont…
+    382|       await settle(() => !resultTitles(host).includes(before));
+    383|       expect(resultTitles(host), "目标已换成六级，不能再显示初级会计的结果").not.toContain…
+       |                                                             ^
+    384|       h.mode.hold = false;
+    385|       await act(async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 13 skipped (14)
+   Start at  22:46:22
+   Duration  8.16s (transform 0ms, setup 0ms, collect 1.93s, tests 3.72s, environment 0ms, prepare 308ms)
+
+JSON report written to /home/claude/work/repo/.test-results/vitest.json

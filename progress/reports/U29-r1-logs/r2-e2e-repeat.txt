@@ -1,0 +1,52 @@
+Scope: all 31 workspace projects
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+Done in 1.3s using pnpm v11.0.0
+
+Running 3 tests using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/pages/S29.spec.ts:52:1 › S29 七态都有原型文案与可行的出口 (15.7s)
+  ✓  2 [chromium] › tests/e2e/pages/S29.spec.ts:52:1 › S29 七态都有原型文案与可行的出口 (15.3s)
+  ✘  3 [chromium] › tests/e2e/pages/S29.spec.ts:52:1 › S29 七态都有原型文案与可行的出口 (11.8s)
+
+
+  1) [chromium] › tests/e2e/pages/S29.spec.ts:52:1 › S29 七态都有原型文案与可行的出口 ────────────────────────────
+
+    Error: 不应有浏览器报错：未捕获的异常：Failed to update a ServiceWorker for scope ('http://127.0.0.1:5173/') with script ('http://127.0.0.1:5173/mockServiceWorker.js'): Not found
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "未捕获的异常：Failed to update a ServiceWorker for scope ('http://127.0.0.1:5173/') with script ('http://127.0.0.1:5173/mockServiceWorker.js'): Not found",
+    + ]
+
+       at support/checks.ts:329
+
+      327 |   const problems = watch.problems(state);
+      328 |   const detail = problems.length === 0 ? "" : `：${problems.join("；")}`;
+    > 329 |   expect(problems, `${where}不应有浏览器报错${detail}`).toEqual([]);
+          |                                                 ^
+      330 | }
+      331 |
+      332 | /** “能打开”：外壳正文区在；页名出现在页标题（h1）或顶栏、沉浸栏里；不是“没有这个页面”；学员端的页面模式与登记一致。 */
+        at expectNoProblems (/home/claude/work/repo/tests/e2e/support/checks.ts:329:49)
+        at /home/claude/work/repo/tests/e2e/pages/S29.spec.ts:77:5
+
+    Error Context: ../logs/r2/e2e3-artifacts/pages-S29-S29-七态都有原型文案与可行的出口-chromium-repeat2/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../logs/r2/e2e3-artifacts/pages-S29-S29-七态都有原型文案与可行的出口-chromium-repeat2/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../logs/r2/e2e3-artifacts/pages-S29-S29-七态都有原型文案与可行的出口-chromium-repeat2/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests/e2e/pages/S29.spec.ts:52:1 › S29 七态都有原型文案与可行的出口 ─────────────────────────────
+  2 passed (46.7s)

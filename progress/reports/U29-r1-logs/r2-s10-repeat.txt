@@ -1,0 +1,14 @@
+Scope: all 31 workspace projects
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+Done in 1.3s using pnpm v11.0.0
+
+Running 4 tests using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/pages/S10.spec.ts:97:1 › S10 七态都能用 ?state= 强制显示，文案按 bk spec (16.3s)
+  ✓  2 [chromium] › tests/e2e/pages/S10.spec.ts:97:1 › S10 七态都能用 ?state= 强制显示，文案按 bk spec (16.4s)
+  ✓  3 [chromium] › tests/e2e/pages/S10.spec.ts:97:1 › S10 七态都能用 ?state= 强制显示，文案按 bk spec (15.8s)
+  ✓  4 [chromium] › tests/e2e/pages/S10.spec.ts:97:1 › S10 七态都能用 ?state= 强制显示，文案按 bk spec (16.9s)
+
+  4 passed (1.2m)
