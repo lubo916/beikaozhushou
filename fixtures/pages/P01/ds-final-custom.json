@@ -1,0 +1,309 @@
+{
+  "normal": {
+    "cockpit": {
+      "data_source": "sample",
+      "exam_name": "自建《数据结构》期末",
+      "generated_at": "2026-10-23T04:00:00Z",
+      "time_zone": "Asia/Shanghai",
+      "period_start": "2026-10-12",
+      "period_end": "2026-10-18",
+      "dictionary_version": "v3",
+      "sample_sufficient": true,
+      "sample_count": 5200,
+      "minimum_sample_size": 200,
+      "open_alert_count": 2,
+      "north_star": {
+        "metric_id": "weekly_effective_learners",
+        "value": 3860,
+        "previous_value": 3410,
+        "change_ratio": 0.132,
+        "target_status": "pending"
+      },
+      "first_week_rate": {
+        "metric_id": "first_week_effective_rate",
+        "numerator": 610,
+        "denominator": 1300,
+        "ratio": 0.47
+      },
+      "funnel": [
+        {
+          "step_id": "visit",
+          "count": 5200,
+          "ratio": 1.0
+        },
+        {
+          "step_id": "goal_created",
+          "count": 3640,
+          "ratio": 0.7
+        },
+        {
+          "step_id": "diagnosis_done",
+          "count": 2080,
+          "ratio": 0.4
+        },
+        {
+          "step_id": "plan_generated",
+          "count": 1820,
+          "ratio": 0.35
+        },
+        {
+          "step_id": "first_week_effective",
+          "count": 1040,
+          "ratio": 0.2
+        },
+        {
+          "step_id": "paid",
+          "count": 260,
+          "ratio": 0.05
+        }
+      ],
+      "retention": {
+        "dimension": "map_source",
+        "day": 30,
+        "groups": [
+          {
+            "group_id": "self_built",
+            "cohort_size": 4600,
+            "sample_sufficient": true,
+            "ratio": 0.5
+          },
+          {
+            "group_id": "self_built_check_failed",
+            "cohort_size": 24,
+            "sample_sufficient": false
+          }
+        ]
+      },
+      "alerts": [
+        {
+          "id": "0195b000-0000-7000-8000-000000004001",
+          "category": "metric",
+          "kind": "error_spike",
+          "subject": "template",
+          "severity": "medium",
+          "raised_at": "2026-10-23T05:00:00Z",
+          "status": "open",
+          "related_page": "P09",
+          "ai_summary": "报错多来自同一个学习包的新版本，题目解析里的图片地址失效；回滚到上一版后可先止损。"
+        },
+        {
+          "id": "0195b000-0000-7000-8000-000000004002",
+          "category": "metric",
+          "kind": "metric_drop",
+          "subject": "first_week_rate",
+          "change_ratio": -0.08,
+          "severity": "low",
+          "raised_at": "2026-10-22T23:40:00Z",
+          "status": "open",
+          "ai_summary": "下降集中在本周新开放的渠道入口，这批用户完成摸底的比例偏低；其他渠道基本持平。"
+        }
+      ]
+    },
+    "retention_by_dimension": {
+      "goal_type": [
+        {
+          "group_id": "first_attempt",
+          "cohort_size": 3900,
+          "sample_sufficient": true,
+          "ratio": 0.52
+        },
+        {
+          "group_id": "retake",
+          "cohort_size": 900,
+          "sample_sufficient": true,
+          "ratio": 0.49
+        },
+        {
+          "group_id": "undecided",
+          "cohort_size": 400,
+          "sample_sufficient": true,
+          "ratio": 0.33
+        }
+      ],
+      "map_source": [
+        {
+          "group_id": "self_built",
+          "cohort_size": 4600,
+          "sample_sufficient": true,
+          "ratio": 0.5
+        },
+        {
+          "group_id": "self_built_check_failed",
+          "cohort_size": 24,
+          "sample_sufficient": false
+        }
+      ],
+      "channel": [
+        {
+          "group_id": "organic_search",
+          "cohort_size": 1200,
+          "sample_sufficient": true,
+          "ratio": 0.44
+        },
+        {
+          "group_id": "app_store",
+          "cohort_size": 900,
+          "sample_sufficient": true,
+          "ratio": 0.41
+        },
+        {
+          "group_id": "org_invite",
+          "cohort_size": 2600,
+          "sample_sufficient": true,
+          "ratio": 0.58
+        },
+        {
+          "group_id": "referral",
+          "cohort_size": 500,
+          "sample_sufficient": true,
+          "ratio": 0.5
+        }
+      ]
+    }
+  },
+  "insufficient": {
+    "cockpit": {
+      "data_source": "sample",
+      "exam_name": "自建《数据结构》期末",
+      "generated_at": "2026-10-23T04:00:00Z",
+      "time_zone": "Asia/Shanghai",
+      "period_start": "2026-10-12",
+      "period_end": "2026-10-18",
+      "dictionary_version": "v3",
+      "sample_sufficient": false,
+      "sample_count": 36,
+      "minimum_sample_size": 200,
+      "open_alert_count": 2,
+      "north_star": {
+        "metric_id": "weekly_effective_learners",
+        "value": 60,
+        "previous_value": 53,
+        "target_status": "pending"
+      },
+      "first_week_rate": {
+        "metric_id": "first_week_effective_rate",
+        "numerator": 10,
+        "denominator": 20
+      },
+      "funnel": [
+        {
+          "step_id": "visit",
+          "count": 81
+        },
+        {
+          "step_id": "goal_created",
+          "count": 57
+        },
+        {
+          "step_id": "diagnosis_done",
+          "count": 32
+        },
+        {
+          "step_id": "plan_generated",
+          "count": 28
+        },
+        {
+          "step_id": "first_week_effective",
+          "count": 16
+        },
+        {
+          "step_id": "paid",
+          "count": 4
+        }
+      ],
+      "retention": {
+        "dimension": "map_source",
+        "day": 30,
+        "groups": [
+          {
+            "group_id": "self_built",
+            "cohort_size": 72,
+            "sample_sufficient": false
+          },
+          {
+            "group_id": "self_built_check_failed",
+            "cohort_size": 0,
+            "sample_sufficient": false
+          }
+        ]
+      },
+      "alerts": [
+        {
+          "id": "0195b000-0000-7000-8000-000000004001",
+          "category": "metric",
+          "kind": "error_spike",
+          "subject": "template",
+          "severity": "medium",
+          "raised_at": "2026-10-23T05:00:00Z",
+          "status": "open",
+          "related_page": "P09",
+          "ai_summary": "报错多来自同一个学习包的新版本，题目解析里的图片地址失效；回滚到上一版后可先止损。"
+        },
+        {
+          "id": "0195b000-0000-7000-8000-000000004002",
+          "category": "metric",
+          "kind": "metric_drop",
+          "subject": "first_week_rate",
+          "change_ratio": -0.08,
+          "severity": "low",
+          "raised_at": "2026-10-22T23:40:00Z",
+          "status": "open",
+          "ai_summary": "下降集中在本周新开放的渠道入口，这批用户完成摸底的比例偏低；其他渠道基本持平。"
+        }
+      ]
+    },
+    "retention_by_dimension": {
+      "goal_type": [
+        {
+          "group_id": "first_attempt",
+          "cohort_size": 61,
+          "sample_sufficient": false
+        },
+        {
+          "group_id": "retake",
+          "cohort_size": 14,
+          "sample_sufficient": false
+        },
+        {
+          "group_id": "undecided",
+          "cohort_size": 6,
+          "sample_sufficient": false
+        }
+      ],
+      "map_source": [
+        {
+          "group_id": "self_built",
+          "cohort_size": 72,
+          "sample_sufficient": false
+        },
+        {
+          "group_id": "self_built_check_failed",
+          "cohort_size": 0,
+          "sample_sufficient": false
+        }
+      ],
+      "channel": [
+        {
+          "group_id": "organic_search",
+          "cohort_size": 19,
+          "sample_sufficient": false
+        },
+        {
+          "group_id": "app_store",
+          "cohort_size": 14,
+          "sample_sufficient": false
+        },
+        {
+          "group_id": "org_invite",
+          "cohort_size": 41,
+          "sample_sufficient": false
+        },
+        {
+          "group_id": "referral",
+          "cohort_size": 8,
+          "sample_sufficient": false
+        }
+      ]
+    }
+  }
+}

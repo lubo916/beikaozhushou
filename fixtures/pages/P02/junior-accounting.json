@@ -1,0 +1,250 @@
+{
+  "dictionary": {
+    "data_source": "sample",
+    "exam_name": "初级会计职称",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "total_count": 12,
+    "glossary_aligned": true,
+    "categories": [
+      {
+        "category": "learning",
+        "count": 6
+      },
+      {
+        "category": "conversion",
+        "count": 2
+      },
+      {
+        "category": "retention",
+        "count": 1
+      },
+      {
+        "category": "quality",
+        "count": 2
+      },
+      {
+        "category": "cost",
+        "count": 1
+      }
+    ],
+    "items": [
+      {
+        "metric_id": "weekly_effective_learners",
+        "name": "周有效学习用户",
+        "category": "learning",
+        "definition": "统计周期内至少完成一次有效学习的去重用户数；有效学习见同名指标，手动勾选只记“看过”，不计入。",
+        "version": "v3",
+        "status": "active",
+        "updated_at": "2026-09-28T02:00:00Z",
+        "versions": [
+          {
+            "version": "v3",
+            "effective_from": "2026-09-28",
+            "change_note": "有效学习改为必须有可核验的证据"
+          },
+          {
+            "version": "v2",
+            "effective_from": "2026-07-06",
+            "change_note": "去掉只停留不作答的会话"
+          }
+        ]
+      },
+      {
+        "metric_id": "effective_learning",
+        "name": "有效学习",
+        "category": "learning",
+        "definition": "一次学习行为产生了可核验的证据才算有效学习：卡片完成回忆、题目完成作答或阅读通过读后即测；只停留不作答不算。",
+        "version": "v2",
+        "status": "active",
+        "updated_at": "2026-09-28T02:00:00Z",
+        "versions": [
+          {
+            "version": "v2",
+            "effective_from": "2026-09-28",
+            "change_note": "读后即测通过才计入"
+          }
+        ]
+      },
+      {
+        "metric_id": "learned_points",
+        "name": "已学知识点",
+        "category": "learning",
+        "definition": "系统判定档达到“已了解”及以上的知识点数；自评不计入。",
+        "version": "v2",
+        "status": "active",
+        "updated_at": "2026-08-17T02:00:00Z",
+        "versions": [
+          {
+            "version": "v2",
+            "effective_from": "2026-08-17",
+            "change_note": "排除自评档"
+          }
+        ],
+        "ai_conflict_note": "学员端统计卡把这个指标写作“学过”，与字典名称“已学”不一致，建议统一为“已学”。"
+      },
+      {
+        "metric_id": "target_reached",
+        "name": "达标知识点",
+        "category": "learning",
+        "definition": "系统判定档不低于目标档的知识点数，与学员端“已达标”同一口径。",
+        "version": "v1",
+        "status": "active",
+        "updated_at": "2026-06-01T02:00:00Z",
+        "versions": [
+          {
+            "version": "v1",
+            "effective_from": "2026-06-01",
+            "change_note": "首次登记"
+          }
+        ]
+      },
+      {
+        "metric_id": "passed_line",
+        "name": "已过线",
+        "category": "learning",
+        "definition": "预测分区间的最可能值不低于合格线；与学员端三个数里的“预测与差额”同一口径。",
+        "version": "v1",
+        "status": "active",
+        "updated_at": "2026-06-01T02:00:00Z",
+        "versions": [
+          {
+            "version": "v1",
+            "effective_from": "2026-06-01",
+            "change_note": "首次登记"
+          }
+        ]
+      },
+      {
+        "metric_id": "completion",
+        "name": "完成度",
+        "category": "learning",
+        "definition": "学习范围内已完成的工作量占总工作量的比例，与学员端三个数里的“完成度”同一口径。",
+        "version": "v1",
+        "status": "active",
+        "updated_at": "2026-06-01T02:00:00Z",
+        "versions": [
+          {
+            "version": "v1",
+            "effective_from": "2026-06-01",
+            "change_note": "首次登记"
+          }
+        ]
+      },
+      {
+        "metric_id": "first_week_effective_rate",
+        "name": "首周有效学习率",
+        "category": "conversion",
+        "definition": "注册后首个自然周内完成有效学习的新用户，占当周新用户的比例。",
+        "version": "v2",
+        "status": "active",
+        "updated_at": "2026-09-28T02:00:00Z",
+        "versions": [
+          {
+            "version": "v2",
+            "effective_from": "2026-09-28",
+            "change_note": "随有效学习口径同步更新"
+          }
+        ]
+      },
+      {
+        "metric_id": "paid_conversion",
+        "name": "付费转化率",
+        "category": "conversion",
+        "definition": "统计周期内首次付费的用户占同期访问用户的比例；退款按退款日回冲。",
+        "version": "v1",
+        "status": "active",
+        "updated_at": "2026-06-01T02:00:00Z",
+        "versions": [
+          {
+            "version": "v1",
+            "effective_from": "2026-06-01",
+            "change_note": "首次登记"
+          }
+        ]
+      },
+      {
+        "metric_id": "retention_day_n",
+        "name": "第 N 日留存",
+        "category": "retention",
+        "definition": "按分群统计注册后第 N 日仍有有效学习的用户占比；N 由指标配置给出，驾驶舱默认看月度留存。",
+        "version": "v2",
+        "status": "active",
+        "updated_at": "2026-09-28T02:00:00Z",
+        "versions": [
+          {
+            "version": "v2",
+            "effective_from": "2026-09-28",
+            "change_note": "留存改按有效学习计算"
+          }
+        ]
+      },
+      {
+        "metric_id": "forecast_interval_coverage",
+        "name": "预测区间覆盖率",
+        "category": "quality",
+        "definition": "回填的真实成绩落在考前预测区间内的用户占比；样本不足时只给原始计数。",
+        "version": "v1",
+        "status": "active",
+        "updated_at": "2026-06-01T02:00:00Z",
+        "versions": [
+          {
+            "version": "v1",
+            "effective_from": "2026-06-01",
+            "change_note": "首次登记"
+          }
+        ]
+      },
+      {
+        "metric_id": "post_read_check_pass_rate",
+        "name": "读后即测通过率",
+        "category": "quality",
+        "definition": "读后即测首次提交即通过的次数占全部提交次数的比例。",
+        "version": "v1",
+        "status": "active",
+        "updated_at": "2026-06-01T02:00:00Z",
+        "versions": [
+          {
+            "version": "v1",
+            "effective_from": "2026-06-01",
+            "change_note": "首次登记"
+          }
+        ]
+      },
+      {
+        "metric_id": "tutor_cost_per_active",
+        "name": "单活跃用户导师成本",
+        "category": "cost",
+        "definition": "统计周期内导师相关 AI 调用成本除以活跃用户数；以分为单位存储，按元显示。",
+        "version": "v2",
+        "status": "draft",
+        "updated_at": "2026-10-26T02:00:00Z",
+        "versions": [
+          {
+            "version": "v2",
+            "effective_from": "2026-10-26",
+            "change_note": "拟把即时出题成本单列（待生效）"
+          },
+          {
+            "version": "v1",
+            "effective_from": "2026-06-01",
+            "change_note": "首次登记"
+          }
+        ]
+      }
+    ],
+    "quality": {
+      "sample_sufficient": true,
+      "event_count": 1080000,
+      "minimum_event_count": 5000,
+      "conflict_count": 1,
+      "missing_event_count": 1,
+      "summary": "昨日埋点完整率正常；“已学知识点”在学员端的叫法与字典不一致，“单活跃用户导师成本”新版本缺少即时出题的上游事件登记，建议先补登记再生效。"
+    }
+  },
+  "insufficient_quality": {
+    "sample_sufficient": false,
+    "event_count": 1260,
+    "minimum_event_count": 5000
+  }
+}
