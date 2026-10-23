@@ -96,6 +96,23 @@ for (const width of [375, 834, 1280]) {
       .getByTestId("week-grid")
       .evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
     expect(weekColumns, "本周安排在手机、平板、桌面分别排成二、四、七列").toBe(width === 375 ? 2 : width === 834 ? 4 : 7);
+    const escapedTags = await page
+      .getByTestId("week-grid")
+      .locator(".ui-tag")
+      .evaluateAll((elements) =>
+        elements
+          .filter((element) => {
+            const day = element.closest(".s07-day");
+            if (day === null) return true;
+            const text = document.createRange();
+            text.selectNodeContents(element);
+            const box = text.getBoundingClientRect();
+            const boundary = day.getBoundingClientRect();
+            return box.left < boundary.left || box.right > boundary.right;
+          })
+          .map((element) => element.textContent),
+      );
+    expect(escapedTags, "日期内标签不能挤到相邻日期").toEqual([]);
     await expectNoOverflow(page);
     expectNoProblems(watch, "normal");
     await watch.open(urlOf(entry, { view: "calendar" }));
@@ -148,6 +165,30 @@ for (const { view, fields } of STACKED_TABLES) {
       expect(labels, `${view} 第 ${index + 1} 行：每个值旁应显示对应中文字段名`).toEqual(expected);
     }
     await expectNoOverflow(page);
+    expectNoProblems(watch, "normal");
+  });
+}
+
+for (const width of [375, 834, 1280]) {
+  test(`S07 ${width} 宽今日视图滚动到底时，最后任务按钮不被导师浮标遮挡`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    const watch = await watchPage(page);
+    await watch.open(urlOf(entry, { view: "today" }));
+    await expectLoaded(page, entry);
+    await page.locator("main#main").evaluate((element) => {
+      element.scrollTop = element.scrollHeight;
+    });
+    const start = page
+      .locator("main#main")
+      .getByRole("button", { name: copy("today.start"), exact: true })
+      .last();
+    await expect(start).toBeVisible();
+    const unobscured = await start.evaluate((element) => {
+      const box = element.getBoundingClientRect();
+      const hit = document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2);
+      return hit !== null && element.contains(hit);
+    });
+    expect(unobscured, "滚动到底后按钮中心应可直接点击").toBe(true);
     expectNoProblems(watch, "normal");
   });
 }

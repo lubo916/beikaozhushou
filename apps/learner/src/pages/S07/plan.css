@@ -1,6 +1,8 @@
 /* 页内样式只引用设计令牌；周表在三档验收宽度分别排两、四、七列。 */
 .s07-page {
   min-width: 0;
+  /* 末行可滚动到公共导师浮标上方，不改变外壳。 */
+  padding-bottom: calc(var(--size-space-12) * 2);
 }
 .s07-timeline {
   display: flex;
@@ -128,4 +130,16 @@
   white-space: normal;
   padding-inline: var(--size-space-1);
   font-size: var(--font-size-small);
+}
+
+.s07-day .ui-tag {
+  max-inline-size: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+@container /* style-exempt: 容器查询条件不能用 CSS 变量，860 对应 size.breakpoint.content-md */ (width >= 860px) {
+  .s07-day,
+  .s07-task {
+    padding: var(--size-space-1);
+  }
 }
