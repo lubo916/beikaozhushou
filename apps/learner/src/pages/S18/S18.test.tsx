@@ -1,6 +1,7 @@
 // S18 做题与解析的测试（U18a，照 S10 样板写，浏览器模式）。
 // ① 假数据：四个演示考试、两个示范题组，正常、空、受限、数据不足四种数据都通过生成的 Zod 校验；提交揭晓、再交回 409、生成题核对、测评态交卷各走一遍。
 // ② 七态判断（data.ts）只看请求结果；重试策略；demo 在 gen 视图换成导师出题的示范题组。③ 整个学员端挂在 /quiz/demo：正常、空态、出错各走一遍。
+// ④ U18b 下半：提示阶梯（服务端记用量、用过提示最高记弱证据、测评态 403）、分层解析、错因确认（可改选、进小结）、讲解与追问与引导我想、导师不可用。
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { S18QuizSession } from "@exam-prep/contract";
 import { ApiError } from "@exam-prep/contract/errors";
@@ -17,7 +18,20 @@ import { collectRoutes, loadRouteModules } from "../../mocks/registry.ts";
 import { emptyResponse } from "../../../../../packages/ui/src/quiz/index.ts";
 import quizCopy from "../../../../../packages/ui/src/quiz/copy.zh-CN.json";
 import { QuestionCard } from "./components/QuestionCard.tsx";
-import { DEMO_GENERATED, nextOpenIndex, sessionIdFor, sessionView, shapeOf, shouldRetry, type SessionQuery } from "./data.ts";
+import {
+  DEMO_GENERATED,
+  ERROR_CAUSES,
+  hintLadder,
+  nextOpenIndex,
+  revealTone,
+  sessionIdFor,
+  sessionView,
+  shapeOf,
+  shouldRetry,
+  sourceOf,
+  wrongPicks,
+  type SessionQuery,
+} from "./data.ts";
 
 type Json = Record<string, unknown>;
 
@@ -395,5 +409,169 @@ describe("S18 页面（整个学员端挂在 /quiz/demo）", () => {
     expect(error?.textContent).toContain("做题与解析没能加载");
     expect([...(error?.querySelectorAll("button") ?? [])].map((button) => button.textContent)).toContain("重试");
     await unmount();
+  });
+});
+
+interface LayerJson {
+  readonly steps: readonly string[];
+  readonly suggested_cause?: string;
+  readonly wrong_step?: number;
+}
+const LAYERS = kj.solution_layers as Readonly<Record<string, LayerJson>>;
+const fillCopy = (text: string, values: Readonly<Record<string, string | number>>): string =>
+  text.replace(/\{\{\s*(\w+)\s*\}\}/g, (whole: string, name: string) => (values[name] === undefined ? whole : String(values[name])));
+
+describe("S18 下半（U18b）：提示阶梯、分层解析、错因确认、讲解与追问", () => {
+  const hintsPath = "/practice/sessions/demo/hints";
+  const causesPath = "/practice/sessions/demo/causes";
+  const explainPath = "/practice/sessions/demo/explanations";
+
+  it("生成的 Zod 结构里有下半的三个接口", () => {
+    for (const name of ["takeQuizHintResponse", "saveQuizErrorCauseResponse", "askQuizTutorResponse"]) {
+      expect(typeof parser(name)?.safeParse, name).toBe("function");
+    }
+  });
+
+  it("提示阶梯：题目不预先带提示原文，一级一级给，用完再要回 422；交的时候说没用过也按记录算，做对最高记弱证据；揭晓后不再给", async () => {
+    const { session, answer, json } = setup();
+    const item = itemsOf(await session("demo"))[3] ?? {};
+    expect((item["question"] as Json)["hints"]).toBeUndefined();
+    const total = (item["hints"] as Json)["total"] as number;
+    expect(total).toBeGreaterThan(1);
+    expect((item["hints"] as Json)["shown"]).toEqual([]);
+    for (let n = 1; n <= total; n += 1) {
+      const next = await json("POST", hintsPath, { item_id: item["id"] }, "takeQuizHintResponse");
+      expect(((next["hints"] as Json)["shown"] as string[]).length).toBe(n);
+    }
+    await json("POST", hintsPath, { item_id: item["id"] }, "", 422);
+    const revealed = await answer("demo", item, [0]);
+    const result = revealed["result"] as Json;
+    expect([result["correct"], result["evidence_strength"], result["evidence_reason"]]).toEqual([true, "weak", "hint_used"]);
+    expect((revealed["answer"] as Json)["hint_level"]).toBe(total);
+    await json("POST", hintsPath, { item_id: item["id"] }, "", 409);
+  });
+
+  it("测评态（?state=restricted）不能看提示：回 403", async () => {
+    const { session, json } = setup("restricted");
+    const item = itemsOf(await session("demo"))[3] ?? {};
+    await json("POST", hintsPath, { item_id: item["id"] }, "", 403);
+  });
+
+  it("答错揭晓带分层解析（分步、资料与视频位置）和导师建议错因；错因无默认，可以选、可以改选；做对的、没揭晓的不收错因", async () => {
+    const { session, answer, json } = setup();
+    const item = itemsOf(await session("demo"))[3] ?? {};
+    const layer = LAYERS[(item["question"] as Json)["id"] as string];
+    const wrong = await answer("demo", item, [1]);
+    const result = wrong["result"] as Json;
+    const layers = result["layers"] as Json;
+    expect(layers["steps"]).toEqual(layer?.steps);
+    expect((layers["sources"] as Json[]).map((source) => source["kind"])).toEqual(["material", "video"]);
+    expect(layers["suggested_cause"]).toBe(layer?.suggested_cause);
+    expect(result["error_cause"]).toBeUndefined();
+    const saved = await json("POST", causesPath, { item_id: item["id"], cause: "method_unknown" }, "saveQuizErrorCauseResponse");
+    expect((saved["result"] as Json)["error_cause"]).toBe("method_unknown");
+    const changed = await json("POST", causesPath, { item_id: item["id"], cause: "concept_unclear" }, "saveQuizErrorCauseResponse");
+    expect((changed["result"] as Json)["error_cause"]).toBe("concept_unclear");
+    await json("POST", causesPath, { item_id: item["id"], cause: "not_a_cause" }, "", 422);
+    const items = itemsOf(await session("demo"));
+    await json("POST", causesPath, { item_id: items[0]?.["id"], cause: "slip" }, "", 422);
+    await json("POST", causesPath, { item_id: items[4]?.["id"], cause: "slip" }, "", 422);
+    const right = items[0]?.["result"] as Json;
+    expect((right["layers"] as Json)["suggested_cause"]).toBeUndefined();
+  });
+
+  it("测评态交卷后选的错因进练习小结的错因分布", async () => {
+    const { session, answer, json } = setup("restricted");
+    const item = itemsOf(await session("demo"))[3] ?? {};
+    await answer("demo", item, [1]);
+    await json("POST", "/practice/sessions/demo/finish", undefined, "finishQuizSessionResponse");
+    await json("POST", causesPath, { item_id: item["id"], cause: "misread" }, "saveQuizErrorCauseResponse");
+    const summary = (await session("demo"))["summary"] as Json;
+    expect(summary["error_causes"]).toContainEqual({ cause: "misread", count: 1 });
+  });
+
+  it("讲解与追问：揭晓前不讲（409）；揭晓后带上作答与草稿来讲，可以接着追问；引导我想先问再指出第几步；回复标示例数据", async () => {
+    const { session, answer, json } = setup();
+    const item = itemsOf(await session("demo"))[3] ?? {};
+    const question = item["question"] as Json;
+    const picked = ((question["options"] as string[]) ?? [])[1] ?? "";
+    await json("POST", explainPath, { item_id: item["id"], mode: "explain", scratch: "" }, "", 409);
+    await answer("demo", item, [1]);
+    const first = await json("POST", explainPath, { item_id: item["id"], mode: "explain", scratch: "206 - 6" }, "askQuizTutorResponse");
+    expect([first["tutor_available"], first["data_source"]]).toEqual([true, "sample"]);
+    expect(first["reply"]).toContain(picked);
+    expect(first["reply"]).toContain("206 - 6");
+    expect((first["follow_ups"] as string[]).length).toBeGreaterThan(0);
+    const asked = "why";
+    const more = await json(
+      "POST",
+      explainPath,
+      { item_id: item["id"], mode: "explain", scratch: "", follow_up: asked, thread_id: first["thread_id"] },
+      "askQuizTutorResponse",
+    );
+    expect(more["thread_id"]).toBe(first["thread_id"]);
+    expect(more["reply"]).toContain(asked);
+    const opening = await json("POST", explainPath, { item_id: item["id"], mode: "guided", scratch: "" }, "askQuizTutorResponse");
+    expect([opening["reply"], opening["wrong_step"]]).toEqual([kj.tutor.guided_open, undefined]);
+    const pointed = await json(
+      "POST",
+      explainPath,
+      { item_id: item["id"], mode: "guided", scratch: "", follow_up: asked, thread_id: opening["thread_id"] },
+      "askQuizTutorResponse",
+    );
+    expect(pointed["wrong_step"]).toBe(LAYERS[question["id"] as string]?.wrong_step);
+    await json("POST", explainPath, { item_id: item["id"], mode: "talk", scratch: "" }, "", 422);
+  });
+
+  it("导师不可用（演示考试 ds）：照常回 200，tutor_available 为 false、回复为空", async () => {
+    const { control, session, answer, json } = setup();
+    control.setExam("ds");
+    const items = itemsOf(await session("demo"));
+    const index = items.findIndex((entry) => entry["status"] === "unanswered" && Array.isArray((entry["question"] as Json)["options"]));
+    const item = items[index] ?? {};
+    await answer("demo", item, [0]);
+    const reply = await json("POST", explainPath, { item_id: item["id"], mode: "explain", scratch: "" }, "askQuizTutorResponse");
+    expect([reply["tutor_available"], reply["reply"]]).toEqual([false, ""]);
+  });
+
+  it("页面的显示判断只看接口给的值：提示按钮、我选错的项、揭晓色调、资料定位、错因七类", async () => {
+    const { session, answer } = setup();
+    const raw = itemsOf(await session("demo"));
+    const data = (await session("demo")) as unknown as S18QuizSession;
+    const open = data.items[3];
+    if (open === undefined) throw new Error("缺少示范题");
+    expect(hintLadder(open)).toEqual({ next: 1, total: open.hints.total, done: false });
+    const wrong = (await answer("demo", raw[3] ?? {}, [1])) as unknown as S18QuizSession["items"][number];
+    expect(wrongPicks(wrong)).toEqual([1]);
+    const result = wrong.result;
+    if (result === undefined) throw new Error("没有揭晓结果");
+    expect(revealTone(result)).toBe("wrong");
+    expect(revealTone({ ...result, correct: true, evidence_strength: "pending" })).toBe("pending");
+    expect(revealTone({ ...result, correct: true, evidence_strength: "strong" })).toBe("correct");
+    expect(revealTone({ ...result, correct: null, evidence_counted: false })).toBe("neutral");
+    expect(sourceOf(result.layers, "material")?.kind).toBe("material");
+    expect(sourceOf({ steps: [], sources: [] }, "video")).toBeUndefined();
+    expect(ERROR_CAUSES).toHaveLength(new Set(ERROR_CAUSES).size);
+  });
+
+  it("页面：点“提示”一级一级给提示，并说明用过提示最高记弱证据", async () => {
+    stubFetch(apiFor());
+    const { host, unmount } = await mountAt("/quiz/demo", <App />);
+    try {
+      await settle(() => heading(host) === kj.sessions.objective.title);
+      const label = fillCopy(copy.question.hint, { n: 1, total: 2 });
+      await settle(() => [...host.querySelectorAll("button")].some((button) => button.textContent?.trim() === label));
+      const hint = [...host.querySelectorAll<HTMLButtonElement>("button")].find((button) => button.textContent?.trim() === label);
+      await click(hint);
+      await settle(() => host.textContent?.includes(copy.question.hint_note) === true);
+      expect(host.textContent).toContain(copy.question.hint_note);
+      expect(
+        [...host.querySelectorAll("button")].some(
+          (button) => button.textContent?.trim() === fillCopy(copy.question.hint, { n: 2, total: 2 }),
+        ),
+      ).toBe(true);
+    } finally {
+      await unmount();
+    }
   });
 });

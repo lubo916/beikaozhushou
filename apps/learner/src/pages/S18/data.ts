@@ -5,14 +5,22 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   getGetQuizSessionQueryKey,
   isApiError,
+  useAskQuizTutor,
   useCheckGeneratedQuestion,
   useFinishQuizSession,
   useGetQuizSession,
+  useSaveQuizErrorCause,
   useSubmitQuizAnswer,
+  useTakeQuizHint,
+  type S18ErrorCause,
+  type S18ItemResult,
   type S18QuizItem,
   type S18QuizSession,
+  type S18SolutionLayers,
+  type S18SourceKind,
+  type S18SourceRef,
 } from "@exam-prep/contract";
-import type { NavStatus, QuizShape } from "../../../../../packages/ui/src/quiz/index.ts";
+import { choosesOptions, type NavStatus, type QuizShape } from "../../../../../packages/ui/src/quiz/index.ts";
 import { invalidateAfter } from "../../api/refresh.ts";
 import { DEMO_PARAM } from "../../routes.ts";
 
@@ -84,13 +92,20 @@ export function useQuizSession(sessionId: string): SessionView & { readonly retr
   return { ...sessionView(query), retry: () => void query.refetch() };
 }
 
-/** 本页的三个写操作：提交一题、生成题核对、测评态交卷；成功后按契约的 x-invalidates 让受影响的查询失效。 */
+/** 本页的写操作：提交一题、生成题核对、测评态交卷，以及提示阶梯、错因确认（U18b）；成功后按契约的 x-invalidates 让受影响的查询失效。 */
 export function useQuizActions() {
   const queryClient = useQueryClient();
   const submit = useSubmitQuizAnswer({ mutation: { onSuccess: () => invalidateAfter(queryClient, "submitQuizAnswer") } });
   const check = useCheckGeneratedQuestion({ mutation: { onSuccess: () => invalidateAfter(queryClient, "checkGeneratedQuestion") } });
   const finish = useFinishQuizSession({ mutation: { onSuccess: () => invalidateAfter(queryClient, "finishQuizSession") } });
-  return { submit, check, finish };
+  const hint = useTakeQuizHint({ mutation: { onSuccess: () => invalidateAfter(queryClient, "takeQuizHint") } });
+  const cause = useSaveQuizErrorCause({ mutation: { onSuccess: () => invalidateAfter(queryClient, "saveQuizErrorCause") } });
+  return { submit, check, finish, hint, cause };
+}
+
+/** 讲解与追问、引导我想（S18-13、S18-17）：只读，不改别的数据，所以不用让查询失效。 */
+export function useQuizTutor() {
+  return useAskQuizTutor();
 }
 
 /** 题号导航的状态：只看接口给的作答状态与判分结果。 */
@@ -122,4 +137,45 @@ export function shapeOf(item: S18QuizItem): QuizShape {
 /** 选择题能不能选多个：多选、不定项。 */
 export function isMultiple(item: S18QuizItem): boolean {
   return item.question.question_type === "multi_choice" || item.question.question_type === "indefinite_choice";
+}
+
+/** 选项字母（揭晓、讲解里说“你选的 B”）。 */
+export const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+/** 错因七类，按术语表 error_cause 的顺序。 */
+export const ERROR_CAUSES: readonly S18ErrorCause[] = [
+  "not_learned",
+  "forgot",
+  "concept_unclear",
+  "method_unknown",
+  "misread",
+  "slip",
+  "time_short",
+];
+
+/** 提示按钮（S18-16）：下一级是第几级、一共几级、是否已用完；只看接口给的提示阶梯。 */
+export function hintLadder(item: S18QuizItem): { readonly next: number; readonly total: number; readonly done: boolean } {
+  const given = item.hints.shown.length;
+  return { next: given + 1, total: item.hints.total, done: given >= item.hints.total };
+}
+
+/** 我选了但不在正确答案里的选项（选择题）：只比对接口给的答案与我交的选项。 */
+export function wrongPicks(item: S18QuizItem): number[] {
+  const answer = item.result?.solution.answer ?? [];
+  if (!choosesOptions(shapeOf(item))) return [];
+  return (item.answer?.response.selected ?? []).filter((index) => !answer.includes(index));
+}
+
+/** 揭晓第一行的色调：做错、待验证（蒙对、秒答）、做对；不计证据或待批改的用中性色。 */
+export type RevealTone = "wrong" | "pending" | "correct" | "neutral";
+
+export function revealTone(result: S18ItemResult): RevealTone {
+  if (result.correct === false) return "wrong";
+  if (result.correct === null || !result.evidence_counted) return "neutral";
+  return result.evidence_strength === "pending" ? "pending" : "correct";
+}
+
+/** 资料定位里第一处资料或视频（S18-06）。 */
+export function sourceOf(layers: S18SolutionLayers, kind: S18SourceKind): S18SourceRef | undefined {
+  return layers.sources.find((source) => source.kind === kind);
 }

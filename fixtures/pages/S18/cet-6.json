@@ -1,5 +1,5 @@
 {
-  "note": "S18 做题与解析的页面演示数据（U18a）：两个示范题组（objective 题库、generated 导师出题）与页面专用的演示题；prefill 是断点续做前已经做过的题；sample_rules 是规则还没实现时假数据层用的示例做法。",
+  "note": "S18 做题与解析的页面演示数据（U18a、U18b）：两个示范题组（objective 题库、generated 导师出题）与页面专用的演示题；prefill 是断点续做前已经做过的题；sample_rules 是规则还没实现时假数据层用的示例做法；solution_layers 按题给分层解析的分步推导、资料定位与导师建议错因（AI 初判，wrong_step 给引导式纠错用）；tutor 是讲解与追问的示例话术。",
   "sample_rules": {
     "fast_answer_ms": 3000,
     "credibility_caps": {
@@ -160,5 +160,163 @@
         "conclusion": "ease congestion 是缓解拥堵的常见搭配。"
       }
     }
-  ]
+  ],
+  "solution_layers": {
+    "019a0318-0000-7000-8000-000000000001": {
+      "steps": [
+        "空格修饰形容词 good，要用副词。",
+        "unexpected 加 -ly 变成副词 unexpectedly。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0310-0000-7000-8000-000000000001",
+          "title": "《大学英语六级词汇》（电子版）",
+          "locator": "Unit 12 动词搭配"
+        },
+        {
+          "kind": "video",
+          "ref_id": "cet-6-video",
+          "title": "讲解：六级高频搭配",
+          "locator": "05:30"
+        }
+      ],
+      "suggested_cause": "slip",
+      "wrong_step": 1
+    },
+    "019a0304-0000-7000-8000-000000000001": {
+      "steps": [
+        "先看搭配：空格后面是 the impact。",
+        "mitigate the impact 意为“减轻影响”。",
+        "militate 常接 against，意思不同。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0310-0000-7000-8000-000000000001",
+          "title": "《大学英语六级词汇》（电子版）",
+          "locator": "Unit 12 动词搭配"
+        },
+        {
+          "kind": "video",
+          "ref_id": "cet-6-video",
+          "title": "讲解：六级高频搭配",
+          "locator": "05:30"
+        }
+      ],
+      "suggested_cause": "forgot",
+      "wrong_step": 2
+    },
+    "019a0318-0000-7000-8000-000000000002": {
+      "steps": [
+        "先抓女士的建议句：路上太堵。",
+        "她建议改坐地铁。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0310-0000-7000-8000-000000000001",
+          "title": "《大学英语六级词汇》（电子版）",
+          "locator": "Unit 12 动词搭配"
+        },
+        {
+          "kind": "video",
+          "ref_id": "cet-6-video",
+          "title": "讲解：六级高频搭配",
+          "locator": "05:30"
+        }
+      ],
+      "suggested_cause": "misread",
+      "wrong_step": 1
+    },
+    "019a0304-0000-7000-8000-000000000002": {
+      "steps": [
+        "开头亮明观点：终身学习很重要。",
+        "中间两段给理由和例子。",
+        "结尾总结并呼应题目。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0310-0000-7000-8000-000000000001",
+          "title": "《大学英语六级词汇》（电子版）",
+          "locator": "Unit 12 动词搭配"
+        },
+        {
+          "kind": "video",
+          "ref_id": "cet-6-video",
+          "title": "讲解：六级高频搭配",
+          "locator": "05:30"
+        }
+      ]
+    },
+    "019a0318-0000-7000-8000-000000000011": {
+      "steps": [
+        "alleviate 意为减轻、缓解。",
+        "四个选项里 relieve 意思最接近。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0310-0000-7000-8000-000000000001",
+          "title": "《大学英语六级词汇》（电子版）",
+          "locator": "Unit 12 动词搭配"
+        },
+        {
+          "kind": "video",
+          "ref_id": "cet-6-video",
+          "title": "讲解：六级高频搭配",
+          "locator": "05:30"
+        }
+      ],
+      "suggested_cause": "forgot",
+      "wrong_step": 1
+    },
+    "019a0318-0000-7000-8000-000000000012": {
+      "steps": [
+        "traffic congestion 是交通拥堵。",
+        "ease congestion 是“缓解拥堵”的常见搭配。"
+      ],
+      "sources": [
+        {
+          "kind": "material",
+          "ref_id": "019a0310-0000-7000-8000-000000000001",
+          "title": "《大学英语六级词汇》（电子版）",
+          "locator": "Unit 12 动词搭配"
+        },
+        {
+          "kind": "video",
+          "ref_id": "cet-6-video",
+          "title": "讲解：六级高频搭配",
+          "locator": "05:30"
+        }
+      ],
+      "suggested_cause": "forgot",
+      "wrong_step": 2
+    }
+  },
+  "tutor": {
+    "note": "讲解与追问的示例话术：导师还没接上时假数据层按这里拼回复，页面上标“AI 生成”。",
+    "confidence_labels": {
+      "sure": "确定",
+      "vague": "模糊",
+      "guess": "蒙的",
+      "off": "已关闭"
+    },
+    "explain_open": "这道题考「{{point}}」。我看了你的作答：{{answer}}，把握度“{{confidence}}”{{scratch}}。",
+    "explain_steps": "按这几步想：{{steps}}",
+    "explain_close": "一句话：{{conclusion}}",
+    "scratch": "，也看了你草稿里写的“{{scratch}}”",
+    "follow_up": "你问“{{question}}”。关键在这一步：{{focus}}",
+    "guided_open": "先不讲答案。说说你为什么这样答？当时第一步是怎么想的？",
+    "guided_wrong": "你的思路从第 {{step}} 步开始偏了。回到这一步再想想：{{focus}}",
+    "guided_right": "思路是对的。再把关键的一步说清楚：{{focus}}",
+    "follow_ups": [
+      "为什么不能那样算？",
+      "换个例子讲讲",
+      "这个点还会怎么考？"
+    ],
+    "available": true,
+    "no_answer": "还没有作答"
+  }
 }

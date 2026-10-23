@@ -1,4 +1,5 @@
-// 题目卡（S18-01 至 S18-05、S18-16、S18-22、S18-28）：题型、知识点、题源；题干与作答；纸笔动作；把握度；本题用时；提交。
+// 题目卡（S18-01 至 S18-05、S18-16、S18-22、S18-28）：题型、知识点、题源；题干与作答；纸笔动作；把握度；提示阶梯；本题用时；提交。
+// 揭晓后（U18b）：纸笔动作、把握度、提示收起，揭晓放进这张卡里、选项下面（原型）；提交条只留“答案不能再改”与下一题。
 // 作答、把握度、纸笔动作、提交条都用全站共用的作答组件（packages/ui/src/quiz/）；测评态的限制只落在这张卡里（受限，F08-Q1）。
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
@@ -18,7 +19,8 @@ import {
   type QuizResponse,
 } from "../../../../../../packages/ui/src/quiz/index.ts";
 import { useToast } from "../../../app/toast.tsx";
-import { isMultiple, shapeOf } from "../data.ts";
+import { hintLadder, isMultiple, shapeOf } from "../data.ts";
+import { HintLadder } from "./HintLadder.tsx";
 
 const MS_PER_SECOND = 1000;
 
@@ -43,6 +45,11 @@ export interface QuestionCardProps {
   readonly onSubmit: () => void;
   /** 揭晓后的下一步按钮（下一题、看小结）。 */
   readonly after: ReactNode;
+  /** 要下一级提示（提示阶梯，S18-16）；不给就只显示、不能点。 */
+  readonly onHint?: (() => void) | undefined;
+  readonly hinting?: boolean | undefined;
+  /** 揭晓（放在题目卡里、选项下面）。 */
+  readonly reveal?: ReactNode;
 }
 
 export function QuestionCard(props: QuestionCardProps) {
@@ -53,7 +60,7 @@ export function QuestionCard(props: QuestionCardProps) {
   const revealed = item.status === "revealed";
   const locked = revealed || session.finished;
   const generated = item.check !== "not_needed";
-  const hints = item.question.hints?.length ?? 0;
+  const ladder = hintLadder(item);
   const used = revealed && item.answer !== undefined ? Math.round(item.answer.duration_ms / MS_PER_SECOND) : props.seconds;
   // feat:S18-03 固定流程：作答 → 选把握度 → 提交 → 揭晓，揭晓后锁定
   const blocker = submitBlocker(shape, props.response, props.confidence, session.confidence_enabled);
@@ -115,19 +122,27 @@ export function QuestionCard(props: QuestionCardProps) {
           onRecord={() => toast(t("soon.record"))}
           label={t("question.answer_label")}
         />
-        {/* feat:S18-05 纸笔动作：草稿、标记、划掉选项、计算器 */}
-        <PaperTools
-          draft={props.scratch}
-          onDraft={props.onScratch}
-          strikeMode={props.strikeMode}
-          onStrikeMode={props.onStrikeMode}
-          canStrike={choosesOptions(shape)}
-          flagged={props.flagged}
-          onFlag={props.onFlag}
-          locked={locked}
-        />
-        {/* feat:S18-04 把握度：必选、无默认，可关闭 */}
-        <ConfidencePicker value={props.confidence} onChange={props.onConfidence} locked={locked} off={!session.confidence_enabled} />
+        {revealed ? (
+          props.reveal
+        ) : (
+          <>
+            {/* feat:S18-05 纸笔动作：草稿、标记、划掉选项、计算器 */}
+            <PaperTools
+              draft={props.scratch}
+              onDraft={props.onScratch}
+              strikeMode={props.strikeMode}
+              onStrikeMode={props.onStrikeMode}
+              canStrike={choosesOptions(shape)}
+              flagged={props.flagged}
+              onFlag={props.onFlag}
+              locked={locked}
+            />
+            {/* feat:S18-04 把握度：必选、无默认，可关闭 */}
+            <ConfidencePicker value={props.confidence} onChange={props.onConfidence} locked={locked} off={!session.confidence_enabled} />
+            {/* feat:S18-16 提示阶梯：用过的几级按顺序留着（U18b-Q3＝A） */}
+            <HintLadder item={item} />
+          </>
+        )}
         <p className="text-small text-ink-tertiary tabular-nums">
           {t("question.timing", { used: formatSeconds(used), suggested: formatSeconds(item.suggested_seconds) })}
         </p>
@@ -135,11 +150,11 @@ export function QuestionCard(props: QuestionCardProps) {
         <SubmitBar blocker={blocker} onSubmit={props.onSubmit} busy={props.busy} locked={locked}>
           {locked
             ? props.after
-            : hints > 0 &&
+            : ladder.total > 0 &&
               !session.restrictions.hints_locked && (
-                // feat:S18-16 提示阶梯（下半 U18b 接上）
-                <Button size="sm" onClick={() => toast(t("soon.hint"))}>
-                  {t("question.hint", { used: 0, total: hints })}
+                // feat:S18-16 提示阶梯：提交前只给分级提示、不给答案；用过提示最高记弱证据（测评态不能看提示）
+                <Button size="sm" busy={props.hinting === true} disabled={ladder.done || props.onHint === undefined} onClick={props.onHint}>
+                  {ladder.done ? t("question.hint_done") : t("question.hint", { n: ladder.next, total: ladder.total })}
                 </Button>
               )}
         </SubmitBar>
