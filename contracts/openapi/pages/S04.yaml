@@ -1,0 +1,457 @@
+# S04 摸底诊断的接口（U04，api-rules 第 2、3 节；规则卡 docs/baseline/rule-cards/diagnosis-start.md 第一至四、九节）。
+# 一次取齐开始页与测评页要显示的东西：三种方式（能不能用、默认选中、推荐、约几题几分钟）、题源、补充诊断、没做完的会话（断点续做）、
+# 当前这一题（不含答案与提示）、分模块进度、交卷后的分模块估计与诊断错题。写操作七个：开始、交一题、暂停、接着做、改用快速定位、
+# 交按章自评、把勾选的诊断错题加入错题本。测评中不显示对错（R5）；作答只追加（INV-24）。数字都由服务端算好，页面只显示（红线 5）。
+# 公共形状引用 schemas/（题目 Question、作答 AnswerResponse、数据来源 DataSource）；本页私有的形状用 S04 作前缀。
+# 把握度多一档“不会”（只用于摸底，F01-Q1＝B），所以用本页的 S04Confidence，不改公共的 Confidence（交接单 U04 风险与提醒）。
+# 权限动作暂挂在已有的 content.question.read（读）与 practice.answer.submit（写）下（同 U18a-Q2＝A）；要不要单列由整合任务定。
+# 文案里的规则数字（题不足几道、每章几题、主观题至少想几秒、核对题最多几道）由接口给：参数 learner.diagnosis.* 还没登记（规则卡“参数”一节）。
+paths:
+  /practice/diagnosis:
+    get:
+      operationId: getDiagnosis
+      x-owner: practice
+      x-action: content.question.read
+      summary: 摸底诊断：三种方式、题源、补充诊断、没做完的会话（当前题、分模块进度）与交卷后的结果
+      parameters:
+        - name: view
+          in: query
+          required: false
+          # 照 S06 写明不展开（explode: false）：Orval 7.11.0 的 fetch 客户端会把“展开”的单值查询参数丢掉（证据见交接单 U06a-r2）。
+          explode: false
+          description: 只在开发与测试时生效的强制视图（页面地址里的 ?view=，ui-rules 第 5 节）；为 test 且还没有会话时，假数据层给一个演示用的进行中会话。正式环境由数据决定视图，忽略这个参数
+          schema: {$ref: "#/components/schemas/S04View"}
+      responses:
+        "200":
+          description: 摸底诊断一页的数据
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S04Diagnosis"}
+        "403": {$ref: "#/components/responses/Error"}
+  /practice/diagnosis/sessions:
+    post:
+      operationId: startDiagnosis
+      x-owner: practice
+      x-action: practice.answer.submit
+      x-errors: [COMMON_VALIDATION]
+      x-invalidates: [getDiagnosis]
+      summary: 按选好的方式开始摸底（自适应、快速定位、章节抽测、补充诊断）；方式不可用回 COMMON_VALIDATION；同一幂等键重复请求返回第一次的结果
+      parameters:
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/S04StartInput"}
+      responses:
+        "200":
+          description: 开始后的整页数据（视图换成测评中）
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S04Diagnosis"}
+        "422": {$ref: "#/components/responses/Error"}
+  /practice/diagnosis/sessions/{sessionId}/answers:
+    post:
+      operationId: submitDiagnosisAnswer
+      x-owner: practice
+      x-action: practice.answer.submit
+      x-errors: [PRAC_CONFIDENCE_REQUIRED, COMMON_VALIDATION]
+      x-invalidates: [getDiagnosis, getMasteryGrid]
+      summary: 交一题（作答、把握度四档、用时、主观题自评勾选）；测评态不揭晓、不回对错，直接给下一题；选“不会”可以不作答（R6）
+      parameters:
+        - {name: sessionId, in: path, required: true, schema: {type: string}}
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/S04AnswerInput"}
+      responses:
+        "200":
+          description: 交完这一题后的整页数据（下一题或交卷后的结果）
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S04Diagnosis"}
+        "404": {$ref: "#/components/responses/Error"}
+        "422": {$ref: "#/components/responses/Error"}
+  /practice/diagnosis/sessions/{sessionId}/pause:
+    post:
+      operationId: pauseDiagnosis
+      x-owner: practice
+      x-action: practice.answer.submit
+      x-invalidates: [getDiagnosis]
+      summary: 暂停并退出：已答的题保留、不过期，回来接着做（R8）
+      parameters:
+        - {name: sessionId, in: path, required: true, schema: {type: string}}
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      responses:
+        "200":
+          description: 暂停后的整页数据（视图换回开始页，提示接着做）
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S04Diagnosis"}
+        "404": {$ref: "#/components/responses/Error"}
+  /practice/diagnosis/sessions/{sessionId}/resume:
+    post:
+      operationId: resumeDiagnosis
+      x-owner: practice
+      x-action: practice.answer.submit
+      x-invalidates: [getDiagnosis]
+      summary: 接着做暂停的摸底：不重做已答的题（R8）
+      parameters:
+        - {name: sessionId, in: path, required: true, schema: {type: string}}
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      responses:
+        "200":
+          description: 接着做的整页数据（视图换成测评中）
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S04Diagnosis"}
+        "404": {$ref: "#/components/responses/Error"}
+  /practice/diagnosis/sessions/{sessionId}/switch-quick:
+    post:
+      operationId: switchDiagnosisToQuick
+      x-owner: practice
+      x-action: practice.answer.submit
+      x-errors: [COMMON_VALIDATION]
+      x-invalidates: [getDiagnosis]
+      summary: 测评中改用快速定位：已答的题保留并照常计入，没测到的章改成按章自评（R9）
+      parameters:
+        - {name: sessionId, in: path, required: true, schema: {type: string}}
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      responses:
+        "200":
+          description: 改用快速定位后的整页数据（会话进入按章自评）
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S04Diagnosis"}
+        "404": {$ref: "#/components/responses/Error"}
+        "422": {$ref: "#/components/responses/Error"}
+  /practice/diagnosis/sessions/{sessionId}/ratings:
+    post:
+      operationId: submitDiagnosisRatings
+      x-owner: practice
+      x-action: practice.answer.submit
+      x-errors: [COMMON_VALIDATION]
+      x-invalidates: [getDiagnosis]
+      summary: 快速定位交按章自评（没学过、学过但不熟、基本会、很熟练）；之后出少量核对题，没有可用题就直接结束（R10）
+      parameters:
+        - {name: sessionId, in: path, required: true, schema: {type: string}}
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/S04RatingsInput"}
+      responses:
+        "200":
+          description: 交了自评后的整页数据（核对题或交卷后的结果）
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S04Diagnosis"}
+        "404": {$ref: "#/components/responses/Error"}
+        "422": {$ref: "#/components/responses/Error"}
+  /practice/diagnosis/sessions/{sessionId}/mistakes:
+    post:
+      operationId: addDiagnosisMistakes
+      x-owner: practice
+      x-action: practice.answer.submit
+      x-errors: [COMMON_VALIDATION]
+      x-invalidates: [getDiagnosis, listMistakes]
+      summary: 把勾选的诊断错题加入错题本（摸底错题不自动进错题本，R12、S04-13）
+      parameters:
+        - {name: sessionId, in: path, required: true, schema: {type: string}}
+        - {$ref: "#/components/parameters/IdempotencyKey"}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/S04MistakesInput"}
+      responses:
+        "200":
+          description: 加入后的整页数据（这些题标“已加入错题本”）
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S04Diagnosis"}
+        "404": {$ref: "#/components/responses/Error"}
+        "422": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S04View:
+      type: string
+      description: 视图：start 开始页（引导页）；test 测评中（沉浸页）
+      enum: [start, test]
+    S04Mode:
+      type: string
+      description: 摸底方式：adaptive 自适应诊断；quick 快速定位（按章自评为主，少量核对题）；chapter 章节抽测；refresh 补充诊断（长时间中断后，S04-14）
+      enum: [adaptive, quick, chapter, refresh]
+    S04Diagnosis:
+      type: object
+      description: 摸底诊断一页要显示的全部数据
+      required: [view, modes, pool, pool_sufficient, min_pool_items, retake, prior_modules, no_basis_modules, assessment_restricted, data_source]
+      properties:
+        view: {$ref: "#/components/schemas/S04View"}
+        modes:
+          type: array
+          description: 三种方式卡（按显示顺序）；能不能用、默认选中、推荐由服务端按题源定（R2、R3）
+          minItems: 1
+          items: {$ref: "#/components/schemas/S04ModeOption"}
+        pool: {$ref: "#/components/schemas/S04Pool"}
+        pool_sufficient:
+          type: boolean
+          description: 一、二级题合计够不够（不少于 min_pool_items）；不够时只能快速定位，页面显示空态（R3）
+        min_pool_items:
+          type: integer
+          minimum: 1
+          description: 题源门槛（参数 learner.diagnosis.min_pool_items 的当前值），文案“题不足 N 道”用
+        retake:
+          type: boolean
+          description: 以前做过摸底，这次是再次诊断：只更新这次测到的知识点，结果低于现有证据时不降级（S04-12、R17）
+        refresh: {$ref: "#/components/schemas/S04RefreshOffer"}
+        prior_modules:
+          type: integer
+          minimum: 0
+          description: 有几个模块还没有可测的题、要先用同类考生的数据代替（数据不足提示，R15 ④、R39）
+        no_basis_modules:
+          type: integer
+          minimum: 0
+          description: 有几个模块既没有可测的题、也没有同类考生的数据（无依据，R15 ⑤；自建考试常见）
+        assessment_restricted:
+          type: boolean
+          description: 测评限制（受限态）：有没做完的会话时为 true——测评中不出现导师、提示与推送（R5、R39）
+        session: {$ref: "#/components/schemas/S04Session"}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+    S04ModeOption:
+      type: object
+      description: 一张方式卡
+      required: [mode, available, recommended, selected, minutes]
+      properties:
+        mode: {$ref: "#/components/schemas/S04Mode"}
+        available: {type: boolean}
+        unavailable_reason: {$ref: "#/components/schemas/S04UnavailableReason"}
+        recommended:
+          type: boolean
+          description: 标“推荐”（自适应不能用时的章节抽测，R3）
+        selected:
+          type: boolean
+          description: 默认选中（R3）
+        items:
+          type: integer
+          minimum: 1
+          description: 约几题（自适应取题量上下限的中间值；快速定位为核对题最多几道，R4）
+        minutes:
+          type: integer
+          minimum: 1
+          description: 约几分钟（按题目平均建议用时折算，R4）
+        chapter_items: {$ref: "#/components/schemas/S04ItemRange"}
+        source: {$ref: "#/components/schemas/S04PoolSource"}
+    S04UnavailableReason:
+      type: string
+      description: 方式不可用的原因：custom_map 地图是自建的，没有审定题池；few_reviewed 带难度标定的审定题不够；pool_too_small 一、二级题合计不够
+      enum: [custom_map, few_reviewed, pool_too_small]
+    S04PoolSource:
+      type: string
+      description: 题来自哪类题：reviewed 审定题；own 你的自有题；mixed 两类都有
+      enum: [reviewed, own, mixed]
+    S04ItemRange:
+      type: object
+      description: 章节抽测每章几题（参数 learner.diagnosis.chapter_items）
+      required: [min, max]
+      properties:
+        min: {type: integer, minimum: 1}
+        max: {type: integer, minimum: 1}
+    S04Pool:
+      type: object
+      description: 可用于摸底的题（只算一级审定题与二级自有题，R1）
+      required: [reviewed, own]
+      properties:
+        reviewed: {type: integer, minimum: 0}
+        own: {type: integer, minimum: 0}
+    S04RefreshOffer:
+      type: object
+      description: 补充诊断（S04-14、R18）：断连时间长了才给；只从已掌握及以上的点里抽
+      required: [items, minutes]
+      properties:
+        items: {type: integer, minimum: 1}
+        minutes: {type: integer, minimum: 1}
+    S04Stage:
+      type: string
+      description: 会话进行到哪：rating 按章自评（快速定位）；questions 答题；finished 已交卷
+      enum: [rating, questions, finished]
+    S04FinishReason:
+      type: string
+      description: 结束原因：precise_enough 精度已够；max_items 到题量上限或题出完；switched_quick 中途改用快速定位；quick_finished 快速定位做完；learner_ended 学员主动结束
+      enum: [precise_enough, max_items, switched_quick, quick_finished, learner_ended]
+    S04Session:
+      type: object
+      description: 一次摸底（进行中、暂停或刚交卷）；断点续做时已答的题保留（S04-07）
+      required: [id, mode, stage, paused, answered, estimate_total, remaining_minutes, modules, mistakes]
+      properties:
+        id: {type: string}
+        mode: {$ref: "#/components/schemas/S04Mode"}
+        stage: {$ref: "#/components/schemas/S04Stage"}
+        paused:
+          type: boolean
+          description: 暂停了（回到开始页，提示接着做）
+        answered: {type: integer, minimum: 0}
+        estimate_total:
+          type: integer
+          minimum: 0
+          description: 约几题：已答题数加预计还要答的题数（R4）
+        remaining_minutes:
+          type: integer
+          minimum: 0
+          description: 预计剩余几分钟
+        current: {$ref: "#/components/schemas/S04Item"}
+        rating: {$ref: "#/components/schemas/S04RatingTask"}
+        modules:
+          type: array
+          description: 分模块进度（交卷后带能力估计，S04-08）
+          items: {$ref: "#/components/schemas/S04ModuleProgress"}
+        finish_reason: {$ref: "#/components/schemas/S04FinishReason"}
+        mistakes:
+          type: array
+          description: 诊断错题（交卷后才有：做错与选“不会”的题；不自动进错题本，R12）
+          items: {$ref: "#/components/schemas/S04MistakeItem"}
+    S04Item:
+      type: object
+      description: 当前这一题（不含答案、解析与提示，R5）
+      required: [id, index, question, module_name, suggested_seconds]
+      properties:
+        id: {type: string}
+        index:
+          type: integer
+          minimum: 0
+          description: 第几题（从 0 数）
+        question: {$ref: "#/components/schemas/Question"}
+        module_name: {type: string}
+        material:
+          type: string
+          description: 材料组合题的材料原文
+        parts:
+          type: array
+          description: 各部分的名称（填空的空、分步的步、排序的位置）
+          items: {type: string}
+        suggested_seconds: {type: integer, minimum: 1}
+        scoring_points:
+          type: array
+          description: 主观题对照得分点（S04-11）
+          items: {type: string}
+        self_check_after_seconds:
+          type: integer
+          minimum: 0
+          description: 主观题：先作答，或至少想这么多秒，才出现得分点清单（参数 learner.diagnosis.subjective_min_seconds）
+    S04RatingTask:
+      type: object
+      description: 按章自评（快速定位，R10）
+      required: [modules, check_items, minutes]
+      properties:
+        modules:
+          type: array
+          minItems: 1
+          items: {$ref: "#/components/schemas/S04RatingModule"}
+        check_items:
+          type: integer
+          minimum: 0
+          description: 自评之后最多再做几道核对题（参数 learner.diagnosis.quick_check_items）
+        minutes: {type: integer, minimum: 1}
+    S04RatingModule:
+      type: object
+      required: [module_id, name]
+      properties:
+        module_id: {type: string}
+        name: {type: string}
+    S04SelfRating:
+      type: string
+      description: 按章自评四档：没学过、学过但不熟、基本会、很熟练（R10）
+      enum: [not_learned, unfamiliar, basic, proficient]
+    S04ModuleStatus:
+      type: string
+      description: 模块状态：estimated 已估计；in_progress 进行中；not_started 未开始；prior 用同类数据代替；no_basis 无依据
+      enum: [estimated, in_progress, not_started, prior, no_basis]
+    S04ModuleProgress:
+      type: object
+      required: [module_id, name, status, progress]
+      properties:
+        module_id: {type: string}
+        name: {type: string}
+        status: {$ref: "#/components/schemas/S04ModuleStatus"}
+        progress:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: 进度条的填充比例（服务端算）
+        estimate: {$ref: "#/components/schemas/S04Estimate"}
+    S04Estimate:
+      type: object
+      description: 能力估计换成掌握档的范围（估计 ± 不确定度，0–5 档）；交卷后才给（S04-08）
+      required: [low, high]
+      properties:
+        low: {type: integer, minimum: 0, maximum: 5}
+        high: {type: integer, minimum: 0, maximum: 5}
+    S04MistakeOutcome:
+      type: string
+      description: wrong 做错；unknown 选了“不会”
+      enum: [wrong, unknown]
+    S04MistakeItem:
+      type: object
+      description: 一道诊断错题（交卷后才显示正确答案，R12）
+      required: [item_id, index, stem, module_name, outcome, added]
+      properties:
+        item_id: {type: string}
+        index: {type: integer, minimum: 0}
+        stem: {type: string}
+        module_name: {type: string}
+        outcome: {$ref: "#/components/schemas/S04MistakeOutcome"}
+        answer_text:
+          type: string
+          description: 正确答案（选择题写选项字母与内容）
+        added:
+          type: boolean
+          description: 已加入错题本
+    S04Confidence:
+      type: string
+      description: 摸底的把握度四档：sure 确定、vague 模糊、guess 蒙的、unknown 不会（“不会”只用于摸底，F01-Q1＝B）
+      enum: [sure, vague, guess, unknown]
+    S04StartInput:
+      type: object
+      required: [mode]
+      properties:
+        mode: {$ref: "#/components/schemas/S04Mode"}
+    S04AnswerInput:
+      type: object
+      description: 交一题（作答只追加）；选“不会”时 response 可以为空
+      required: [item_id, question_id, question_version, response, confidence, duration_ms]
+      properties:
+        item_id: {type: string}
+        question_id: {$ref: "#/components/schemas/Id"}
+        question_version: {type: integer, minimum: 1}
+        response: {$ref: "#/components/schemas/AnswerResponse"}
+        confidence: {$ref: "#/components/schemas/S04Confidence"}
+        duration_ms: {type: integer, minimum: 0}
+        self_check:
+          type: array
+          description: 主观题对照得分点勾上的项（序号；只进起点估计，不写证据，R11）
+          items: {type: integer, minimum: 0}
+    S04Rating:
+      type: object
+      required: [module_id, rating]
+      properties:
+        module_id: {type: string}
+        rating: {$ref: "#/components/schemas/S04SelfRating"}
+    S04RatingsInput:
+      type: object
+      required: [ratings]
+      properties:
+        ratings:
+          type: array
+          minItems: 1
+          items: {$ref: "#/components/schemas/S04Rating"}
+    S04MistakesInput:
+      type: object
+      required: [item_ids]
+      properties:
+        item_ids:
+          type: array
+          minItems: 1
+          items: {type: string}

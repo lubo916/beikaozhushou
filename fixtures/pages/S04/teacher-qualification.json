@@ -1,0 +1,165 @@
+{
+  "exam_id": "teacher-qualification",
+  "pool": {
+    "reviewed": 320,
+    "own": 45
+  },
+  "empty_pool": {
+    "reviewed": 0,
+    "own": 12
+  },
+  "pool_sufficient": true,
+  "modes": [
+    {
+      "mode": "adaptive",
+      "available": true,
+      "recommended": false,
+      "selected": true,
+      "items": 24,
+      "minutes": 14,
+      "source": "mixed"
+    },
+    {
+      "mode": "quick",
+      "available": true,
+      "recommended": false,
+      "selected": false,
+      "items": 5,
+      "minutes": 5
+    },
+    {
+      "mode": "chapter",
+      "available": true,
+      "recommended": false,
+      "selected": false,
+      "items": 20,
+      "minutes": 10,
+      "chapter_items": {
+        "min": 2,
+        "max": 3
+      },
+      "source": "mixed"
+    }
+  ],
+  "retake": true,
+  "refresh": {
+    "items": 10,
+    "minutes": 8
+  },
+  "group_data": true,
+  "insufficient_modules": 2,
+  "min_pool_items": 20,
+  "check_items": 5,
+  "subjective_min_seconds": 60,
+  "prior_estimate": {
+    "low": 1,
+    "high": 3
+  },
+  "demo": {
+    "mode": "adaptive",
+    "answers": [
+      {
+        "selected": [
+          1
+        ],
+        "confidence": "sure"
+      },
+      {
+        "selected": [
+          0
+        ],
+        "confidence": "vague"
+      }
+    ]
+  },
+  "bank": [
+    {
+      "module_id": "019a0202-0000-7000-8000-000000000001",
+      "suggested_seconds": 40,
+      "question": {
+        "id": "019a0244-0000-7000-8000-000000000001",
+        "version": 1,
+        "question_type": "single_choice",
+        "response_form": "choice",
+        "credibility": "reviewed",
+        "knowledge_point_ids": [
+          "019a0203-0000-7000-8000-000000000001"
+        ],
+        "stem": "“教学相长”这一思想最早出自（　）。",
+        "options": [
+          "《论语》",
+          "《学记》",
+          "《孟子》",
+          "《大学》"
+        ],
+        "answer": [
+          1
+        ]
+      }
+    },
+    {
+      "module_id": "019a0202-0000-7000-8000-000000000002",
+      "suggested_seconds": 40,
+      "question": {
+        "id": "019a0244-0000-7000-8000-000000000002",
+        "version": 1,
+        "question_type": "single_choice",
+        "response_form": "choice",
+        "credibility": "reviewed",
+        "knowledge_point_ids": [
+          "019a0203-0000-7000-8000-000000000002"
+        ],
+        "stem": "以学科知识为中心编制的课程属于（　）。",
+        "options": [
+          "活动课程",
+          "学科课程",
+          "综合课程",
+          "隐性课程"
+        ],
+        "answer": [
+          1
+        ]
+      }
+    },
+    {
+      "module_id": "019a0202-0000-7000-8000-000000000004",
+      "suggested_seconds": 45,
+      "question_id": "019a0204-0000-7000-8000-000000000001"
+    },
+    {
+      "module_id": "019a0202-0000-7000-8000-000000000004",
+      "suggested_seconds": 240,
+      "question_id": "019a0204-0000-7000-8000-000000000002",
+      "scoring_points": [
+        "了解和利用学生的需要，激发求知欲",
+        "设置合适的学习目标，及时反馈",
+        "引导学生正确归因",
+        "创设问题情境，实施启发式教学"
+      ]
+    },
+    {
+      "module_id": "019a0202-0000-7000-8000-000000000007",
+      "suggested_seconds": 40,
+      "question": {
+        "id": "019a0244-0000-7000-8000-000000000003",
+        "version": 1,
+        "question_type": "single_choice",
+        "response_form": "choice",
+        "credibility": "reviewed",
+        "knowledge_point_ids": [
+          "019a0203-0000-7000-8000-00000000000b"
+        ],
+        "stem": "班主任通过表扬先进、树立榜样来教育学生，运用的德育方法主要是（　）。",
+        "options": [
+          "说服教育法",
+          "榜样示范法",
+          "陶冶教育法",
+          "品德评价法"
+        ],
+        "answer": [
+          1
+        ]
+      }
+    }
+  ]
+}

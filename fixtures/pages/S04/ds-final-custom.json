@@ -1,0 +1,158 @@
+{
+  "exam_id": "ds-final-custom",
+  "pool": {
+    "reviewed": 0,
+    "own": 86
+  },
+  "empty_pool": {
+    "reviewed": 0,
+    "own": 12
+  },
+  "pool_sufficient": true,
+  "modes": [
+    {
+      "mode": "adaptive",
+      "available": false,
+      "recommended": false,
+      "selected": false,
+      "minutes": 15,
+      "unavailable_reason": "custom_map"
+    },
+    {
+      "mode": "quick",
+      "available": true,
+      "recommended": false,
+      "selected": false,
+      "items": 5,
+      "minutes": 5
+    },
+    {
+      "mode": "chapter",
+      "available": true,
+      "recommended": true,
+      "selected": true,
+      "items": 18,
+      "minutes": 12,
+      "chapter_items": {
+        "min": 2,
+        "max": 3
+      },
+      "source": "own"
+    }
+  ],
+  "retake": false,
+  "group_data": false,
+  "insufficient_modules": 4,
+  "min_pool_items": 20,
+  "check_items": 5,
+  "subjective_min_seconds": 60,
+  "prior_estimate": {
+    "low": 1,
+    "high": 3
+  },
+  "demo": {
+    "mode": "chapter",
+    "answers": [
+      {
+        "selected": [],
+        "confidence": "unknown"
+      },
+      {
+        "selected": [
+          2
+        ],
+        "confidence": "vague"
+      }
+    ]
+  },
+  "bank": [
+    {
+      "module_id": "019a0402-0000-7000-8000-000000000001",
+      "suggested_seconds": 45,
+      "question": {
+        "id": "019a0444-0000-7000-8000-000000000001",
+        "version": 1,
+        "question_type": "choice",
+        "response_form": "choice",
+        "credibility": "own",
+        "knowledge_point_ids": [
+          "019a0403-0000-7000-8000-000000000001"
+        ],
+        "stem": "下面程序段的时间复杂度是（　）。\nfor (i = 1; i < n; i = i * 2) x++;",
+        "options": [
+          "O(1)",
+          "O(log n)",
+          "O(n)",
+          "O(n log n)"
+        ],
+        "answer": [
+          1
+        ]
+      }
+    },
+    {
+      "module_id": "019a0402-0000-7000-8000-000000000002",
+      "suggested_seconds": 45,
+      "question": {
+        "id": "019a0444-0000-7000-8000-000000000002",
+        "version": 1,
+        "question_type": "choice",
+        "response_form": "choice",
+        "credibility": "own",
+        "knowledge_point_ids": [
+          "019a0403-0000-7000-8000-000000000002"
+        ],
+        "stem": "在长度为 n 的顺序表中删除一个元素，平均需要移动的元素个数是（　）。",
+        "options": [
+          "n",
+          "n/2",
+          "(n−1)/2",
+          "(n+1)/2"
+        ],
+        "answer": [
+          2
+        ]
+      }
+    },
+    {
+      "module_id": "019a0402-0000-7000-8000-000000000004",
+      "suggested_seconds": 60,
+      "question_id": "019a0404-0000-7000-8000-000000000001"
+    },
+    {
+      "module_id": "019a0402-0000-7000-8000-000000000004",
+      "suggested_seconds": 300,
+      "question_id": "019a0404-0000-7000-8000-000000000002",
+      "scoring_points": [
+        "用栈保存沿左子树走过的结点",
+        "左子树走到底后出栈并访问该结点",
+        "转向出栈结点的右子树继续",
+        "说明栈的作用：记住回溯的位置，代替递归调用"
+      ]
+    },
+    {
+      "module_id": "019a0402-0000-7000-8000-000000000006",
+      "suggested_seconds": 45,
+      "question": {
+        "id": "019a0444-0000-7000-8000-000000000003",
+        "version": 1,
+        "question_type": "choice",
+        "response_form": "choice",
+        "credibility": "own",
+        "knowledge_point_ids": [
+          "019a0403-0000-7000-8000-00000000000a"
+        ],
+        "stem": "对长度为 n 的有序表进行折半查找，最坏情况下需要比较的次数是（　）。",
+        "options": [
+          "n",
+          "n/2",
+          "⌊log₂n⌋ + 1",
+          "n²"
+        ],
+        "answer": [
+          2
+        ]
+      }
+    }
+  ]
+}

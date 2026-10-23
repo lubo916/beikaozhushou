@@ -1,0 +1,159 @@
+{
+  "exam_id": "junior-accounting",
+  "pool": {
+    "reviewed": 1260,
+    "own": 0
+  },
+  "empty_pool": {
+    "reviewed": 0,
+    "own": 12
+  },
+  "pool_sufficient": true,
+  "modes": [
+    {
+      "mode": "adaptive",
+      "available": true,
+      "recommended": false,
+      "selected": true,
+      "items": 26,
+      "minutes": 15,
+      "source": "reviewed"
+    },
+    {
+      "mode": "quick",
+      "available": true,
+      "recommended": false,
+      "selected": false,
+      "items": 5,
+      "minutes": 5
+    },
+    {
+      "mode": "chapter",
+      "available": true,
+      "recommended": false,
+      "selected": false,
+      "items": 20,
+      "minutes": 10,
+      "chapter_items": {
+        "min": 2,
+        "max": 3
+      },
+      "source": "reviewed"
+    }
+  ],
+  "retake": false,
+  "group_data": true,
+  "insufficient_modules": 3,
+  "min_pool_items": 20,
+  "check_items": 5,
+  "subjective_min_seconds": 60,
+  "prior_estimate": {
+    "low": 1,
+    "high": 3
+  },
+  "demo": {
+    "mode": "adaptive",
+    "answers": [
+      {
+        "selected": [
+          0
+        ],
+        "confidence": "sure"
+      },
+      {
+        "selected": [],
+        "confidence": "unknown"
+      }
+    ]
+  },
+  "bank": [
+    {
+      "module_id": "019a0102-0000-7000-8000-000000000001",
+      "suggested_seconds": 45,
+      "question": {
+        "id": "019a0144-0000-7000-8000-000000000001",
+        "version": 1,
+        "question_type": "single_choice",
+        "response_form": "choice",
+        "credibility": "reviewed",
+        "knowledge_point_ids": [
+          "019a0103-0000-7000-8000-000000000001"
+        ],
+        "stem": "下列各项中，属于会计基本职能的是（　）。",
+        "options": [
+          "预测经济前景与参与决策",
+          "进行会计核算与实施会计监督",
+          "评价企业经营业绩",
+          "编制财务预算"
+        ],
+        "answer": [
+          1
+        ]
+      }
+    },
+    {
+      "module_id": "019a0102-0000-7000-8000-000000000002",
+      "suggested_seconds": 45,
+      "question": {
+        "id": "019a0144-0000-7000-8000-000000000002",
+        "version": 1,
+        "question_type": "single_choice",
+        "response_form": "choice",
+        "credibility": "reviewed",
+        "knowledge_point_ids": [
+          "019a0103-0000-7000-8000-000000000003"
+        ],
+        "stem": "下列会计要素中，反映企业财务状况的是（　）。",
+        "options": [
+          "收入",
+          "费用",
+          "利润",
+          "资产"
+        ],
+        "answer": [
+          3
+        ]
+      }
+    },
+    {
+      "module_id": "019a0102-0000-7000-8000-000000000003",
+      "suggested_seconds": 90,
+      "question_id": "019a0104-0000-7000-8000-000000000001"
+    },
+    {
+      "module_id": "019a0102-0000-7000-8000-000000000003",
+      "suggested_seconds": 180,
+      "question_id": "019a0104-0000-7000-8000-000000000002",
+      "scoring_points": [
+        "购入时按公允价值 200 万元计入交易性金融资产（成本）",
+        "交易费用 1 万元计入投资收益",
+        "已宣告未发放的现金股利 6 万元计入应收股利",
+        "月末公允价值上升：借记交易性金融资产（公允价值变动），贷记公允价值变动损益"
+      ]
+    },
+    {
+      "module_id": "019a0102-0000-7000-8000-000000000004",
+      "suggested_seconds": 45,
+      "question": {
+        "id": "019a0144-0000-7000-8000-000000000003",
+        "version": 1,
+        "question_type": "single_choice",
+        "response_form": "choice",
+        "credibility": "reviewed",
+        "knowledge_point_ids": [
+          "019a0103-0000-7000-8000-000000000007"
+        ],
+        "stem": "企业按月计提短期借款利息时，应贷记的会计科目是（　）。",
+        "options": [
+          "短期借款",
+          "应付利息",
+          "财务费用",
+          "其他应付款"
+        ],
+        "answer": [
+          1
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,162 @@
+{
+  "exam_id": "cet-6",
+  "pool": {
+    "reviewed": 860,
+    "own": 0
+  },
+  "empty_pool": {
+    "reviewed": 0,
+    "own": 12
+  },
+  "pool_sufficient": true,
+  "modes": [
+    {
+      "mode": "adaptive",
+      "available": true,
+      "recommended": false,
+      "selected": true,
+      "items": 26,
+      "minutes": 15,
+      "source": "reviewed"
+    },
+    {
+      "mode": "quick",
+      "available": true,
+      "recommended": false,
+      "selected": false,
+      "items": 5,
+      "minutes": 5
+    },
+    {
+      "mode": "chapter",
+      "available": true,
+      "recommended": false,
+      "selected": false,
+      "items": 15,
+      "minutes": 10,
+      "chapter_items": {
+        "min": 2,
+        "max": 3
+      },
+      "source": "reviewed"
+    }
+  ],
+  "retake": false,
+  "group_data": true,
+  "insufficient_modules": 2,
+  "min_pool_items": 20,
+  "check_items": 5,
+  "subjective_min_seconds": 60,
+  "prior_estimate": {
+    "low": 1,
+    "high": 3
+  },
+  "demo": {
+    "mode": "adaptive",
+    "answers": [
+      {
+        "selected": [
+          0
+        ],
+        "confidence": "sure"
+      },
+      {
+        "selected": [
+          2
+        ],
+        "confidence": "guess"
+      }
+    ]
+  },
+  "bank": [
+    {
+      "module_id": "019a0302-0000-7000-8000-000000000001",
+      "suggested_seconds": 30,
+      "question": {
+        "id": "019a0344-0000-7000-8000-000000000001",
+        "version": 1,
+        "question_type": "single_choice",
+        "response_form": "choice",
+        "credibility": "reviewed",
+        "knowledge_point_ids": [
+          "019a0303-0000-7000-8000-000000000001"
+        ],
+        "stem": "She was ______ to learn that her application had been accepted.",
+        "options": [
+          "delighted",
+          "delightful",
+          "delighting",
+          "delight"
+        ],
+        "answer": [
+          0
+        ]
+      }
+    },
+    {
+      "module_id": "019a0302-0000-7000-8000-000000000002",
+      "suggested_seconds": 40,
+      "question": {
+        "id": "019a0344-0000-7000-8000-000000000002",
+        "version": 1,
+        "question_type": "listening",
+        "response_form": "listening",
+        "credibility": "reviewed",
+        "knowledge_point_ids": [
+          "019a0303-0000-7000-8000-000000000005"
+        ],
+        "stem": "（听力）What does the woman suggest the man do?",
+        "options": [
+          "Take a short break.",
+          "Ask the professor for help.",
+          "Review the lecture notes.",
+          "Join a study group."
+        ],
+        "answer": [
+          3
+        ]
+      }
+    },
+    {
+      "module_id": "019a0302-0000-7000-8000-000000000001",
+      "suggested_seconds": 30,
+      "question_id": "019a0304-0000-7000-8000-000000000001"
+    },
+    {
+      "module_id": "019a0302-0000-7000-8000-000000000003",
+      "suggested_seconds": 90,
+      "material": "Many cities have introduced congestion charges to cut traffic in their centres. Supporters say the charges speed up buses and clean the air. Critics argue that the charges hit low-income drivers hardest, because they often cannot choose when to travel.",
+      "question": {
+        "id": "019a0344-0000-7000-8000-000000000003",
+        "version": 1,
+        "question_type": "reading",
+        "response_form": "material",
+        "credibility": "reviewed",
+        "knowledge_point_ids": [
+          "019a0303-0000-7000-8000-000000000007"
+        ],
+        "stem": "What is the critics’ main concern about congestion charges?",
+        "options": [
+          "They are too complicated.",
+          "They are unfair to low-income drivers.",
+          "They raise little money.",
+          "They make the air worse."
+        ],
+        "answer": [
+          1
+        ]
+      }
+    },
+    {
+      "module_id": "019a0302-0000-7000-8000-000000000004",
+      "suggested_seconds": 300,
+      "question_id": "019a0304-0000-7000-8000-000000000002",
+      "scoring_points": [
+        "切题：围绕“终身学习的重要性”展开",
+        "结构：开头点题，中间论证，结尾总结",
+        "语言：句式多样，用词准确",
+        "篇幅：达到题目要求的字数"
+      ]
+    }
+  ]
+}
