@@ -124,7 +124,7 @@ export function TimeSetup({ data, onDaily }: Props) {
                           aria-describedby={`slot-${slot.id}`}
                           title={description}
                           onClick={() => edit(day, slot)}
-                          className={`h-8 min-w-0 truncate rounded-sm border px-1 text-small focus-visible:outline-2 focus-visible:outline-brand-primary ${tones[draft.kind] ?? tones["unavailable"]}`}
+                          className={`h-8 min-w-[0] truncate rounded-sm border px-1 text-small focus-visible:outline-2 focus-visible:outline-brand-primary ${tones[draft.kind] ?? tones["unavailable"]}`}
                         >
                           {t(`scenario.${draft.kind}`)}
                           <span id={`slot-${slot.id}`} className="sr-only">
