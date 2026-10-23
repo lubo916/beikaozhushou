@@ -1,6 +1,6 @@
 // S30 回归测试（U29 续写）：每一条都先在修复前跑过并确认失败，修好后通过，永久保留（AGENTS.md「测试与修 bug」）。
 // 覆盖：番茄钟绑定今日清单里真实的任务、按考试分开缓存、接口拒绝优先于旧缓存、离线只留番茄钟、举报须明确选原因。
-import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act } from "react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -15,7 +15,7 @@ import { MockDb } from "../../mocks/db.ts";
 import { loadDemoFixtures } from "../../mocks/fixtures.ts";
 import { collectRoutes, loadRouteModules } from "../../mocks/registry.ts";
 import { pathTo } from "../../routes.ts";
-import { roomView } from "./data.ts";
+import { roomView, useStudyRoom } from "./data.ts";
 
 interface PageFixture {
   readonly group_size: number;
@@ -281,6 +281,59 @@ describe("S30 内容治理须明确操作（回归：举报原因默认已选，
       await settle(() => text(document.body).includes(copy.soon.block));
       expect(text(document.body)).toContain(copy.soon.block);
       expect(text(host), "屏蔽未接后端，房间仍照常显示，不假装已屏蔽").toContain(room);
+    } finally {
+      await unmount();
+    }
+  });
+});
+
+describe("S30 只跟随外壳已取到的当前目标，不另发请求（回归：页面挂载时自己再取一次当前目标，受限态多出 403 与重试）", () => {
+  it("页面挂载不请求 /me/context；外壳的当前目标一变，本页请求随之带上新的考试", async () => {
+    const { api } = setupApi();
+    const requests: URL[] = [];
+    vi.stubGlobal("fetch", async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+      const url = new URL(typeof input === "string" ? input : input instanceof URL ? input.href : input.url, "http://localhost");
+      requests.push(url);
+      const outcome = await api.handle({
+        method: init?.method ?? "GET",
+        url: url.href,
+        headers: new Headers(init?.headers),
+        body: undefined,
+      });
+      if (outcome.kind !== "json") throw new TypeError("network");
+      return json(outcome.status, outcome.body);
+    });
+    // 和学员端一样用默认设置（数据立即过期、挂载即重取），只关掉重试；当前目标是外壳已取到放进缓存的那份。
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    client.setQueryData(getGetMeContextQueryKey(), DEMO_CONTEXT);
+    let seen: { readonly data: unknown } | undefined;
+    function Probe() {
+      seen = useStudyRoom();
+      return null;
+    }
+    const { unmount } = await mount(
+      <QueryClientProvider client={client}>
+        <Probe />
+      </QueryClientProvider>,
+    );
+    try {
+      const own = () => requests.filter((url) => url.pathname.endsWith(ROOM_PATH));
+      const contexts = () => requests.filter((url) => url.pathname.endsWith("/me/context"));
+      await settle(() => seen?.data !== undefined);
+      expect(own()[0]?.searchParams.get("exam_id")).toBe(DEMO_CONTEXT.goal?.exam_id);
+      expect(contexts(), "页面不另发当前目标请求").toEqual([]);
+      const goal = DEMO_CONTEXT.goal;
+      if (goal === undefined || goal === null) throw new Error("演示上下文缺当前目标");
+      const next = examOf("en").examId;
+      act(() => {
+        client.setQueryData<MeContext>(getGetMeContextQueryKey(), { ...DEMO_CONTEXT, goal: { ...goal, exam_id: next } });
+      });
+      await settle(() => own().some((url) => url.searchParams.get("exam_id") === next));
+      expect(
+        own().some((url) => url.searchParams.get("exam_id") === next),
+        "外壳换了目标，本页跟着换",
+      ).toBe(true);
+      expect(contexts(), "跟随时也不另发当前目标请求").toEqual([]);
     } finally {
       await unmount();
     }
