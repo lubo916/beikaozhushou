@@ -8,21 +8,28 @@ const STATUS_TONE: Readonly<Record<P02MetricEntry["status"], TagTone>> = { activ
 // feat:P02-01 指标字典：每个指标的口径与版本（含版本记录）；口径冲突由 AI 标出并带 AI 标识。
 export function DictionaryTable({ data }: { data: P02MetricDictionary }) {
   const { t } = useTranslation("P02");
+  const header = (key: string) => t(`dictionary.columns.${key}`);
   const columns: readonly TableColumn<P02MetricEntry>[] = [
     {
       key: "name",
-      header: t("dictionary.columns.name"),
+      header: header("name"),
+      label: header("name"),
       render: (row) => (
         <div className="flex flex-col gap-1">
           <strong>{row.name}</strong>
           <span className="text-small text-ink-tertiary">{row.metric_id}</span>
+          <span>
+            <Tag size="sm" tone="outline">
+              {t(`categories.${row.category}`)}
+            </Tag>
+          </span>
         </div>
       ),
     },
-    { key: "category", header: t("dictionary.columns.category"), render: (row) => t(`categories.${row.category}`) },
     {
       key: "definition",
-      header: t("dictionary.columns.definition"),
+      header: header("definition"),
+      label: header("definition"),
       render: (row) => (
         <div className="flex flex-col gap-2">
           <span>{row.definition}</span>
@@ -32,7 +39,8 @@ export function DictionaryTable({ data }: { data: P02MetricDictionary }) {
     },
     {
       key: "version",
-      header: t("dictionary.columns.version"),
+      header: header("version"),
+      label: header("version"),
       render: (row) => (
         <details>
           <summary>{row.version}</summary>
@@ -42,20 +50,21 @@ export function DictionaryTable({ data }: { data: P02MetricDictionary }) {
                 {t("dictionary.versions", { version: entry.version, date: formatDate(entry.effective_from), note: entry.change_note })}
               </li>
             ))}
+            <li className="text-ink-tertiary">{t("dictionary.updated", { time: formatDateTime(row.updated_at, data.time_zone) })}</li>
           </ol>
         </details>
       ),
     },
     {
       key: "status",
-      header: t("dictionary.columns.status"),
+      header: header("status"),
+      label: header("status"),
       render: (row) => (
         <Tag size="sm" tone={STATUS_TONE[row.status]}>
           {t(`status.${row.status}`)}
         </Tag>
       ),
     },
-    { key: "updated", header: t("dictionary.columns.updated"), render: (row) => formatDateTime(row.updated_at, data.time_zone) },
   ];
   return (
     <Card title={t("dictionary.title")}>

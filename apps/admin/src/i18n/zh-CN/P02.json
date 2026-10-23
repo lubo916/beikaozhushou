@@ -24,14 +24,13 @@
     "caption": "指标字典：每个指标的口径与版本",
     "columns": {
       "name": "指标",
-      "category": "分类",
       "definition": "口径",
       "version": "版本",
-      "status": "状态",
-      "updated": "更新时间"
+      "status": "状态"
     },
     "versions": "{{version}}，{{date}} 起：{{note}}",
-    "aiNote": "口径冲突提示，仅供参考"
+    "aiNote": "口径冲突提示，仅供参考",
+    "updated": "最近更新：{{time}}"
   },
   "status": {
     "active": "生效",
