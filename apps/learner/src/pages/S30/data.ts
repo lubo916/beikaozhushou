@@ -3,6 +3,7 @@
 // 1. 接口明确拒绝（403）或出错时，以这次的接口结果为准，不再显示之前缓存的房间与专注记录；只有断网才保留缓存并标明离线。
 // 2. 请求带上当前目标考试（exam_id），查询键随之按考试分开：同一页切换考试，不会沿用上一考试的房间。
 import {
+  getGetMeContextQueryKey,
   getGetS30StudyRoomQueryKey,
   isApiError,
   useGetMeContext,
@@ -50,7 +51,9 @@ export function roomView(query: RoomQuery): RoomView {
 
 /** 本页的数据钩子：生成的钩子，加上当前目标考试、重试策略与七态判断。 */
 export function useStudyRoom(): RoomView & { readonly retry: () => void } {
-  const examId = useGetMeContext().data?.goal?.exam_id;
+  // 只跟随外壳已取到的当前目标（enabled: false：收到更新但自己不发请求）。页面挂载时若自己再取，
+  // 默认的“挂载即重取、失败重试三次”会在受限态多出 403，并拖到下一次打开（U29 回归测试锁定）。
+  const examId = useGetMeContext({ query: { queryKey: getGetMeContextQueryKey(), enabled: false } }).data?.goal?.exam_id;
   const request: GetS30StudyRoomParams = examId === undefined ? {} : { exam_id: examId };
   const query = useGetS30StudyRoom(request, { query: { queryKey: getGetS30StudyRoomQueryKey(request), retry: shouldRetry } });
   return { ...roomView(query), retry: () => void query.refetch() };
