@@ -1806,6 +1806,66 @@
       "asked": "v0033",
       "answer": "A",
       "answered": "v0033"
+    },
+    {
+      "id": "U18b-Q1",
+      "task": "U18b",
+      "q": "讲解与追问放在哪（全站“问导师”浮层不在本任务范围）",
+      "options": [
+        "A 做题页里开面板，自动带上题目、所选项、把握度与草稿，底下有“去导师页继续聊”",
+        "B 等整合任务让全站浮层能带上下文再接，这期间提示即将上线"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0037",
+      "answer": "A",
+      "answered": "v0037"
+    },
+    {
+      "id": "U18b-Q2",
+      "task": "U18b",
+      "q": "回原文、看视频这一刻要不要精确跳到那一段",
+      "options": [
+        "A 先跳到阅读器、视听课堂那一页，按钮旁写明章节或时间点；精确定位等那两页定好参数",
+        "B 现在就在网址里自己加定位参数（会碰别的并行任务）"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0037",
+      "answer": "A",
+      "answered": "v0037"
+    },
+    {
+      "id": "U18b-Q3",
+      "task": "U18b",
+      "q": "提示阶梯怎么显示",
+      "options": [
+        "A 用过的几级提示按顺序都留着",
+        "B 和原型一样只显示最新一级"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0037",
+      "answer": "A",
+      "answered": "v0037"
+    },
+    {
+      "id": "U18b-Q4",
+      "task": "U18b",
+      "q": "再来一道变式（P0）这一轮做不做",
+      "options": [
+        "A 这一轮仍提示即将上线，另开小任务做",
+        "B 这一轮一起做（要改一组题的结构）"
+      ],
+      "recommend": "A",
+      "temp": "A",
+      "status": "answered",
+      "asked": "v0037",
+      "answer": "A",
+      "answered": "v0037"
     }
   ]
 }
