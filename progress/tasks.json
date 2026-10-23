@@ -1170,7 +1170,16 @@
       "title": "S34 成长档案（前端，假数据）",
       "goal": "照原型做出 S34 成长档案：所有视图、七态、三档宽度，数据来自假数据层。",
       "notes": "功能少且多为 P1，Codex 可以独立完成。",
-      "status": "todo"
+      "status": "done",
+      "history": [
+        {
+          "round": 1,
+          "version": "v0042",
+          "tool": "local",
+          "date": "2026-10-24 04:50",
+          "status": "done"
+        }
+      ]
     },
     {
       "id": "I1",
