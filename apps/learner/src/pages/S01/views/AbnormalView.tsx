@@ -91,7 +91,7 @@ export function AbnormalView({ data, onLogin }: AbnormalViewProps) {
       {/* feat:S01-19 设备上限只显示接口值；选择后才允许请求下线，取消不触发登录。 */}
       {issue === "devices" && (
         <Card>
-          <fieldset className="flex min-w-0 flex-col gap-3">
+          <fieldset className="flex min-w-[0] flex-col gap-3">
             <legend className="mb-3 font-medium">{t("account.devices.select")}</legend>
             {account.devices.map((device) => (
               <label key={device.id} className="flex cursor-pointer items-start gap-3 rounded-sm border border-line-strong bg-bg-sunk p-3">
@@ -103,7 +103,7 @@ export function AbnormalView({ data, onLogin }: AbnormalViewProps) {
                   onChange={() => setSelectedDevice(device.id)}
                   className="mt-1 accent-brand-primary"
                 />
-                <span className="flex min-w-0 flex-col gap-1">
+                <span className="flex min-w-[0] flex-col gap-1">
                   <span className="font-medium">{t(device.label_key)}</span>
                   <span className="text-small text-ink-secondary">
                     {t("account.devices.lastSeen", { time: formatDateTime(device.last_seen_at, data.time_zone, { year: true }) })}
