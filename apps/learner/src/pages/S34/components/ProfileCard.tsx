@@ -40,7 +40,7 @@ export function Shortcuts({ data }: { data: S34GrowthProfile }) {
           <Link
             key={item.page}
             to={pathTo(item.page)}
-            className="flex min-w-0 flex-col items-start gap-2 rounded-sm border border-line-soft bg-surface p-3 text-small text-ink-primary hover:bg-sunk focus-visible:outline-brand"
+            className="flex min-w-[0] flex-col items-start gap-2 rounded-sm border border-line-soft bg-surface p-3 text-small text-ink-primary hover:bg-sunk focus-visible:outline-brand"
           >
             <strong>{t(`shortcuts.page.${item.page}`)}</strong>
             <Tag tone={item.status === "unread" ? "warning" : "neutral"} size="sm">
