@@ -1,0 +1,69 @@
+/* 本页只使用公共令牌；容器断点由公共 Columns 和主题控制。 */
+.s19-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--size-space-3);
+}
+.s19-fields {
+  display: grid;
+  gap: var(--size-space-3);
+}
+.s19-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-space-1);
+  font-size: var(--font-size-small);
+  color: var(--color-ink-secondary);
+}
+.s19-field select,
+.s19-field textarea,
+.s19-field input {
+  width: 100%;
+  min-width: 0;
+  border: var(--size-stroke-thin) solid var(--color-line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  padding: var(--size-space-2);
+  color: var(--color-ink-primary);
+  font: inherit;
+}
+.s19-field textarea {
+  resize: vertical;
+}
+.s19-row {
+  padding: var(--size-space-3);
+  border: var(--size-stroke-thin) solid var(--color-line-soft);
+  border-radius: var(--radius-md);
+}
+.s19-row-active {
+  border-color: var(--color-brand-primary);
+  background: var(--color-brand-primary-soft);
+}
+.s19-stem {
+  display: block;
+  width: 100%;
+  padding-block: var(--size-space-2);
+  text-align: left;
+  font-weight: var(--font-weight-medium);
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+.s19-detail {
+  min-width: 0;
+}
+.s19-field :focus-visible,
+.s19-stem:focus-visible {
+  outline: var(--size-stroke-thick) solid var(--color-brand-primary);
+  outline-offset: var(--size-space-1);
+}
+
+@container /* style-exempt: 容器查询条件不能用 CSS 变量，860 为 size.breakpoint.content-md 令牌 */ (width >= 860px) {
+  .s19-notebook-cols.ui-cols--split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  }
+}
+
+/* 为公共导师浮标留出空位，手机上的页尾动作可直接点击。 */
+.s19-detail-actions {
+  padding-inline-end: calc(var(--size-space-12) * 2);
+}

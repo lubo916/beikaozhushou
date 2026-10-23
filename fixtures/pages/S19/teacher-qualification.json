@@ -1,0 +1,278 @@
+{
+  "normal": {
+    "data_source": "sample",
+    "stats": {
+      "total": 126,
+      "today": 12,
+      "stubborn": 8,
+      "graduated": 42
+    },
+    "graduation": {
+      "correct_times": 2,
+      "interval_days": 3,
+      "variant_times": 1,
+      "fallback_correct_times": 3
+    },
+    "items": [
+      {
+        "mistake": {
+          "id": "019a0219-0000-7000-8000-000000000001",
+          "question_id": "019a0204-0000-7000-8000-000000000001",
+          "exam_id": "teacher-qualification",
+          "knowledge_point_ids": [
+            "019a0203-0000-7000-8000-000000000006"
+          ],
+          "status": "new",
+          "tags": [
+            "needs_correction"
+          ],
+          "wrong_count": 1,
+          "correct_streak": 0,
+          "created_at": "2026-10-01T09:00:00Z",
+          "last_answered_at": "2026-10-18T09:00:00Z",
+          "next_due_day": "2026-10-22"
+        },
+        "stem": "教师在教学中常说“跳一跳，摘桃子”，这主要体现了下列哪一理论的要求？",
+        "subject": "教育知识与能力",
+        "point_name": "最近发展区",
+        "source": "practice",
+        "cause_code": "concept_unclear",
+        "trap_code": "concept_swap",
+        "due_today": true,
+        "retry_count": 0,
+        "correction": {
+          "thought": "我把熟悉的理论名称当成了答案。",
+          "wrong_step": "没有把题干的任务难度与理论要点对照。",
+          "signal": "先圈题干描述的现象，再排除只有名字相似的理论。"
+        },
+        "history": [
+          {
+            "day": "2026-10-11",
+            "result": "wrong",
+            "confidence": "sure"
+          },
+          {
+            "day": "2026-10-18",
+            "result": "wrong",
+            "confidence": "vague"
+          }
+        ],
+        "solution": "“跳一跳”说的是任务难度要略高于现有水平、在帮助下够得着，对应维果茨基的最近发展区。"
+      },
+      {
+        "mistake": {
+          "id": "019a0219-0000-7000-8000-000000000002",
+          "question_id": "019a0204-0000-7000-8000-000000000002",
+          "exam_id": "teacher-qualification",
+          "knowledge_point_ids": [
+            "019a0203-0000-7000-8000-000000000006"
+          ],
+          "status": "retrying",
+          "tags": [
+            "stubborn",
+            "due_retry"
+          ],
+          "wrong_count": 4,
+          "correct_streak": 0,
+          "created_at": "2026-10-01T09:00:00Z",
+          "last_answered_at": "2026-10-18T09:00:00Z",
+          "next_due_day": "2026-10-22"
+        },
+        "stem": "简述如何培养与激发学生的学习动机。",
+        "subject": "教育知识与能力",
+        "point_name": "最近发展区",
+        "source": "mock_exam",
+        "cause_code": "misread",
+        "trap_code": "ignore_exception",
+        "due_today": true,
+        "retry_count": 4,
+        "correction": {
+          "thought": "我把熟悉的理论名称当成了答案。",
+          "wrong_step": "没有把题干的任务难度与理论要点对照。",
+          "signal": "先圈题干描述的现象，再排除只有名字相似的理论。"
+        },
+        "history": [
+          {
+            "day": "2026-10-11",
+            "result": "wrong",
+            "confidence": "sure"
+          },
+          {
+            "day": "2026-10-18",
+            "result": "wrong",
+            "confidence": "vague"
+          }
+        ],
+        "solution": "创设问题情境，实施启发式教学；根据作业难度，恰当控制动机水平；充分利用反馈信息，妥善进行奖惩；正确指导结果归因，促使学生继续努力"
+      },
+      {
+        "mistake": {
+          "id": "019a0219-0000-7000-8000-000000000003",
+          "question_id": "019a0204-0000-7000-8000-000000000001",
+          "exam_id": "teacher-qualification",
+          "knowledge_point_ids": [
+            "019a0203-0000-7000-8000-000000000006"
+          ],
+          "status": "awaiting_check",
+          "tags": [
+            "due_retry"
+          ],
+          "wrong_count": 2,
+          "correct_streak": 2,
+          "created_at": "2026-10-01T09:00:00Z",
+          "last_answered_at": "2026-10-18T09:00:00Z",
+          "next_due_day": "2026-10-22"
+        },
+        "stem": "教师在教学中常说“跳一跳，摘桃子”，这主要体现了下列哪一理论的要求？",
+        "subject": "教育知识与能力",
+        "point_name": "最近发展区",
+        "source": "photo",
+        "cause_code": "forgot",
+        "trap_code": "scope_widen",
+        "due_today": true,
+        "retry_count": 2,
+        "correction": {
+          "thought": "我把熟悉的理论名称当成了答案。",
+          "wrong_step": "没有把题干的任务难度与理论要点对照。",
+          "signal": "先圈题干描述的现象，再排除只有名字相似的理论。"
+        },
+        "history": [
+          {
+            "day": "2026-10-11",
+            "result": "wrong",
+            "confidence": "sure"
+          },
+          {
+            "day": "2026-10-18",
+            "result": "correct",
+            "confidence": "sure"
+          }
+        ],
+        "solution": "“跳一跳”说的是任务难度要略高于现有水平、在帮助下够得着，对应维果茨基的最近发展区。"
+      },
+      {
+        "mistake": {
+          "id": "019a0219-0000-7000-8000-000000000004",
+          "question_id": "019a0204-0000-7000-8000-000000000002",
+          "exam_id": "teacher-qualification",
+          "knowledge_point_ids": [
+            "019a0203-0000-7000-8000-000000000006"
+          ],
+          "status": "graduated",
+          "tags": [],
+          "wrong_count": 1,
+          "correct_streak": 3,
+          "created_at": "2026-10-01T09:00:00Z",
+          "last_answered_at": "2026-10-18T09:00:00Z",
+          "next_due_day": "2026-10-22"
+        },
+        "stem": "简述如何培养与激发学生的学习动机。",
+        "subject": "教育知识与能力",
+        "point_name": "最近发展区",
+        "source": "manual",
+        "cause_code": "method_unknown",
+        "trap_code": "partially_true",
+        "due_today": false,
+        "retry_count": 3,
+        "correction": {
+          "thought": "我把熟悉的理论名称当成了答案。",
+          "wrong_step": "没有把题干的任务难度与理论要点对照。",
+          "signal": "先圈题干描述的现象，再排除只有名字相似的理论。"
+        },
+        "history": [
+          {
+            "day": "2026-10-11",
+            "result": "wrong",
+            "confidence": "sure"
+          },
+          {
+            "day": "2026-10-18",
+            "result": "correct",
+            "confidence": "sure"
+          }
+        ],
+        "solution": "创设问题情境，实施启发式教学；根据作业难度，恰当控制动机水平；充分利用反馈信息，妥善进行奖惩；正确指导结果归因，促使学生继续努力"
+      }
+    ],
+    "insights": {
+      "available": true,
+      "restricted": false,
+      "sample_count": 126,
+      "minimum_count": 10,
+      "analysis_cost": 3,
+      "clusters": [
+        {
+          "title": "教育理论的适用情境混淆",
+          "body": "自己的订正反复出现“记住名字却没看情境”，建议用同一情境比较相邻理论。",
+          "count": 18
+        },
+        {
+          "title": "看漏限定条件",
+          "body": "自己的订正中出现跳过限定词的情况；重做时先标出否定、范围与例外。",
+          "count": 12
+        }
+      ],
+      "root_points": [
+        {
+          "id": "019a0203-0000-7000-8000-000000000001",
+          "name": "教育的本质与功能",
+          "reason": "先分清现有水平与潜在水平，再判断教学任务的难度。"
+        }
+      ],
+      "traps": [
+        {
+          "code": "concept_swap",
+          "hit_rate": 0.42,
+          "count": 18
+        },
+        {
+          "code": "ignore_exception",
+          "hit_rate": 0.28,
+          "count": 12
+        },
+        {
+          "code": "scope_widen",
+          "hit_rate": 0.17,
+          "count": 7
+        }
+      ],
+      "causes": [
+        {
+          "code": "concept_unclear",
+          "count": 36
+        },
+        {
+          "code": "misread",
+          "count": 28
+        },
+        {
+          "code": "forgot",
+          "count": 22
+        },
+        {
+          "code": "method_unknown",
+          "count": 18
+        },
+        {
+          "code": "slip",
+          "count": 12
+        },
+        {
+          "code": "time_short",
+          "count": 6
+        },
+        {
+          "code": "not_learned",
+          "count": 4
+        }
+      ]
+    }
+  },
+  "insufficient_sample_count": 6,
+  "insufficient_stats": {
+    "total": 6,
+    "today": 3,
+    "stubborn": 1,
+    "graduated": 1
+  }
+}
