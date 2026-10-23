@@ -1,0 +1,109 @@
+{
+  "data_source": "sample",
+  "exam_name": "大学英语六级",
+  "access": "authorized",
+  "sample_sufficient": true,
+  "minimum_group_size": 10,
+  "sample_count": 36,
+  "organization_name": "启明学习中心",
+  "metrics": [
+    {
+      "id": "students",
+      "value": 286,
+      "format": "count"
+    },
+    {
+      "id": "learning",
+      "value": 0.78,
+      "format": "percent"
+    },
+    {
+      "id": "completion",
+      "value": 0.72,
+      "format": "percent"
+    },
+    {
+      "id": "ai_minutes",
+      "value": 1380,
+      "format": "minutes"
+    }
+  ],
+  "todos": [
+    {
+      "id": "grading",
+      "count": 12,
+      "target": "O09"
+    },
+    {
+      "id": "qa",
+      "count": 8,
+      "target": "O10"
+    },
+    {
+      "id": "contact",
+      "count": 5,
+      "target": "O02"
+    },
+    {
+      "id": "review",
+      "count": 3,
+      "target": "O11"
+    },
+    {
+      "id": "schedule",
+      "count": 2,
+      "target": "O05"
+    }
+  ],
+  "classes": [
+    {
+      "id": "0195a000-0000-7000-8000-000000000001",
+      "name": "大学英语六级 · 周末班",
+      "active": 0.86,
+      "completion": 0.79,
+      "risk": 3,
+      "students": 36
+    },
+    {
+      "id": "0195a000-0000-7000-8000-000000000002",
+      "name": "大学英语六级 · 晚间班",
+      "active": 0.71,
+      "completion": 0.68,
+      "risk": 5,
+      "students": 28
+    }
+  ],
+  "notices": [
+    {
+      "id": "0195a000-0000-7000-8000-000000000003",
+      "title": "本周学习与答疑安排已更新",
+      "audience": "students",
+      "read_count": 128
+    },
+    {
+      "id": "0195a000-0000-7000-8000-000000000004",
+      "title": "教学资料发布前请完成审核",
+      "audience": "staff",
+      "read_count": 18
+    }
+  ],
+  "saving": [
+    {
+      "id": "pregrading",
+      "value": 660,
+      "format": "minutes"
+    },
+    {
+      "id": "answers",
+      "value": 480,
+      "format": "minutes"
+    },
+    {
+      "id": "supervision",
+      "value": 240,
+      "format": "minutes"
+    }
+  ],
+  "weekly_summary": "本周学习参与情况平稳，建议优先查看晚间班的督学提醒。",
+  "node_reminder": "大学英语六级：请核对最新报名通知与考试大纲。"
+}

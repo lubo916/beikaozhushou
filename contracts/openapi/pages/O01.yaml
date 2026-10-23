@@ -1,0 +1,251 @@
+{
+  "paths": {
+    "/org/workbench": {
+      "get": {
+        "operationId": "getO01Workbench",
+        "x-owner": "org",
+        "x-action": "org.workbench.read",
+        "summary": "机构工作台（示例接口，机构权限动作待整合登记，暂不接真实服务）",
+        "parameters": [
+          {
+            "name": "exam",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "organization_type",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "scope",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "授权范围内的工作台示例数据",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/O01Workbench"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "O01Metric": {
+        "type": "object",
+        "required": [
+          "id",
+          "value",
+          "format"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "count",
+              "percent",
+              "minutes"
+            ]
+          }
+        }
+      },
+      "O01Todo": {
+        "type": "object",
+        "required": [
+          "id",
+          "count",
+          "target"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer"
+          },
+          "target": {
+            "type": "string"
+          }
+        }
+      },
+      "O01Class": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "active",
+          "completion",
+          "risk",
+          "students"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "name": {
+            "type": "string"
+          },
+          "active": {
+            "type": "number"
+          },
+          "completion": {
+            "type": "number"
+          },
+          "risk": {
+            "type": "integer"
+          },
+          "students": {
+            "type": "integer"
+          }
+        }
+      },
+      "O01Notice": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "audience",
+          "read_count"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "title": {
+            "type": "string"
+          },
+          "audience": {
+            "type": "string",
+            "enum": [
+              "students",
+              "staff"
+            ]
+          },
+          "read_count": {
+            "type": "integer"
+          }
+        }
+      },
+      "O01Workbench": {
+        "type": "object",
+        "required": [
+          "data_source",
+          "exam_name",
+          "access",
+          "sample_sufficient",
+          "minimum_group_size",
+          "sample_count",
+          "organization_name",
+          "metrics",
+          "todos",
+          "classes",
+          "notices",
+          "saving",
+          "weekly_summary",
+          "node_reminder"
+        ],
+        "properties": {
+          "data_source": {
+            "$ref": "#/components/schemas/DataSource"
+          },
+          "exam_name": {
+            "type": "string"
+          },
+          "access": {
+            "type": "string",
+            "enum": [
+              "authorized",
+              "restricted"
+            ]
+          },
+          "sample_sufficient": {
+            "type": "boolean"
+          },
+          "minimum_group_size": {
+            "type": "integer"
+          },
+          "sample_count": {
+            "type": "integer"
+          },
+          "organization_name": {
+            "type": "string"
+          },
+          "metrics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/O01Metric"
+            }
+          },
+          "todos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/O01Todo"
+            }
+          },
+          "classes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/O01Class"
+            }
+          },
+          "notices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/O01Notice"
+            }
+          },
+          "saving": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/O01Metric"
+            }
+          },
+          "weekly_summary": {
+            "type": "string"
+          },
+          "node_reminder": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,1 +1,91 @@
-{}
+{
+  "title": "招生与线索",
+  "description": "从摸底诊断到试听报名，让每次沟通都有依据。",
+  "eyebrow": "机构端 · 招生",
+  "sample": "示例数据",
+  "exam": "演示考试：{{name}}",
+  "action": {
+    "diagnostic": "创建品牌摸底诊断",
+    "add": "录入线索",
+    "follow": "安排跟进",
+    "details": "查看沟通要点",
+    "trial": "管理试听",
+    "enroll": "报名、协议与收款",
+    "refund": "退费办理",
+    "import": "导入学员",
+    "close": "关闭",
+    "check": "检测宣传文案",
+    "review": "查看授权设置",
+    "retry": "重试"
+  },
+  "soon": "即将上线",
+  "summary": {
+    "new": "本周新增线索",
+    "due": "今日待跟进",
+    "trial": "已预约试听",
+    "enrolled": "本周报名",
+    "conversion": "成交转化率"
+  },
+  "pool": {
+    "title": "线索池",
+    "description": "按接口给出的沟通优先级排列；联系方式默认脱敏，查看原号需授权并留痕。",
+    "name": "线索与联系方式",
+    "source": "来源 / 意向",
+    "level": "摸底水平",
+    "status": "跟进状态",
+    "action": "下一步",
+    "priority": {
+      "high": "优先联系",
+      "medium": "持续跟进",
+      "low": "了解需求"
+    }
+  },
+  "compliance": {
+    "title": "宣传合规检测",
+    "description": "发布前检查承诺性宣传与缺少依据的通过率表述。",
+    "label": "宣传草稿",
+    "sample_result": "检查结果示例",
+    "result_note": "当前展示示例结论；正式检测与发布校验接通后上线。",
+    "empty": "先填写宣传草稿，再检测。"
+  },
+  "campaign": {
+    "title": "品牌摸底诊断",
+    "hint": "带机构品牌的摸底诊断，报告经学员同意后引导留资。"
+  },
+  "channels": {
+    "title": "转化漏斗与渠道",
+    "name": "渠道",
+    "leads": "留资",
+    "trial": "试听",
+    "enrolled": "成交",
+    "count": "人",
+    "private": "小样本仅显示原始计数，不给出汇总比例。"
+  },
+  "communication": {
+    "title": "线索沟通要点",
+    "note": "仅作为沟通准备，请结合学员实际情况解读摸底报告。"
+  },
+  "state": {
+    "empty": {
+      "title": "招生与线索暂无数据",
+      "body": "还没有班级或学员数据时，先导入学员或建班",
+      "action": "导入学员"
+    },
+    "error": {
+      "body": "招生与线索没能加载：服务暂时异常，已保存的内容不受影响；重试或稍后再来。"
+    },
+    "offline": {
+      "body": "离线时只能查看已缓存的待办与联系清单，提交与发布需要联网"
+    },
+    "restricted": {
+      "title": "仅显示已授权数据",
+      "body": "学员数据只显示已授权项；未授权的不显示、不参与统计"
+    },
+    "insufficient_data": {
+      "title": "样本不足，暂不展示汇总统计",
+      "body": "不足 {{minimum}} 人的班级不显示汇总统计",
+      "count": "已授权样本",
+      "missing": "补充已授权样本后再查看汇总。"
+    }
+  }
+}
