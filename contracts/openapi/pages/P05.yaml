@@ -1,0 +1,152 @@
+# P05 考情分析工作台：真题拆解、题与知识点关联、干扰项标注、考点档案与数据成熟度（阶段 1 只有假数据层，不接真实服务）。
+# x-action 用考情档案所属 exam 领域已登记的读取动作 exam.profile.read（没有借用别的领域的动作）。它对游客与学员也开放，
+# 接真实服务前必须由整合任务登记平台后台专用的 admin.exam_analysis.read 并替换（见 W03 交接单“风险与提醒”）。
+paths:
+  /admin/exam-analysis:
+    get:
+      operationId: getP05ExamAnalysis
+      x-owner: exam
+      x-action: exam.profile.read
+      summary: 考情分析工作台（示例数据：真题拆解、知识点关联、干扰项标注、考点档案与数据成熟度；业务数字由接口给）
+      description: exam、state 只在开发与测试时由假数据层使用（演示考试与强制页面状态）；按来源筛选由接口完成。
+      parameters:
+        - name: exam
+          in: query
+          schema: {type: string}
+        - name: state
+          in: query
+          schema: {type: string}
+        - name: source
+          in: query
+          schema: {$ref: "#/components/schemas/P05SourceLevel"}
+      responses:
+        "200":
+          description: 当前考试的考情分析数据（按来源筛选后的真题拆解，及不受筛选影响的成熟度与考点档案）
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/P05ExamAnalysis"}
+        "403": {$ref: "#/components/responses/Error"}
+        "500": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    P05SourceLevel:
+      type: string
+      description: 真题来源三级：官方公开、授权、回忆版
+      enum: [official_public, licensed, recalled]
+    P05TrapType:
+      type: string
+      description: 干扰模式（统一词汇“陷阱类型”的通用十二类，代码同术语表 trap_type）
+      enum: [concept_swap, scope_widen, scope_narrow, absolutize, time_confusion, subject_confusion, cause_reversal, partially_true, true_but_irrelevant, over_inference, boundary_break, ignore_exception]
+    P05DataMaturity:
+      type: string
+      description: 数据成熟度四档（代码同术语表 data_maturity）：冷启动、成熟中、可参考、成熟
+      enum: [cold, maturing, usable, mature]
+    P05ExamAnalysis:
+      type: object
+      required: [data_source, exam_name, generated_at, time_zone, total_count, source_counts, questions, maturity, maturity_tiers, profile]
+      properties:
+        data_source: {$ref: "#/components/schemas/DataSource"}
+        exam_name: {type: string}
+        generated_at: {$ref: "#/components/schemas/Timestamp"}
+        time_zone: {type: string}
+        total_count: {type: integer, minimum: 0, description: 已入库真题总数（不受筛选影响）}
+        source_counts:
+          type: array
+          items: {$ref: "#/components/schemas/P05SourceCount"}
+        questions:
+          type: array
+          items: {$ref: "#/components/schemas/P05PastQuestion"}
+        maturity: {$ref: "#/components/schemas/P05MaturityStatus"}
+        maturity_tiers:
+          type: array
+          description: 四档门控：每档在学员端显示什么（档的条件由服务端参数决定，界面只显示叫法）
+          items: {$ref: "#/components/schemas/P05MaturityTier"}
+        profile: {$ref: "#/components/schemas/P05ProfileSummary"}
+    P05SourceCount:
+      type: object
+      required: [source, count]
+      properties:
+        source: {$ref: "#/components/schemas/P05SourceLevel"}
+        count: {type: integer, minimum: 0}
+    P05PastQuestion:
+      type: object
+      required: [question_id, year, subject, number, source, knowledge_point, distractors, review_status, ai_draft]
+      properties:
+        question_id: {$ref: "#/components/schemas/Id"}
+        year: {type: integer, description: 真题年份}
+        subject: {type: string, description: 科目或部分（考试画像里的叫法）}
+        number: {type: integer, minimum: 1, description: 题号}
+        source: {$ref: "#/components/schemas/P05SourceLevel"}
+        knowledge_point: {$ref: "#/components/schemas/P05KnowledgePointLink"}
+        distractors:
+          type: array
+          description: 选项级解构：每个错项的干扰模式
+          items: {$ref: "#/components/schemas/P05DistractorNote"}
+        review_status: {type: string, enum: [pending, reviewed], description: 教研审核状态：待审、已审}
+        ai_draft: {type: boolean, description: 拆解与干扰项标注是否为 AI 初稿（界面须带 AI 标识）}
+    P05KnowledgePointLink:
+      type: object
+      required: [kp_id, name, confidence, status]
+      properties:
+        kp_id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        confidence: {type: number, minimum: 0, maximum: 1, description: 自动关联的置信度}
+        status: {type: string, enum: [suggested, confirmed], description: 待人工确认、已确认}
+    P05DistractorNote:
+      type: object
+      required: [option, trap]
+      properties:
+        option: {type: string, description: 选项标号，如 B}
+        trap: {$ref: "#/components/schemas/P05TrapType"}
+    P05MaturityStatus:
+      type: object
+      required: [level, question_count, year_count]
+      properties:
+        level: {$ref: "#/components/schemas/P05DataMaturity"}
+        question_count: {type: integer, minimum: 0, description: 已入库真题数（原始计数）}
+        year_count: {type: integer, minimum: 0, description: 覆盖的年份数（原始计数）}
+    P05MaturityTier:
+      type: object
+      required: [level, learner_display]
+      properties:
+        level: {$ref: "#/components/schemas/P05DataMaturity"}
+        learner_display:
+          type: string
+          enum: [hidden, raw_counts, reference_only, full]
+          description: 学员端显示什么：不展示、只显示原始次数、显示并标“仅供参考”、参与性价比与预测
+    P05ProfileSummary:
+      type: object
+      required: [sample_sufficient, question_count, minimum_question_count, entries]
+      properties:
+        sample_sufficient: {type: boolean, description: 样本是否足以生成考点档案；不足时只给原始计数}
+        question_count: {type: integer, minimum: 0}
+        minimum_question_count: {type: integer, minimum: 0, description: 出档案至少需要的真题数（服务端参数）}
+        recomputed_at: {$ref: "#/components/schemas/Timestamp"}
+        new_question_count: {type: integer, minimum: 0, description: 最近一次增量重算时新入库的真题数}
+        entries:
+          type: array
+          items: {$ref: "#/components/schemas/P05ProfileEntry"}
+    P05ProfileEntry:
+      type: object
+      required: [kp_id, name, appearance_count, year_count, status, ai_draft]
+      properties:
+        kp_id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        appearance_count: {type: integer, minimum: 0, description: 出现次数（原始计数）}
+        year_count: {type: integer, minimum: 0, description: 统计的年份数}
+        total_score: {type: number, minimum: 0, description: 累计分值；成熟中不返回}
+        question_types:
+          type: array
+          description: 题型（本考试的叫法）；成熟中不返回
+          items: {type: string}
+        angles:
+          type: array
+          description: 考查角度；成熟中不返回
+          items: {type: string}
+        trend: {type: string, enum: [rising, steady, falling, new], description: 只描述考频的变化；成熟中不返回}
+        traps:
+          type: array
+          description: 常见陷阱；成熟中不返回
+          items: {$ref: "#/components/schemas/P05TrapType"}
+        status: {type: string, enum: [draft, published], description: 草稿、已发布}
+        ai_draft: {type: boolean, description: 是否为 AI 生成的档案草稿（界面须带 AI 标识）}
