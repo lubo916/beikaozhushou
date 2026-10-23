@@ -1,0 +1,94 @@
+Scope: all 31 workspace projects
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+Done in 1.4s using pnpm v11.0.0
+
+ RUN  v4.0.0 /home/claude/work/repo
+
+ ❯  browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx (15 tests | 1 failed | 14 skipped) 245ms
+     ↓ junior-accounting：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点
+     ↓ teacher-qualification：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点
+     ↓ cet-6：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点
+     ↓ ds-final-custom：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点
+     ↓ 地址带关键词、类型和速查表时，接口只回该类型的结果并选中那张表
+     ↓ 搜不到的关键词进入“没找到”；最近访问视图不带关键词，进入空态
+     ↓ 判断函数：有缓存时被拒绝显示受限、服务出错显示出错，都不再带旧数据；断网仍保留缓存并标明离线
+     ↓ 页面：已显示结果后接口拒绝访问，个人结果全部收起，显示账号受限的说明与出路（不是拍照额度）
+     ↓ 页面：拍照额度受限（本页假数据的受限示例，不是接口拒绝）只停拍照，文本搜索和结果照常可用
+     ↓ 断网时保留已缓存的结果并标明离线；拍照搜题要联网，按钮不可用
+     ↓ 接口按请求里的考试返回；不认识的考试回 404
+     ↓ 切到六级后，新结果还没回来时不显示初级会计的结果；回来后显示六级自己的结果
+     ↓ 导师答过的结果与 AI 速查表用公共 AI 内容组件包起来，复制出去的文字开头带“【AI 生成】”（回归：只有标签、复制不带标识）
+     ↓ 拍照搜题先选用途才能继续；取消后重新打开要重新选；继续只提示即将上线，不假装上传
+     × 页面挂载不请求 /me/context；外壳的当前目标一变，本页请求随之带上新的考试 244ms
+ ❯  browser (chromium)  apps/learner/src/pages/S30/S30.regression.test.tsx (11 tests | 1 failed | 10 skipped) 138ms
+     ↓ junior-accounting：绑定的任务在今日清单里，接口给出的任务名与清单一致
+     ↓ teacher-qualification：绑定的任务在今日清单里，接口给出的任务名与清单一致
+     ↓ cet-6：绑定的任务在今日清单里，接口给出的任务名与清单一致
+     ↓ ds-final-custom：绑定的任务在今日清单里，接口给出的任务名与清单一致
+     ↓ 判断函数：有缓存时被拒绝显示受限、服务出错显示出错，都不再带旧数据；断网仍保留缓存并标明离线
+     ↓ 页面：已显示房间后接口拒绝访问，房间与专注记录全部收起，显示账号受限的说明与出路（不是未成年人模式）
+     ↓ 断网时标明离线：自习室需要联网所以收起房间，番茄钟保留，小组收起
+     ↓ 接口按请求里的考试返回；不认识的考试回 404
+     ↓ 切到六级后，新数据还没回来时不显示初级会计的自习室；回来后显示六级自己的
+     ↓ 举报要先选原因才能提交；重新打开要重新选；提交和屏蔽都只提示即将上线，不假装已处理
+     × 页面挂载不请求 /me/context；外壳的当前目标一变，本页请求随之带上新的考试 138ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx > S29 只跟随外壳已取到的当前目标，不另发请求（回归：页面挂载时自己再取一次当前目标，受限态多出 403 与重试） > 页面挂载不请求 /me/context；外壳的当前目标一变，本页请求随之带上新的考试
+AssertionError: 页面不另发当前目标请求: expected [ URL{} ] to deeply equal []
+
+Failure screenshot:
+  - apps/learner/src/pages/S29/__screenshots__/S29.regression.test.tsx/S29----------------------------------------------403---------------me-context------------------------1.png
+
+- Expected
++ Received
+
+- []
++ [
++   "http://localhost/api/v1/me/context",
++ ]
+
+ ❯ apps/learner/src/pages/S29/S29.regression.test.tsx:493:40
+    491|       await settle(() => seen?.data !== undefined);
+    492|       expect(own()[0]?.searchParams.get("exam_id")).toBe(DEMO_CONTEXT.…
+    493|       expect(contexts(), "页面不另发当前目标请求").toEqual([]);
+       |                                        ^
+    494|       const goal = DEMO_CONTEXT.goal;
+    495|       if (goal === undefined || goal === null) throw new Error("演示上下文缺…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S30/S30.regression.test.tsx > S30 只跟随外壳已取到的当前目标，不另发请求（回归：页面挂载时自己再取一次当前目标，受限态多出 403 与重试） > 页面挂载不请求 /me/context；外壳的当前目标一变，本页请求随之带上新的考试
+AssertionError: 页面不另发当前目标请求: expected [ URL{} ] to deeply equal []
+
+Failure screenshot:
+  - apps/learner/src/pages/S30/__screenshots__/S30.regression.test.tsx/S30----------------------------------------------403---------------me-context------------------------1.png
+
+- Expected
++ Received
+
+- []
++ [
++   "http://localhost/api/v1/me/context",
++ ]
+
+ ❯ apps/learner/src/pages/S30/S30.regression.test.tsx:324:40
+    322|       await settle(() => seen?.data !== undefined);
+    323|       expect(own()[0]?.searchParams.get("exam_id")).toBe(DEMO_CONTEXT.…
+    324|       expect(contexts(), "页面不另发当前目标请求").toEqual([]);
+       |                                        ^
+    325|       const goal = DEMO_CONTEXT.goal;
+    326|       if (goal === undefined || goal === null) throw new Error("演示上下文缺…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 24 skipped (26)
+   Start at  00:08:30
+   Duration  4.39s (transform 0ms, setup 0ms, collect 1.98s, tests 383ms, environment 0ms, prepare 3.09s)
+
+JSON report written to /home/claude/work/repo/.test-results/vitest.json

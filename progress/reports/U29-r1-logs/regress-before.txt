@@ -1,0 +1,1031 @@
+Scope: all 31 workspace projects
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+Done in 1.3s using pnpm v11.0.0
+
+ RUN  v4.0.0 /home/claude/work/repo
+
+ ❯  browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx (14 tests | 12 failed) 18793ms
+     × junior-accounting：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点 209ms
+     × teacher-qualification：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点 129ms
+     × cet-6：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点 80ms
+     × ds-final-custom：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点 85ms
+     × 地址带关键词、类型和速查表时，接口只回该类型的结果并选中那张表 3349ms
+     × 搜不到的关键词进入“没找到”；最近访问视图不带关键词，进入空态 3249ms
+     × 判断函数：有缓存时被拒绝显示受限、服务出错显示出错，都不再带旧数据；断网仍保留缓存并标明离线 121ms
+     × 页面：已显示结果后接口拒绝访问，个人结果全部收起，显示账号受限的说明与出路（不是拍照额度） 3363ms
+     ✓ 页面：拍照额度受限（本页假数据的受限示例，不是接口拒绝）只停拍照，文本搜索和结果照常可用  3283ms
+     × 断网时保留已缓存的结果并标明离线；拍照搜题要联网，按钮不可用 1200ms
+     × 接口按请求里的考试返回；不认识的考试回 404 82ms
+     × 切到六级后，新结果还没回来时不显示初级会计的结果；回来后显示六级自己的结果 3283ms
+     × 导师答过的结果与 AI 速查表用公共 AI 内容组件包起来，复制出去的文字开头带“【AI 生成】”（回归：只有标签、复制不带标识） 151ms
+     ✓ 拍照搜题先选用途才能继续；取消后重新打开要重新选；继续只提示即将上线，不假装上传 207ms
+ ❯  browser (chromium)  apps/learner/src/pages/S30/S30.regression.test.tsx (10 tests | 10 failed) 8558ms
+     × junior-accounting：绑定的任务在今日清单里，接口给出的任务名与清单一致 91ms
+     × teacher-qualification：绑定的任务在今日清单里，接口给出的任务名与清单一致 83ms
+     × cet-6：绑定的任务在今日清单里，接口给出的任务名与清单一致 82ms
+     × ds-final-custom：绑定的任务在今日清单里，接口给出的任务名与清单一致 108ms
+     × 判断函数：有缓存时被拒绝显示受限、服务出错显示出错，都不再带旧数据；断网仍保留缓存并标明离线 96ms
+     × 页面：已显示房间后接口拒绝访问，房间与专注记录全部收起，显示账号受限的说明与出路（不是未成年人模式） 3349ms
+     × 断网时标明离线：自习室需要联网所以收起房间，番茄钟保留，小组收起 1184ms
+     × 接口按请求里的考试返回；不认识的考试回 404 83ms
+     × 切到六级后，新数据还没回来时不显示初级会计的自习室；回来后显示六级自己的 3300ms
+     × 举报要先选原因才能提交；重新打开要重新选；提交和屏蔽都只提示即将上线，不假装已处理 182ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 22 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx > S29 示例引用与考试地图一致（回归：示例查询曾指向别的知识点、资料和题目） > junior-accounting：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点
+AssertionError: 资料要覆盖这个知识点: expected [ …(2) ] to include '019a0103-0000-7000-8000-000000000006'
+
+Failure screenshot:
+  - apps/learner/src/pages/S29/__screenshots__/S29.regression.test.tsx/S29------------------------------------junior-accounting-------------------------------------1.png
+
+ ❯ apps/learner/src/pages/S29/S29.regression.test.tsx:159:93
+    157|       expect(new Set(fixture.aliases).size, "别名不重复").toBe(fixture.alia…
+    158|       const material = exam.learner.materials.find((item) => isRecord(…
+    159|       expect(isRecord(material) ? material["knowledge_point_ids"] : un…
+       |                                                                                             ^
+    160|       expect(isRecord(material) ? material["access"] : undefined, "结果跳…
+    161|       const question = exam.questions.find((item) => item.id === fixtu…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/22]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx > S29 示例引用与考试地图一致（回归：示例查询曾指向别的知识点、资料和题目） > teacher-qualification：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点
+AssertionError: 别名不重复: expected 4 to be 5 // Object.is equality
+
+Failure screenshot:
+  - apps/learner/src/pages/S29/__screenshots__/S29.regression.test.tsx/S29------------------------------------teacher-qualification-------------------------------------1.png
+
+- Expected
++ Received
+
+- 5
++ 4
+
+ ❯ apps/learner/src/pages/S29/S29.regression.test.tsx:157:53
+    155|       expect(point?.name, "示例查询要能对上知识点名称").toContain(fixture.sample_qu…
+    156|       expect(fixture.aliases).toContain(fixture.sample_query);
+    157|       expect(new Set(fixture.aliases).size, "别名不重复").toBe(fixture.alia…
+       |                                                     ^
+    158|       const material = exam.learner.materials.find((item) => isRecord(…
+    159|       expect(isRecord(material) ? material["knowledge_point_ids"] : un…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/22]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx > S29 示例引用与考试地图一致（回归：示例查询曾指向别的知识点、资料和题目） > cet-6：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点
+AssertionError: 示例查询要能对上知识点名称: expected '高频学术词汇 A 组' to contain '虚拟语气'
+
+Failure screenshot:
+  - apps/learner/src/pages/S29/__screenshots__/S29.regression.test.tsx/S29------------------------------------cet-6-------------------------------------1.png
+
+Expected: "虚拟语气"
+Received: "高频学术词汇 A 组"
+
+ ❯ apps/learner/src/pages/S29/S29.regression.test.tsx:155:43
+    153|       const point = points.get(fixture.point_id);
+    154|       expect(point, "示例知识点必须在考试地图里").toBeDefined();
+    155|       expect(point?.name, "示例查询要能对上知识点名称").toContain(fixture.sample_qu…
+       |                                           ^
+    156|       expect(fixture.aliases).toContain(fixture.sample_query);
+    157|       expect(new Set(fixture.aliases).size, "别名不重复").toBe(fixture.alia…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/22]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx > S29 示例引用与考试地图一致（回归：示例查询曾指向别的知识点、资料和题目） > ds-final-custom：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点
+AssertionError: 示例查询要能对上知识点名称: expected '时间复杂度分析' to contain '二叉树'
+
+Failure screenshot:
+  - apps/learner/src/pages/S29/__screenshots__/S29.regression.test.tsx/S29------------------------------------ds-final-custom-------------------------------------1.png
+
+Expected: "二叉树"
+Received: "时间复杂度分析"
+
+ ❯ apps/learner/src/pages/S29/S29.regression.test.tsx:155:43
+    153|       const point = points.get(fixture.point_id);
+    154|       expect(point, "示例知识点必须在考试地图里").toBeDefined();
+    155|       expect(point?.name, "示例查询要能对上知识点名称").toContain(fixture.sample_qu…
+       |                                           ^
+    156|       expect(fixture.aliases).toContain(fixture.sample_query);
+    157|       expect(new Set(fixture.aliases).size, "别名不重复").toBe(fixture.alia…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/22]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx > S29 搜索词、类型和速查表真的随请求发出（回归：生成的请求地址丢掉了普通查询参数，搜什么都回示例结果） > 地址带关键词、类型和速查表时，接口只回该类型的结果并选中那张表
+AssertionError: 只剩“我的资料原文”一类: expected [ '知识点', '我的资料原文', '题目', '笔记', …(2) ] to deeply equal [ '我的资料原文' ]
+
+Failure screenshot:
+  - apps/learner/src/pages/S29/__screenshots__/S29.regression.test.tsx/S29----------------------------------------------------------------------------------1.png
+
+- Expected
++ Received
+
+  [
++   "知识点",
+    "我的资料原文",
++   "题目",
++   "笔记",
++   "错题",
++   "导师答过的",
+  ]
+
+ ❯ apps/learner/src/pages/S29/S29.regression.test.tsx:202:39
+    200|       await settle(() => host.querySelectorAll(".s29-results > section…
+    201|       const sections = [...host.querySelectorAll(".s29-results > secti…
+    202|       expect(sections, "只剩“我的资料原文”一类").toEqual([copy.kind.material]);
+       |                                       ^
+    203|       expect(host.querySelector(".s29-results a")?.getAttribute("href"…
+    204|       expect(host.querySelector<HTMLSelectElement>(".ui-cols__aside se…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/22]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx > S29 搜索词、类型和速查表真的随请求发出（回归：生成的请求地址丢掉了普通查询参数，搜什么都回示例结果） > 搜不到的关键词进入“没找到”；最近访问视图不带关键词，进入空态
+AssertionError: ?q=__no_s29_matching_content__: expected null not to be null
+
+Failure screenshot:
+  - apps/learner/src/pages/S29/__screenshots__/S29.regression.test.tsx/S29----------------------------------------------------------------------------------1.png
+
+ ❯ apps/learner/src/pages/S29/S29.regression.test.tsx:219:69
+    217|       try {
+    218|         await settle(() => host.querySelector(`.ui-state--${state}`) !…
+    219|         expect(host.querySelector(`.ui-state--${state}`), query).not.t…
+       |                                                                     ^
+    220|         expect(resultTitles(host), query).toEqual([]);
+    221|       } finally {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/22]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx > S29 接口拒绝与出错优先于旧缓存（回归：有旧缓存时 403 仍显示旧的个人内容） > 判断函数：有缓存时被拒绝显示受限、服务出错显示出错，都不再带旧数据；断网仍保留缓存并标明离线
+AssertionError: expected { state: 'normal', …(2) } to deeply equal { state: 'restricted', …(2) }
+
+Failure screenshot:
+  - apps/learner/src/pages/S29/__screenshots__/S29.regression.test.tsx/S29------------------------403-----------------------------------------------------------1.png
+
+- Expected
++ Received
+
+  {
+-   "data": undefined,
++   "data": {
++     "data_source": "sample",
++     "groups": [
++       {
++         "count": 1,
++         "items": [
++           {
++             "ai_generated": false,
++             "excerpt": "年限平均法、双倍余额递减法与年数总和法的适用差异。",
++             "id": "019a0103-0000-7000-8000-000000000006",
++             "kind": "point",
++             "source": "初级会计职称",
++             "target": "S10",
++             "target_id": "019a0103-0000-7000-8000-000000000006",
++             "title": "固定资产折旧方法",
++           },
++         ],
++         "kind": "point",
++       },
++       {
++         "count": 1,
++         "items": [
++           {
++             "ai_generated": false,
++             "excerpt": "年限平均法、双倍余额递减法与年数总和法的适用差异。",
++             "id": "019a0103-0000-7000-8000-000000000006",
++             "kind": "material",
++             "source": "我的资料原文",
++             "target": "S12",
++             "target_id": "019a010b-0000-7000-8000-000000000001",
++             "title": "初级会计教材（纸书，按页码映射）",
++           },
++         ],
++         "kind": "material",
++       },
++       {
++         "count": 1,
++         "items": [
++           {
++             "ai_generated": false,
++             "excerpt": "年限平均法、双倍余额递减法与年数总和法的适用差异。",
++             "id": "019a0104-0000-7000-8000-000000000001",
++             "kind": "question",
++             "source": "题目",
++             "target": "S18",
++             "target_id": "demo",
++             "title": "甲公司购入一项交易性金融资产，支付价款 206 万元，其中包含已宣告但尚未发放的现金股利 6 万元；另支付交易费用 1 万元。该资产的入账金额为（　）万元。",
++           },
++         ],
++         "kind": "question",
++       },
++       {
++         "count": 1,
++         "items": [
++           {
++             "ai_generated": false,
++             "excerpt": "年限平均法、双倍余额递减法与年数总和法的适用差异。",
++             "id": "019a0103-0000-7000-8000-000000000006",
++             "kind": "note",
++             "source": "笔记",
++             "target": "S14",
++             "target_id": "demo",
++             "title": "固定资产折旧方法",
++           },
++         ],
++         "kind": "note",
++       },
++       {
++         "count": 1,
++         "items": [
++           {
++             "ai_generated": false,
++             "excerpt": "年限平均法、双倍余额递减法与年数总和法的适用差异。",
++             "id": "019a0104-0000-7000-8000-000000000001",
++             "kind": "mistake",
++             "source": "错题",
++             "target": "S18",
++             "target_id": "demo",
++             "title": "甲公司购入一项交易性金融资产，支付价款 206 万元，其中包含已宣告但尚未发放的现金股利 6 万元；另支付交易费用 1 万元。该资产的入账金额为（　）万元。",
++           },
++         ],
++         "kind": "mistake",
++       },
++       {
++         "count": 1,
++         "items": [
++           {
++             "ai_generated": true,
++             "excerpt": "年限平均法、双倍余额递减法与年数总和法的适用差异。",
++             "id": "019a0103-0000-7000-8000-000000000006",
++             "kind": "tutor",
++             "source": "导师答过的",
++             "target": "S28",
++             "target_id": "demo",
++             "title": "固定资产折旧方法",
++           },
++         ],
++         "kind": "tutor",
++       },
++     ],
++     "photo_available": true,
++     "query": "折旧",
++     "quick_tables": [
++       {
++         "ai_generated": false,
++         "category": "values",
++         "id": "values",
++         "rows": [
++           {
++             "id": "values",
++             "label": "固定资产折旧方法",
++             "point_id": "019a0103-0000-7000-8000-000000000006",
++             "value": "预计净残值率用于计算应计折旧额",
++           },
++         ],
++         "title": "固定资产折旧方法 · 数值与时限",
++       },
++       {
++         "ai_generated": false,
++         "category": "formulas",
++         "id": "formulas",
++         "rows": [
++           {
++             "id": "formulas",
++             "label": "固定资产折旧方法",
++             "point_id": "019a0103-0000-7000-8000-000000000006",
++             "value": "年折旧额＝应计折旧额 ÷ 预计使用年限",
++           },
++         ],
++         "title": "固定资产折旧方法 · 公式",
++       },
++       {
++         "ai_generated": false,
++         "category": "clauses",
++         "id": "clauses",
++         "rows": [
++           {
++             "id": "clauses",
++             "label": "固定资产折旧方法",
++             "point_id": "019a0103-0000-7000-8000-000000000006",
++             "value": "固定资产按月计提折旧，留意开始与停止的边界",
++           },
++         ],
++         "title": "固定资产折旧方法 · 条文",
++       },
++       {
++         "ai_generated": false,
++         "category": "terms",
++         "id": "terms",
++         "rows": [
++           {
++             "id": "terms",
++             "label": "固定资产折旧方法",
++             "point_id": "019a0103-0000-7000-8000-000000000006",
++             "value": "应计折旧额：原价减预计净残值",
++           },
++         ],
++         "title": "固定资产折旧方法 · 术语",
++       },
++       {
++         "ai_generated": false,
++         "category": "compare",
++         "id": "compare",
++         "rows": [
++           {
++             "id": "compare",
++             "label": "固定资产折旧方法",
++             "point_id": "019a0103-0000-7000-8000-000000000006",
++             "value": "加速折旧与年限平均法的计算基础不同",
++           },
++         ],
++         "title": "固定资产折旧方法 · 易混对照",
++       },
++     ],
++     "recent": [
++       {
++         "ai_generated": false,
++         "excerpt": "年限平均法、双倍余额递减法与年数总和法的适用差异。",
++         "id": "019a0103-0000-7000-8000-000000000006",
++         "kind": "point",
++         "source": "初级会计职称",
++         "target": "S10",
++         "target_id": "019a0103-0000-7000-8000-000000000006",
++         "title": "固定资产折旧方法",
++       },
++       {
++         "ai_generated": false,
++         "excerpt": "年限平均法、双倍余额递减法与年数总和法的适用差异。",
++         "id": "019a0103-0000-7000-8000-000000000006",
++         "kind": "material",
++         "source": "我的资料原文",
++         "target": "S12",
++         "target_id": "019a010b-0000-7000-8000-000000000001",
++         "title": "初级会计教材（纸书，按页码映射）",
++       },
++     ],
++     "result_count": 6,
++     "selected_table": "values",
++     "state_hint": "normal",
++   },
+    "stale": false,
+-   "state": "restricted",
++   "state": "normal",
+  }
+
+ ❯ apps/learner/src/pages/S29/S29.regression.test.tsx:232:112
+    230|   it("判断函数：有缓存时被拒绝显示受限、服务出错显示出错，都不再带旧数据；断网仍保留缓存并标明离线", async () => {
+    231|     const data = await setupApi().search();
+    232|     expect(searchView({ data, status: "error", fetchStatus: "idle", er…
+       |                                                                                                                ^
+    233|       state: "restricted",
+    234|       data: undefined,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/22]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx > S29 接口拒绝与出错优先于旧缓存（回归：有旧缓存时 403 仍显示旧的个人内容） > 页面：已显示结果后接口拒绝访问，个人结果全部收起，显示账号受限的说明与出路（不是拍照额度）
+AssertionError: 被拒绝后不能继续显示旧结果: expected <div class="s29-results">…(6)</div> to be null
+
+Failure screenshot:
+  - apps/learner/src/pages/S29/__screenshots__/S29.regression.test.tsx/S29------------------------403----------------------------------------------------------1.png
+
+- Expected: 
+null
+
++ Received: 
+<div
+  class="s29-results"
+>
+  <section
+    aria-label="知识点"
+  >
+    <h2>
+      知识点 · 1 条
+    </h2>
+    <ul>
+      <li>
+        <div
+          class="flex flex-wrap items-center gap-2"
+        >
+          <span
+            class="ui-tag ui-tag--neutral"
+          >
+            知识点
+          </span>
+        </div>
+        <a
+          aria-label="打开：固定资产折旧方法"
+          class="s29-result-title"
+          data-discover="true"
+          href="/kp/019a0103-0000-7000-8000-000000000006"
+        >
+          固定资产折旧方法
+        </a>
+        <p>
+          年限平均法、双倍余额递减法与年数总和法的适用差异。
+        </p>
+        <p
+          class="s29-hint"
+        >
+          来源：初级会计职称
+        </p>
+        <div
+          class="flex flex-wrap gap-2"
+        >
+          <button
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            type="button"
+          >
+            加入今日
+          </button>
+          <button
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            type="button"
+          >
+            制卡
+          </button>
+          <button
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            type="button"
+          >
+            记笔记
+          </button>
+        </div>
+      </li>
+    </ul>
+  </section>
+  <section
+    aria-label="我的资料原文"
+  >
+    <h2>
+      我的资料原文 · 1 条
+    </h2>
+    <ul>
+      <li>
+        <div
+          class="flex flex-wrap items-center gap-2"
+        >
+          <span
+            class="ui-tag ui-tag--neutral"
+          >
+            我的资料原文
+          </span>
+        </div>
+        <a
+          aria-label="打开：初级会计教材（纸书，按页码映射）"
+          class="s29-result-title"
+          data-discover="true"
+          href="/reader/019a010b-0000-7000-8000-000000000001"
+        >
+          初级会计教材（纸书，按页码映射）
+        </a>
+        <p>
+          年限平均法、双倍余额递减法与年数总和法的适用差异。
+        </p>
+        <p
+          class="s29-hint"
+        >
+          来源：我的资料原文
+        </p>
+        <div
+          class="flex flex-wrap gap-2"
+        >
+          <button
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            type="button"
+          >
+            加入今日
+          </button>
+          <button
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            type="button"
+          >
+            制卡
+          </button>
+          <button
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            type="button"
+          >
+            记笔记
+          </button>
+        </div>
+      </li>
+    </ul>
+  </section>
+  <section
+    aria-label="题目"
+  >
+    <h2>
+      题目 · 1 条
+    </h2>
+    <ul>
+      <li>
+        <div
+          class="flex flex-wrap items-center gap-2"
+        >
+          <span
+            class="ui-tag ui-tag--neutral"
+          >
+            题目
+          </span>
+        </div>
+        <a
+          aria-label="打开：甲公司购入一项交易性金融资产，支付价款 206 万元，其中包含已宣告但尚未发放的现金股利 6 万元；另支付交易费用 1 万元。该资产的入账金额为（　）万元。"
+          class="s29-result-title"
+          data-discover="true"
+          href="/quiz/demo"
+        >
+          甲公司购入一项交易性金融资产，支付价款 206 万元，其中包含已宣告但尚未发放的现金股利 6 万元；另支付交易费用 1 万元。该资产的入账金额为（　）万元。
+        </a>
+        <p>
+          年限平均法、双倍余额递减法与年数总和法的适用差异。
+        </p>
+        <p
+          class="s29-hint"
+        >
+          来源：题目
+        </p>
+        <div
+          class="flex flex-wrap gap-2"
+        >
+          <button
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            type="button"
+          >
+            加入今日
+          </button>
+          <button
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            type="button"
+          >
+            制卡
+          </button>
+          <button
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            type="button"
+          >
+            记笔记
+          </button>
+        </div>
+      </li>
+    </ul>
+  </section>
+  <section
+    aria-label="笔记"
+  >
+    <h2>
+      笔记 · 1 条
+    </h2>
+    <ul>
+      <li>
+        <div
+          class="flex flex-wrap items-center gap-2"
+        >
+          <span
+            class="ui-tag ui-tag--neutral"
+          >
+            笔记
+          </span>
+        </div>
+        <a
+          aria-label="打开：固定资产折旧方法"
+          class="s29-result-title"
+          data-discover="true"
+          href="/notes"
+        >
+          固定资产折旧方法
+        </a>
+        <p>
+          年限平均法、双倍余额递减法与年数总和法的适用差异。
+        </p>
+        <p
+          class="s29-hint"
+        >
+          来源：笔记
+        </p>
+        <div
+          class="flex flex-wrap gap-2"
+        >
+          <button
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            type="button"
+          >
+            加入今日
+          </button>
+          <button
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            type="button"
+          >
+            制卡
+          </button>
+          <button
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            type="button"
+          >
+            记笔记
+          </button>
+        </div>
+      </li>
+    </ul>
+  </section>
+  <section
+    aria-label="错题"
+  >
+    <h2>
+      错题 · 1 条
+    </h2>
+    <ul>
+      <li>
+        <div
+          class="flex flex-wrap items-center gap-2"
+        >
+          <span
+            class="ui-tag ui-tag--neutral"
+          >
+            错题
+          </span>
+        </div>
+        <a
+          aria-label="打开：甲公司购入一项交易性金融资产，支付价款 206 万元，其中包含已宣告但尚未发放的现金股利 6 万元；另支付交易费用 1 万元。该资产的入账金额为（　）万元。"
+          class="s29-result-title"
+          data-discover="true"
+          href="/quiz/demo"
+        >
+          甲公司购入一项交易性金融资产，支付价款 206 万元，其中包含已宣告但尚未发放的现金股利 6 万元；另支付交易费用 1 万元。该资产的入账金额为（　）万元。
+        </a>
+        <p>
+          年限平均法、双倍余额递减法与年数总和法的适用差异。
+        </p>
+        <p
+          class="s29-hint"
+        >
+          来源：错题
+        </p>
+        <div
+          class="flex flex-wrap gap-2"
+        >
+          <button
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            type="button"
+          >
+            加入今日
+          </button>
+          <button
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            type="button"
+          >
+            制卡
+          </button>
+          <button
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            type="button"
+          >
+            记笔记
+          </button>
+        </div>
+      </li>
+    </ul>
+  </section>
+  <section
+    aria-label="导师答过的"
+  >
+    <h2>
+      导师答过的 · 1 条
+    </h2>
+    <ul>
+      <li>
+        <div
+          class="flex flex-wrap items-center gap-2"
+        >
+          <span
+            class="ui-tag ui-tag--neutral"
+          >
+            导师答过的
+          </span>
+          <span
+            class="ui-ai-badge"
+          >
+            <svg
+              aria-hidden="true"
+              class="ui-icon"
+              fill="none"
+              focusable="false"
+              height="1em"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.8"
+              viewBox="0 0 24 24"
+              width="1em"
+            >
+              <path
+                d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"
+              />
+            </svg>
+            AI 生成
+          </span>
+        </div>
+        <a
+          aria-label="打开：固定资产折旧方法"
+          class="s29-result-title"
+          data-discover="true"
+          href="/tutor"
+        >
+          固定资产折旧方法
+        </a>
+        <p>
+          年限平均法、双倍余额递减法与年数总和法的适用差异。
+        </p>
+        <p
+          class="s29-hint"
+        >
+          来源：导师答过的
+        </p>
+        <div
+          class="flex flex-wrap gap-2"
+        >
+          <button
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            type="button"
+          >
+            加入今日
+          </button>
+          <button
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            type="button"
+          >
+            制卡
+          </button>
+          <button
+            class="ui-btn ui-btn--secondary ui-btn--sm"
+            type="button"
+          >
+            记笔记
+          </button>
+        </div>
+      </li>
+    </ul>
+  </section>
+</div>
+
+ ❯ apps/learner/src/pages/S29/S29.regression.test.tsx:260:66
+    258|       });
+    259|       await settle(() => host.querySelector(".s29-results") === null);
+    260|       expect(host.querySelector(".s29-results"), "被拒绝后不能继续显示旧结果").toBe…
+       |                                                                  ^
+    261|       expect(host.querySelector(".s29-recent"), "最近访问也是个人内容，一并收起").toB…
+    262|       const state = host.querySelector(".ui-state--restricted");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/22]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx > S29 离线只保留能离线用的内容（回归：断网后拍照入口仍可点） > 断网时保留已缓存的结果并标明离线；拍照搜题要联网，按钮不可用
+AssertionError: 断网时拍照搜题不可用: expected false to be true // Object.is equality
+
+Failure screenshot:
+  - apps/learner/src/pages/S29/__screenshots__/S29.regression.test.tsx/S29------------------------------------------------------------1.png
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ apps/learner/src/pages/S29/S29.regression.test.tsx:313:76
+    311|       expect(resultTitles(host)).toContain(pointName("junior-accountin…
+    312|       expect(host.querySelector(".ui-banner")?.textContent).toContain(…
+    313|       expect(buttonByText(host, copy.search.photo)?.disabled, "断网时拍照搜题…
+       |                                                                            ^
+    314|     } finally {
+    315|       await unmount();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/22]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx > S29 同页切换考试不串数据（回归：查询键不含考试，切换后仍显示上一考试的结果） > 接口按请求里的考试返回；不认识的考试回 404
+AssertionError: expected '019a0103-0000-7000-8000-000000000006' to be '019a0303-0000-7000-8000-000000000001' // Object.is equality
+
+Failure screenshot:
+  - apps/learner/src/pages/S29/__screenshots__/S29.regression.test.tsx/S29----------------------------------------------------------404-1.png
+
+Expected: "019a0303-0000-7000-8000-000000000001"
+Received: "019a0103-0000-7000-8000-000000000006"
+
+ ❯ apps/learner/src/pages/S29/S29.regression.test.tsx:332:49
+    330|     expect(outcome.kind === "json" ? outcome.status : outcome.kind).to…
+    331|     const body = outcome.kind === "json" ? (outcome.body as S29SearchP…
+    332|     expect(body?.groups[0]?.items[0]?.target_id).toBe(fixtureOf("cet-6…
+       |                                                 ^
+    333|     const missing = await api.handle({
+    334|       method: "GET",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/22]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx > S29 同页切换考试不串数据（回归：查询键不含考试，切换后仍显示上一考试的结果） > 切到六级后，新结果还没回来时不显示初级会计的结果；回来后显示六级自己的结果
+AssertionError: 目标已换成六级，不能再显示初级会计的结果: expected [ Array(6) ] to not include '固定资产折旧方法'
+
+Failure screenshot:
+  - apps/learner/src/pages/S29/__screenshots__/S29.regression.test.tsx/S29----------------------------------------------------------------------------1.png
+
+ ❯ apps/learner/src/pages/S29/S29.regression.test.tsx:356:61
+    354|       await settle(() => h.client.getQueryData<MeContext>(getGetMeCont…
+    355|       await settle(() => !resultTitles(host).includes(before));
+    356|       expect(resultTitles(host), "目标已换成六级，不能再显示初级会计的结果").not.toContain…
+       |                                                             ^
+    357|       h.mode.hold = false;
+    358|       await act(async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/22]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx > S29 AI 内容与拍照流程 > 导师答过的结果与 AI 速查表用公共 AI 内容组件包起来，复制出去的文字开头带“【AI 生成】”（回归：只有标签、复制不带标识）
+AssertionError: 导师答过的内容要用 AiContent 包起来: expected null not to be null
+
+Failure screenshot:
+  - apps/learner/src/pages/S29/__screenshots__/S29.regression.test.tsx/S29-AI------------------AI--------AI---------------------AI----------------------1.png
+
+ ❯ apps/learner/src/pages/S29/S29.regression.test.tsx:391:53
+    389|       const tutor = host.querySelector(`section[aria-label="${copy.kin…
+    390|       const tutorAi = tutor?.querySelector(".ui-ai .ui-ai__body");
+    391|       expect(tutorAi, "导师答过的内容要用 AiContent 包起来").not.toBeNull();
+       |                                                     ^
+    392|       if (tutorAi) expect(copyFrom(tutorAi)).toMatch(/^【AI 生成】/);
+    393|       const quick = host.querySelector(".ui-cols__aside .ui-ai .ui-ai_…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/22]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S30/S30.regression.test.tsx > S30 番茄钟绑定今日清单里真实的任务（回归：示例任务是编的，不在该考试的今日清单里） > junior-accounting：绑定的任务在今日清单里，接口给出的任务名与清单一致
+ FAIL   browser (chromium)  apps/learner/src/pages/S30/S30.regression.test.tsx > S30 番茄钟绑定今日清单里真实的任务（回归：示例任务是编的，不在该考试的今日清单里） > teacher-qualification：绑定的任务在今日清单里，接口给出的任务名与清单一致
+ FAIL   browser (chromium)  apps/learner/src/pages/S30/S30.regression.test.tsx > S30 番茄钟绑定今日清单里真实的任务（回归：示例任务是编的，不在该考试的今日清单里） > cet-6：绑定的任务在今日清单里，接口给出的任务名与清单一致
+ FAIL   browser (chromium)  apps/learner/src/pages/S30/S30.regression.test.tsx > S30 番茄钟绑定今日清单里真实的任务（回归：示例任务是编的，不在该考试的今日清单里） > ds-final-custom：绑定的任务在今日清单里，接口给出的任务名与清单一致
+AssertionError: 番茄钟绑定的任务必须来自该考试的今日清单: expected undefined to be defined
+
+Failure screenshots:
+  - apps/learner/src/pages/S30/__screenshots__/S30.regression.test.tsx/S30-----------------------------------------junior-accounting---------------------------1.png
+  - apps/learner/src/pages/S30/__screenshots__/S30.regression.test.tsx/S30-----------------------------------------teacher-qualification---------------------------1.png
+  - apps/learner/src/pages/S30/__screenshots__/S30.regression.test.tsx/S30-----------------------------------------cet-6---------------------------1.png
+  - apps/learner/src/pages/S30/__screenshots__/S30.regression.test.tsx/S30-----------------------------------------ds-final-custom---------------------------1.png
+
+ ❯ apps/learner/src/pages/S30/S30.regression.test.tsx:105:43
+    103|       const fixture = fixtureOf(exam.examId);
+    104|       const task = exam.learner.today_tasks.find((item) => item.id ===…
+    105|       expect(task, "番茄钟绑定的任务必须来自该考试的今日清单").toBeDefined();
+       |                                           ^
+    106|       const { api, control } = setupApi();
+    107|       control.setExam(exam.key);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/22]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S30/S30.regression.test.tsx > S30 接口拒绝与出错优先于旧缓存（回归：有旧缓存时 403 仍显示旧的房间与专注记录） > 判断函数：有缓存时被拒绝显示受限、服务出错显示出错，都不再带旧数据；断网仍保留缓存并标明离线
+AssertionError: expected { state: 'normal', …(2) } to deeply equal { state: 'restricted', …(2) }
+
+Failure screenshot:
+  - apps/learner/src/pages/S30/__screenshots__/S30.regression.test.tsx/S30------------------------403--------------------------------------------------------------1.png
+
+- Expected
++ Received
+
+  {
+-   "data": undefined,
++   "data": {
++     "data_source": "sample",
++     "focus": {
++       "minutes": 25,
++       "task": "会计等式：读后即测",
++       "today_minutes": 50,
++     },
++     "group_size": 6,
++     "minor_mode": false,
++     "page_state": "normal",
++     "rooms": [
++       {
++         "capacity": 30,
++         "id": "01900000-0030-7000-8000-000000000001",
++         "kind": "quiet",
++         "name": "会计晚间自习室",
++         "participants": 18,
++       },
++       {
++         "capacity": 20,
++         "id": "01900000-0030-7000-8000-000000000002",
++         "kind": "sprint",
++         "name": "会计冲刺自习室",
++         "participants": 8,
++       },
++     ],
++   },
+    "stale": false,
+-   "state": "restricted",
++   "state": "normal",
+  }
+
+ ❯ apps/learner/src/pages/S30/S30.regression.test.tsx:119:110
+    117|     const { api } = setupApi();
+    118|     const data = (await fetchRoom(api)).body as S30StudyRoom;
+    119|     expect(roomView({ data, status: "error", fetchStatus: "idle", erro…
+       |                                                                                                              ^
+    120|       state: "restricted",
+    121|       data: undefined,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/22]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S30/S30.regression.test.tsx > S30 接口拒绝与出错优先于旧缓存（回归：有旧缓存时 403 仍显示旧的房间与专注记录） > 页面：已显示房间后接口拒绝访问，房间与专注记录全部收起，显示账号受限的说明与出路（不是未成年人模式）
+AssertionError: 被拒绝后不能继续显示旧房间: expected '跳到正文备考助手学员端今今日今今日今日学习计划复盘与报告学学学学知识地图知…' not to contain '会计晚间自习室'
+
+Failure screenshot:
+  - apps/learner/src/pages/S30/__screenshots__/S30.regression.test.tsx/S30------------------------403------------------------------------------------------------------1.png
+
+Expected: "会计晚间自习室"
+Received: "跳到正文备考助手学员端今今日今今日今日学习计划复盘与报告学学学学知识地图知识点主页我的资料阅读器视听课堂笔记本记记记记复习与卡片背诵训练练练练练练习中心做题与解析错题本主观题批改考考考考模考中心测评报告进度与预测考试日历与资讯冲刺与考后助助助助AI 导师搜索与速查自习室与小组我我我我会员与权益数据与隐私设置成长档案消息与帮助演演示学员演示学员我的账号学员端 · 助自习室与小组初级会计206 天问导师自习室与小组同伴在场，没有信息流。进来安静学一会儿。安静学习示例数据在线自习室选择适合自己的学习环境，进入后先绑定今日任务。会计晚间自习室无聊天房18 / 30 人在学进入自习室举报屏蔽会计冲刺自习室冲刺房8 / 20 人在学进入自习室举报屏蔽任务绑定番茄钟本次专注会计等式：读后即测专注时长: 25 分钟今天已专注: 50 分钟选择今日任务开始专注专注时长只记录投入，不算任务完成，也不作为掌握证据。学习搭子与小组围绕同一个目标安静学习，使用匿名昵称。小组匹配将在后续开放。找小组社区规则让你更多地学，少一些打扰。不发布广告、引流链接与付费私聊邀请。不传播制造焦虑的营销内容。不索取他人的联系方式、照片与学习隐私。遇到不适内容可举报或屏蔽。举报不当内容查看屏蔽设置保护个人信息，保持友善沟通，专注自己的学习节奏。举报不当内容请选择最接近的原因，后续会由内容治理人员处理。举报原因广告与引流焦虑营销骚扰与不当内容泄露个人隐私取消提交举报屏蔽这个房间？屏蔽后将不再向你推荐这个房间，可以在屏蔽设置中恢复。暂不屏蔽确认屏蔽问导师今今日学学习练练测导导师我我的全部页面AI 导师"
+
+ ❯ apps/learner/src/pages/S30/S30.regression.test.tsx:147:46
+    145|       });
+    146|       await settle(() => !text(host).includes(room));
+    147|       expect(text(host), "被拒绝后不能继续显示旧房间").not.toContain(room);
+       |                                              ^
+    148|       expect(text(host)).not.toContain(copy.focus.title);
+    149|       const state = host.querySelector(".ui-state--restricted");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/22]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S30/S30.regression.test.tsx > S30 离线只保留番茄钟（回归：断网后仍显示上次的在线人数和房间入口） > 断网时标明离线：自习室需要联网所以收起房间，番茄钟保留，小组收起
+AssertionError: 离线时不显示上次的房间和在线人数: expected '跳到正文备考助手学员端今今日今今日今日学习计划复盘与报告学学学学知识地图知…' not to contain '会计晚间自习室'
+
+Failure screenshot:
+  - apps/learner/src/pages/S30/__screenshots__/S30.regression.test.tsx/S30------------------------------------------------------------------1.png
+
+Expected: "会计晚间自习室"
+Received: "跳到正文备考助手学员端今今日今今日今日学习计划复盘与报告学学学学知识地图知识点主页我的资料阅读器视听课堂笔记本记记记记复习与卡片背诵训练练练练练练习中心做题与解析错题本主观题批改考考考考模考中心测评报告进度与预测考试日历与资讯冲刺与考后助助助助AI 导师搜索与速查自习室与小组我我我我会员与权益数据与隐私设置成长档案消息与帮助演演示学员演示学员我的账号学员端 · 助自习室与小组初级会计206 天问导师自习室与小组同伴在场，没有信息流。进来安静学一会儿。安静学习示例数据正在显示上次保存的自习室自习室需要联网；番茄钟可离线使用离线番茄钟在线自习室选择适合自己的学习环境，进入后先绑定今日任务。会计晚间自习室无聊天房18 / 30 人在学进入自习室举报屏蔽会计冲刺自习室冲刺房8 / 20 人在学进入自习室举报屏蔽任务绑定番茄钟本次专注会计等式：读后即测专注时长: 25 分钟今天已专注: 50 分钟选择今日任务开始专注专注时长只记录投入，不算任务完成，也不作为掌握证据。学习搭子与小组围绕同一个目标安静学习，使用匿名昵称。小组匹配将在后续开放。找小组社区规则让你更多地学，少一些打扰。不发布广告、引流链接与付费私聊邀请。不传播制造焦虑的营销内容。不索取他人的联系方式、照片与学习隐私。遇到不适内容可举报或屏蔽。举报不当内容查看屏蔽设置保护个人信息，保持友善沟通，专注自己的学习节奏。举报不当内容请选择最接近的原因，后续会由内容治理人员处理。举报原因广告与引流焦虑营销骚扰与不当内容泄露个人隐私取消提交举报屏蔽这个房间？屏蔽后将不再向你推荐这个房间，可以在屏蔽设置中恢复。暂不屏蔽确认屏蔽问导师今今日学学习练练测导导师我我的全部页面AI 导师"
+
+ ❯ apps/learner/src/pages/S30/S30.regression.test.tsx:172:49
+    170|       await settle(() => host.querySelector(".ui-banner") !== null, 25…
+    171|       expect(host.querySelector(".ui-banner")?.textContent).toContain(…
+    172|       expect(text(host), "离线时不显示上次的房间和在线人数").not.toContain(room);
+       |                                                 ^
+    173|       expect(text(host)).toContain(copy.focus.title);
+    174|       expect(text(host)).not.toContain(copy.group.title);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/22]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S30/S30.regression.test.tsx > S30 同页切换考试不串数据（回归：查询键不含考试，切换后仍显示上一考试的自习室） > 接口按请求里的考试返回；不认识的考试回 404
+AssertionError: expected '会计晚间自习室' to be '六级安静自习室' // Object.is equality
+
+Failure screenshot:
+  - apps/learner/src/pages/S30/__screenshots__/S30.regression.test.tsx/S30-----------------------------------------------------------404-1.png
+
+Expected: "六级安静自习室"
+Received: "会计晚间自习室"
+
+ ❯ apps/learner/src/pages/S30/S30.regression.test.tsx:187:56
+    185|     const other = await fetchRoom(api, "?exam_id=cet-6");
+    186|     expect(other.status).toBe(200);
+    187|     expect((other.body as S30StudyRoom).rooms[0]?.name).toBe(firstRoom…
+       |                                                        ^
+    188|     expect((await fetchRoom(api, "?exam_id=no-such-exam")).status).toB…
+    189|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/22]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S30/S30.regression.test.tsx > S30 同页切换考试不串数据（回归：查询键不含考试，切换后仍显示上一考试的自习室） > 切到六级后，新数据还没回来时不显示初级会计的自习室；回来后显示六级自己的
+AssertionError: 目标已换成六级，不能再显示初级会计的自习室: expected '跳到正文备考助手学员端今今日今今日今日学习计划复盘与报告学学学学知识地图知…' not to contain '会计晚间自习室'
+
+Failure screenshot:
+  - apps/learner/src/pages/S30/__screenshots__/S30.regression.test.tsx/S30----------------------------------------------------------------------------1.png
+
+Expected: "会计晚间自习室"
+Received: "跳到正文备考助手学员端今今日今今日今日学习计划复盘与报告学学学学知识地图知识点主页我的资料阅读器视听课堂笔记本记记记记复习与卡片背诵训练练练练练练习中心做题与解析错题本主观题批改考考考考模考中心测评报告进度与预测考试日历与资讯冲刺与考后助助助助AI 导师搜索与速查自习室与小组我我我我会员与权益数据与隐私设置成长档案消息与帮助演演示学员演示学员我的账号学员端 · 助自习室与小组六级51 天问导师自习室与小组同伴在场，没有信息流。进来安静学一会儿。安静学习示例数据在线自习室选择适合自己的学习环境，进入后先绑定今日任务。会计晚间自习室无聊天房18 / 30 人在学进入自习室举报屏蔽会计冲刺自习室冲刺房8 / 20 人在学进入自习室举报屏蔽任务绑定番茄钟本次专注会计等式：读后即测专注时长: 25 分钟今天已专注: 50 分钟选择今日任务开始专注专注时长只记录投入，不算任务完成，也不作为掌握证据。学习搭子与小组围绕同一个目标安静学习，使用匿名昵称。小组匹配将在后续开放。找小组社区规则让你更多地学，少一些打扰。不发布广告、引流链接与付费私聊邀请。不传播制造焦虑的营销内容。不索取他人的联系方式、照片与学习隐私。遇到不适内容可举报或屏蔽。举报不当内容查看屏蔽设置保护个人信息，保持友善沟通，专注自己的学习节奏。举报不当内容请选择最接近的原因，后续会由内容治理人员处理。举报原因广告与引流焦虑营销骚扰与不当内容泄露个人隐私取消提交举报屏蔽这个房间？屏蔽后将不再向你推荐这个房间，可以在屏蔽设置中恢复。暂不屏蔽确认屏蔽问导师今今日学学习练练测导导师我我的全部页面AI 导师"
+
+ ❯ apps/learner/src/pages/S30/S30.regression.test.tsx:204:54
+    202|       await settle(() => h.client.getQueryData<MeContext>(getGetMeCont…
+    203|       await settle(() => !text(host).includes(before));
+    204|       expect(text(host), "目标已换成六级，不能再显示初级会计的自习室").not.toContain(before…
+       |                                                      ^
+    205|       h.mode.hold = false;
+    206|       await act(async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/22]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S30/S30.regression.test.tsx > S30 内容治理须明确操作（回归：举报原因默认已选，点一下就能提交） > 举报要先选原因才能提交；重新打开要重新选；提交和屏蔽都只提示即将上线，不假装已处理
+AssertionError: expected true to be false // Object.is equality
+
+Failure screenshot:
+  - apps/learner/src/pages/S30/__screenshots__/S30.regression.test.tsx/S30--------------------------------------------------------------------------1.png
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ apps/learner/src/pages/S30/S30.regression.test.tsx:228:126
+    226|       await settle(() => dialog() !== null);
+    227|       const submit = () => buttonByText(dialog() ?? document, copy.rep…
+    228|       expect([...(dialog()?.querySelectorAll<HTMLInputElement>('input[…
+       |                                                                                                                              ^
+    229|       expect(submit()?.disabled, "没选原因不能提交").toBe(true);
+    230|       await click(dialog()?.querySelector<HTMLInputElement>('input[val…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/22]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  22 failed | 2 passed (24)
+   Start at  22:10:47
+   Duration  31.88s (transform 0ms, setup 0ms, collect 2.31s, tests 27.35s, environment 0ms, prepare 21.84s)
+
+JSON report written to /home/claude/work/repo/.test-results/vitest.json

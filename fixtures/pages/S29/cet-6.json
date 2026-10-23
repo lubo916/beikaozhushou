@@ -1,0 +1,88 @@
+{
+  "sample_query": "mitigate",
+  "aliases": [
+    "mitigate",
+    "xingjinci",
+    "militate",
+    "形近词辨析",
+    "mitigate 和 militate 怎么区分"
+  ],
+  "point_id": "019a0303-0000-7000-8000-000000000002",
+  "excerpt": "mitigate 意为减轻、缓和，直接接宾语；militate 常与 against 连用，意为妨碍、对……产生不利影响。",
+  "material_id": "019a030b-0000-7000-8000-000000000002",
+  "question_id": "019a0304-0000-7000-8000-000000000001",
+  "quick_tables": [
+    {
+      "id": "compare",
+      "title": "六级 · 易混对照",
+      "category": "compare",
+      "ai_generated": true,
+      "rows": [
+        {
+          "id": "compare-1",
+          "label": "形近词辨析：mitigate 与 militate",
+          "value": "mitigate the impact 减轻影响；militate against success 妨碍成功",
+          "point_id": "019a0303-0000-7000-8000-000000000002"
+        },
+        {
+          "id": "compare-2",
+          "label": "让步状语从句",
+          "value": "although 和 though 不与 but 连用；even if 偏重假设，even though 偏重事实",
+          "point_id": "019a0303-0000-7000-8000-000000000004"
+        }
+      ]
+    },
+    {
+      "id": "terms",
+      "title": "六级 · 术语",
+      "category": "terms",
+      "ai_generated": false,
+      "rows": [
+        {
+          "id": "terms-1",
+          "label": "高频学术词汇 A 组",
+          "value": "allocate 分配；substantial 大量的；derive 获得；undermine 削弱",
+          "point_id": "019a0303-0000-7000-8000-000000000001"
+        },
+        {
+          "id": "terms-2",
+          "label": "翻译：文化主题词",
+          "value": "春节 the Spring Festival；剪纸 paper cutting；京剧 Peking Opera",
+          "point_id": "019a0303-0000-7000-8000-00000000000b"
+        },
+        {
+          "id": "terms-3",
+          "label": "让步状语从句",
+          "value": "由 although、though、even if、while 等引导，表示“尽管、即使”",
+          "point_id": "019a0303-0000-7000-8000-000000000004"
+        }
+      ]
+    },
+    {
+      "id": "formulas",
+      "title": "六级 · 公式与步骤",
+      "category": "formulas",
+      "ai_generated": false,
+      "rows": [
+        {
+          "id": "formulas-1",
+          "label": "长难句：非谓语结构",
+          "value": "先找谓语动词，再看 doing、done、to do 与逻辑主语是主动还是被动关系",
+          "point_id": "019a0303-0000-7000-8000-000000000003"
+        },
+        {
+          "id": "formulas-2",
+          "label": "阅读：主旨题定位",
+          "value": "先读首段和各段首句，重点看转折词之后的观点",
+          "point_id": "019a0303-0000-7000-8000-000000000007"
+        },
+        {
+          "id": "formulas-3",
+          "label": "翻译：长句拆分",
+          "value": "先确定主干，再按时间或逻辑顺序拆成短句",
+          "point_id": "019a0303-0000-7000-8000-00000000000c"
+        }
+      ]
+    }
+  ]
+}

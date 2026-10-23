@@ -1,0 +1,141 @@
+Scope: all 31 workspace projects
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+Done in 1.9s using pnpm v11.0.0
+
+ RUN  v4.0.0 /home/claude/work/repo
+
+Failed to resolve dependency: react, present in client 'optimizeDeps.include'
+Failed to resolve dependency: react-dom, present in client 'optimizeDeps.include'
+Failed to resolve dependency: react/jsx-dev-runtime, present in client 'optimizeDeps.include'
+Failed to resolve dependency: react/jsx-runtime, present in client 'optimizeDeps.include'
+ ❯  browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx (14 tests | 3 failed) 38996ms
+     ✓ junior-accounting：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点 34ms
+     ✓ teacher-qualification：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点 3ms
+     ✓ cet-6：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点 3ms
+     ✓ ds-final-custom：查询、别名、资料、题目和速查表行都对应地图里真实存在且内容相符的知识点 2ms
+     ✓ 地址带关键词、类型和速查表时，接口只回该类型的结果并选中那张表  350ms
+     ✓ 搜不到的关键词进入“没找到”；最近访问视图不带关键词，进入空态 169ms
+     ✓ 判断函数：有缓存时被拒绝显示受限、服务出错显示出错，都不再带旧数据；断网仍保留缓存并标明离线 1ms
+     ✓ 页面：已显示结果后接口拒绝访问，个人结果全部收起，显示账号受限的说明与出路（不是拍照额度） 196ms
+     ✓ 页面：拍照额度受限（本页假数据的受限示例，不是接口拒绝）只停拍照，文本搜索和结果照常可用  323ms
+     ✓ 断网时保留已缓存的结果并标明离线；拍照搜题要联网，按钮不可用  1129ms
+     ✓ 接口按请求里的考试返回；不认识的考试回 404 3ms
+     × 切到六级后，新结果还没回来时不显示初级会计的结果；回来后显示六级自己的结果 30358ms
+     × 导师答过的结果与 AI 速查表用公共 AI 内容组件包起来，复制出去的文字开头带“【AI 生成】”（回归：只有标签、复制不带标识） 3226ms
+     × 拍照搜题先选用途才能继续；取消后重新打开要重新选；继续只提示即将上线，不假装上传 3197ms
+ ❯  browser (chromium)  apps/learner/src/pages/S30/S30.regression.test.tsx (10 tests | 2 failed) 34829ms
+     ✓ junior-accounting：绑定的任务在今日清单里，接口给出的任务名与清单一致 4ms
+     ✓ teacher-qualification：绑定的任务在今日清单里，接口给出的任务名与清单一致 1ms
+     ✓ cet-6：绑定的任务在今日清单里，接口给出的任务名与清单一致 0ms
+     ✓ ds-final-custom：绑定的任务在今日清单里，接口给出的任务名与清单一致 0ms
+     ✓ 判断函数：有缓存时被拒绝显示受限、服务出错显示出错，都不再带旧数据；断网仍保留缓存并标明离线 1ms
+     ✓ 页面：已显示房间后接口拒绝访问，房间与专注记录全部收起，显示账号受限的说明与出路（不是未成年人模式）  358ms
+     ✓ 断网时标明离线：自习室需要联网所以收起房间，番茄钟保留，小组收起  1101ms
+     ✓ 接口按请求里的考试返回；不认识的考试回 404 1ms
+     × 切到六级后，新数据还没回来时不显示初级会计的自习室；回来后显示六级自己的 30170ms
+     × 举报要先选原因才能提交；重新打开要重新选；提交和屏蔽都只提示即将上线，不假装已处理 3192ms
+ ✓  browser (chromium)  apps/learner/src/pages/S29/S29.test.tsx (8 tests) 1520ms
+     ✓ 空态保留搜索框与最近访问；错误态给重试和反馈  1198ms
+ ✓  browser (chromium)  apps/learner/src/pages/S30/S30.test.tsx (3 tests) 16ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx > S29 同页切换考试不串数据（回归：查询键不含考试，切换后仍显示上一考试的结果） > 切到六级后，新结果还没回来时不显示初级会计的结果；回来后显示六级自己的结果
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+
+Failure screenshot:
+  - apps/learner/src/pages/S29/__screenshots__/S29.regression.test.tsx/S29----------------------------------------------------------------------------1.png
+
+ ❯ apps/learner/src/pages/S29/S29.regression.test.tsx:350:2
+    348|   });
+    349| 
+    350|   it("切到六级后，新结果还没回来时不显示初级会计的结果；回来后显示六级自己的结果", async () => {
+       |  ^
+    351|     const h = harness();
+    352|     const { host, unmount } = await open(h, pathTo("S29"));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx > S29 AI 内容与拍照流程 > 导师答过的结果与 AI 速查表用公共 AI 内容组件包起来，复制出去的文字开头带“【AI 生成】”（回归：只有标签、复制不带标识）
+AssertionError: 不是 AI 生成的结果不加标识: expected undefined to be null
+
+Failure screenshot:
+  - apps/learner/src/pages/S29/__screenshots__/S29.regression.test.tsx/S29-AI------------------AI--------AI---------------------AI----------------------1.png
+
+- Expected: 
+null
+
++ Received: 
+undefined
+
+ ❯ apps/learner/src/pages/S29/S29.regression.test.tsx:405:64
+    403|       if (quick) expect(copyFrom(quick)).toMatch(/^【AI 生成】/);
+    404|       const point = host.querySelector(`section[aria-label="${copy.kin…
+    405|       expect(point?.querySelector(".ui-ai"), "不是 AI 生成的结果不加标识").toBeNu…
+       |                                                                ^
+    406|     } finally {
+    407|       await unmount();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S29/S29.regression.test.tsx > S29 AI 内容与拍照流程 > 拍照搜题先选用途才能继续；取消后重新打开要重新选；继续只提示即将上线，不假装上传
+Error: 找不到要点的元素
+
+Failure screenshot:
+  - apps/learner/src/pages/S29/__screenshots__/S29.regression.test.tsx/S29-AI--------------------------------------------------1.png
+
+ ❯ click apps/learner/src/app/testing.tsx:78:47
+     76| 
+     77| export async function click(element: Element | null | undefined): Prom…
+     78|   if (!(element instanceof HTMLElement)) throw new Error("找不到要点的元素");
+       |                                               ^
+     79|   await act(async () => element.click());
+     80| }
+ ❯ apps/learner/src/pages/S29/S29.regression.test.tsx:416:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S30/S30.regression.test.tsx > S30 同页切换考试不串数据（回归：查询键不含考试，切换后仍显示上一考试的自习室） > 切到六级后，新数据还没回来时不显示初级会计的自习室；回来后显示六级自己的
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+
+Failure screenshot:
+  - apps/learner/src/pages/S30/__screenshots__/S30.regression.test.tsx/S30----------------------------------------------------------------------------1.png
+
+ ❯ apps/learner/src/pages/S30/S30.regression.test.tsx:205:2
+    203|   });
+    204| 
+    205|   it("切到六级后，新数据还没回来时不显示初级会计的自习室；回来后显示六级自己的", async () => {
+       |  ^
+    206|     const h = harness();
+    207|     const { host, unmount } = await open(h);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL   browser (chromium)  apps/learner/src/pages/S30/S30.regression.test.tsx > S30 内容治理须明确操作（回归：举报原因默认已选，点一下就能提交） > 举报要先选原因才能提交；重新打开要重新选；提交和屏蔽都只提示即将上线，不假装已处理
+Error: 找不到要点的元素
+
+Failure screenshot:
+  - apps/learner/src/pages/S30/__screenshots__/S30.regression.test.tsx/S30--------------------------------------------------------------------------1.png
+
+ ❯ click apps/learner/src/app/testing.tsx:78:47
+     76| 
+     77| export async function click(element: Element | null | undefined): Prom…
+     78|   if (!(element instanceof HTMLElement)) throw new Error("找不到要点的元素");
+       |                                               ^
+     79|   await act(async () => element.click());
+     80| }
+ ❯ apps/learner/src/pages/S30/S30.regression.test.tsx:239:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  2 failed | 2 passed (4)
+      Tests  5 failed | 30 passed (35)
+   Start at  22:40:24
+   Duration  86.02s (transform 0ms, setup 0ms, collect 4.37s, tests 75.36s, environment 0ms, prepare 206.53s)
+
+JSON report written to /home/claude/work/repo/.test-results/vitest.json

@@ -1,0 +1,6 @@
+/* S30 自习室：房间卡按容器宽度自动排成网格（手机一列，平板与桌面横排），与原型一致。 */
+.s30-rooms {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--size-space-8) * 7)), 1fr));
+  gap: var(--size-space-3);
+}

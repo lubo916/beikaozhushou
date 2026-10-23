@@ -1,0 +1,52 @@
+# S30 简版：自习室主视图和内容治理；写动作尚未登记，界面先提示即将上线。
+paths:
+  /engagement/study-room:
+    get:
+      operationId: getS30StudyRoom
+      x-owner: engagement
+      x-action: account.context.read
+      summary: 自习室与小组的演示主视图
+      parameters:
+        - name: exam_id
+          in: query
+          explode: false
+          description: 当前目标考试（MeContext.goal.exam_id）；查询键随之按考试分开，同页切换考试不沿用上一考试的房间
+          schema: {type: string}
+      responses:
+        "200":
+          description: 自习室、番茄钟示例与社区规则；未成年人只保留自习室与番茄钟
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S30StudyRoom"}
+        "403": {$ref: "#/components/responses/Error"}
+        "404": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S30StudyRoom:
+      type: object
+      required: [page_state, minor_mode, group_size, rooms, focus, data_source]
+      properties:
+        page_state: {type: string, enum: [normal, empty, restricted, insufficient_data]}
+        minor_mode: {type: boolean}
+        group_size: {type: integer, minimum: 1}
+        rooms:
+          type: array
+          items: {$ref: "#/components/schemas/S30Room"}
+        focus: {$ref: "#/components/schemas/S30Focus"}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+    S30Room:
+      type: object
+      required: [id, name, kind, participants, capacity]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        name: {type: string}
+        kind: {type: string, enum: [quiet, sprint]}
+        participants: {type: integer, minimum: 0}
+        capacity: {type: integer, minimum: 1}
+    S30Focus:
+      type: object
+      required: [minutes, today_minutes, task]
+      properties:
+        minutes: {type: integer, minimum: 1}
+        today_minutes: {type: integer, minimum: 0}
+        task: {type: string}

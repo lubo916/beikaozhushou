@@ -1,0 +1,100 @@
+Scope: all 31 workspace projects
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+Done in 4s using pnpm v11.0.0
+
+Running 13 tests using 1 worker
+
+  ✓   1 [chromium] › tests/e2e/pages/S29.spec.ts:29:3 › S29 375：布局按容器切换，正文不横向溢出 (4.6s)
+  ✓   2 [chromium] › tests/e2e/pages/S29.spec.ts:29:3 › S29 834：布局按容器切换，正文不横向溢出 (3.1s)
+  ✓   3 [chromium] › tests/e2e/pages/S29.spec.ts:29:3 › S29 1280：布局按容器切换，正文不横向溢出 (3.3s)
+  ✓   4 [chromium] › tests/e2e/pages/S29.spec.ts:52:1 › S29 七态都有原型文案与可行的出口 (17.2s)
+  ✘   5 [chromium] › tests/e2e/pages/S29.spec.ts:104:1 › S29 搜索结果、最近访问和速查表都可直接用 view 打开 (10.1s)
+  ✓   6 [chromium] › tests/e2e/pages/S29.spec.ts:133:1 › S29 四个演示考试各有自己的检索结果和速查表 (11.2s)
+  ✘   7 [chromium] › tests/e2e/pages/S29.spec.ts:158:1 › S29 可搜索、筛选、查表、回到资料，并在拍照前选择用途 (8.8s)
+  ✓   8 [chromium] › tests/e2e/pages/S30.spec.ts:18:3 › S30 375 宽主视图与正文无横向溢出 (3.4s)
+  ✓   9 [chromium] › tests/e2e/pages/S30.spec.ts:18:3 › S30 834 宽主视图与正文无横向溢出 (3.2s)
+  ✓  10 [chromium] › tests/e2e/pages/S30.spec.ts:18:3 › S30 1280 宽主视图与正文无横向溢出 (2.9s)
+  ✓  11 [chromium] › tests/e2e/pages/S30.spec.ts:53:1 › S30 只有主视图，七态按原型显示；未成年人只留自习室和番茄钟 (16.9s)
+  ✓  12 [chromium] › tests/e2e/pages/S30.spec.ts:89:1 › S30 四考试分别显示对应的自习室 (10.3s)
+  ✓  13 [chromium] › tests/e2e/pages/S30.spec.ts:105:1 › S30 举报和屏蔽需明确操作，主要入口提示即将上线 (4.6s)
+
+
+  1) [chromium] › tests/e2e/pages/S29.spec.ts:104:1 › S29 搜索结果、最近访问和速查表都可直接用 view 打开 ───────────────
+
+    Error: 学员端 S29 搜索与速查 空态：应显示公共状态组件 .ui-state--empty
+
+    expect(locator).toBeVisible() failed
+
+    Locator: locator('main#main .ui-state--empty').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - 学员端 S29 搜索与速查 空态：应显示公共状态组件 .ui-state--empty with timeout 5000ms
+      - waiting for locator('main#main .ui-state--empty').first()
+
+
+       at support/checks.ts:401
+
+      399 |   const label = `${pageLabel(entry)} ${STATE_NAMES[state]}态`;
+      400 |   const shown = page.locator(`main#main .ui-state--${state}`).first();
+    > 401 |   await expect(shown, `${label}：应显示公共状态组件 .ui-state--${state}`).toBeVisible();
+          |                                                                 ^
+      402 |   if (state === "loading") {
+      403 |     // 外壳等懒加载的页面模块时也显示加载态：页面安静下来以后还在加载，才说明是 ?state= 强制出来的
+      404 |     await settle(page);
+        at expectState (/home/claude/work/repo/tests/e2e/support/checks.ts:401:65)
+        at /home/claude/work/repo/tests/e2e/pages/S29.spec.ts:88:13
+
+    Error Context: ../logs/baseline-e2e-artifacts/pages-S29-S29-搜索结果、最近访问和速查表都可直接用-view-打开-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../logs/baseline-e2e-artifacts/pages-S29-S29-搜索结果、最近访问和速查表都可直接用-view-打开-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../logs/baseline-e2e-artifacts/pages-S29-S29-搜索结果、最近访问和速查表都可直接用-view-打开-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests/e2e/pages/S29.spec.ts:158:1 › S29 可搜索、筛选、查表、回到资料，并在拍照前选择用途 ─────────────────
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('main#main').locator('.s29-results > section')
+    Expected: 1
+    Received: 6
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" with timeout 5000ms
+      - waiting for locator('main#main').locator('.s29-results > section')
+        9 × locator resolved to 6 elements
+          - unexpected value "6"
+
+
+      126 |   await expect(main.locator(".s29-results > section")).toHaveCount(6);
+      127 |   await main.getByRole("button", { name: copy("kind.material"), exact: true }).press("Enter");
+    > 128 |   await expect(main.locator(".s29-results > section")).toHaveCount(1);
+          |                                                        ^
+      129 |   await expect(main.locator(".s29-results a")).toHaveAttribute("href", pathTo("S12", { docId: fixture.material_id }));
+      130 |   await main.getByRole("button", { name: copy("kind.all"), exact: true }).press("Enter");
+      131 |   await expect(main.locator(".s29-results > section")).toHaveCount(6);
+        at /home/claude/work/repo/tests/e2e/pages/S29.spec.ts:128:56
+
+    Error Context: ../logs/baseline-e2e-artifacts/pages-S29-S29-可搜索、筛选、查表、回到资料，并在拍照前选择用途-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../logs/baseline-e2e-artifacts/pages-S29-S29-可搜索、筛选、查表、回到资料，并在拍照前选择用途-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../logs/baseline-e2e-artifacts/pages-S29-S29-可搜索、筛选、查表、回到资料，并在拍照前选择用途-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium] › tests/e2e/pages/S29.spec.ts:104:1 › S29 搜索结果、最近访问和速查表都可直接用 view 打开 ────────────────
+    [chromium] › tests/e2e/pages/S29.spec.ts:158:1 › S29 可搜索、筛选、查表、回到资料，并在拍照前选择用途 ──────────────────
+  11 passed (1.8m)
