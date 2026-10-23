@@ -10,7 +10,7 @@ import { pathTo } from "../../../routes.ts";
 
 const LEVELS: readonly S16Level[] = ["keywords", "initials", "full"];
 const SOURCES: readonly S16Source[] = ["user", "tutor"];
-const INPUT = "w-full min-w-0 rounded-sm border border-line-strong bg-bg-surface p-3 text-ink-primary";
+const INPUT = "w-full min-w-[0] rounded-sm border border-line-strong bg-bg-surface p-3 text-ink-primary";
 
 export function TrainingWorkspace({
   data,
