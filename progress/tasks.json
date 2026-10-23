@@ -882,7 +882,16 @@
       ],
       "title": "S19 错题本（前端，假数据）",
       "goal": "照原型做出 S19 错题本：所有视图、七态、三档宽度，数据来自假数据层。",
-      "status": "todo"
+      "status": "done",
+      "history": [
+        {
+          "round": 1,
+          "version": "v0036",
+          "tool": "local",
+          "date": "2026-10-23 11:54",
+          "status": "done"
+        }
+      ]
     },
     {
       "id": "U20",
