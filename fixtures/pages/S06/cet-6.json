@@ -20,5 +20,83 @@
     "tasks": [
       { "id": "019a0306-0000-7000-8000-000000000067", "order": 10, "segment": "consolidate", "source": "due_review", "title": "到期复习 10 张", "minutes": 8, "reasons": [{ "kind": "restart_due" }], "go": { "page": "S15" } }
     ]
+  },
+  "side": {
+    "metrics": {
+      "forecast_gap": {
+        "status": "ok",
+        "low": 455,
+        "likely": 488,
+        "high": 512,
+        "target": 520,
+        "gap_to_target": 32,
+        "week_change": 0
+      },
+      "completion": {
+        "status": "ok",
+        "ratio": 0.31
+      },
+      "health": {
+        "status": "ok",
+        "ratio": 1.05,
+        "need_per_day": 2.1,
+        "actual_per_day": 2.2,
+        "recent_days": 7
+      }
+    },
+    "insufficient": {
+      "forecast_gap": {
+        "have": 25,
+        "missing": 35
+      },
+      "health": {
+        "have": 4,
+        "missing": 3
+      }
+    },
+    "carryovers": [],
+    "proposals": [
+      {
+        "id": "019a0306-0000-7000-8000-0000000000d1",
+        "kind": "cannot_place",
+        "ai_generated": false,
+        "hours_ago": 5,
+        "change": "把本周排不下的 2 组阅读精练挪到下周，下周每天多排约 10 分钟",
+        "reason": "本周可用时间比计划少，自动顺延找不到空位",
+        "cost": "下周每天多学约 10 分钟",
+        "if_declined": "这 2 组精练先放着，本周不再出现"
+      }
+    ],
+    "restart_proposal": {
+      "kind": "reconnect_reorganize",
+      "days": 14,
+      "ai_generated": false,
+      "hours_ago": 1,
+      "change": "把中断期间的新学顺延到后 {{days}} 天，第 1 轮结束日推后 3 天；这 {{days}} 天里复习上限临时提到 100 项",
+      "reason": "中断 {{away_days}} 天，原来的排期已经排不下",
+      "cost": "第 1 轮少 3 天缓冲",
+      "if_declined": "接下来每天都会有任务被顺延，清单会越来越长",
+      "id": "019a0306-0000-7000-8000-0000000000d9"
+    },
+    "milestones": {
+      "window_days": 30,
+      "items": [
+        {
+          "kind": "registration_close",
+          "in_days": 45,
+          "status": "official",
+          "basis": "准考证打印时间以官网为准"
+        }
+      ]
+    },
+    "onboarding": {
+      "done": [
+        "goal",
+        "materials",
+        "diagnosis",
+        "today"
+      ],
+      "collapse_at": 6
+    }
   }
 }

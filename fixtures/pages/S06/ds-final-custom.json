@@ -21,5 +21,77 @@
     "tasks": [
       { "id": "019a0406-0000-7000-8000-000000000067", "order": 10, "segment": "consolidate", "source": "due_review", "title": "到期复习 7 张", "minutes": 6, "reasons": [{ "kind": "restart_due" }], "go": { "page": "S15" } }
     ]
+  },
+  "side": {
+    "metrics": {
+      "forecast_gap": {
+        "status": "locked"
+      },
+      "completion": {
+        "status": "ok",
+        "ratio": 0.52
+      },
+      "health": {
+        "status": "ok",
+        "ratio": 1.31,
+        "need_per_day": 1.2,
+        "actual_per_day": 1.57,
+        "recent_days": 7
+      }
+    },
+    "insufficient": {
+      "forecast_gap": {
+        "have": 9,
+        "missing": 31
+      },
+      "health": {
+        "have": 1,
+        "missing": 6
+      }
+    },
+    "carryovers": [
+      {
+        "id": "019a0406-0000-7000-8000-0000000000c1",
+        "title": "「二叉树遍历」的读后即测",
+        "spent_minutes": 10,
+        "from_offset": -3,
+        "moved_offset": -2
+      }
+    ],
+    "proposals": [
+      {
+        "id": "019a0406-0000-7000-8000-0000000000d1",
+        "kind": "compress_scope",
+        "ai_generated": true,
+        "source": "tutor",
+        "hours_ago": 3,
+        "change": "把“图的最短路径”移出学习范围",
+        "reason": "期末考纲只要求了解，题量覆盖也不够",
+        "cost": "这部分不再进今日推荐，仍可自己学",
+        "if_declined": "今日清单会继续给它排新学"
+      }
+    ],
+    "restart_proposal": {
+      "kind": "reconnect_reorganize",
+      "days": 14,
+      "ai_generated": false,
+      "hours_ago": 1,
+      "change": "把中断期间的新学顺延到后 {{days}} 天，第 1 轮结束日推后 3 天；这 {{days}} 天里复习上限临时提到 100 项",
+      "reason": "中断 {{away_days}} 天，原来的排期已经排不下",
+      "cost": "第 1 轮少 3 天缓冲",
+      "if_declined": "接下来每天都会有任务被顺延，清单会越来越长",
+      "id": "019a0406-0000-7000-8000-0000000000d9"
+    },
+    "inbox": {
+      "pending": 1,
+      "minutes": 2
+    },
+    "onboarding": {
+      "done": [
+        "goal"
+      ],
+      "collapse_at": 6
+    },
+    "ai_eta_minutes": 15
   }
 }

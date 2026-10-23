@@ -21,5 +21,94 @@
     "tasks": [
       { "id": "019a0206-0000-7000-8000-000000000067", "order": 10, "segment": "consolidate", "source": "due_review", "title": "到期复习 6 张", "minutes": 5, "reasons": [{ "kind": "restart_due" }], "go": { "page": "S15" } }
     ]
+  },
+  "side": {
+    "metrics": {
+      "forecast_gap": {
+        "status": "ok",
+        "low": 66,
+        "likely": 71,
+        "high": 76,
+        "target": 78,
+        "gap_to_target": 7,
+        "week_change": 1
+      },
+      "completion": {
+        "status": "ok",
+        "ratio": 0.38
+      },
+      "health": {
+        "status": "ok",
+        "ratio": 0.92,
+        "need_per_day": 1.5,
+        "actual_per_day": 1.38,
+        "recent_days": 7
+      }
+    },
+    "insufficient": {
+      "forecast_gap": {
+        "have": 11,
+        "missing": 29
+      },
+      "health": {
+        "have": 2,
+        "missing": 5
+      }
+    },
+    "carryovers": [
+      {
+        "id": "019a0206-0000-7000-8000-0000000000c1",
+        "title": "「学习动机」的读后即测",
+        "spent_minutes": 15,
+        "from_offset": -2,
+        "moved_offset": -1
+      }
+    ],
+    "proposals": [
+      {
+        "id": "019a0206-0000-7000-8000-0000000000d1",
+        "kind": "calibrate",
+        "ai_generated": false,
+        "hours_ago": 6,
+        "change": "近 {{weeks}} 周实测每周 5.1 小时，计划按 7 小时排；把第 1 轮结束日推后 5 天",
+        "reason": "声明与实测连续 {{weeks}} 周相差 {{gap}} 以上",
+        "cost": "第 2 轮攻重点少 5 天",
+        "if_declined": "按 7 小时排下去，每周都会有约 1.9 小时的任务被顺延"
+      }
+    ],
+    "restart_proposal": {
+      "kind": "reconnect_reorganize",
+      "days": 14,
+      "ai_generated": false,
+      "hours_ago": 1,
+      "change": "把中断期间的新学顺延到后 {{days}} 天，第 1 轮结束日推后 3 天；这 {{days}} 天里复习上限临时提到 100 项",
+      "reason": "中断 {{away_days}} 天，原来的排期已经排不下",
+      "cost": "第 1 轮少 3 天缓冲",
+      "if_declined": "接下来每天都会有任务被顺延，清单会越来越长",
+      "id": "019a0206-0000-7000-8000-0000000000d9"
+    },
+    "milestones": {
+      "window_days": 30,
+      "items": [
+        {
+          "kind": "registration_open",
+          "in_days": 26,
+          "status": "estimated",
+          "basis": "按往年报名时间推算，公告后核对"
+        }
+      ]
+    },
+    "inbox": {
+      "pending": 2,
+      "minutes": 2
+    },
+    "onboarding": {
+      "done": [
+        "goal",
+        "materials"
+      ],
+      "collapse_at": 6
+    },
+    "ai_eta_minutes": 30
   }
 }

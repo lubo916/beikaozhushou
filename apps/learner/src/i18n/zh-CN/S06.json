@@ -105,6 +105,121 @@
       "body": "前两周按同类考生的典型节奏排；你的实测足够后改用你的数据"
     }
   },
+  "metrics": {
+    "title": "三个数",
+    "meta": "各答一个问题，不互相替代",
+    "summary_label": "三个数摘要",
+    "detail": "详情",
+    "separator": "；",
+    "insufficient": "数据不足",
+    "insufficient_hint": "样本还不够，先不下结论",
+    "locked": "已锁定",
+    "fix": "去修复",
+    "forecast": {
+      "question": "够不够",
+      "name": "预测",
+      "hint": "预测区间，按今天的水平",
+      "gap_short": "最可能值离目标线还差 {{gap}}",
+      "gap_reached": "最可能值已到目标线",
+      "change_up": "较上周 +{{n}}",
+      "change_down": "较上周 -{{n}}",
+      "change_flat": "与上周持平",
+      "shortfall": "已有 {{have}} 次作答，再做 {{missing}} 次才出预测",
+      "locked": "地图体检未通过，预测先锁定；学习照常。"
+    },
+    "completion": {
+      "question": "走了多远",
+      "name": "完成度",
+      "hint": "完成度：学习范围内的工作量已完成多少",
+      "pending": "学习范围定好后才算得出完成度"
+    },
+    "health": {
+      "question": "来不来得及",
+      "name": "健康度",
+      "hint": "健康度：按期需要每天 {{need}} 档，近 {{days}} 天每天 {{actual}} 档",
+      "shortfall": "已有 {{have}} 天实测，再学 {{missing}} 天才出结果"
+    }
+  },
+  "plan_adjust": {
+    "title": "计划调整",
+    "meta": "只挪时间的自动做；改目标、范围、轮次的先问你",
+    "carryover_title": "{{when}}凌晨自动顺延",
+    "carryover_body": "{{title}}（原定{{from}}）顺延到{{to}}。",
+    "carryover_spent": "那天只学了 {{spent}}。",
+    "carryover_rule": "只挪时间、不超当天预算的调整会自动做。",
+    "undo_hint": "{{days}} 天内可撤销",
+    "pin": "{{n}} 条调整待你确认：{{title}}",
+    "pin_more": "{{n}} 条调整待你确认：{{title}} 等"
+  },
+  "proposal": {
+    "kind": {
+      "calibrate": "按实测重排",
+      "reconnect_reorganize": "重组接下来 {{days}} 天",
+      "cannot_place": "排不下的任务",
+      "budget_conflict": "时间预算有冲突",
+      "compress_scope": "收窄学习范围",
+      "switch_round": "进入下一轮",
+      "replan_remaining_rounds": "重排剩下的轮次"
+    }
+  },
+  "milestones": {
+    "title": "节点提醒",
+    "calendar": "考试日历",
+    "note": "{{days}} 天内的节点才在今日页出现；{{detail}}",
+    "kind": {
+      "registration_open": {
+        "official": "报名{{date}}开始",
+        "estimated": "报名预计{{date}}开始",
+        "detail": "报名入口与所需材料已整理在考试日历"
+      },
+      "registration_close": {
+        "official": "报名{{date}}截止",
+        "estimated": "报名预计{{date}}截止",
+        "detail": "报名入口与所需材料已整理在考试日历"
+      },
+      "exam": {
+        "official": "{{date}}考试",
+        "estimated": "预计{{date}}考试",
+        "detail": "准考证与考场信息已整理在考试日历"
+      },
+      "score_release": {
+        "official": "{{date}}出成绩",
+        "estimated": "预计{{date}}出成绩",
+        "detail": "查分入口已整理在考试日历"
+      },
+      "target": {
+        "official": "目标日{{date}}",
+        "estimated": "目标日预计{{date}}",
+        "detail": "目标日前的轮次安排在学习计划里"
+      }
+    }
+  },
+  "inbox": {
+    "label": "学习收件箱",
+    "title": "学习收件箱有 {{n}} 条待归档",
+    "body": "拍照、语音与粘贴的内容；花 {{duration}}归到知识点",
+    "action": "去归档"
+  },
+  "onboarding": {
+    "label": "上手清单",
+    "title": "上手清单",
+    "collapse": "再完成 {{n}} 项后自动收起",
+    "skip": "跳过",
+    "done": "已完成：",
+    "step": {
+      "goal": "定目标",
+      "materials": "接资料",
+      "diagnosis": "摸底",
+      "today": "看懂今日清单",
+      "annotate": "在阅读器里标注一次",
+      "ask_tutor": "问一次导师"
+    }
+  },
+  "noai": {
+    "title": "导师暂时不可用",
+    "eta": "预计 {{duration}}内恢复。",
+    "body": "任务理由改用模板句；讲解、出题与制卡暂停。清单、到期复习、做题与解析照常。"
+  },
   "soon": {
     "short": "即将上线：按你说的时间即时重组今天的任务",
     "tier": "即将上线：换档会把剩下的任务换成这一档",
@@ -112,6 +227,12 @@
     "skip": "即将上线：今天不想学这个（只对今天有效，记下原因）",
     "off_cancel": "即将上线：把今天改回可学日",
     "extra": "即将上线：可选加练",
-    "report": "即将上线：反馈问题"
+    "report": "即将上线：反馈问题",
+    "confirm": "即将上线：确认后才按提议改计划",
+    "decline": "即将上线：选“不改”会保留原来的计划",
+    "undo": "即将上线：撤销这次自动顺延",
+    "undo_proposal": "即将上线：撤销已确认的提议",
+    "inbox": "即将上线：学习收件箱（把拍照、语音与粘贴的内容归到知识点）",
+    "onboarding_skip": "即将上线：跳过上手清单（可在设置里重开）"
   }
 }

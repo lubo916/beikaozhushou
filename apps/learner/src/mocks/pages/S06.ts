@@ -6,8 +6,12 @@
 // 演示用的完成状态只在还没作答时套用。所以在做题页把题做完，回到今日这一项就记为已完成，英雄区的“继续”接着指向下一项。
 // 视图：页面在开发与测试时把地址里的 ?view= 传来（查询参数 view）；没传时按数据定——都做完了是“全部完成”，否则是“正常”。
 // ?state= 的空、受限、数据不足由下面的 variants 给数据；加载、出错、离线由接口层统一处理（mocks/api.ts），这里不管。
+// U06b 下半：三个数、计划调整（自动顺延与待确认提议）、节点提醒、收件箱、上手清单与导师恢复时间，取页面示例里的 side。
+// 规则还没实现，这些数是演示值；日期按今天往前往后数（演示数据不随真实日期过期）；提议文字里的规则数字按参数填（红线 2）。
+// 数据不足时预测与健康度不下结论、只给原始计数；《数据结构》期末故意“体检不通过”，预测锁定（vocabulary 第 9 节）。
 import { param } from "@exam-prep/params";
-import { diffDays } from "@exam-prep/shared/today";
+import { formatPercent } from "@exam-prep/shared/format";
+import { addDays, diffDays } from "@exam-prep/shared/today";
 import { defineRoute, type MockContext } from "../route.ts";
 
 type Json = Record<string, unknown>;
@@ -22,6 +26,10 @@ const FINISHED: ReadonlySet<unknown> = new Set(["done", "seen"]);
 const LAST = Number.MAX_SAFE_INTEGER;
 /** 首次进入的那天是第几天。 */
 const FIRST_DAY_NO = 1;
+/** 上手清单六项（vocabulary 第 4 节）。 */
+const ONBOARDING_STEPS = ["goal", "materials", "diagnosis", "today", "annotate", "ask_tutor"] as const;
+const MS_PER_HOUR = 60 * 60 * 1000;
+const PLACEHOLDER = /\{\{\s*(\w+)\s*\}\}/g;
 
 interface Reason {
   readonly kind: string;
@@ -44,6 +52,52 @@ interface TaskEntry {
   readonly go?: Json;
 }
 
+/** 页面示例里的一次自动顺延：日期按今天往前数（moved_offset 是哪天凌晨挪的，from_offset 是原定哪天）。 */
+interface CarryoverEntry {
+  readonly id: string;
+  readonly title: string;
+  readonly spent_minutes?: number;
+  readonly from_offset: number;
+  readonly moved_offset: number;
+}
+
+/** 页面示例里的一条提议：四行文字里的 {{weeks}}、{{gap}}、{{days}}、{{away_days}} 由这里按参数与这次的数填好。 */
+interface ProposalEntry {
+  readonly id: string;
+  readonly kind: string;
+  readonly days?: number;
+  readonly ai_generated: boolean;
+  readonly source?: string;
+  readonly hours_ago: number;
+  readonly change: string;
+  readonly reason: string;
+  readonly cost: string;
+  readonly if_declined: string;
+}
+
+/** 页面示例里的一个节点：日期按今天往后数 in_days 天。 */
+interface MilestoneEntry {
+  readonly kind: string;
+  readonly in_days: number;
+  readonly status: string;
+  readonly basis?: string;
+}
+
+/** 右栏与各视图专属部件的演示数据（U06b）。 */
+interface SideFixture {
+  /** 三个数，形状同接口（S06Metrics）。 */
+  readonly metrics: Json;
+  /** 数据不足时预测与健康度的原始计数（S06Shortfall）。 */
+  readonly insufficient: Readonly<Record<string, Json>>;
+  readonly carryovers: readonly CarryoverEntry[];
+  readonly proposals: readonly ProposalEntry[];
+  readonly restart_proposal?: ProposalEntry;
+  readonly milestones?: { readonly window_days: number; readonly items: readonly MilestoneEntry[] };
+  readonly inbox?: Json;
+  readonly onboarding: { readonly done: readonly string[]; readonly collapse_at: number };
+  readonly ai_eta_minutes?: number;
+}
+
 /** fixtures/pages/S06/<考试 ID>.json。 */
 interface PageFixture {
   readonly week: number;
@@ -56,6 +110,7 @@ interface PageFixture {
   readonly tasks: readonly TaskEntry[];
   readonly off: readonly TaskEntry[];
   readonly back: { readonly away_days: number; readonly tasks: readonly TaskEntry[] };
+  readonly side?: SideFixture;
 }
 
 interface Row {
@@ -76,6 +131,19 @@ const NO_PAGE: PageFixture = {
   tasks: [],
   off: [],
   back: { away_days: FIRST_DAY_NO, tasks: [] },
+};
+
+/** 新加的演示考试还没有右栏示例时：三个数先不下结论，其余都没有。 */
+const NO_SIDE: SideFixture = {
+  metrics: {
+    forecast_gap: { status: "insufficient", shortfall: { have: 0, missing: FIRST_DAY_NO } },
+    completion: { status: "ok", ratio: 0 },
+    health: { status: "insufficient", shortfall: { have: 0, missing: FIRST_DAY_NO } },
+  },
+  insufficient: {},
+  carryovers: [],
+  proposals: [],
+  onboarding: { done: [], collapse_at: ONBOARDING_STEPS.length },
 };
 
 /** 一键开始默认去哪（页面示例里没写时）：复习去复习与卡片，新学去阅读器，口述回顾去背诵训练，其余去做题。 */
@@ -195,6 +263,108 @@ function aiPaused(mode: Mode, view: View): string {
   return view === "noai" ? "unavailable" : "none";
 }
 
+/** 文字里的占位符按给的值填好（规则数字只从参数来，红线 2）。 */
+function fillText(text: string, values: Readonly<Record<string, string | number>>): string {
+  return text.replace(PLACEHOLDER, (whole: string, name: string) => (values[name] === undefined ? whole : String(values[name])));
+}
+
+/** 三个数：数据不足时预测与健康度不下结论，只给原始计数（演示值），完成度照常；预测已锁定（地图体检不通过）的照样锁定。 */
+function metricsOf(side: SideFixture, mode: Mode): Json {
+  if (mode !== "insufficient_data") return side.metrics;
+  const short = (key: string): Json => ({
+    status: "insufficient",
+    shortfall: side.insufficient[key] ?? { have: 0, missing: FIRST_DAY_NO },
+  });
+  const forecast = side.metrics["forecast_gap"];
+  const locked = isRecord(forecast) && forecast["status"] === "locked";
+  return { ...side.metrics, forecast_gap: locked ? forecast : short("forecast_gap"), health: short("health") };
+}
+
+/** 一条待确认的提议（公共的 Proposal 加上本页的种类与 AI 标识）：四行文字里的规则数字按参数填，中断天数取这次的。 */
+function proposalOf(ctx: MockContext, entry: ProposalEntry, awayDays: number): Json {
+  const values = {
+    weeks: param("plan.calibrate.weeks"),
+    gap: formatPercent(param("plan.calibrate.gap_ratio")),
+    days: entry.days ?? 0,
+    away_days: awayDays,
+  };
+  return {
+    kind: entry.kind,
+    ...(entry.days === undefined ? {} : { days: entry.days }),
+    ai_generated: entry.ai_generated,
+    proposal: {
+      id: entry.id,
+      exam_id: ctx.exam.examId,
+      status: "pending",
+      source: entry.source ?? "planner",
+      change: fillText(entry.change, values),
+      reason: fillText(entry.reason, values),
+      cost: fillText(entry.cost, values),
+      if_declined: fillText(entry.if_declined, values),
+      created_at: new Date(ctx.now - entry.hours_ago * MS_PER_HOUR).toISOString(),
+    },
+  };
+}
+
+/** 一次自动顺延：挪到今天；参数 plan.proposal.undo_days 天内可撤销。 */
+function carryoverOf(ctx: MockContext, entry: CarryoverEntry): Json {
+  const movedOn = addDays(ctx.day, entry.moved_offset);
+  return {
+    id: entry.id,
+    moved_on: movedOn,
+    from_day: addDays(ctx.day, entry.from_offset),
+    to_day: ctx.day,
+    title: entry.title,
+    ...(entry.spent_minutes === undefined ? {} : { spent_minutes: entry.spent_minutes }),
+    undo_until: `${addDays(movedOn, param("plan.proposal.undo_days"))}T00:00:00Z`,
+  };
+}
+
+/** 节点提醒：只给离今天不超过 window_days 天的（窗口天数的参数待登记，先用演示值）；一个都没有就不给。 */
+function milestonesOf(ctx: MockContext, side: SideFixture): Json | undefined {
+  const window = side.milestones;
+  if (window === undefined) return undefined;
+  const items = window.items
+    .filter((entry) => entry.in_days >= 0 && entry.in_days <= window.window_days)
+    .map((entry) => ({
+      kind: entry.kind,
+      date: addDays(ctx.day, entry.in_days),
+      status: entry.status,
+      ...(entry.basis === undefined ? {} : { basis: entry.basis }),
+    }));
+  return items.length === 0 ? undefined : { window_days: window.window_days, items };
+}
+
+/** 上手清单：六项逐项打勾；再完成几项就自动收起（收起项数的参数待登记，先用演示值）。 */
+function onboardingOf(side: SideFixture): Json {
+  const done = new Set(side.onboarding.done);
+  const items = ONBOARDING_STEPS.map((step) => ({ step, done: done.has(step) }));
+  const finished = items.filter((entry) => entry.done).length;
+  return { items, collapse_in: Math.max(0, side.onboarding.collapse_at - finished) };
+}
+
+/** 右栏与各视图专属部件（U06b）：首次进入有上手清单、还没有计划调整与收件箱；中断回归另给重组提议；导师不可用给恢复时间。 */
+function sideOf(ctx: MockContext, page: PageFixture, view: View, mode: Mode, paused: string): Json {
+  const side = page.side ?? NO_SIDE;
+  const first = view === "first";
+  const planned = mode !== "empty";
+  const awayDays = page.back.away_days;
+  const carryovers = side.carryovers.map((entry) => carryoverOf(ctx, entry));
+  const proposals = side.proposals.map((entry) => proposalOf(ctx, entry, awayDays));
+  const adjust = planned && !first && carryovers.length + proposals.length > 0;
+  const restart = planned && view === "back" ? side.restart_proposal : undefined;
+  const milestones = planned ? milestonesOf(ctx, side) : undefined;
+  return {
+    metrics: metricsOf(side, mode),
+    ...(adjust ? { adjustments: { carryovers, proposals } } : {}),
+    ...(restart === undefined ? {} : { restart_proposal: proposalOf(ctx, restart, awayDays) }),
+    ...(milestones === undefined ? {} : { milestones }),
+    ...(planned && !first && side.inbox !== undefined ? { inbox: side.inbox } : {}),
+    ...(first ? { onboarding: onboardingOf(side) } : {}),
+    ...(paused === "unavailable" && side.ai_eta_minutes !== undefined ? { ai_eta_minutes: side.ai_eta_minutes } : {}),
+  };
+}
+
 function home(ctx: MockContext, mode: Mode): Json {
   const page = pageFixture(ctx.exam.examId);
   const answered = answeredToday(ctx);
@@ -215,6 +385,7 @@ function home(ctx: MockContext, mode: Mode): Json {
   const remaining = minutesOf(open);
   const plan = ctx.exam.learner.plan;
   const showTiers = view !== "off" && view !== "back" && remaining > 0;
+  const paused = aiPaused(mode, view);
   return {
     view,
     day: ctx.day,
@@ -240,7 +411,8 @@ function home(ctx: MockContext, mode: Mode): Json {
     ...(view === "done" && page.tomorrow_first !== undefined ? { tomorrow_first: page.tomorrow_first } : {}),
     ...(view === "back" ? { away_days: awayDays } : {}),
     pace: mode === "insufficient_data" ? "typical" : "measured",
-    ai_paused: aiPaused(mode, view),
+    ai_paused: paused,
+    ...sideOf(ctx, page, view, mode, paused),
     data_source: "sample",
   };
 }

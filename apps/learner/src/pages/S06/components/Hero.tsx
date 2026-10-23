@@ -1,5 +1,6 @@
 // 英雄区：日期、轮次与周、一句话、继续、我只有 N 分钟、倒计时（bk spec 布局：桌面左栏最上面，手机也在最上面）。
 // 一句话是模板句加接口给的数：件数、分钟数、已完成几件都由接口算好（红线 5）；六个视图的句子与按钮各不相同。
+// 首次进入时最上面是上手清单（feat:S06-20，bk spec：上手清单放在英雄区上方）。
 import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
@@ -10,6 +11,7 @@ import { VOCAB } from "@exam-prep/shared/vocab";
 import { Button, Tag, buttonClass } from "@exam-prep/ui";
 import { useToast } from "../../../app/toast.tsx";
 import { goPath, nextTask } from "../data.ts";
+import { Onboarding } from "./Onboarding.tsx";
 import { TomorrowDialog } from "./TomorrowDialog.tsx";
 
 export interface HeroProps {
@@ -67,7 +69,7 @@ export function Hero({ data, bare = false }: HeroProps) {
       </>
     );
   } else if (data.view === "back") {
-    // feat:S06-18 中断回归态：先给一个很短的启动任务（重组方案以提议给出，在 U06b）
+    // feat:S06-18 中断回归态：先给一个很短的启动任务（重组方案以提议给出，在启动任务下面，见 ShortList）
     actions = start(t("hero.back_start", { duration }));
   } else {
     actions = (
@@ -83,6 +85,7 @@ export function Hero({ data, bare = false }: HeroProps) {
 
   return (
     <section aria-label={t("hero.label")} className="rounded-md bg-brand-primary-ink p-5 text-bg-surface">
+      {!bare && data.onboarding !== undefined && <Onboarding onboarding={data.onboarding} />}
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-[0] flex-1">
           {/* feat:S06-01 倒计时与轮次：日期、当前轮次与周次（多目标的切换在顶栏的目标切换里） */}
