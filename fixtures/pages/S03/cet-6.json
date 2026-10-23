@@ -1,0 +1,423 @@
+{
+  "data_source": "sample",
+  "state": "normal",
+  "exam_name": "大学英语六级",
+  "identity": "student",
+  "identities": [
+    {
+      "id": "working",
+      "label_key": "identity.working"
+    },
+    {
+      "id": "fulltime",
+      "label_key": "identity.fulltime"
+    },
+    {
+      "id": "student",
+      "label_key": "identity.student"
+    },
+    {
+      "id": "caregiver",
+      "label_key": "identity.caregiver"
+    }
+  ],
+  "days": [
+    {
+      "id": "mon",
+      "label_key": "day.mon",
+      "slots": [
+        {
+          "id": "mon-morning",
+          "period_key": "period.morning",
+          "kind": "audio",
+          "minutes": 10
+        },
+        {
+          "id": "mon-commute",
+          "period_key": "period.commute",
+          "kind": "fragment",
+          "minutes": 10
+        },
+        {
+          "id": "mon-noon",
+          "period_key": "period.noon",
+          "kind": "unavailable",
+          "minutes": 0
+        },
+        {
+          "id": "mon-daytime",
+          "period_key": "period.daytime",
+          "kind": "unavailable",
+          "minutes": 0
+        },
+        {
+          "id": "mon-evening",
+          "period_key": "period.evening",
+          "kind": "deep",
+          "minutes": 70
+        },
+        {
+          "id": "mon-bedtime",
+          "period_key": "period.bedtime",
+          "kind": "unavailable",
+          "minutes": 0
+        }
+      ]
+    },
+    {
+      "id": "tue",
+      "label_key": "day.tue",
+      "slots": [
+        {
+          "id": "tue-morning",
+          "period_key": "period.morning",
+          "kind": "audio",
+          "minutes": 10
+        },
+        {
+          "id": "tue-commute",
+          "period_key": "period.commute",
+          "kind": "fragment",
+          "minutes": 10
+        },
+        {
+          "id": "tue-noon",
+          "period_key": "period.noon",
+          "kind": "unavailable",
+          "minutes": 0
+        },
+        {
+          "id": "tue-daytime",
+          "period_key": "period.daytime",
+          "kind": "unavailable",
+          "minutes": 0
+        },
+        {
+          "id": "tue-evening",
+          "period_key": "period.evening",
+          "kind": "deep",
+          "minutes": 70
+        },
+        {
+          "id": "tue-bedtime",
+          "period_key": "period.bedtime",
+          "kind": "unavailable",
+          "minutes": 0
+        }
+      ]
+    },
+    {
+      "id": "wed",
+      "label_key": "day.wed",
+      "slots": [
+        {
+          "id": "wed-morning",
+          "period_key": "period.morning",
+          "kind": "audio",
+          "minutes": 10
+        },
+        {
+          "id": "wed-commute",
+          "period_key": "period.commute",
+          "kind": "fragment",
+          "minutes": 10
+        },
+        {
+          "id": "wed-noon",
+          "period_key": "period.noon",
+          "kind": "unavailable",
+          "minutes": 0
+        },
+        {
+          "id": "wed-daytime",
+          "period_key": "period.daytime",
+          "kind": "unavailable",
+          "minutes": 0
+        },
+        {
+          "id": "wed-evening",
+          "period_key": "period.evening",
+          "kind": "deep",
+          "minutes": 70
+        },
+        {
+          "id": "wed-bedtime",
+          "period_key": "period.bedtime",
+          "kind": "unavailable",
+          "minutes": 0
+        }
+      ]
+    },
+    {
+      "id": "thu",
+      "label_key": "day.thu",
+      "slots": [
+        {
+          "id": "thu-morning",
+          "period_key": "period.morning",
+          "kind": "audio",
+          "minutes": 10
+        },
+        {
+          "id": "thu-commute",
+          "period_key": "period.commute",
+          "kind": "fragment",
+          "minutes": 10
+        },
+        {
+          "id": "thu-noon",
+          "period_key": "period.noon",
+          "kind": "unavailable",
+          "minutes": 0
+        },
+        {
+          "id": "thu-daytime",
+          "period_key": "period.daytime",
+          "kind": "unavailable",
+          "minutes": 0
+        },
+        {
+          "id": "thu-evening",
+          "period_key": "period.evening",
+          "kind": "deep",
+          "minutes": 70
+        },
+        {
+          "id": "thu-bedtime",
+          "period_key": "period.bedtime",
+          "kind": "unavailable",
+          "minutes": 0
+        }
+      ]
+    },
+    {
+      "id": "fri",
+      "label_key": "day.fri",
+      "slots": [
+        {
+          "id": "fri-morning",
+          "period_key": "period.morning",
+          "kind": "audio",
+          "minutes": 10
+        },
+        {
+          "id": "fri-commute",
+          "period_key": "period.commute",
+          "kind": "fragment",
+          "minutes": 10
+        },
+        {
+          "id": "fri-noon",
+          "period_key": "period.noon",
+          "kind": "unavailable",
+          "minutes": 0
+        },
+        {
+          "id": "fri-daytime",
+          "period_key": "period.daytime",
+          "kind": "unavailable",
+          "minutes": 0
+        },
+        {
+          "id": "fri-evening",
+          "period_key": "period.evening",
+          "kind": "deep",
+          "minutes": 70
+        },
+        {
+          "id": "fri-bedtime",
+          "period_key": "period.bedtime",
+          "kind": "unavailable",
+          "minutes": 0
+        }
+      ]
+    },
+    {
+      "id": "sat",
+      "label_key": "day.sat",
+      "slots": [
+        {
+          "id": "sat-morning",
+          "period_key": "period.morning",
+          "kind": "audio",
+          "minutes": 10
+        },
+        {
+          "id": "sat-commute",
+          "period_key": "period.commute",
+          "kind": "fragment",
+          "minutes": 10
+        },
+        {
+          "id": "sat-noon",
+          "period_key": "period.noon",
+          "kind": "unavailable",
+          "minutes": 0
+        },
+        {
+          "id": "sat-daytime",
+          "period_key": "period.daytime",
+          "kind": "unavailable",
+          "minutes": 0
+        },
+        {
+          "id": "sat-evening",
+          "period_key": "period.evening",
+          "kind": "deep",
+          "minutes": 85
+        },
+        {
+          "id": "sat-bedtime",
+          "period_key": "period.bedtime",
+          "kind": "unavailable",
+          "minutes": 0
+        }
+      ]
+    },
+    {
+      "id": "sun",
+      "label_key": "day.sun",
+      "slots": [
+        {
+          "id": "sun-morning",
+          "period_key": "period.morning",
+          "kind": "audio",
+          "minutes": 10
+        },
+        {
+          "id": "sun-commute",
+          "period_key": "period.commute",
+          "kind": "fragment",
+          "minutes": 10
+        },
+        {
+          "id": "sun-noon",
+          "period_key": "period.noon",
+          "kind": "unavailable",
+          "minutes": 0
+        },
+        {
+          "id": "sun-daytime",
+          "period_key": "period.daytime",
+          "kind": "unavailable",
+          "minutes": 0
+        },
+        {
+          "id": "sun-evening",
+          "period_key": "period.evening",
+          "kind": "deep",
+          "minutes": 85
+        },
+        {
+          "id": "sun-bedtime",
+          "period_key": "period.bedtime",
+          "kind": "unavailable",
+          "minutes": 0
+        }
+      ]
+    }
+  ],
+  "templates": [
+    {
+      "id": "weekday",
+      "minutes": 90
+    },
+    {
+      "id": "weekend",
+      "minutes": 105
+    }
+  ],
+  "daily_minutes": 100,
+  "unavailable_days": [
+    {
+      "id": "019a0300-0003-7000-8000-000000000001",
+      "date": "2026-10-25",
+      "reason": "家庭安排"
+    }
+  ],
+  "summary": {
+    "weekly_minutes": 660,
+    "total_hours": 88,
+    "recommended_hours": 96,
+    "gap_hours": 8,
+    "calibration_days": 14
+  },
+  "calibration": {
+    "status": "ready",
+    "declared_minutes": 100,
+    "observed_minutes": 85,
+    "sample_minutes": 30
+  },
+  "materials": [
+    {
+      "id": "019a0300-0003-7000-8000-000000000002",
+      "title": "六级核心词汇",
+      "kind_key": "kind.textbook",
+      "access": "parsable",
+      "status": "ready"
+    },
+    {
+      "id": "019a0300-0003-7000-8000-000000000003",
+      "title": "六级听力课程",
+      "kind_key": "kind.course",
+      "access": "link_only",
+      "status": "ready"
+    },
+    {
+      "id": "019a0300-0003-7000-8000-000000000004",
+      "title": "六级阅读练习讲义",
+      "kind_key": "kind.handout",
+      "access": "mapped_only",
+      "status": "needs_alignment"
+    }
+  ],
+  "maps": [
+    {
+      "id": "019a0300-0003-7000-8000-000000000005",
+      "target_name": "大学英语六级",
+      "source": "official",
+      "enabled": true,
+      "extension": false
+    },
+    {
+      "id": "019a0300-0003-7000-8000-000000000006",
+      "target_name": "大学英语六级",
+      "source": "draft",
+      "enabled": false,
+      "extension": true
+    },
+    {
+      "id": "019a0300-0003-7000-8000-000000000007",
+      "target_name": "大学英语六级",
+      "source": "template",
+      "enabled": false,
+      "extension": false
+    }
+  ],
+  "import_methods": [
+    {
+      "id": "file",
+      "label_key": "import.file"
+    },
+    {
+      "id": "photo",
+      "label_key": "import.photo"
+    },
+    {
+      "id": "drive",
+      "label_key": "import.drive"
+    },
+    {
+      "id": "link",
+      "label_key": "import.link"
+    },
+    {
+      "id": "isbn",
+      "label_key": "import.isbn"
+    },
+    {
+      "id": "template",
+      "label_key": "import.template"
+    }
+  ]
+}
