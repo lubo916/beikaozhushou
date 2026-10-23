@@ -116,6 +116,20 @@ describe("S07 假数据与生成契约", () => {
     }
   });
 
+  it("预测不可用时，提议与沙盘代价不显示预测分值变化", () => {
+    for (const exam of fixtures.exams) {
+      const data = planFixture(exam.examId);
+      if (data.forecast_available) continue;
+      const costs = [
+        ...data.proposals.map((proposal) => proposal.cost),
+        ...data.sandbox.flatMap((scenario) => [scenario.cost, scenario.proposal.cost]),
+      ];
+      for (const cost of costs) {
+        expect(cost, `${exam.examId}：预测锁定时不能展示预测分数差额`).not.toMatch(/\d+(?:\s*[–—-]\s*\d+)?\s*分(?!钟)/u);
+      }
+    }
+  });
+
   it("空态保留上下文；受限和数据不足只改标记，不清除计划或学习范围", async () => {
     const normal = await setup().overview();
     const empty = await setup("empty").overview();
