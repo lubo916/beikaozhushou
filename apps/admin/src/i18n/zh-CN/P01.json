@@ -1,1 +1,132 @@
-{}
+{
+  "title": "运营驾驶舱",
+  "description": "北极星：周有效学习用户数。业务目标值待确认，确认前不着色。",
+  "sample": "示例数据",
+  "scope": "考试范围：{{exam}}",
+  "period": "统计周期 {{start}} 至 {{end}}",
+  "alertsBadge": "告警 {{n}} 条",
+  "soon": "即将上线",
+  "people": "{{n}} 人",
+  "northStar": {
+    "section": "北极星与首周转化",
+    "label": "周有效学习用户",
+    "up": "较上周 +{{change}}",
+    "down": "较上周 −{{change}}",
+    "flat": "与上周持平",
+    "previous": "上周 {{n}} 人，样本不足，暂不比较",
+    "targetPending": "目标值：待确认（确认前不着色）。",
+    "target": "目标值：{{value}} 人。",
+    "dictionary": "口径以指标字典 {{version}} 为准"
+  },
+  "firstWeek": {
+    "label": "首周有效学习率",
+    "hint": "新用户 {{n}} 人中有 {{effective}} 人"
+  },
+  "funnel": {
+    "title": "新用户转化漏斗",
+    "label": "从访问到付费的各步转化",
+    "meta": "口径 {{version}}",
+    "steps": {
+      "visit": "到访",
+      "goal_created": "建目标",
+      "diagnosis_done": "完成摸底",
+      "plan_generated": "生成计划",
+      "first_week_effective": "首周有效学习",
+      "paid": "付费"
+    }
+  },
+  "retention": {
+    "title": "按{{dimension}}看第 {{day}} 日留存",
+    "switch": "分群维度",
+    "list": "各分群的留存",
+    "thinTitle": "样本不足的分群：只显示人数，不出结论",
+    "dimensions": {
+      "goal_type": "目标类型",
+      "map_source": "地图来源",
+      "channel": "渠道"
+    },
+    "groups": {
+      "first_attempt": "首次报考",
+      "retake": "再次报考",
+      "undecided": "先学后定",
+      "official": "官方地图",
+      "template": "模板",
+      "self_built": "自建地图",
+      "self_built_check_failed": "自建且体检未通过",
+      "organic_search": "自然搜索",
+      "app_store": "应用商店",
+      "org_invite": "机构邀请",
+      "referral": "朋友推荐"
+    },
+    "notes": {
+      "map_source": "验证“不依赖平台内容也能闭环”的唯一指标：自建地图的留存不应明显低于官方。"
+    }
+  },
+  "alerts": {
+    "title": "异常告警",
+    "meta": "待处理 {{n}} 条",
+    "none": "当前没有告警。",
+    "handle": "处理",
+    "when": "{{time}} 发现",
+    "acknowledged": "已确认",
+    "aiNote": "异常归因摘要，仅供参考",
+    "categories": {
+      "metric": "指标",
+      "service": "服务",
+      "cost": "成本"
+    },
+    "severity": {
+      "high": "紧急",
+      "medium": "关注",
+      "low": "提示"
+    },
+    "subjects": {
+      "grading": "批改服务",
+      "template": "模板学习包",
+      "tutor": "导师调用成本",
+      "first_week_rate": "首周有效学习率",
+      "north_star": "周有效学习用户"
+    },
+    "kinds": {
+      "latency_high": "{{subject}}延迟超过 {{seconds}} 秒",
+      "error_spike": "{{subject}}报错激增",
+      "budget_exceeded": "{{subject}}超出本月预算 {{change}}",
+      "metric_drop": "{{subject}}较上周下降 {{change}}"
+    },
+    "pages": {
+      "P09": "去模板与学习包",
+      "P12": "去 AI 评测与质量",
+      "P17": "去内容安全"
+    }
+  },
+  "insufficient": {
+    "sample": "当前样本",
+    "minimum": "出结论至少需要",
+    "missing": "样本够了以后自动显示转化与留存结论；下面的人数都是原始计数。"
+  },
+  "state": {
+    "empty": {
+      "title": "运营驾驶舱暂无数据",
+      "body": "当前筛选下没有记录，换个筛选条件试试",
+      "action": "恢复默认筛选"
+    },
+    "error": {
+      "body": "服务暂时异常，已保存的内容不受影响；重试或稍后再来。"
+    },
+    "offline": {
+      "title": "后台需要联网",
+      "body": "运营驾驶舱的数据要联网才能取到，恢复网络后点“重新连接”。",
+      "action": "重新连接",
+      "stale": "网络断开了，下面是断网前取到的数据。"
+    },
+    "restricted": {
+      "title": "需要相应的后台角色",
+      "body": "须相应后台角色；敏感操作先重验身份，再按风险分档确认，只有不可逆操作双人复核",
+      "action": "去系统、参数与权限"
+    },
+    "insufficient_data": {
+      "title": "样本不足，暂不出结论",
+      "body": "样本不足时不出结论，只显示原始计数"
+    }
+  }
+}

@@ -1,1 +1,75 @@
-{}
+{
+  "title": "数据中台",
+  "description": "埋点、指标与数据任务；所有看板与预测的地基。",
+  "sample": "示例数据",
+  "scope": "考试范围：{{exam}}",
+  "soon": "即将上线",
+  "filters": {
+    "label": "按分类筛选",
+    "all": "全部",
+    "search": "搜索指标",
+    "placeholder": "指标名或代码"
+  },
+  "categories": {
+    "learning": "学习",
+    "conversion": "转化",
+    "retention": "留存",
+    "quality": "质量",
+    "cost": "成本"
+  },
+  "dictionary": {
+    "title": "指标字典",
+    "aligned": "共 {{n}} 个指标，口径与学员端术语一致：已学、达标、已过线、有效学习等。",
+    "misaligned": "共 {{n}} 个指标，部分口径与学员端术语不一致，见各指标下的提示。",
+    "caption": "指标字典：每个指标的口径与版本",
+    "columns": {
+      "name": "指标",
+      "definition": "口径",
+      "version": "版本",
+      "status": "状态"
+    },
+    "versions": "{{version}}，{{date}} 起：{{note}}",
+    "aiNote": "口径冲突提示，仅供参考",
+    "updated": "最近更新：{{time}}"
+  },
+  "status": {
+    "active": "生效",
+    "draft": "待生效",
+    "deprecated": "已停用"
+  },
+  "quality": {
+    "title": "数据质量日报",
+    "conflicts": "口径冲突",
+    "missing": "缺少事件登记",
+    "events": "昨日事件",
+    "count": "{{n}} 个",
+    "aiNote": "数据质量日报，仅供参考",
+    "eventsMinimum": "出结论至少需要",
+    "insufficientMissing": "事件量够了以后自动生成日报；现在只显示原始计数。"
+  },
+  "state": {
+    "empty": {
+      "title": "数据中台暂无数据",
+      "body": "当前筛选下没有记录，换个筛选条件试试",
+      "action": "清除筛选"
+    },
+    "error": {
+      "body": "服务暂时异常，已保存的内容不受影响；重试或稍后再来。"
+    },
+    "offline": {
+      "title": "后台需要联网",
+      "body": "指标字典要联网才能取到，恢复网络后点“重新连接”。",
+      "action": "重新连接",
+      "stale": "网络断开了，下面是断网前取到的数据。"
+    },
+    "restricted": {
+      "title": "需要相应的后台角色",
+      "body": "须相应后台角色；敏感操作先重验身份，再按风险分档确认，只有不可逆操作双人复核",
+      "action": "去系统、参数与权限"
+    },
+    "insufficient_data": {
+      "title": "样本不足，暂不出结论",
+      "body": "样本不足时不出结论，只显示原始计数"
+    }
+  }
+}

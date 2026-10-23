@@ -1,0 +1,93 @@
+# P02 数据中台·指标字典：每个指标的口径与版本（阶段 1 只有假数据层，不接真实服务）。
+# x-action 暂借已登记、未授予任何真实角色的 org.workbench.read 占位（谁都调不了，失败即拒绝）；
+# 整合任务在 contracts/permissions.yaml 登记平台后台读取动作后替换（见 W01 交接单）。
+paths:
+  /admin/metric-dictionary:
+    get:
+      operationId: getP02MetricDictionary
+      x-owner: metrics
+      x-action: org.workbench.read
+      summary: 指标字典（示例数据：口径、版本与数据质量检查；筛选由接口完成）
+      description: exam、state 只在开发与测试时由假数据层使用（演示考试与强制页面状态）。
+      parameters:
+        - name: exam
+          in: query
+          schema: {type: string}
+        - name: state
+          in: query
+          schema: {type: string}
+        - name: category
+          in: query
+          schema: {$ref: "#/components/schemas/P02MetricCategory"}
+        - name: q
+          in: query
+          description: 按指标名或代码搜索
+          schema: {type: string}
+      responses:
+        "200":
+          description: 按筛选条件返回的指标字典
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/P02MetricDictionary"}
+        "403": {$ref: "#/components/responses/Error"}
+        "500": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    P02MetricCategory:
+      type: string
+      enum: [learning, conversion, retention, quality, cost]
+    P02MetricDictionary:
+      type: object
+      required: [data_source, exam_name, generated_at, time_zone, total_count, glossary_aligned, categories, items, quality]
+      properties:
+        data_source: {$ref: "#/components/schemas/DataSource"}
+        exam_name: {type: string}
+        generated_at: {$ref: "#/components/schemas/Timestamp"}
+        time_zone: {type: string}
+        total_count: {type: integer, minimum: 0, description: 字典里的指标总数（不受筛选影响）}
+        glossary_aligned: {type: boolean, description: 口径用语是否与统一词汇一致}
+        categories:
+          type: array
+          items: {$ref: "#/components/schemas/P02CategoryCount"}
+        items:
+          type: array
+          items: {$ref: "#/components/schemas/P02MetricEntry"}
+        quality: {$ref: "#/components/schemas/P02QualityCheck"}
+    P02CategoryCount:
+      type: object
+      required: [category, count]
+      properties:
+        category: {$ref: "#/components/schemas/P02MetricCategory"}
+        count: {type: integer, minimum: 0}
+    P02MetricEntry:
+      type: object
+      required: [metric_id, name, category, definition, version, status, updated_at, versions]
+      properties:
+        metric_id: {type: string}
+        name: {type: string}
+        category: {$ref: "#/components/schemas/P02MetricCategory"}
+        definition: {type: string, description: 口径}
+        version: {type: string}
+        status: {type: string, enum: [active, draft, deprecated]}
+        updated_at: {$ref: "#/components/schemas/Timestamp"}
+        versions:
+          type: array
+          items: {$ref: "#/components/schemas/P02MetricVersion"}
+        ai_conflict_note: {type: string, description: AI 识别的口径冲突提示（界面须带 AI 标识）}
+    P02MetricVersion:
+      type: object
+      required: [version, effective_from, change_note]
+      properties:
+        version: {type: string}
+        effective_from: {$ref: "#/components/schemas/LearningDay"}
+        change_note: {type: string}
+    P02QualityCheck:
+      type: object
+      required: [sample_sufficient, event_count, minimum_event_count]
+      properties:
+        sample_sufficient: {type: boolean}
+        event_count: {type: integer, minimum: 0}
+        minimum_event_count: {type: integer, minimum: 0}
+        conflict_count: {type: integer, minimum: 0, description: 口径冲突数；样本不足时不返回}
+        missing_event_count: {type: integer, minimum: 0, description: 缺少上游事件登记的指标数；样本不足时不返回}
+        summary: {type: string, description: AI 生成的数据质量日报摘要（界面须带 AI 标识）；样本不足时不返回}

@@ -1,0 +1,149 @@
+# P01 运营驾驶舱：平台运营看的匿名聚合指标（阶段 1 只有假数据层，不接真实服务）。
+# x-action 暂借已登记、未授予任何真实角色的 org.workbench.read 占位（谁都调不了，失败即拒绝）；
+# 整合任务在 contracts/permissions.yaml 登记平台后台读取动作后替换（见 W01 交接单）。
+paths:
+  /admin/cockpit:
+    get:
+      operationId: getP01Cockpit
+      x-owner: metrics
+      x-action: org.workbench.read
+      summary: 运营驾驶舱（示例数据：北极星、转化漏斗、留存分群与异常告警；业务数字由接口算好）
+      description: exam、state 只在开发与测试时由假数据层使用（演示考试与强制页面状态）。
+      parameters:
+        - name: exam
+          in: query
+          schema: {type: string}
+        - name: state
+          in: query
+          schema: {type: string}
+        - name: dimension
+          in: query
+          schema: {$ref: "#/components/schemas/P01CohortDimension"}
+      responses:
+        "200":
+          description: 当前统计周期的驾驶舱数据（匿名聚合）
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/P01Cockpit"}
+        "403": {$ref: "#/components/responses/Error"}
+        "500": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    P01CohortDimension:
+      type: string
+      description: 留存分群维度：目标类型、地图来源、渠道
+      enum: [goal_type, map_source, channel]
+    P01Cockpit:
+      type: object
+      required:
+        - data_source
+        - exam_name
+        - generated_at
+        - time_zone
+        - period_start
+        - period_end
+        - dictionary_version
+        - sample_sufficient
+        - sample_count
+        - minimum_sample_size
+        - open_alert_count
+        - north_star
+        - first_week_rate
+        - funnel
+        - retention
+        - alerts
+      properties:
+        data_source: {$ref: "#/components/schemas/DataSource"}
+        exam_name: {type: string, description: 考试范围的显示名}
+        generated_at: {$ref: "#/components/schemas/Timestamp"}
+        time_zone: {type: string, description: 显示时间用的时区（IANA 名）}
+        period_start: {$ref: "#/components/schemas/LearningDay"}
+        period_end: {$ref: "#/components/schemas/LearningDay"}
+        dictionary_version: {type: string, description: 口径所依据的指标字典版本}
+        sample_sufficient: {type: boolean, description: 样本是否足够出结论；不足时比例类字段不返回}
+        sample_count: {type: integer, minimum: 0}
+        minimum_sample_size: {type: integer, minimum: 0}
+        open_alert_count: {type: integer, minimum: 0}
+        north_star: {$ref: "#/components/schemas/P01NorthStar"}
+        first_week_rate: {$ref: "#/components/schemas/P01RateMetric"}
+        funnel:
+          type: array
+          items: {$ref: "#/components/schemas/P01FunnelStep"}
+        retention: {$ref: "#/components/schemas/P01Retention"}
+        alerts:
+          type: array
+          items: {$ref: "#/components/schemas/P01Alert"}
+    P01NorthStar:
+      type: object
+      description: 北极星：周有效学习用户数（口径以指标字典为准）
+      required: [metric_id, value, previous_value, target_status]
+      properties:
+        metric_id: {type: string}
+        value: {type: integer, minimum: 0}
+        previous_value: {type: integer, minimum: 0}
+        change_ratio: {type: number, description: 较上一周期的变化比例；样本不足时不返回}
+        target_status: {type: string, enum: [pending, confirmed], description: 业务目标值是否已确认；待确认时界面不着色}
+        target_value: {type: integer, minimum: 0, description: 已确认的目标值}
+    P01RateMetric:
+      type: object
+      required: [metric_id, numerator, denominator]
+      properties:
+        metric_id: {type: string}
+        numerator: {type: integer, minimum: 0}
+        denominator: {type: integer, minimum: 0}
+        ratio: {type: number, minimum: 0, maximum: 1, description: 后端算好的比例；样本不足时不返回}
+    P01FunnelStep:
+      type: object
+      required: [step_id, count]
+      properties:
+        step_id:
+          type: string
+          enum: [visit, goal_created, diagnosis_done, plan_generated, first_week_effective, paid]
+        count: {type: integer, minimum: 0}
+        ratio: {type: number, minimum: 0, maximum: 1, description: 相对第一步的转化比例；样本不足时不返回}
+    P01Retention:
+      type: object
+      required: [dimension, day, groups]
+      properties:
+        dimension: {$ref: "#/components/schemas/P01CohortDimension"}
+        day: {type: integer, minimum: 1, description: 第几日留存（来自指标字典配置）}
+        groups:
+          type: array
+          items: {$ref: "#/components/schemas/P01RetentionGroup"}
+    P01RetentionGroup:
+      type: object
+      required: [group_id, cohort_size, sample_sufficient]
+      properties:
+        group_id:
+          type: string
+          enum:
+            - first_attempt
+            - retake
+            - undecided
+            - official
+            - template
+            - self_built
+            - self_built_check_failed
+            - organic_search
+            - app_store
+            - org_invite
+            - referral
+        cohort_size: {type: integer, minimum: 0}
+        ratio: {type: number, minimum: 0, maximum: 1, description: 留存比例；该分群样本不足时不返回}
+        sample_sufficient: {type: boolean}
+        tone: {type: string, enum: [default, warning], description: 后端标出需要关注的分群}
+    P01Alert:
+      type: object
+      required: [id, category, kind, subject, severity, raised_at, status]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        category: {type: string, enum: [metric, service, cost]}
+        kind: {type: string, enum: [latency_high, error_spike, budget_exceeded, metric_drop]}
+        subject: {type: string, enum: [grading, template, tutor, first_week_rate, north_star]}
+        threshold_seconds: {type: integer, minimum: 0}
+        change_ratio: {type: number}
+        severity: {type: string, enum: [high, medium, low]}
+        raised_at: {$ref: "#/components/schemas/Timestamp"}
+        status: {type: string, enum: [open, acknowledged]}
+        related_page: {type: string, enum: [P09, P12, P17], description: 处理时要去的后台页面}
+        ai_summary: {type: string, description: AI 生成的异常归因摘要（界面须带 AI 标识）}

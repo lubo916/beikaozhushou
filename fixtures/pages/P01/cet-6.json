@@ -1,0 +1,337 @@
+{
+  "normal": {
+    "cockpit": {
+      "data_source": "sample",
+      "exam_name": "大学英语六级",
+      "generated_at": "2026-10-23T04:00:00Z",
+      "time_zone": "Asia/Shanghai",
+      "period_start": "2026-10-12",
+      "period_end": "2026-10-18",
+      "dictionary_version": "v3",
+      "sample_sufficient": true,
+      "sample_count": 96000,
+      "minimum_sample_size": 200,
+      "open_alert_count": 1,
+      "north_star": {
+        "metric_id": "weekly_effective_learners",
+        "value": 128700,
+        "previous_value": 131200,
+        "change_ratio": -0.019,
+        "target_status": "pending"
+      },
+      "first_week_rate": {
+        "metric_id": "first_week_effective_rate",
+        "numerator": 15580,
+        "denominator": 41000,
+        "ratio": 0.38
+      },
+      "funnel": [
+        {
+          "step_id": "visit",
+          "count": 96000,
+          "ratio": 1.0
+        },
+        {
+          "step_id": "goal_created",
+          "count": 55680,
+          "ratio": 0.58
+        },
+        {
+          "step_id": "diagnosis_done",
+          "count": 33600,
+          "ratio": 0.35
+        },
+        {
+          "step_id": "plan_generated",
+          "count": 26880,
+          "ratio": 0.28
+        },
+        {
+          "step_id": "first_week_effective",
+          "count": 15360,
+          "ratio": 0.16
+        },
+        {
+          "step_id": "paid",
+          "count": 2880,
+          "ratio": 0.03
+        }
+      ],
+      "retention": {
+        "dimension": "map_source",
+        "day": 30,
+        "groups": [
+          {
+            "group_id": "official",
+            "cohort_size": 71000,
+            "sample_sufficient": true,
+            "ratio": 0.46
+          },
+          {
+            "group_id": "template",
+            "cohort_size": 19000,
+            "sample_sufficient": true,
+            "ratio": 0.41
+          },
+          {
+            "group_id": "self_built",
+            "cohort_size": 5400,
+            "sample_sufficient": true,
+            "ratio": 0.39
+          },
+          {
+            "group_id": "self_built_check_failed",
+            "cohort_size": 600,
+            "sample_sufficient": true,
+            "ratio": 0.27,
+            "tone": "warning"
+          }
+        ]
+      },
+      "alerts": [
+        {
+          "id": "0195b000-0000-7000-8000-000000003001",
+          "category": "cost",
+          "kind": "budget_exceeded",
+          "subject": "tutor",
+          "change_ratio": 0.12,
+          "severity": "medium",
+          "raised_at": "2026-10-23T02:30:00Z",
+          "status": "open",
+          "related_page": "P12",
+          "ai_summary": "超支主要来自即时出题调用次数上升，单次成本没有明显变化；建议先核对出题场景的调用上限。"
+        }
+      ]
+    },
+    "retention_by_dimension": {
+      "goal_type": [
+        {
+          "group_id": "first_attempt",
+          "cohort_size": 61000,
+          "sample_sufficient": true,
+          "ratio": 0.42
+        },
+        {
+          "group_id": "retake",
+          "cohort_size": 28000,
+          "sample_sufficient": true,
+          "ratio": 0.48
+        },
+        {
+          "group_id": "undecided",
+          "cohort_size": 7000,
+          "sample_sufficient": true,
+          "ratio": 0.29
+        }
+      ],
+      "map_source": [
+        {
+          "group_id": "official",
+          "cohort_size": 71000,
+          "sample_sufficient": true,
+          "ratio": 0.46
+        },
+        {
+          "group_id": "template",
+          "cohort_size": 19000,
+          "sample_sufficient": true,
+          "ratio": 0.41
+        },
+        {
+          "group_id": "self_built",
+          "cohort_size": 5400,
+          "sample_sufficient": true,
+          "ratio": 0.39
+        },
+        {
+          "group_id": "self_built_check_failed",
+          "cohort_size": 600,
+          "sample_sufficient": true,
+          "ratio": 0.27,
+          "tone": "warning"
+        }
+      ],
+      "channel": [
+        {
+          "group_id": "organic_search",
+          "cohort_size": 44000,
+          "sample_sufficient": true,
+          "ratio": 0.4
+        },
+        {
+          "group_id": "app_store",
+          "cohort_size": 33000,
+          "sample_sufficient": true,
+          "ratio": 0.38
+        },
+        {
+          "group_id": "org_invite",
+          "cohort_size": 8000,
+          "sample_sufficient": true,
+          "ratio": 0.52
+        },
+        {
+          "group_id": "referral",
+          "cohort_size": 11000,
+          "sample_sufficient": true,
+          "ratio": 0.47
+        }
+      ]
+    }
+  },
+  "insufficient": {
+    "cockpit": {
+      "data_source": "sample",
+      "exam_name": "大学英语六级",
+      "generated_at": "2026-10-23T04:00:00Z",
+      "time_zone": "Asia/Shanghai",
+      "period_start": "2026-10-12",
+      "period_end": "2026-10-18",
+      "dictionary_version": "v3",
+      "sample_sufficient": false,
+      "sample_count": 36,
+      "minimum_sample_size": 200,
+      "open_alert_count": 1,
+      "north_star": {
+        "metric_id": "weekly_effective_learners",
+        "value": 60,
+        "previous_value": 61,
+        "target_status": "pending"
+      },
+      "first_week_rate": {
+        "metric_id": "first_week_effective_rate",
+        "numerator": 7,
+        "denominator": 19
+      },
+      "funnel": [
+        {
+          "step_id": "visit",
+          "count": 45
+        },
+        {
+          "step_id": "goal_created",
+          "count": 26
+        },
+        {
+          "step_id": "diagnosis_done",
+          "count": 16
+        },
+        {
+          "step_id": "plan_generated",
+          "count": 13
+        },
+        {
+          "step_id": "first_week_effective",
+          "count": 7
+        },
+        {
+          "step_id": "paid",
+          "count": 1
+        }
+      ],
+      "retention": {
+        "dimension": "map_source",
+        "day": 30,
+        "groups": [
+          {
+            "group_id": "official",
+            "cohort_size": 33,
+            "sample_sufficient": false
+          },
+          {
+            "group_id": "template",
+            "cohort_size": 9,
+            "sample_sufficient": false
+          },
+          {
+            "group_id": "self_built",
+            "cohort_size": 3,
+            "sample_sufficient": false
+          },
+          {
+            "group_id": "self_built_check_failed",
+            "cohort_size": 0,
+            "sample_sufficient": false
+          }
+        ]
+      },
+      "alerts": [
+        {
+          "id": "0195b000-0000-7000-8000-000000003001",
+          "category": "cost",
+          "kind": "budget_exceeded",
+          "subject": "tutor",
+          "change_ratio": 0.12,
+          "severity": "medium",
+          "raised_at": "2026-10-23T02:30:00Z",
+          "status": "open",
+          "related_page": "P12",
+          "ai_summary": "超支主要来自即时出题调用次数上升，单次成本没有明显变化；建议先核对出题场景的调用上限。"
+        }
+      ]
+    },
+    "retention_by_dimension": {
+      "goal_type": [
+        {
+          "group_id": "first_attempt",
+          "cohort_size": 28,
+          "sample_sufficient": false
+        },
+        {
+          "group_id": "retake",
+          "cohort_size": 13,
+          "sample_sufficient": false
+        },
+        {
+          "group_id": "undecided",
+          "cohort_size": 3,
+          "sample_sufficient": false
+        }
+      ],
+      "map_source": [
+        {
+          "group_id": "official",
+          "cohort_size": 33,
+          "sample_sufficient": false
+        },
+        {
+          "group_id": "template",
+          "cohort_size": 9,
+          "sample_sufficient": false
+        },
+        {
+          "group_id": "self_built",
+          "cohort_size": 3,
+          "sample_sufficient": false
+        },
+        {
+          "group_id": "self_built_check_failed",
+          "cohort_size": 0,
+          "sample_sufficient": false
+        }
+      ],
+      "channel": [
+        {
+          "group_id": "organic_search",
+          "cohort_size": 21,
+          "sample_sufficient": false
+        },
+        {
+          "group_id": "app_store",
+          "cohort_size": 15,
+          "sample_sufficient": false
+        },
+        {
+          "group_id": "org_invite",
+          "cohort_size": 4,
+          "sample_sufficient": false
+        },
+        {
+          "group_id": "referral",
+          "cohort_size": 5,
+          "sample_sufficient": false
+        }
+      ]
+    }
+  }
+}
