@@ -103,7 +103,9 @@ for (const size of WIDTHS) {
     expectNoProblems(watch, "normal");
   });
 
-  test(`S04 ${size.width} 宽：测评页${size.split ? "分模块进度在右栏" : size.narrow ? "分模块进度收进抽屉" : "分模块进度排在题目下面"}`, async ({ page }) => {
+  test(`S04 ${size.width} 宽：测评页${size.split ? "分模块进度在右栏" : size.narrow ? "分模块进度收进抽屉" : "分模块进度排在题目下面"}`, async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: size.width, height: size.height });
     const watch = await watchPage(page);
     await watch.open(urlOf(entry, { view: "test" }));

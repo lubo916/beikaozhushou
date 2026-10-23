@@ -26,7 +26,9 @@ export function TestBar({ session, onPause, pausing }: TestBarProps) {
       <span className="hidden shrink-0 rounded-full border border-ink-tertiary px-2 text-small @tablet:inline-flex">{t("test.badge")}</span>
       <span className="hidden min-w-[0] truncate @desktop:inline">{t("test.note")}</span>
       <span className="shrink-0 tabular-nums">{position}</span>
-      {!finished && <span className="hidden shrink-0 tabular-nums @tablet:inline">{t("test.remaining", { minutes: session.remaining_minutes })}</span>}
+      {!finished && (
+        <span className="hidden shrink-0 tabular-nums @tablet:inline">{t("test.remaining", { minutes: session.remaining_minutes })}</span>
+      )}
       {!finished && (
         <button type="button" className={BAR_BUTTON} disabled={pausing} onClick={onPause}>
           {t("test.pause")}

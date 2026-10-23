@@ -56,7 +56,7 @@ function setup(state = "", exam?: string) {
     expect(result?.success, `${method} ${path}（?state=${state}）：${String(result?.error)}`).toBe(true);
     return outcome.body as Json;
   };
-  return { api, call, json };
+  return { api, call, json, db };
 }
 
 const sessionOf = (body: Json): Json => body["session"] as Json;
@@ -141,7 +141,8 @@ describe("S04 假数据（mocks/pages/S04.ts）", () => {
     const session = sessionOf(await json("POST", `${BASE}/sessions`, { mode: "adaptive" }));
     const good = unknownAnswer(session);
     const path = `${BASE}/sessions/${String(session["id"])}/answers`;
-    const { confidence: _dropped, ...noConfidence } = good;
+    const noConfidence = { ...good };
+    delete noConfidence["confidence"];
     for (const body of [noConfidence, { ...good, item_id: "not-this-one" }, { ...good, confidence: "sure" }]) {
       const outcome = await call("POST", path, body);
       expect(outcome.kind).toBe("json");
@@ -163,11 +164,48 @@ describe("S04 假数据（mocks/pages/S04.ts）", () => {
     expect(session["finish_reason"]).toBe("quick_finished");
     const mistakes = session["mistakes"] as Json[];
     expect(mistakes.length).toBeGreaterThan(0);
-    expect(mistakes.every((row) => row["added"] === false), "不自动进错题本").toBe(true);
+    expect(
+      mistakes.every((row) => row["added"] === false),
+      "不自动进错题本",
+    ).toBe(true);
     const first = String(mistakes[0]?.["item_id"]);
     const after = sessionOf(await json("POST", `${BASE}/sessions/${id}/mistakes`, { item_ids: [first] }));
     expect((after["mistakes"] as Json[]).find((row) => row["item_id"] === first)?.["added"]).toBe(true);
-    expect((after["modules"] as Json[]).some((row) => row["status"] === "in_progress"), "交卷后没有进行中的模块").toBe(false);
+    expect(
+      (after["modules"] as Json[]).some((row) => row["status"] === "in_progress"),
+      "交卷后没有进行中的模块",
+    ).toBe(false);
+  });
+
+  it("勾选的诊断错题进入共享错题本，未勾选的不进入；重置后清除诊断会话", async () => {
+    const { json, db } = setup();
+    const exam = fixtures.exams.find((item) => item.key === fixtures.defaultKey);
+    if (exam === undefined) throw new Error("默认演示考试缺失");
+    const before = db.listMistakes(exam, null, null)["items"] as Json[];
+    const known = new Set(before.map((row) => row["question_id"]));
+    const questions = new Map<string, string>();
+    let session = sessionOf(await json("POST", `${BASE}/sessions`, { mode: "adaptive" }));
+    const id = String(session["id"]);
+    for (let guard = 0; session["stage"] === "questions" && guard < 20; guard += 1) {
+      const current = session["current"] as Json;
+      questions.set(String(current["id"]), String((current["question"] as Json)["id"]));
+      session = sessionOf(await json("POST", `${BASE}/sessions/${id}/answers`, unknownAnswer(session)));
+    }
+    expect(session["stage"]).toBe("finished");
+    expect(db.listMistakes(exam, null, null)["items"]).toEqual(before);
+    const selected = (session["mistakes"] as Json[]).find((row) => !known.has(questions.get(String(row["item_id"]))));
+    if (selected === undefined) throw new Error("诊断示例缺少未入本的错题");
+    const itemId = String(selected["item_id"]);
+    await json("POST", `${BASE}/sessions/${id}/mistakes`, { item_ids: [itemId] });
+    const after = db.listMistakes(exam, null, null)["items"] as Json[];
+    expect(after).toHaveLength(before.length + 1);
+    expect(after.some((row) => row["question_id"] === questions.get(itemId))).toBe(true);
+    await json("POST", `${BASE}/sessions/${id}/mistakes`, { item_ids: [itemId] });
+    expect(db.listMistakes(exam, null, null)["items"]).toEqual(after);
+    db.reset();
+    const reset = await json("GET", BASE);
+    expect(reset["view"]).toBe("start");
+    expect(reset["session"]).toBeUndefined();
   });
 
   it("中途改用快速定位：已答的题保留，没答过题的章改成按章自评", async () => {
@@ -186,7 +224,12 @@ describe("S04 假数据（mocks/pages/S04.ts）", () => {
 describe("S04 七态判断与提交条件（data.ts）", () => {
   const waiting: DiagnosisQuery = { data: undefined, error: null, status: "pending", fetchStatus: "fetching" };
   const failed = (error: unknown): DiagnosisQuery => ({ data: undefined, error, status: "error", fetchStatus: "idle" });
-  const loaded = (data: Json): DiagnosisQuery => ({ data: data as unknown as S04Diagnosis, error: null, status: "success", fetchStatus: "idle" });
+  const loaded = (data: Json): DiagnosisQuery => ({
+    data: data as unknown as S04Diagnosis,
+    error: null,
+    status: "success",
+    fetchStatus: "idle",
+  });
 
   it("还在取：加载；查询被暂停或请求没拿到回应：离线；接口回 403：受限；其他错误：出错", () => {
     expect(diagnosisView(waiting).state).toBe("loading");
@@ -201,6 +244,19 @@ describe("S04 七态判断与提交条件（data.ts）", () => {
     const normal = loaded(await setup().json("GET", BASE));
     expect(diagnosisView(normal).state).toBe("normal");
     expect(diagnosisView({ ...normal, fetchStatus: "paused" }).stale).toBe(true);
+  });
+
+  it("已有缓存后服务出错或权限失效，收起旧数据并显示对应错误态", async () => {
+    const normal = loaded(await setup().json("GET", BASE));
+    for (const [code, expected] of [
+      ["COMMON_FORBIDDEN", "restricted"],
+      ["COMMON_INTERNAL", "error"],
+    ] as const) {
+      const result = diagnosisView({ ...normal, status: "error", error: new ApiError(code, {}) });
+      expect(result.state).toBe(expected);
+      expect(result.data).toBeUndefined();
+      expect(result.stale).toBe(false);
+    }
   });
 
   it("网络与服务异常只再试一次；4xx 不重试", () => {

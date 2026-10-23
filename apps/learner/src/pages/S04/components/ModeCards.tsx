@@ -61,7 +61,9 @@ export function ModeCards({ modes, value, onChange }: ModeCardsProps) {
                 disabled={!option.available}
                 onChange={() => onChange(option.mode)}
               />
-              <span className={cx("font-bold", option.available ? "text-ink-primary" : "text-ink-tertiary")}>{t(`mode.${option.mode}.title`)}</span>
+              <span className={cx("font-bold", option.available ? "text-ink-primary" : "text-ink-tertiary")}>
+                {t(`mode.${option.mode}.title`)}
+              </span>
               <span className={cx("text-small", muted)}>{lengthOf(option)}</span>
               <span className={cx("text-small", muted)}>{costOf(option)}</span>
             </label>

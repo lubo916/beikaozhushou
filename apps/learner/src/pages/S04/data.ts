@@ -71,6 +71,10 @@ export function isEmptyDiagnosis(data: S04Diagnosis): boolean {
 
 export function diagnosisView(query: DiagnosisQuery): DiagnosisView {
   const { data } = query;
+  // 服务出错或权限失效时收起旧数据；仅离线时沿用缓存。
+  if (query.status === "error" && isApiError(query.error)) {
+    return { state: query.error.code === "COMMON_FORBIDDEN" ? "restricted" : "error", data: undefined, stale: false };
+  }
   if (data !== undefined) return { state: isEmptyDiagnosis(data) ? "empty" : "normal", data, stale: isOffline(query) };
   if (isOffline(query)) return { state: "offline", data, stale: false };
   if (query.status === "pending") return { state: "loading", data, stale: false };

@@ -20,7 +20,8 @@ export function FinishCard({ session }: { readonly session: S04Session }) {
   const [picked, setPicked] = useState<readonly string[]>([]);
   const open = session.mistakes.filter((row) => !row.added);
   const chosen = picked.filter((id) => open.some((row) => row.item_id === id));
-  const toggle = (id: string) => setPicked((previous) => (previous.includes(id) ? previous.filter((item) => item !== id) : [...previous, id]));
+  const toggle = (id: string) =>
+    setPicked((previous) => (previous.includes(id) ? previous.filter((item) => item !== id) : [...previous, id]));
   const add = () => {
     if (chosen.length === 0 || addMistakes.isPending) return;
     addMistakes.mutate(

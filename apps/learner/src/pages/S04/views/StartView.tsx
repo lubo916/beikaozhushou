@@ -30,7 +30,8 @@ export function StartView({ data, empty, stale, onRetry, onLeave }: StartViewPro
   const { t } = useTranslation("S04");
   const toast = useToast();
   const actions = useDiagnosisActions();
-  const preset = data.modes.find((option) => option.available && option.selected)?.mode ?? data.modes.find((option) => option.available)?.mode;
+  const preset =
+    data.modes.find((option) => option.available && option.selected)?.mode ?? data.modes.find((option) => option.available)?.mode;
   const [chosen, setChosen] = useState<S04Mode | undefined>(undefined);
   const mode = chosen ?? preset;
   const session = data.session;

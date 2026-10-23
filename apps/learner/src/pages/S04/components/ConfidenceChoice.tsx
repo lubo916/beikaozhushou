@@ -1,6 +1,6 @@
 // 把握度四档（feat:S04-05）：确定、模糊、蒙的、不会，每题必选、没有默认，用来识别蒙对；“不会”只用于摸底（F01-Q1＝B）。
 // 共用的把握度组件只有三档（U18a）：这里照它的样子多做一档“不会”（U04-Q1＝A）；整合任务给共用组件加上“不会”以后改回共用组件。
-// 手机上两列放在拇指区（“不会”虚线框独占一行），平板与桌面一行四个（“不会”窄一些）。
+// 手机上四档两行两列放在拇指区，平板与桌面一行四个（“不会”窄一些）。
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
 import type { S04Confidence } from "@exam-prep/contract";
@@ -32,7 +32,7 @@ export function ConfidenceChoice({ value, onChange }: ConfidenceChoiceProps) {
               key={code}
               className={cx(
                 "flex min-h-12 cursor-pointer flex-col justify-center rounded-md border px-3 py-2 focus-within:ring-2 focus-within:ring-brand-primary",
-                code === "unknown" && "col-span-2 border-dashed @tablet:col-span-1",
+                code === "unknown" && "border-dashed",
                 chosen ? "border-brand-primary bg-brand-primary-soft" : "border-line-strong bg-bg-surface",
               )}
             >

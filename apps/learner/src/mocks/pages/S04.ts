@@ -104,6 +104,7 @@ interface Session {
 }
 
 interface Live {
+  readonly resetToken: object;
   readonly sessions: Map<string, Session>;
   seq: number;
 }
@@ -117,8 +118,8 @@ const strings = (value: unknown): string[] => (Array.isArray(value) ? value.filt
 
 function live(db: MockDb): Live {
   const found = LIVE.get(db);
-  if (found !== undefined) return found;
-  const created: Live = { sessions: new Map(), seq: 0 };
+  if (found !== undefined && found.resetToken === db.resetToken) return found;
+  const created: Live = { resetToken: db.resetToken, sessions: new Map(), seq: 0 };
   LIVE.set(db, created);
   return created;
 }
@@ -449,7 +450,8 @@ function submit(ctx: MockContext, variant: Variant): Json {
   const selected = numbers(response["selected"]);
   const text = typeof response["text"] === "string" ? response["text"] : "";
   // 选“不会”可以不作答；其他把握度要先作答（R6）
-  if (confidence !== "unknown" && selected.length === 0 && text.trim() === "") throw new ApiError("COMMON_VALIDATION", { field: "response" });
+  if (confidence !== "unknown" && selected.length === 0 && text.trim() === "")
+    throw new ApiError("COMMON_VALIDATION", { field: "response" });
   session.answers.push({ itemId: expected, bank: head, selected, text, confidence });
   session.queue = session.queue.slice(1);
   session.paused = false;
@@ -509,7 +511,15 @@ function addMistakes(ctx: MockContext, variant: Variant): Json {
   const ids = strings(body["item_ids"]);
   const open = new Set(mistakeRows(ctx, bankOf(ctx.exam, pageOf(ctx.exam)), session).map((row) => row["item_id"]));
   if (ids.length === 0 || ids.some((id) => !open.has(id))) throw new ApiError("COMMON_VALIDATION", { field: "item_ids" });
-  for (const id of ids) session.added.add(id);
+  const bank = bankOf(ctx.exam, pageOf(ctx.exam));
+  for (const id of ids) {
+    const answer = session.answers.find((row) => row.itemId === id);
+    const entry = answer === undefined ? undefined : bank[answer.bank];
+    if (entry === undefined) throw new ApiError("COMMON_VALIDATION", { field: "item_ids" });
+    // feat:S04-13 手动加入共享错题本，不创建作答或掌握证据。
+    ctx.db.addDiagnosisMistake(ctx.exam, entry.question, ctx.now);
+    session.added.add(id);
+  }
   return diagnosisBody(ctx, variant);
 }
 
