@@ -1,1 +1,132 @@
-{}
+{
+  "title": "考情分析工作台",
+  "description": "考点档案按成熟度门控：冷启动不展示，成熟中只显示原始次数。",
+  "sample": "示例数据",
+  "scope": "考试范围：{{exam}}",
+  "maturityNow": "数据成熟度：{{level}}",
+  "soon": "即将上线",
+  "actions": {
+    "import": "真题入库"
+  },
+  "filters": {
+    "label": "按来源筛选",
+    "all": "全部"
+  },
+  "sources": {
+    "official_public": "官方公开",
+    "licensed": "授权",
+    "recalled": "回忆版"
+  },
+  "questions": {
+    "title": "真题拆解",
+    "caption": "真题拆解：来源、关联知识点、干扰项标注与审核状态",
+    "summary": "已入库 {{n}} 道真题，下表是最近入库的题；来源按官方公开、授权、回忆版三级标注。",
+    "columns": {
+      "question": "真题",
+      "point": "关联知识点",
+      "distractors": "干扰项标注",
+      "status": "状态"
+    },
+    "label": "{{year}} {{subject}} 第 {{number}} 题",
+    "confidence": "自动关联置信度 {{value}}",
+    "distractor": "{{option}}：{{trap}}",
+    "separator": "；",
+    "aiNote": "拆解与干扰项标注初稿，待教研审核"
+  },
+  "link": {
+    "confirm": "确认关联",
+    "confirmed": "已确认"
+  },
+  "review": {
+    "pending": "待审",
+    "reviewed": "已审"
+  },
+  "profile": {
+    "title": "考点档案",
+    "level": {
+      "cold": "冷启动：学员端不展示考点档案。",
+      "maturing": "成熟中：学员端只显示原始次数，这里也只列出现次数，不出结论。",
+      "usable": "可参考：学员端显示考点档案，并标“仅供参考”。",
+      "mature": "成熟：考点档案参与性价比与预测。"
+    },
+    "recomputed": "最近一次增量重算：{{time}}，新入库 {{n}} 道真题",
+    "frequency": "考频",
+    "frequencyValue": "近 {{years}} 年出现 {{n}} 次",
+    "score": "累计分值",
+    "types": "题型",
+    "angles": "角度",
+    "trend": "趋势",
+    "traps": "陷阱",
+    "listSeparator": "、",
+    "status": {
+      "draft": "草稿",
+      "published": "已发布"
+    },
+    "aiNote": "考点档案草稿，待教研审核后发布",
+    "questions": "已入库真题",
+    "years": "覆盖年份",
+    "minimum": "出档案至少需要",
+    "insufficientMissing": "真题入库够了以后自动生成考点档案；现在只显示原始计数。"
+  },
+  "trend": {
+    "rising": "考频上升",
+    "steady": "考频持平",
+    "falling": "考频下降",
+    "new": "新出现"
+  },
+  "maturity": {
+    "title": "数据成熟度",
+    "caption": "数据成熟度四档：条件与学员端显示",
+    "columns": {
+      "level": "档",
+      "condition": "条件",
+      "display": "学员端显示"
+    },
+    "current": "当前",
+    "condition": {
+      "cold": "样本不足",
+      "maturing": "有少量样本",
+      "usable": "样本一般",
+      "mature": "样本充足"
+    },
+    "display": {
+      "hidden": "不展示",
+      "raw_counts": "只显示原始次数",
+      "reference_only": "显示并标“仅供参考”",
+      "full": "参与性价比与预测"
+    },
+    "questions": "已入库真题",
+    "years": "覆盖年份",
+    "count": "{{n}} 道",
+    "yearCount": "{{n}} 年"
+  },
+  "wording": {
+    "title": "禁用表述",
+    "body": "宣传禁用语和暗示命题信息的表述，不得出现在考点档案里；趋势只描述考频与变化。"
+  },
+  "state": {
+    "empty": {
+      "title": "考情分析工作台暂无数据",
+      "body": "当前筛选下没有记录，换个筛选条件试试",
+      "action": "清除筛选"
+    },
+    "error": {
+      "body": "服务暂时异常，已保存的内容不受影响；重试或稍后再来。"
+    },
+    "offline": {
+      "title": "后台需要联网",
+      "body": "真题拆解与考点档案要联网才能取到，恢复网络后点“重新连接”。",
+      "action": "重新连接",
+      "stale": "网络断开了，下面是断网前取到的数据。"
+    },
+    "restricted": {
+      "title": "需要相应的后台角色",
+      "body": "须相应后台角色；敏感操作先重验身份，再按风险分档确认，只有不可逆操作双人复核",
+      "action": "去系统、参数与权限"
+    },
+    "insufficient_data": {
+      "title": "样本不足，暂不出结论",
+      "body": "样本不足时不出结论，只显示原始计数"
+    }
+  }
+}

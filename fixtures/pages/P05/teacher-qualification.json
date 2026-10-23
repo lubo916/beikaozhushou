@@ -1,0 +1,283 @@
+{
+  "analysis": {
+    "data_source": "sample",
+    "exam_name": "中学教师资格（笔试）",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "total_count": 642,
+    "source_counts": [
+      {
+        "source": "official_public",
+        "count": 120
+      },
+      {
+        "source": "licensed",
+        "count": 380
+      },
+      {
+        "source": "recalled",
+        "count": 142
+      }
+    ],
+    "questions": [
+      {
+        "question_id": "019a0502-0000-7000-8000-000000000001",
+        "year": 2025,
+        "subject": "教育知识与能力",
+        "number": 3,
+        "source": "licensed",
+        "knowledge_point": {
+          "kp_id": "019a0203-0000-7000-8000-000000000003",
+          "name": "教学原则",
+          "confidence": 0.91,
+          "status": "confirmed"
+        },
+        "distractors": [
+          {
+            "option": "B",
+            "trap": "concept_swap"
+          },
+          {
+            "option": "D",
+            "trap": "partially_true"
+          }
+        ],
+        "review_status": "reviewed",
+        "ai_draft": false
+      },
+      {
+        "question_id": "019a0502-0000-7000-8000-000000000002",
+        "year": 2025,
+        "subject": "教育知识与能力",
+        "number": 14,
+        "source": "recalled",
+        "knowledge_point": {
+          "kp_id": "019a0203-0000-7000-8000-000000000006",
+          "name": "最近发展区",
+          "confidence": 0.74,
+          "status": "suggested"
+        },
+        "distractors": [
+          {
+            "option": "A",
+            "trap": "subject_confusion"
+          },
+          {
+            "option": "C",
+            "trap": "over_inference"
+          }
+        ],
+        "review_status": "pending",
+        "ai_draft": true
+      },
+      {
+        "question_id": "019a0502-0000-7000-8000-000000000003",
+        "year": 2024,
+        "subject": "教育知识与能力",
+        "number": 9,
+        "source": "official_public",
+        "knowledge_point": {
+          "kp_id": "019a0203-0000-7000-8000-000000000007",
+          "name": "学习动机理论",
+          "confidence": 0.86,
+          "status": "confirmed"
+        },
+        "distractors": [
+          {
+            "option": "B",
+            "trap": "concept_swap"
+          }
+        ],
+        "review_status": "reviewed",
+        "ai_draft": false
+      },
+      {
+        "question_id": "019a0502-0000-7000-8000-000000000004",
+        "year": 2024,
+        "subject": "教育知识与能力",
+        "number": 21,
+        "source": "recalled",
+        "knowledge_point": {
+          "kp_id": "019a0203-0000-7000-8000-000000000009",
+          "name": "皮亚杰认知发展阶段",
+          "confidence": 0.68,
+          "status": "suggested"
+        },
+        "distractors": [
+          {
+            "option": "C",
+            "trap": "time_confusion"
+          },
+          {
+            "option": "D",
+            "trap": "absolutize"
+          }
+        ],
+        "review_status": "pending",
+        "ai_draft": true
+      },
+      {
+        "question_id": "019a0502-0000-7000-8000-000000000005",
+        "year": 2023,
+        "subject": "教育知识与能力",
+        "number": 30,
+        "source": "licensed",
+        "knowledge_point": {
+          "kp_id": "019a0203-0000-7000-8000-000000000008",
+          "name": "知识的迁移",
+          "confidence": 0.79,
+          "status": "confirmed"
+        },
+        "distractors": [
+          {
+            "option": "A",
+            "trap": "cause_reversal"
+          }
+        ],
+        "review_status": "reviewed",
+        "ai_draft": false
+      }
+    ],
+    "maturity": {
+      "level": "usable",
+      "question_count": 642,
+      "year_count": 5
+    },
+    "maturity_tiers": [
+      {
+        "level": "cold",
+        "learner_display": "hidden"
+      },
+      {
+        "level": "maturing",
+        "learner_display": "raw_counts"
+      },
+      {
+        "level": "usable",
+        "learner_display": "reference_only"
+      },
+      {
+        "level": "mature",
+        "learner_display": "full"
+      }
+    ],
+    "profile": {
+      "sample_sufficient": true,
+      "question_count": 642,
+      "minimum_question_count": 60,
+      "entries": [
+        {
+          "kp_id": "019a0203-0000-7000-8000-000000000003",
+          "name": "教学原则",
+          "appearance_count": 5,
+          "year_count": 5,
+          "total_score": 22,
+          "question_types": [
+            "单项选择题",
+            "材料分析题"
+          ],
+          "angles": [
+            "结合课堂情境辨析原则"
+          ],
+          "trend": "steady",
+          "traps": [
+            "concept_swap",
+            "partially_true"
+          ],
+          "status": "published",
+          "ai_draft": false
+        },
+        {
+          "kp_id": "019a0203-0000-7000-8000-000000000007",
+          "name": "学习动机理论",
+          "appearance_count": 5,
+          "year_count": 5,
+          "total_score": 16,
+          "question_types": [
+            "单项选择题",
+            "简答题"
+          ],
+          "angles": [
+            "成就动机与归因理论辨析"
+          ],
+          "trend": "steady",
+          "traps": [
+            "concept_swap",
+            "over_inference"
+          ],
+          "status": "published",
+          "ai_draft": false
+        },
+        {
+          "kp_id": "019a0203-0000-7000-8000-000000000006",
+          "name": "最近发展区",
+          "appearance_count": 4,
+          "year_count": 5,
+          "total_score": 9,
+          "question_types": [
+            "单项选择题",
+            "辨析题"
+          ],
+          "angles": [
+            "与支架式教学的联系"
+          ],
+          "trend": "rising",
+          "traps": [
+            "subject_confusion"
+          ],
+          "status": "draft",
+          "ai_draft": true
+        },
+        {
+          "kp_id": "019a0203-0000-7000-8000-000000000008",
+          "name": "知识的迁移",
+          "appearance_count": 3,
+          "year_count": 5,
+          "total_score": 7,
+          "question_types": [
+            "单项选择题"
+          ],
+          "angles": [
+            "正迁移与负迁移的区分"
+          ],
+          "trend": "falling",
+          "traps": [
+            "cause_reversal"
+          ],
+          "status": "draft",
+          "ai_draft": true
+        }
+      ],
+      "recomputed_at": "2026-10-22T18:30:00Z",
+      "new_question_count": 9
+    }
+  },
+  "insufficient": {
+    "total_count": 5,
+    "source_counts": [
+      {
+        "source": "official_public",
+        "count": 1
+      },
+      {
+        "source": "licensed",
+        "count": 2
+      },
+      {
+        "source": "recalled",
+        "count": 2
+      }
+    ],
+    "maturity": {
+      "level": "cold",
+      "question_count": 5,
+      "year_count": 3
+    },
+    "profile": {
+      "sample_sufficient": false,
+      "question_count": 5,
+      "minimum_question_count": 60,
+      "entries": []
+    }
+  }
+}
