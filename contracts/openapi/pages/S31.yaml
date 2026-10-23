@@ -210,4 +210,3 @@ components:
         kind: {type: string, enum: [expiry, renewal, final]}
         at: {$ref: "#/components/schemas/Timestamp"}
         days_before: {type: integer, minimum: 0}
-
