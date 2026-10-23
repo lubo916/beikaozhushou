@@ -2765,7 +2765,16 @@
       "owns": [
         "docs/baseline/ui-rules.md"
       ],
-      "status": "todo"
+      "status": "done",
+      "history": [
+        {
+          "round": 1,
+          "version": "v0041",
+          "tool": "claude-web",
+          "date": "2026-10-24 02:39",
+          "status": "done"
+        }
+      ]
     },
     {
       "id": "W02",

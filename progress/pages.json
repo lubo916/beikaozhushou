@@ -925,8 +925,8 @@
         0
       ],
       "extension": false,
-      "status": "shell",
-      "updated": "v0012"
+      "status": "ui",
+      "updated": "v0041"
     },
     {
       "id": "P02",
@@ -942,8 +942,8 @@
         0
       ],
       "extension": false,
-      "status": "shell",
-      "updated": "v0012"
+      "status": "ui",
+      "updated": "v0041"
     },
     {
       "id": "P03",
