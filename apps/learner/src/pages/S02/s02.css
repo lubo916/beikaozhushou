@@ -1,0 +1,9 @@
+/* 使用公共令牌：手机确认画像贴底，宽屏保留公共对话框。 */
+.s02-profile--bottom.ui-dialog {
+  margin: auto auto 0;
+  width: 100%;
+}
+.s02-profile--bottom .ui-dialog__panel {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}

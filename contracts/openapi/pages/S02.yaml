@@ -1,0 +1,311 @@
+# S02 备考目标：公共画像引用 ExamProfile；本页独有字段使用 S02 前缀。
+# 写入目标、解析、导入等权限尚未登记，前端保留可确认的草稿并提示即将上线。
+{
+  "paths": {
+    "/learner/goals/home": {
+      "get": {
+        "operationId": "getS02Goals",
+        "x-owner": "exam",
+        "x-action": "exam.profile.read",
+        "summary": "备考目标：选考候选、模板与已建目标的页面视图；规则尚未接通时返回示例数据",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "description": "全称、简称、俗称、拼音或一句话目标；在接口层匹配",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "description": "考试类别；空或全部时不筛选",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "S02 页面数据",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/S02GoalsHome"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "description": "标准筛选使用 q/category。公共查询参数生成链修复前，本页临时兼容 x-s02-search、x-s02-category 可选请求头；头值为 encodeURIComponent 编码的 q/category，存在时优先（空值表示清空）。该兼容将在公共整合修复后移除。"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "S02GoalsHome": {
+        "type": "object",
+        "required": [
+          "catalog",
+          "templates",
+          "goals",
+          "categories",
+          "extensions",
+          "passed_subjects",
+          "certificate_path",
+          "conflict",
+          "availability",
+          "guest_limit",
+          "data_source",
+          "custom_choice"
+        ],
+        "properties": {
+          "catalog": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S02ExamChoice"
+            }
+          },
+          "templates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S02ExamChoice"
+            }
+          },
+          "goals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S02Goal"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "extensions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "passed_subjects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S02PassedSubject"
+            }
+          },
+          "certificate_path": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "conflict": {
+            "type": "string"
+          },
+          "availability": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "empty",
+              "insufficient_data",
+              "restricted"
+            ]
+          },
+          "guest_limit": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "data_source": {
+            "$ref": "#/components/schemas/DataSource"
+          },
+          "custom_choice": {
+            "$ref": "#/components/schemas/S02ExamChoice"
+          }
+        }
+      },
+      "S02ExamChoice": {
+        "type": "object",
+        "description": "候选考试与待确认画像；目标分、初判、日期依据均由接口给出，页面只显示",
+        "required": [
+          "id",
+          "name",
+          "short_name",
+          "search_terms",
+          "category",
+          "summary",
+          "target_date",
+          "date_basis",
+          "target_basis",
+          "assessment",
+          "form",
+          "validity",
+          "suggestion",
+          "question_distribution",
+          "template_quality",
+          "map_version",
+          "aliases",
+          "readiness",
+          "profile",
+          "estimated",
+          "target_score",
+          "map_pending"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "short_name": {
+            "type": "string"
+          },
+          "search_terms": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "target_date": {
+            "type": "string"
+          },
+          "date_basis": {
+            "type": "string"
+          },
+          "target_basis": {
+            "type": "string"
+          },
+          "assessment": {
+            "type": "string"
+          },
+          "form": {
+            "type": "string"
+          },
+          "validity": {
+            "type": "string"
+          },
+          "suggestion": {
+            "type": "string"
+          },
+          "question_distribution": {
+            "type": "string"
+          },
+          "template_quality": {
+            "type": "string"
+          },
+          "map_version": {
+            "type": "string"
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "readiness": {
+            "type": "string",
+            "enum": [
+              "complete",
+              "map_only",
+              "exam_only",
+              "template_only",
+              "none"
+            ]
+          },
+          "profile": {
+            "$ref": "#/components/schemas/ExamProfile"
+          },
+          "estimated": {
+            "type": "boolean"
+          },
+          "target_score": {
+            "type": "number"
+          },
+          "map_pending": {
+            "type": "boolean"
+          }
+        }
+      },
+      "S02Goal": {
+        "type": "object",
+        "required": [
+          "id",
+          "exam_id",
+          "name",
+          "target_date",
+          "map_source",
+          "primary",
+          "target_score",
+          "overlap",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "exam_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "target_date": {
+            "type": "string"
+          },
+          "map_source": {
+            "type": "string"
+          },
+          "primary": {
+            "type": "boolean"
+          },
+          "target_score": {
+            "type": "number"
+          },
+          "overlap": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "paused",
+              "archived"
+            ]
+          }
+        }
+      },
+      "S02PassedSubject": {
+        "type": "object",
+        "required": [
+          "name",
+          "expires_on",
+          "status"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "expires_on": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "choice": {
+    "id": "ds-final-custom",
+    "name": "《数据结构》期末考",
+    "short_name": "数据结构",
+    "aliases": [
+      "数据结构",
+      "期末",
+      "shujujiegou",
+      "datastructure",
+      "ds"
+    ],
+    "search_terms": "《数据结构》期末考 数据结构 数据结构 期末 shujujiegou datastructure ds",
+    "category": "自定学习",
+    "readiness": "map_only",
+    "summary": "已有个人知识地图；题库与考情覆盖仍需补齐。",
+    "profile": {
+      "exam_id": "ds-final-custom",
+      "name": "《数据结构》期末考",
+      "short_name": "数据结构",
+      "aliases": [],
+      "kind": "custom",
+      "evaluation_rule": {
+        "type": "custom",
+        "description": "自设目标 85 分（满分 100）"
+      },
+      "full_score": 100,
+      "structure": [
+        {
+          "subject": "数据结构",
+          "sections": [
+            {
+              "name": "绪论与复杂度",
+              "knowledge_point_count": 6
+            },
+            {
+              "name": "线性表",
+              "knowledge_point_count": 10
+            },
+            {
+              "name": "栈、队列与串",
+              "knowledge_point_count": 12
+            },
+            {
+              "name": "树与二叉树",
+              "knowledge_point_count": 16
+            },
+            {
+              "name": "图",
+              "knowledge_point_count": 14
+            },
+            {
+              "name": "查找",
+              "knowledge_point_count": 10
+            },
+            {
+              "name": "排序",
+              "knowledge_point_count": 10
+            }
+          ]
+        }
+      ],
+      "question_types": [
+        {
+          "type": "choice",
+          "label": "选择",
+          "response_form": "choice",
+          "count": 15,
+          "subjective": false
+        },
+        {
+          "type": "fill_blank",
+          "label": "填空",
+          "response_form": "fill",
+          "count": 10,
+          "subjective": false
+        },
+        {
+          "type": "short_answer",
+          "label": "简答",
+          "response_form": "written",
+          "count": 4,
+          "subjective": true
+        },
+        {
+          "type": "algorithm_design",
+          "label": "算法设计",
+          "response_form": "written",
+          "count": 2,
+          "subjective": true
+        }
+      ],
+      "scoring": {
+        "target_default": 85,
+        "target_basis": "85 分",
+        "rubrics": []
+      },
+      "duration_minutes": 120,
+      "key_dates": [
+        {
+          "kind": "target",
+          "date": "2027-01-08",
+          "status": "custom",
+          "basis": "按教务处期末考试周安排，你自己设定"
+        }
+      ],
+      "readiness": {
+        "map": {
+          "level": 2,
+          "note": "由课件拆解，你已校准 86%"
+        },
+        "questions": {
+          "level": 1,
+          "note": "自有题 61 道，已确认的生成题 36 道"
+        },
+        "exam_intel": {
+          "level": 1,
+          "note": "由 3 套往年卷推算，参考性有限"
+        }
+      },
+      "variation_extensions": []
+    },
+    "target_date": "2027-01-08",
+    "estimated": false,
+    "date_basis": "按教务处期末考试周安排，你自己设定",
+    "target_score": 85,
+    "target_basis": "85 分",
+    "assessment": "地图覆盖仍有缺口，当前只记录目标；补齐大纲和样本后再判断。",
+    "form": "闭卷笔试",
+    "validity": "由课程教师与教务处的安排为准",
+    "suggestion": "先补齐树与图的前置知识，再用往年卷核对覆盖。",
+    "question_distribution": "选择 15 题 / 填空 10 题 / 简答 4 题 / 算法设计 2 题",
+    "template_quality": "完整度 68% · 自有题 61 道 · 由你持续维护",
+    "map_version": "个人地图第 2 版",
+    "map_pending": false
+  },
+  "goal": {
+    "id": "019a0002-0000-7000-8000-000000000004",
+    "exam_id": "ds-final-custom",
+    "name": "《数据结构》期末考",
+    "primary": true,
+    "target_date": "2027-01-08",
+    "target_score": 85,
+    "map_source": "个人",
+    "overlap": 0.16,
+    "status": "active"
+  },
+  "categories": [
+    "财经财会",
+    "职业资格",
+    "语言学习",
+    "自定学习"
+  ],
+  "extensions": [
+    "算法速查表"
+  ],
+  "passed_subjects": [],
+  "certificate_path": [
+    "核对课程大纲与考试周",
+    "补齐地图和往年卷",
+    "按教务处通知确认考试日"
+  ],
+  "conflict": "目标日与另一目标的复习周接近，请在下一步保留可用时段。",
+  "guest_limit": 1
+}
