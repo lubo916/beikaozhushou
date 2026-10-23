@@ -21,8 +21,9 @@ describe("平台后台外壳（浏览器模式）", () => {
     const header = host.querySelector("header");
     expect(header?.textContent).toContain("平台后台 · 总览与数据");
     expect(header?.textContent).toContain("测试环境");
-    expect(host.textContent).toContain("P0 必做：4 项");
-    expect(host.textContent).toContain("python3 tools/bk.py proto P01");
+    await settle(() => host.textContent?.includes("告警 3 条") === true);
+    expect(host.textContent).toContain("周有效学习用户");
+    expect(host.textContent).toContain("告警 3 条");
     await unmount();
   });
 
