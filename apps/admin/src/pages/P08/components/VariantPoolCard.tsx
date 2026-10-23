@@ -16,7 +16,7 @@ export function VariantPoolCard({ data, onSoon }: { data: P08QuestionReview; onS
       key: "parent",
       header: t("variants.columns.parent"),
       render: (pool) => (
-        <span className="flex flex-col gap-1">
+        <span className="flex flex-col gap-1 text-start">
           <strong>{pool.parent_ref}</strong>
           <span className="text-small text-ink-secondary">{pool.stem}</span>
         </span>

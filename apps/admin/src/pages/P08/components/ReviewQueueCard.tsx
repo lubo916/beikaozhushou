@@ -41,7 +41,7 @@ export function ReviewQueueCard({ data, origin, onOrigin, onSoon }: ReviewQueueC
       key: "question",
       header: t("queue.columns.question"),
       render: (task) => (
-        <span className="flex flex-col gap-1">
+        <span className="flex flex-col gap-1 text-start">
           <strong>{task.question_ref}</strong>
           <span className="text-small text-ink-secondary">{task.stem}</span>
         </span>
