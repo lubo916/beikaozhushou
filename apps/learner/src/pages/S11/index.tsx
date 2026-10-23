@@ -111,13 +111,13 @@ export default function Page() {
           )}
           {/* feat:S11-12 额度与存储数字由接口返回；受限只暂停新解析，保留已有资料。 */}
           <div className="grid grid-cols-2 gap-4 @content-md:grid-cols-4">
-            <Card className="min-w-0">
+            <Card className="min-w-[0]">
               <Stat label={t("summary.coverage")} value={formatPercent(data.summary.coverage)} />
             </Card>
-            <Card className="min-w-0">
+            <Card className="min-w-[0]">
               <Stat label={t("summary.pending")} value={formatCount(data.summary.pending)} />
             </Card>
-            <Card className="min-w-0">
+            <Card className="min-w-[0]">
               <Stat
                 label={t("summary.quota")}
                 value={t("summary.quota_value", {
@@ -130,7 +130,7 @@ export default function Page() {
                 })}
               />
             </Card>
-            <Card className="min-w-0">
+            <Card className="min-w-[0]">
               <Stat label={t("summary.inbox")} value={formatCount(data.summary.inbox_count)} />
             </Card>
           </div>
