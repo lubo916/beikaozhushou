@@ -1,0 +1,106 @@
+# S01 的公开只读欢迎上下文；账号写操作由后续账号领域登记后接入。
+paths:
+  /account/welcome:
+    get:
+      operationId: getWelcome
+      x-owner: account
+      x-action: account.context.read
+      security: []
+      summary: 欢迎、年龄分组、游客合并说明与账号异常演示
+      responses:
+        "200":
+          description: 欢迎与登录数据，业务数字由接口返回
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S01WelcomeData"}
+components:
+  schemas:
+    S01WelcomeData:
+      type: object
+      required: [availability, time_zone, today, age_options, minor_notice_key, sms, guest_merge, resume, account, invitation, data_source]
+      properties:
+        availability:
+          type: string
+          description: 首次进入无真实空态；空与数据不足只用于演示说明
+          enum: [ready, empty, restricted, insufficient_data]
+        time_zone:
+          type: string
+          description: 用户时区（IANA 名），完整日期时刻按此显示
+        today: {$ref: "#/components/schemas/LearningDay"}
+        age_options:
+          type: array
+          items: {$ref: "#/components/schemas/S01AgeOption"}
+        minor_notice_key: {type: string}
+        sms: {$ref: "#/components/schemas/S01Sms"}
+        guest_merge: {$ref: "#/components/schemas/S01GuestMerge"}
+        resume: {$ref: "#/components/schemas/S01Resume"}
+        account: {$ref: "#/components/schemas/S01Account"}
+        invitation: {$ref: "#/components/schemas/S01Invitation"}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+    S01AgeOption:
+      type: object
+      description: 年龄线由账号领域按适用规则提供，页面不写死年龄数字且不默认选择
+      required: [id, label_key, description_key, eligibility]
+      properties:
+        id: {type: string, enum: [adult, minor, under_minimum]}
+        label_key: {type: string}
+        description_key: {type: string}
+        eligibility: {type: string, enum: [allowed, minor, blocked]}
+    S01Sms:
+      type: object
+      description: 演示验证码输入要求，不发送短信且不含可登录凭证
+      required: [code_length, resend_seconds]
+      properties:
+        code_length: {type: integer, minimum: 1}
+        resend_seconds: {type: integer, minimum: 1}
+    S01GuestMerge:
+      type: object
+      description: 游客数据并入账号的原始计数，本页不实际修改账号
+      required: [goals, diagnoses, learning_records]
+      properties:
+        goals: {type: integer, minimum: 0}
+        diagnoses: {type: integer, minimum: 0}
+        learning_records: {type: integer, minimum: 0}
+    S01Resume:
+      type: object
+      required: [has_target, target_name]
+      properties:
+        has_target: {type: boolean}
+        target_name: {type: string}
+    S01Account:
+      type: object
+      description: 账号异常的可检查示例，不代表真实账号状态
+      required: [restriction_reason_key, restricted_until, appeal_reference, device_limit, devices, cooling_days_remaining, deletion_at, deletion_scope_keys, logout_reason, drafts_available]
+      properties:
+        restriction_reason_key: {type: string}
+        restricted_until: {$ref: "#/components/schemas/Timestamp"}
+        appeal_reference: {type: string}
+        device_limit: {type: integer, minimum: 1}
+        devices:
+          type: array
+          items: {$ref: "#/components/schemas/S01Device"}
+        cooling_days_remaining: {type: integer, minimum: 0}
+        deletion_at: {$ref: "#/components/schemas/Timestamp"}
+        deletion_scope_keys:
+          type: array
+          items: {type: string}
+        logout_reason: {type: string, enum: [other_device, admin, password_changed]}
+        drafts_available: {type: boolean}
+    S01Device:
+      type: object
+      required: [id, label_key, last_seen_at, current]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        label_key: {type: string}
+        last_seen_at: {$ref: "#/components/schemas/Timestamp"}
+        current: {type: boolean}
+    S01Invitation:
+      type: object
+      description: 加入机构前的数据可见范围提示，加入操作尚未接入
+      required: [institution_key, class_key, visibility_keys]
+      properties:
+        institution_key: {type: string}
+        class_key: {type: string}
+        visibility_keys:
+          type: array
+          items: {type: string}
