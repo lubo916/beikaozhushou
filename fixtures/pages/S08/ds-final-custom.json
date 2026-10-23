@@ -1,0 +1,434 @@
+{
+  "views": {
+    "week": {
+      "exam_id": "ds-final-custom",
+      "exam_name": "数据结构期末",
+      "view": "week",
+      "period_start": "2026-10-12",
+      "period_end": "2026-10-18",
+      "availability": "ready",
+      "data_source": "sample",
+      "minimum_days": 3,
+      "minimum_minutes": 120,
+      "metrics": {
+        "effective_minutes": 510,
+        "tier_gains": 18,
+        "forecast_delta": 3.5,
+        "active_days": 5
+      },
+      "summary": "复习先行的学习日，换来了更稳定的掌握提升。",
+      "highlights": [
+        "到期复习有回应，已学内容在变稳。",
+        "变式练习带来了新的有效证据。",
+        "主动复盘后，更清楚自己的易错环节。"
+      ],
+      "improvement": "新学后缺少一次主动回忆，部分内容还停留在已了解。",
+      "mastery": [
+        {
+          "level": 0,
+          "before": 46,
+          "after": 41
+        },
+        {
+          "level": 1,
+          "before": 28,
+          "after": 29
+        },
+        {
+          "level": 2,
+          "before": 20,
+          "after": 20
+        },
+        {
+          "level": 3,
+          "before": 12,
+          "after": 13
+        },
+        {
+          "level": 4,
+          "before": 6,
+          "after": 7
+        },
+        {
+          "level": 5,
+          "before": 2,
+          "after": 4
+        }
+      ],
+      "methods": [
+        {
+          "key": "read",
+          "minutes": 150,
+          "gains_per_hour": 1.2
+        },
+        {
+          "key": "watch",
+          "minutes": 90,
+          "gains_per_hour": 0.8
+        },
+        {
+          "key": "listen",
+          "minutes": 30,
+          "gains_per_hour": 0.6
+        },
+        {
+          "key": "practice",
+          "minutes": 180,
+          "gains_per_hour": 3.2
+        },
+        {
+          "key": "recite",
+          "minutes": 60,
+          "gains_per_hour": 2.1
+        }
+      ],
+      "rhythm": [
+        {
+          "day": "2026-10-12",
+          "minutes": 90,
+          "height_percent": 75
+        },
+        {
+          "day": "2026-10-13",
+          "minutes": 120,
+          "height_percent": 100
+        },
+        {
+          "day": "2026-10-14",
+          "minutes": 0,
+          "height_percent": 0
+        },
+        {
+          "day": "2026-10-15",
+          "minutes": 100,
+          "height_percent": 83
+        },
+        {
+          "day": "2026-10-16",
+          "minutes": 80,
+          "height_percent": 67
+        },
+        {
+          "day": "2026-10-17",
+          "minutes": 0,
+          "height_percent": 0
+        },
+        {
+          "day": "2026-10-18",
+          "minutes": 120,
+          "height_percent": 100
+        }
+      ],
+      "score_sources": [],
+      "forecast_available": false,
+      "mistakes": {
+        "new": 12,
+        "graduated": 8,
+        "stubborn": 3
+      },
+      "coach": "练习后的主动回忆比单纯重看资料更有效。下一周期可把这一步放在新学结束后，先小范围尝试。",
+      "sample_count": 42,
+      "choices": [
+        {
+          "id": "recall",
+          "title": "新学结束后先主动回忆，再对照资料",
+          "reason": "本期主动回忆获得了有效证据，而单纯重看资料提升较少。",
+          "cost": "从已有新学时段里留出回忆时间，不增加每日预算。",
+          "if_declined": "保持当前学习安排。",
+          "ai_generated": true
+        },
+        {
+          "id": "review",
+          "title": "先完成到期复习，再开始新学",
+          "reason": "巩固已有知识后，新学的节奏更稳定。",
+          "cost": "调换任务顺序，每日预算不变。",
+          "if_declined": "保持当前任务顺序。",
+          "ai_generated": false
+        }
+      ],
+      "comparison": []
+    },
+    "month": {
+      "exam_id": "ds-final-custom",
+      "exam_name": "数据结构期末",
+      "view": "month",
+      "period_start": "2026-10-01",
+      "period_end": "2026-10-31",
+      "availability": "ready",
+      "data_source": "sample",
+      "minimum_days": 3,
+      "minimum_minutes": 120,
+      "metrics": {
+        "effective_minutes": 2040,
+        "tier_gains": 62,
+        "forecast_delta": 3.5,
+        "active_days": 21
+      },
+      "summary": "复习先行的学习日，换来了更稳定的掌握提升。",
+      "highlights": [
+        "到期复习有回应，已学内容在变稳。",
+        "变式练习带来了新的有效证据。",
+        "主动复盘后，更清楚自己的易错环节。"
+      ],
+      "improvement": "新学后缺少一次主动回忆，部分内容还停留在已了解。",
+      "mastery": [
+        {
+          "level": 0,
+          "before": 46,
+          "after": 26
+        },
+        {
+          "level": 1,
+          "before": 28,
+          "after": 32
+        },
+        {
+          "level": 2,
+          "before": 20,
+          "after": 24
+        },
+        {
+          "level": 3,
+          "before": 12,
+          "after": 16
+        },
+        {
+          "level": 4,
+          "before": 6,
+          "after": 8
+        },
+        {
+          "level": 5,
+          "before": 2,
+          "after": 8
+        }
+      ],
+      "methods": [
+        {
+          "key": "read",
+          "minutes": 600,
+          "gains_per_hour": 1.2
+        },
+        {
+          "key": "watch",
+          "minutes": 360,
+          "gains_per_hour": 0.8
+        },
+        {
+          "key": "listen",
+          "minutes": 120,
+          "gains_per_hour": 0.6
+        },
+        {
+          "key": "practice",
+          "minutes": 720,
+          "gains_per_hour": 3.2
+        },
+        {
+          "key": "recite",
+          "minutes": 240,
+          "gains_per_hour": 2.1
+        }
+      ],
+      "rhythm": [
+        {
+          "day": "2026-10-01",
+          "minutes": 420,
+          "height_percent": 70
+        },
+        {
+          "day": "2026-10-08",
+          "minutes": 540,
+          "height_percent": 90
+        },
+        {
+          "day": "2026-10-15",
+          "minutes": 600,
+          "height_percent": 100
+        },
+        {
+          "day": "2026-10-22",
+          "minutes": 480,
+          "height_percent": 80
+        }
+      ],
+      "score_sources": [],
+      "forecast_available": false,
+      "mistakes": {
+        "new": 12,
+        "graduated": 8,
+        "stubborn": 3
+      },
+      "coach": "练习后的主动回忆比单纯重看资料更有效。下一周期可把这一步放在新学结束后，先小范围尝试。",
+      "sample_count": 42,
+      "choices": [
+        {
+          "id": "recall",
+          "title": "新学结束后先主动回忆，再对照资料",
+          "reason": "本期主动回忆获得了有效证据，而单纯重看资料提升较少。",
+          "cost": "从已有新学时段里留出回忆时间，不增加每日预算。",
+          "if_declined": "保持当前学习安排。",
+          "ai_generated": true
+        },
+        {
+          "id": "review",
+          "title": "先完成到期复习，再开始新学",
+          "reason": "巩固已有知识后，新学的节奏更稳定。",
+          "cost": "调换任务顺序，每日预算不变。",
+          "if_declined": "保持当前任务顺序。",
+          "ai_generated": false
+        }
+      ],
+      "comparison": []
+    },
+    "round": {
+      "exam_id": "ds-final-custom",
+      "exam_name": "数据结构期末",
+      "view": "round",
+      "period_start": "2026-09-01",
+      "period_end": "2026-10-18",
+      "availability": "ready",
+      "data_source": "sample",
+      "minimum_days": 3,
+      "minimum_minutes": 120,
+      "metrics": {
+        "effective_minutes": 3720,
+        "tier_gains": 106,
+        "forecast_delta": 3.5,
+        "active_days": 38
+      },
+      "summary": "复习先行的学习日，换来了更稳定的掌握提升。",
+      "highlights": [
+        "到期复习有回应，已学内容在变稳。",
+        "变式练习带来了新的有效证据。",
+        "主动复盘后，更清楚自己的易错环节。"
+      ],
+      "improvement": "新学后缺少一次主动回忆，部分内容还停留在已了解。",
+      "mastery": [
+        {
+          "level": 0,
+          "before": 46,
+          "after": 10
+        },
+        {
+          "level": 1,
+          "before": 28,
+          "after": 38
+        },
+        {
+          "level": 2,
+          "before": 20,
+          "after": 26
+        },
+        {
+          "level": 3,
+          "before": 12,
+          "after": 16
+        },
+        {
+          "level": 4,
+          "before": 6,
+          "after": 14
+        },
+        {
+          "level": 5,
+          "before": 2,
+          "after": 10
+        }
+      ],
+      "methods": [
+        {
+          "key": "read",
+          "minutes": 1000,
+          "gains_per_hour": 1.2
+        },
+        {
+          "key": "watch",
+          "minutes": 600,
+          "gains_per_hour": 0.8
+        },
+        {
+          "key": "listen",
+          "minutes": 200,
+          "gains_per_hour": 0.6
+        },
+        {
+          "key": "practice",
+          "minutes": 1450,
+          "gains_per_hour": 3.2
+        },
+        {
+          "key": "recite",
+          "minutes": 470,
+          "gains_per_hour": 2.1
+        }
+      ],
+      "rhythm": [
+        {
+          "day": "2026-09-01",
+          "minutes": 900,
+          "height_percent": 88
+        },
+        {
+          "day": "2026-09-15",
+          "minutes": 960,
+          "height_percent": 94
+        },
+        {
+          "day": "2026-10-01",
+          "minutes": 1020,
+          "height_percent": 100
+        },
+        {
+          "day": "2026-10-15",
+          "minutes": 840,
+          "height_percent": 82
+        }
+      ],
+      "score_sources": [],
+      "forecast_available": false,
+      "mistakes": {
+        "new": 12,
+        "graduated": 8,
+        "stubborn": 3
+      },
+      "coach": "练习后的主动回忆比单纯重看资料更有效。下一周期可把这一步放在新学结束后，先小范围尝试。",
+      "sample_count": 42,
+      "choices": [
+        {
+          "id": "recall",
+          "title": "新学结束后先主动回忆，再对照资料",
+          "reason": "本期主动回忆获得了有效证据，而单纯重看资料提升较少。",
+          "cost": "从已有新学时段里留出回忆时间，不增加每日预算。",
+          "if_declined": "保持当前学习安排。",
+          "ai_generated": true
+        },
+        {
+          "id": "review",
+          "title": "先完成到期复习，再开始新学",
+          "reason": "巩固已有知识后，新学的节奏更稳定。",
+          "cost": "调换任务顺序，每日预算不变。",
+          "if_declined": "保持当前任务顺序。",
+          "ai_generated": false
+        }
+      ],
+      "comparison": [
+        {
+          "key": "effective_minutes",
+          "before": 2880,
+          "after": 3720
+        },
+        {
+          "key": "tier_gains",
+          "before": 82,
+          "after": 106
+        },
+        {
+          "key": "active_days",
+          "before": 32,
+          "after": 38
+        }
+      ]
+    }
+  }
+}

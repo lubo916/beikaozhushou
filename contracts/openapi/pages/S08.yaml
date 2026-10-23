@@ -1,0 +1,379 @@
+{
+  "paths": {
+    "/plan/recap/{period}": {
+      "get": {
+        "operationId": "getS08Recap",
+        "x-owner": "plan",
+        "x-action": "plan.plan.read",
+        "summary": "复盘与报告：周期指标、原始计数与待确认建议；未登记写权限前不写回计划",
+        "parameters": [
+          {
+            "name": "period",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/S08Period"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "示例报告，业务数字由接口给出",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/S08Report"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "S08Period": {
+        "type": "string",
+        "enum": [
+          "week",
+          "month",
+          "round"
+        ]
+      },
+      "S08Report": {
+        "type": "object",
+        "required": [
+          "exam_id",
+          "exam_name",
+          "view",
+          "period_start",
+          "period_end",
+          "availability",
+          "data_source",
+          "minimum_days",
+          "minimum_minutes",
+          "metrics",
+          "summary",
+          "highlights",
+          "improvement",
+          "mastery",
+          "methods",
+          "rhythm",
+          "score_sources",
+          "forecast_available",
+          "mistakes",
+          "coach",
+          "sample_count",
+          "choices",
+          "comparison"
+        ],
+        "properties": {
+          "exam_id": {
+            "type": "string",
+            "description": "演示考试目录ID，与公共Plan.exam_id一致"
+          },
+          "exam_name": {
+            "type": "string"
+          },
+          "view": {
+            "$ref": "#/components/schemas/S08Period"
+          },
+          "period_start": {
+            "$ref": "#/components/schemas/LearningDay"
+          },
+          "period_end": {
+            "$ref": "#/components/schemas/LearningDay"
+          },
+          "availability": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "empty",
+              "restricted",
+              "insufficient_data"
+            ]
+          },
+          "data_source": {
+            "$ref": "#/components/schemas/DataSource"
+          },
+          "minimum_days": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "minimum_minutes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/S08Metrics"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "highlights": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "improvement": {
+            "type": "string"
+          },
+          "mastery": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S08MasteryChange"
+            }
+          },
+          "methods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S08Method"
+            }
+          },
+          "rhythm": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S08Rhythm"
+            }
+          },
+          "score_sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S08ScoreSource"
+            }
+          },
+          "forecast_available": {
+            "type": "boolean"
+          },
+          "mistakes": {
+            "$ref": "#/components/schemas/S08Mistakes"
+          },
+          "coach": {
+            "type": "string"
+          },
+          "sample_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "choices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S08Choice"
+            }
+          },
+          "comparison": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S08Comparison"
+            }
+          }
+        }
+      },
+      "S08Metrics": {
+        "type": "object",
+        "required": [
+          "effective_minutes",
+          "tier_gains",
+          "forecast_delta",
+          "active_days"
+        ],
+        "properties": {
+          "effective_minutes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "tier_gains": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "forecast_delta": {
+            "type": "number",
+            "description": "有符号的预测变化，可上升也可下降"
+          },
+          "active_days": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "S08MasteryChange": {
+        "type": "object",
+        "required": [
+          "level",
+          "before",
+          "after"
+        ],
+        "properties": {
+          "level": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5
+          },
+          "before": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "after": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "S08Method": {
+        "type": "object",
+        "required": [
+          "key",
+          "minutes",
+          "gains_per_hour"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "read",
+              "watch",
+              "listen",
+              "practice",
+              "recite"
+            ]
+          },
+          "minutes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "gains_per_hour": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "S08Rhythm": {
+        "type": "object",
+        "required": [
+          "day",
+          "minutes",
+          "height_percent"
+        ],
+        "properties": {
+          "day": {
+            "$ref": "#/components/schemas/LearningDay"
+          },
+          "minutes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "height_percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          }
+        }
+      },
+      "S08ScoreSource": {
+        "type": "object",
+        "required": [
+          "module",
+          "action",
+          "delta"
+        ],
+        "properties": {
+          "module": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "delta": {
+            "type": "number",
+            "description": "有符号的预测来源变化"
+          }
+        }
+      },
+      "S08Mistakes": {
+        "type": "object",
+        "required": [
+          "new",
+          "graduated",
+          "stubborn"
+        ],
+        "properties": {
+          "new": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "graduated": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "stubborn": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "S08Choice": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "reason",
+          "cost",
+          "if_declined",
+          "ai_generated"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "报告内选项键，不是已创建的提议ID"
+          },
+          "title": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "cost": {
+            "type": "string"
+          },
+          "if_declined": {
+            "type": "string"
+          },
+          "ai_generated": {
+            "type": "boolean"
+          }
+        }
+      },
+      "S08Comparison": {
+        "type": "object",
+        "required": [
+          "key",
+          "before",
+          "after"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "effective_minutes",
+              "tier_gains",
+              "active_days"
+            ]
+          },
+          "before": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "after": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}
