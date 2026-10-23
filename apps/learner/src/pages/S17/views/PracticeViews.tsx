@@ -17,16 +17,17 @@ import {
   buttonClass,
   type TableColumn,
 } from "@exam-prep/ui";
-import { pathTo } from "../../../routes.ts";
+import { DEMO_PARAM, pathTo } from "../../../routes.ts";
 import { useToast } from "../../../app/toast.tsx";
 export type DialogKind = "newQuestion" | "photo" | "import" | "tutor" | "settings" | "auto" | "manual" | "bank" | "past" | "special";
 export interface ViewProps {
   data: S17PracticeCenter;
   open: (kind: DialogKind) => void;
 }
-function ExerciseLink({ sessionId, children }: { sessionId: string; children: React.ReactNode }) {
+function ExerciseLink({ sessionId, sample, children }: { sessionId: string; sample: boolean; children: React.ReactNode }) {
+  // 示例会话尚未创建：沿用 S18 当前考试的示范题组，真实会话 ID 原样交给路由。
   return (
-    <Link className={buttonClass("primary")} to={pathTo("S18", { sessionId })}>
+    <Link className={buttonClass("primary")} to={pathTo("S18", { sessionId: sample ? DEMO_PARAM : sessionId })}>
       {children}
     </Link>
   );
@@ -62,7 +63,9 @@ export function RecommendView({ data, open }: ViewProps) {
                 <Tag tone="success">{rec.accuracy_label}</Tag>
               </div>
               <div className="s17-row">
-                <ExerciseLink sessionId={rec.session_id}>{t("practice")}</ExerciseLink>
+                <ExerciseLink sessionId={rec.session_id} sample={data.data_source === "sample"}>
+                  {t("practice")}
+                </ExerciseLink>
                 <Button onClick={() => open("settings")}>{t("settings")}</Button>
               </div>
             </div>
@@ -75,7 +78,9 @@ export function RecommendView({ data, open }: ViewProps) {
                 <p>
                   {t("count", { n: formatCount(data.daily.question_count) })} · {formatDuration(data.daily.minutes)}
                 </p>
-                <ExerciseLink sessionId={data.daily.session_id}>{t("practice")}</ExerciseLink>
+                <ExerciseLink sessionId={data.daily.session_id} sample={data.data_source === "sample"}>
+                  {t("practice")}
+                </ExerciseLink>
               </div>
             </Card>
             <Card title={t("recommend.past")}>
@@ -370,6 +375,7 @@ export function RecordsView({ data }: ViewProps) {
   // feat:S17-09 历次练习可回看续做，显示当时档位快照
   return (
     <Card title={t("records.title")}>
+      {data.data_source === "sample" && <p className="mb-3 text-small text-ink-secondary">{t("records.sampleNotice")}</p>}
       <DataTable
         caption={t("records.title")}
         rows={data.records}
@@ -396,7 +402,7 @@ export function RecordsView({ data }: ViewProps) {
             header: t("records.action"),
             label: t("records.action"),
             render: (row) => (
-              <ExerciseLink sessionId={row.session_id}>
+              <ExerciseLink sessionId={row.session_id} sample={data.data_source === "sample"}>
                 {t(row.status === "in_progress" ? "records.resume" : "records.review")}
               </ExerciseLink>
             ),

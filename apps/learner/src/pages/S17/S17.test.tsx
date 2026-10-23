@@ -12,6 +12,7 @@ import { DevControl } from "../../mocks/control.ts";
 import { MockDb } from "../../mocks/db.ts";
 import { loadDemoFixtures } from "../../mocks/fixtures.ts";
 import { collectRoutes, loadRouteModules } from "../../mocks/registry.ts";
+import { DEMO_PARAM, pathTo } from "../../routes.ts";
 import { practiceView, shouldRetry, type PracticeQuery } from "./data.ts";
 
 interface Parser {
@@ -179,5 +180,121 @@ describe("S17 页面接线", () => {
     expect(error?.getAttribute("role")).toBe("alert");
     expect(error?.querySelector("button")).not.toBeNull();
     await unmount();
+  });
+});
+
+/** 保留真实接口替身的状态码与元数据，只替换本页经过生成 Zod 校验的响应体。 */
+function stubCenter(api: MockApi, data: S17PracticeCenter): void {
+  const parsed = parser?.safeParse(data);
+  expect(parsed?.success, String(parsed?.error)).toBe(true);
+  stubFetch({
+    handle: async (request) => {
+      const outcome = await api.handle(request);
+      if (new URL(request.url).pathname !== "/api/v1/practice/center" || outcome.kind !== "json" || outcome.status !== 200) return outcome;
+      return { ...outcome, body: data };
+    },
+  });
+}
+
+function exerciseLinks(host: ParentNode): HTMLAnchorElement[] {
+  return [...host.querySelectorAll<HTMLAnchorElement>("main#main a")].filter((link) =>
+    link.getAttribute("href")?.startsWith(pathTo("S18", { sessionId: "" })),
+  );
+}
+
+describe("S17 会话入口回归", () => {
+  // U18a 的既有模拟层只接受 demo/demo-gen；示例 UUID 不能当作已经创建的作答会话。
+  it.each(fixtures.exams)("$key 示例推荐与每日一练进入现有示范会话", async (exam) => {
+    const mock = setup();
+    mock.control.setExam(exam.key);
+    const data = await mock.center();
+    stubCenter(mock.api, data);
+    const { host, unmount } = await mountAt(pathTo("S17"), <App />);
+    try {
+      await settle(() => host.textContent?.includes(data.recommendation.title) === true);
+      const links = exerciseLinks(host);
+      expect(links).toHaveLength(2);
+      expect(links.map((link) => link.getAttribute("href"))).toEqual([
+        pathTo("S18", { sessionId: DEMO_PARAM }),
+        pathTo("S18", { sessionId: DEMO_PARAM }),
+      ]);
+    } finally {
+      await unmount();
+    }
+  });
+
+  it.each(fixtures.exams)("$key 示例记录入口进入现有示范会话", async (exam) => {
+    const mock = setup();
+    mock.control.setExam(exam.key);
+    const data = await mock.center();
+    stubCenter(mock.api, data);
+    const { host, unmount } = await mountAt(`${pathTo("S17")}?view=records`, <App />);
+    try {
+      await settle(() => host.textContent?.includes(copy.records.title) === true);
+      const links = exerciseLinks(host);
+      expect(links).toHaveLength(data.records.length);
+      expect(links.map((link) => link.getAttribute("href"))).toEqual(data.records.map(() => pathTo("S18", { sessionId: DEMO_PARAM })));
+    } finally {
+      await unmount();
+    }
+  });
+
+  it("非示例推荐与每日一练保留接口返回的真实 UUID", async () => {
+    const mock = setup();
+    const sample = await mock.center();
+    const data: S17PracticeCenter = { ...sample, data_source: "computed" };
+    stubCenter(mock.api, data);
+    const { host, unmount } = await mountAt(pathTo("S17"), <App />);
+    try {
+      await settle(() => host.textContent?.includes(data.recommendation.title) === true);
+      const links = exerciseLinks(host);
+      expect(links).toHaveLength(2);
+      expect(links.map((link) => link.getAttribute("href"))).toEqual([
+        pathTo("S18", { sessionId: data.recommendation.session_id }),
+        pathTo("S18", { sessionId: data.daily.session_id }),
+      ]);
+    } finally {
+      await unmount();
+    }
+  });
+
+  it("非示例记录保留每条真实会话的续做与回看入口", async () => {
+    const mock = setup();
+    const sample = await mock.center();
+    const data: S17PracticeCenter = { ...sample, data_source: "computed" };
+    stubCenter(mock.api, data);
+    const { host, unmount } = await mountAt(`${pathTo("S17")}?view=records`, <App />);
+    try {
+      await settle(() => host.textContent?.includes(copy.records.title) === true);
+      const links = exerciseLinks(host);
+      expect(links).toHaveLength(data.records.length);
+      expect(links.map((link) => link.getAttribute("href"))).toEqual(
+        data.records.map((record) => pathTo("S18", { sessionId: record.session_id })),
+      );
+      expect(links.map((link) => link.textContent?.trim())).toEqual(
+        data.records.map((record) => (record.status === "in_progress" ? copy.records.resume : copy.records.review)),
+      );
+    } finally {
+      await unmount();
+    }
+  });
+
+  it("示例记录说明示范题组用途，真实续做与回看仍待上线", async () => {
+    const mock = setup();
+    const data = await mock.center();
+    stubCenter(mock.api, data);
+    const { host, unmount } = await mountAt(`${pathTo("S17")}?view=records`, <App />);
+    try {
+      await settle(() => host.textContent?.includes(copy.records.title) === true);
+      // 用动态键让修复前的失败来自缺失产品说明，而不是 TypeScript 编译错误。
+      const notice = (copy.records as Record<string, unknown>)["sampleNotice"];
+      expect(typeof notice).toBe("string");
+      if (typeof notice !== "string") throw new Error("S17.records.sampleNotice 尚未说明示例记录入口");
+      expect(notice).toMatch(/示范题组/u);
+      expect(notice).toMatch(/(?:续做.*回看|回看.*续做).*即将上线/u);
+      expect(host.querySelector("main#main")?.textContent).toContain(notice);
+    } finally {
+      await unmount();
+    }
   });
 });
