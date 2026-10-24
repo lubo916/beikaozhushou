@@ -1,0 +1,112 @@
+{
+  "data_source": "sample",
+  "availability": "ready",
+  "sprint_window_days": 10,
+  "days_to_exam": 8,
+  "exam_day": "2026-10-30",
+  "exam_start": "2026-10-30T01:00:00Z",
+  "time_zone": "Asia/Shanghai",
+  "timeline": [
+    {
+      "key": "warm_start",
+      "days": 14,
+      "active": false
+    },
+    {
+      "key": "proposal",
+      "days": 10,
+      "active": true
+    },
+    {
+      "key": "align",
+      "days": 7,
+      "active": false
+    },
+    {
+      "key": "exam",
+      "days": 0,
+      "active": false
+    },
+    {
+      "key": "after",
+      "days": 0,
+      "active": false
+    }
+  ],
+  "proposal": {
+    "status": "pending",
+    "consolidate_ratio": 0.6,
+    "reminder_key": "proposal.reminder"
+  },
+  "today": [
+    {
+      "key": "overview",
+      "minutes": 15
+    },
+    {
+      "key": "warm",
+      "minutes": 20
+    },
+    {
+      "key": "mistakes",
+      "minutes": 10
+    }
+  ],
+  "warmth": {
+    "scanned": 86,
+    "total": 120,
+    "ratio": 0.72
+  },
+  "checklist": [
+    {
+      "key": "identity",
+      "checked": true
+    },
+    {
+      "key": "route",
+      "checked": true
+    },
+    {
+      "key": "stationery",
+      "checked": false
+    },
+    {
+      "key": "prohibited",
+      "checked": false
+    }
+  ],
+  "sheet": {
+    "point_count": 18,
+    "ai_generated": true,
+    "item_keys": [
+      "boundary",
+      "formula",
+      "mistake"
+    ]
+  },
+  "estimates": [
+    {
+      "subject_key": "english",
+      "objective": 348,
+      "subjective_low": 82,
+      "subjective_high": 137,
+      "total_low": 430,
+      "total_high": 485
+    }
+  ],
+  "grades": [
+    {
+      "subject_key": "english",
+      "forecast_low": 430,
+      "forecast_high": 485,
+      "actual": 432
+    }
+  ],
+  "calibration_ready": true,
+  "archive": {
+    "study_minutes": 2580,
+    "sessions": 42,
+    "cards": 186,
+    "mistakes": 68
+  }
+}

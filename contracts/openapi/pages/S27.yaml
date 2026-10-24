@@ -1,0 +1,334 @@
+{
+  "paths": {
+    "/learner/sprint": {
+      "get": {
+        "operationId": "getS27SprintHome",
+        "x-owner": "plan",
+        "x-action": "plan.plan.read",
+        "summary": "冲刺与考后页面的演示数据；所有业务数字由接口提供",
+        "responses": {
+          "200": {
+            "description": "页面数据；未登记权限的写操作仅展示即将上线",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/S27SprintHome"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "S27TimelineStep": {
+        "type": "object",
+        "required": [
+          "key",
+          "days",
+          "active"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "days": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "S27Task": {
+        "type": "object",
+        "required": [
+          "key",
+          "minutes"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "minutes": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "S27ChecklistItem": {
+        "type": "object",
+        "required": [
+          "key",
+          "checked"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "checked": {
+            "type": "boolean"
+          }
+        }
+      },
+      "S27Estimate": {
+        "type": "object",
+        "required": [
+          "subject_key",
+          "objective",
+          "subjective_low",
+          "subjective_high",
+          "total_low",
+          "total_high"
+        ],
+        "properties": {
+          "subject_key": {
+            "type": "string"
+          },
+          "objective": {
+            "type": "number",
+            "minimum": 0
+          },
+          "subjective_low": {
+            "type": "number",
+            "minimum": 0
+          },
+          "subjective_high": {
+            "type": "number",
+            "minimum": 0
+          },
+          "total_low": {
+            "type": "number",
+            "minimum": 0
+          },
+          "total_high": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "S27Grade": {
+        "type": "object",
+        "required": [
+          "subject_key",
+          "forecast_low",
+          "forecast_high"
+        ],
+        "properties": {
+          "subject_key": {
+            "type": "string"
+          },
+          "forecast_low": {
+            "type": "number",
+            "minimum": 0
+          },
+          "forecast_high": {
+            "type": "number",
+            "minimum": 0
+          },
+          "actual": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "S27SprintHome": {
+        "type": "object",
+        "required": [
+          "exam_id",
+          "exam_name",
+          "data_source",
+          "availability",
+          "sprint_window_days",
+          "days_to_exam",
+          "exam_day",
+          "exam_start",
+          "time_zone",
+          "timeline",
+          "proposal",
+          "today",
+          "warmth",
+          "checklist",
+          "sheet",
+          "estimates",
+          "grades",
+          "calibration_ready",
+          "archive"
+        ],
+        "properties": {
+          "exam_id": {
+            "type": "string"
+          },
+          "exam_name": {
+            "type": "string"
+          },
+          "data_source": {
+            "$ref": "#/components/schemas/DataSource"
+          },
+          "availability": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "not_yet",
+              "exam_day"
+            ]
+          },
+          "sprint_window_days": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "days_to_exam": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "exam_day": {
+            "$ref": "#/components/schemas/LearningDay"
+          },
+          "exam_start": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "time_zone": {
+            "type": "string"
+          },
+          "timeline": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S27TimelineStep"
+            }
+          },
+          "proposal": {
+            "type": "object",
+            "required": [
+              "status",
+              "consolidate_ratio",
+              "reminder_key"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "confirmed",
+                  "declined",
+                  "undone"
+                ]
+              },
+              "consolidate_ratio": {
+                "type": "number",
+                "minimum": 0
+              },
+              "reminder_key": {
+                "type": "string"
+              }
+            }
+          },
+          "today": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S27Task"
+            }
+          },
+          "warmth": {
+            "type": "object",
+            "required": [
+              "scanned",
+              "total",
+              "ratio"
+            ],
+            "properties": {
+              "scanned": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "total": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "ratio": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          "checklist": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S27ChecklistItem"
+            }
+          },
+          "sheet": {
+            "type": "object",
+            "required": [
+              "point_count",
+              "ai_generated",
+              "item_keys"
+            ],
+            "properties": {
+              "point_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "ai_generated": {
+                "type": "boolean"
+              },
+              "item_keys": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "estimates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S27Estimate"
+            }
+          },
+          "grades": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/S27Grade"
+            }
+          },
+          "calibration_ready": {
+            "type": "boolean"
+          },
+          "archive": {
+            "type": "object",
+            "required": [
+              "study_minutes",
+              "sessions",
+              "cards",
+              "mistakes"
+            ],
+            "properties": {
+              "study_minutes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "sessions": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "cards": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "mistakes": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
