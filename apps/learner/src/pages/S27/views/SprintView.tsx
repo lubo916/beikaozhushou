@@ -13,7 +13,7 @@ export function SprintView({ data, soon }: { data: S27SprintHome; soon: () => vo
       <Card title={t("sprint.timeline.title")}>
         <ol className="grid grid-cols-5 gap-2">
           {data.timeline.map((step) => (
-            <li key={step.key} className="flex min-w-0 flex-col gap-1">
+            <li key={step.key} className="flex min-w-[0] flex-col gap-1">
               <Tag tone={step.active ? "brand" : "neutral"} className="whitespace-normal">
                 {step.key === "after"
                   ? t("views.after")
@@ -47,7 +47,7 @@ export function SprintView({ data, soon }: { data: S27SprintHome; soon: () => vo
               <ul className="ui-list ui-list--divided">
                 {data.today.map((task) => (
                   <li key={task.key} className="flex flex-wrap items-center justify-between gap-3 py-3">
-                    <div className="min-w-0 flex-1">
+                    <div className="min-w-[0] flex-1">
                       <h3 className="font-bold">{t(`sprint.today.${task.key}.title`)}</h3>
                       <p>{t(`sprint.today.${task.key}.detail`)}</p>
                       <span>{formatDuration(task.minutes)}</span>

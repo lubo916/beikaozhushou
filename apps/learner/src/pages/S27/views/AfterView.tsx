@@ -161,7 +161,7 @@ export function AfterView({ data, soon }: { data: S27SprintHome; soon: () => voi
           {submitted && <Banner tone="warning">{t("soon")}</Banner>}
           <label className="flex flex-col gap-1">
             {t("after.grades.subject")}
-            <select name="subject" className="min-w-0 rounded-sm border border-line-strong bg-bg-surface px-3 py-2">
+            <select name="subject" className="min-w-[0] rounded-sm border border-line-strong bg-bg-surface px-3 py-2">
               {data.estimates.map((row) => (
                 <option key={row.subject_key} value={row.subject_key}>
                   {t(`subject.${row.subject_key}`)}
@@ -176,7 +176,7 @@ export function AfterView({ data, soon }: { data: S27SprintHome; soon: () => voi
               type="number"
               step="any"
               required
-              className="min-w-0 rounded-sm border border-line-strong bg-bg-surface px-3 py-2"
+              className="min-w-[0] rounded-sm border border-line-strong bg-bg-surface px-3 py-2"
             />
           </label>
           <div className="flex flex-wrap gap-2">
