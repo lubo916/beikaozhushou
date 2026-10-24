@@ -1,4 +1,4 @@
-// S23：所有业务数字直接取演示报告；页面不计算成绩、百分位或补强排序。
+// S23：所有业务数字直接取演示报告；页面不计算成绩、目标差额或补强排序。
 import type { S23AssessmentReport } from "@exam-prep/contract";
 import { defineRoute, type MockContext } from "../route.ts";
 const FILES = import.meta.glob("../../../../../fixtures/pages/S23/*.json", { eager: true, import: "default" });
@@ -19,6 +19,8 @@ export const routes = [
         return {
           ...data,
           pending_grading: 1,
+          score_status: "provisional",
+          target_comparison: null,
           questions: data.questions.map((q, index) =>
             index === data.questions.length - 1 ? { ...q, pending_grading: true, correct: null, score: 0 } : q,
           ),
@@ -26,7 +28,7 @@ export const routes = [
       },
       insufficient_data: (ctx) => {
         const data = report(ctx);
-        return { ...data, summary: { ...data.summary, rank_visible: false, sample_count: 36 } };
+        return { ...data, score_status: "incomplete", target_comparison: null, losses: [], error_causes: [], traps: [], time_strategy: [] };
       },
     },
   }),

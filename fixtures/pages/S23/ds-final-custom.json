@@ -9,17 +9,11 @@
   "summary": {
     "score": 46,
     "total": 100,
-    "target": 60,
-    "gap": 14,
-    "gap_kind": "below",
     "interpretation": "先在最熟悉的部分找回稳定性。会但做错和时间分配值得优先关注；一次测评只是一张快照。",
     "low_score_path": "先复盘一道确定却做错的题，再完成对应知识点的短练习；从一个能开始的小任务恢复节奏。",
-    "sample_count": 36,
-    "minimum_sample_count": 200,
-    "rank_visible": false,
-    "percentile": 0.64,
     "screen_switches": 2,
-    "duration_minutes": 92
+    "duration_minutes": 92,
+    "score_rate": 0.46
   },
   "losses": [
     {
@@ -387,5 +381,8 @@
   "unattributed_question_ids": [
     "019a0023-0003-7000-8000-000000000006"
   ],
-  "demo_exam_key": "ds"
+  "demo_exam_key": "ds",
+  "assessment_kind": "custom",
+  "score_status": "official",
+  "target_comparison": null
 }

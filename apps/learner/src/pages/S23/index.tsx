@@ -110,9 +110,11 @@ export default function Page() {
                 main={
                   <div className="flex flex-col gap-4">
                     {/* feat:S23-02 六类失分归因；feat:S23-03 图例筛选对应题目。 */}
-                    <DistributionCard title={t("loss.title")} groups={data.losses} onSelect={setFilter} hint={t("loss.hint")} />
+                    {data.score_status !== "incomplete" && (
+                      <DistributionCard title={t("loss.title")} groups={data.losses} onSelect={setFilter} hint={t("loss.hint")} />
+                    )}
                     <AnalysisCard title={t("analysis.types")} rows={data.question_types} />
-                    <TimingCard report={data} />
+                    {data.score_status !== "incomplete" && <TimingCard report={data} />}
                     <ReinforcementCard report={data} />
                     {/* feat:S23-07 一键重做本场错题：待正式会话接口接通，先提示即将上线。 */}
                     <Button onClick={() => toast(t("soon"))}>{t("header.redo")}</Button>
@@ -122,15 +124,19 @@ export default function Page() {
                   <div className="flex flex-col gap-4">
                     <AnalysisCard title={t("analysis.points")} rows={data.knowledge_points} points />
                     <ConfidenceCard report={data} />
-                    <SimulationCard report={data} />
-                    <DistributionCard title={t("loss.causes")} groups={data.error_causes} onSelect={setFilter} />
-                    <DistributionCard title={t("loss.traps")} groups={data.traps} onSelect={setFilter} />
-                    <Card title={t("loss.attribution")}>
-                      <p className="mb-3">{t("loss.unattributed", { quantity: formatCount(data.unattributed_count) })}</p>
-                      <Button onClick={() => setFilter({ name: t("review.unattributed"), ids: data.unattributed_question_ids })}>
-                        {t("loss.attribute")}
-                      </Button>
-                    </Card>
+                    {data.score_status !== "incomplete" && (
+                      <>
+                        <SimulationCard report={data} />
+                        <DistributionCard title={t("loss.causes")} groups={data.error_causes} onSelect={setFilter} />
+                        <DistributionCard title={t("loss.traps")} groups={data.traps} onSelect={setFilter} />
+                        <Card title={t("loss.attribution")}>
+                          <p className="mb-3">{t("loss.unattributed", { quantity: formatCount(data.unattributed_count) })}</p>
+                          <Button onClick={() => setFilter({ name: t("review.unattributed"), ids: data.unattributed_question_ids })}>
+                            {t("loss.attribute")}
+                          </Button>
+                        </Card>
+                      </>
+                    )}
                   </div>
                 }
               />

@@ -4,7 +4,6 @@
   "soon": "即将上线",
   "unit": {
     "question": "题",
-    "person": "人",
     "times": "次",
     "score": "分"
   },
@@ -36,9 +35,8 @@
       "action": "去完成评分"
     },
     "insufficient_data": {
-      "title": "样本不足，暂不显示百分位",
-      "body": "样本不足 {{minimum}} 人不显示排名；分数和本次作答分析仍可查看。",
-      "count": "当前有效样本"
+      "title": "这场没考完，没出正式分",
+      "body": "已答题目的得分和作答记录仍保留。可以逐题复盘、重做错题，查看知识点诊断和补强清单。"
     }
   },
   "hero": {
@@ -47,15 +45,14 @@
     "above": "高于目标线 {{score}}",
     "below": "距目标线还差 {{score}}",
     "on_target": "已到目标线",
-    "position": "成绩位置",
-    "percentile": "百分位 {{percent}}",
-    "sample": "有效样本 {{quantity}}",
     "screens": "切屏记录",
     "duration": "整卷用时",
     "provisional": "暂定总分",
     "interpretation": "这次最该在意什么",
     "path": "最短回升路径",
-    "pending": "主观题待评分 {{quantity}}"
+    "pending": "主观题待评分 {{quantity}}",
+    "rate": "本卷得分率",
+    "raw_score": "已答题目得分"
   },
   "loss": {
     "title": "失分归因",
@@ -114,7 +111,8 @@
     "note": "待确认的提议；不会自动改动你的学习计划。",
     "later": "稍后再看",
     "today": "回到今日",
-    "plan": "查看学习计划"
+    "plan": "查看学习计划",
+    "source": "来源：测评"
   },
   "review": {
     "title": "逐题复盘",

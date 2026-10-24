@@ -8,6 +8,10 @@
 .s23-hero .ui-stat__hint {
   color: var(--color-bg-surface);
 }
+/* 两个成绩统计项使用足够的列宽，窄容器自然换行，避免大分数字形挤占用时间距。 */
+.s23-hero .ui-stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--size-space-12) * 4)), 1fr));
+}
 .s23-hero .ui-stat:first-child .ui-stat__value {
   font-size: calc(var(--font-size-title) * 2);
 }

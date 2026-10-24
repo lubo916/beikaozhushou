@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import type { S23Analysis, S23AssessmentReport } from "@exam-prep/contract";
 import { formatCount, formatDuration, formatPercent, formatRange, formatScore } from "@exam-prep/shared/format";
-import { AiContent, Button, Card, DataTable, Dialog, KeyValueList, ProposalCard, Stat, StatGroup, Tag, buttonClass } from "@exam-prep/ui";
+import { Button, Card, DataTable, Dialog, KeyValueList, ProposalCard, Stat, StatGroup, Tag, buttonClass } from "@exam-prep/ui";
 import { useToast } from "../../../app/toast.tsx";
 import { pathTo } from "../../../routes.ts";
 
@@ -112,25 +112,24 @@ export function ConfidenceCard({ report }: { report: S23AssessmentReport }) {
     </Card>
   );
 }
-// feat:S23-10 策略模拟：AI 生成的示例估计；尝试顺序不修改分数与预测。
+// feat:S23-10 策略模拟：接口返回的确定性示例估计；尝试顺序不修改分数与预测。
 export function SimulationCard({ report }: { report: S23AssessmentReport }) {
   const { t } = useTranslation("S23");
   const toast = useToast();
   const s = report.simulation;
   return (
     <Card title={t("simulation.title")}>
-      <AiContent note={t("simulation.hint")}>
-        <KeyValueList
-          items={[
-            { key: "before", label: t("simulation.before"), value: s.before_order },
-            { key: "after", label: t("simulation.after"), value: s.after_order },
-          ]}
-        />
-        <p className="mt-3 font-medium text-status-success">
-          {t("simulation.gain", { score: formatRange(s.gain_low, s.gain_high, t("unit.score")) })}
-        </p>
-        <p className="mt-2 text-small text-ink-secondary">{s.note}</p>
-      </AiContent>
+      <p className="mb-3 text-small text-ink-secondary">{t("simulation.hint")}</p>
+      <KeyValueList
+        items={[
+          { key: "before", label: t("simulation.before"), value: s.before_order },
+          { key: "after", label: t("simulation.after"), value: s.after_order },
+        ]}
+      />
+      <p className="mt-3 font-medium text-status-success">
+        {t("simulation.gain", { score: formatRange(s.gain_low, s.gain_high, t("unit.score")) })}
+      </p>
+      <p className="mt-2 text-small text-ink-secondary">{s.note}</p>
       <Button className="mt-3" onClick={() => toast(t("soon"))}>
         {t("simulation.try")}
       </Button>
@@ -183,10 +182,10 @@ export function ReinforcementCard({ report }: { report: S23AssessmentReport }) {
           </>
         }
       >
+        <p className="mb-3 text-small text-ink-secondary">{t("plan.source")}</p>
         <ProposalCard
           title={t("plan.dialog")}
           status="pending"
-          aiGenerated
           what={p.proposal.what}
           why={p.proposal.why}
           cost={p.proposal.cost}

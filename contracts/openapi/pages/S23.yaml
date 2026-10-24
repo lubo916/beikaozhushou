@@ -61,7 +61,10 @@
           "pending_grading",
           "unattributed_count",
           "unattributed_question_ids",
-          "demo_exam_key"
+          "demo_exam_key",
+          "assessment_kind",
+          "score_status",
+          "target_comparison"
         ],
         "properties": {
           "id": {
@@ -156,6 +159,27 @@
           "demo_exam_key": {
             "type": "string",
             "description": "阶段一演示考试上下文，供示例报告缓存隔离；不参与业务计算。"
+          },
+          "assessment_kind": {
+            "type": "string",
+            "enum": [
+              "full",
+              "half",
+              "stage",
+              "custom"
+            ],
+            "description": "卷型由接口确定，不按考试名称判断。"
+          },
+          "score_status": {
+            "type": "string",
+            "enum": [
+              "official",
+              "provisional",
+              "incomplete"
+            ]
+          },
+          "target_comparison": {
+            "$ref": "#/components/schemas/S23TargetComparison"
           }
         }
       },
@@ -164,17 +188,11 @@
         "required": [
           "score",
           "total",
-          "target",
-          "gap",
-          "gap_kind",
           "interpretation",
           "low_score_path",
-          "sample_count",
-          "minimum_sample_count",
-          "rank_visible",
-          "percentile",
           "screen_switches",
-          "duration_minutes"
+          "duration_minutes",
+          "score_rate"
         ],
         "properties": {
           "score": {
@@ -183,39 +201,11 @@
           "total": {
             "type": "number"
           },
-          "target": {
-            "type": "number"
-          },
-          "gap": {
-            "type": "number"
-          },
-          "gap_kind": {
-            "type": "string",
-            "enum": [
-              "above",
-              "below",
-              "on_target"
-            ]
-          },
           "interpretation": {
             "type": "string"
           },
           "low_score_path": {
             "type": "string"
-          },
-          "sample_count": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "minimum_sample_count": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "rank_visible": {
-            "type": "boolean"
-          },
-          "percentile": {
-            "type": "number"
           },
           "screen_switches": {
             "type": "integer",
@@ -223,6 +213,12 @@
           },
           "duration_minutes": {
             "type": "number"
+          },
+          "score_rate": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "接口已计算的本卷得分率。"
           }
         }
       },
@@ -532,6 +528,34 @@
           },
           "pending_grading": {
             "type": "boolean"
+          }
+        }
+      },
+      "S23TargetComparison": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "description": "仅正式全真套卷或半卷且已设目标时返回；阶段、定制、暂定和未完成报告必须为 null。差额由接口按折算分给出，页面不重算。",
+        "required": [
+          "target",
+          "gap",
+          "gap_kind"
+        ],
+        "properties": {
+          "target": {
+            "type": "number"
+          },
+          "gap": {
+            "type": "number"
+          },
+          "gap_kind": {
+            "type": "string",
+            "enum": [
+              "above",
+              "below",
+              "on_target"
+            ]
           }
         }
       }

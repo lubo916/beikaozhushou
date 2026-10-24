@@ -25,7 +25,7 @@ const query = (patch: Partial<ReportQuery> = {}): ReportQuery => ({
 });
 
 describe("S23 测评报告数据契约", () => {
-  it("四个演示考试与三种数据变体都通过生成的 Zod，受限保留暂定总分，样本不足隐藏百分位", async () => {
+  it("四个演示考试与三种数据变体都通过生成的 Zod，受限保留暂定总分，未完成保留个人记录且不提供群体成绩", async () => {
     for (const state of ["normal", "empty", "restricted", "insufficient_data"]) {
       const control = new DevControl({
         examKeys: fixtures.exams.map((e) => e.key),
@@ -51,9 +51,25 @@ describe("S23 测评报告数据契约", () => {
         if (state === "empty") expect(data.available).toBe(false);
         if (state === "restricted") {
           expect(data.pending_grading).toBeGreaterThan(0);
+          expect(data.score_status).toBe("provisional");
+          expect(data.target_comparison).toBeNull();
           expect(data.questions.some((q) => q.pending_grading && q.correct === null)).toBe(true);
         }
-        if (state === "insufficient_data") expect(data.summary.rank_visible).toBe(false);
+        for (const key of ["rank_visible", "percentile", "sample_count", "minimum_sample_count"])
+          expect(data.summary).not.toHaveProperty(key);
+        if (state === "insufficient_data") {
+          expect(data.score_status).toBe("incomplete");
+          expect(data.target_comparison).toBeNull();
+          const original = reportFixture(exam.examId);
+          expect(data.summary).toEqual(original.summary);
+          expect(data.losses).toEqual([]);
+          expect(data.error_causes).toEqual([]);
+          expect(data.traps).toEqual([]);
+          expect(data.time_strategy).toEqual([]);
+          expect(data.knowledge_points).toEqual(original.knowledge_points);
+          expect(data.reinforcement).toEqual(original.reinforcement);
+          expect(data.questions).toEqual(original.questions);
+        }
       }
     }
   });
@@ -77,9 +93,9 @@ describe("S23 请求状态映射与重试", () => {
     expect(reportView(failed, normal)).toEqual({ state: "offline", data: normal });
     expect(reportView(query({ fetchStatus: "paused", data: normal })).state).toBe("offline");
   });
-  it("主观题未评分、样本不足都只限制局部，完整报告仍可读", () => {
+  it("主观题未评分、未完成都只限制局部，个人报告仍可读", () => {
     expect(reportView(query({ status: "success", data: { ...normal, pending_grading: 1 } })).state).toBe("normal");
-    expect(reportView(query({ status: "success", data: { ...normal, summary: { ...normal.summary, rank_visible: false } } })).state).toBe(
+    expect(reportView(query({ status: "success", data: { ...normal, score_status: "incomplete", target_comparison: null } })).state).toBe(
       "normal",
     );
   });

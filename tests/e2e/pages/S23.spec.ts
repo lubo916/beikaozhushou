@@ -3,7 +3,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { formatCount, formatScore } from "../../../packages/shared/src/format/index.ts";
+import { formatPercent, formatScore } from "../../../packages/shared/src/format/index.ts";
 import { pathTo } from "../../../apps/learner/src/routes.ts";
 import { pageById, urlOf } from "../support/catalog.ts";
 import { ABNORMAL_STATES, expectLoaded, expectNoProblems, expectOpened, expectState, watchPage } from "../support/checks.ts";
@@ -12,7 +12,9 @@ import { ROOT } from "../support/env.ts";
 const ENTRY = pageById("S23");
 interface ReportFixture {
   readonly title: string;
-  readonly summary: { readonly score: number; readonly total: number; readonly minimum_sample_count: number };
+  readonly assessment_kind: "full" | "half" | "stage" | "custom";
+  readonly target_comparison: { readonly target: number; readonly gap: number; readonly gap_kind: "above" | "below" | "on_target" } | null;
+  readonly summary: { readonly score: number; readonly total: number; readonly score_rate: number };
   readonly losses: readonly { readonly name: string; readonly question_ids: readonly string[] }[];
   readonly questions: readonly { readonly id: string; readonly number: number; readonly title: string; readonly analysis: string }[];
   readonly reinforcement: { readonly proposal: { readonly what: string } };
@@ -64,6 +66,25 @@ for (const size of WIDTHS) {
     const aside = await boxOf(page.locator("main#main .ui-cols__aside"));
     if (size.split) expect(aside.x).toBeGreaterThanOrEqual(main.x + main.width - 1);
     else expect(aside.y).toBeGreaterThanOrEqual(main.y + main.height - 1);
+    const values = await page.locator(".s23-hero .ui-stat__value").evaluateAll((elements) =>
+      elements.map((element) => {
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        const rect = range.getBoundingClientRect();
+        return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom };
+      }),
+    );
+    const gap = await page.locator(".s23-hero .ui-stats").evaluate((element) => Number.parseFloat(getComputedStyle(element).gap));
+    expect(values).toHaveLength(2);
+    const score = values[0]!;
+    const duration = values[1]!;
+    expect(
+      score.right + gap <= duration.left ||
+        duration.right + gap <= score.left ||
+        score.bottom + gap <= duration.top ||
+        duration.bottom + gap <= score.top,
+      "成绩和用时文字应保留统计组间距",
+    ).toBe(true);
     const overflow = await page.locator("main#main").evaluate((element) => element.scrollWidth - element.clientWidth);
     expect(overflow, "正文区不应横向溢出").toBeLessThanOrEqual(1);
     await page.screenshot({ path: join(ROOT, ".bk/qa/S23", `default@${size.width}.png`), fullPage: false });
@@ -94,9 +115,10 @@ test("S23 七态都能通过接口层强制显示", async ({ page }) => {
     }
     if (state === "insufficient_data") {
       await expect(shown).toContainText(copy("state.insufficient_data.title"));
-      await expect(shown).toContainText(copy("state.insufficient_data.body", { minimum: formatCount(KJ.summary.minimum_sample_count) }));
+      await expect(shown).toContainText(copy("state.insufficient_data.body"));
       await expect(page.locator("main#main")).toContainText(formatScore(KJ.summary.score, { total: KJ.summary.total }));
     }
+    await expect(page.locator("main#main")).not.toContainText(/排名|百分位|有效样本|参加人数/);
     expectNoProblems(watch, state);
   }
 });
@@ -110,6 +132,19 @@ test("S23 四个演示考试都能打开各自报告", async ({ page }) => {
     await expect(page.locator("main#main")).toContainText(copy("sample"));
     await expect(page.locator("main#main")).toContainText(report.title);
     await expect(page.locator("main#main")).toContainText(formatScore(report.summary.score, { total: report.summary.total }));
+    await expect(page.locator("main#main")).toContainText(formatPercent(report.summary.score_rate));
+    if (report.target_comparison === null) {
+      await expect(page.locator("main#main")).not.toContainText("目标线");
+    } else {
+      const comparison = report.target_comparison;
+      await expect(page.locator("main#main")).toContainText(copy("hero.target", { score: formatScore(comparison.target) }));
+      await expect(page.locator("main#main")).toContainText(
+        comparison.gap_kind === "on_target"
+          ? copy("hero.on_target")
+          : copy(`hero.${comparison.gap_kind}`, { score: formatScore(comparison.gap) }),
+      );
+    }
+    await expect(page.locator("main#main")).not.toContainText(/排名|百分位|有效样本|参加人数/);
     expectNoProblems(watch, "normal", `${exam.key}：`);
   }
 });
@@ -167,6 +202,9 @@ test("S23 补强清单先给待确认提议，模拟与重做按钮有明确反�
   await expectSoon(page, main.getByRole("button", { name: copy("simulation.try"), exact: true }));
   await main.getByRole("button", { name: copy("plan.propose"), exact: true }).press("Enter");
   const dialog = page.getByRole("dialog", { name: copy("plan.dialog"), exact: true });
+  await expect(main.locator(".s23-hero .ui-ai")).toContainText("AI 生成");
+  await expect(dialog).not.toContainText("AI 生成");
+  await expect(dialog).toContainText(copy("plan.source"));
   await expect(dialog).toContainText(copy("plan.note"));
   await expect(dialog).toContainText(KJ.reinforcement.proposal.what);
   await expectSoon(page, dialog.getByRole("button", { name: UI.action.confirm, exact: true }));
@@ -231,4 +269,30 @@ test("S23 工具条同页切考试后，缓存仍按实际考试隔离", async (
   await expectState(page, ENTRY, "offline");
   await expect(page.locator("main#main")).toContainText(en.title);
   expectNoProblems(watch, "offline");
+});
+
+test("S23 R18 没考完保留复盘诊断补强，但不出三类整卷分析", async ({ page }) => {
+  const watch = await watchPage(page);
+  await watch.open(urlOf(ENTRY, { state: "insufficient_data" }));
+  await expectState(page, ENTRY, "insufficient_data");
+  const main = page.locator("main#main");
+  await expect(main).toContainText("这场没考完，没出正式分");
+  await expect(main).toContainText(formatScore(KJ.summary.score, { total: KJ.summary.total }));
+  await expect(main).toContainText(copy("hero.screens"));
+  await expect(main).toContainText(copy("analysis.points"));
+  await expect(main).toContainText(copy("plan.title"));
+  for (const key of ["loss.title", "loss.causes", "loss.traps", "loss.attribution", "timing.title", "simulation.title"]) {
+    await expect(main.getByRole("heading", { name: copy(key), exact: true })).toHaveCount(0);
+  }
+  await expect(main).not.toContainText("目标线");
+  await expect(main).not.toContainText(/排名|百分位|有效样本|参加人数/);
+  await expectSoon(page, main.getByRole("button", { name: copy("header.redo"), exact: true }));
+  await main.getByRole("button", { name: copy("header.review"), exact: true }).press("Enter");
+  const dialog = page.getByRole("dialog", { name: copy("review.title"), exact: true });
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText(KJ.questions[0]!.title);
+  await dialog.getByRole("button", { name: copy("review.close"), exact: true }).press("Enter");
+  await main.getByRole("button", { name: copy("plan.propose"), exact: true }).press("Enter");
+  await expect(page.getByRole("dialog", { name: copy("plan.dialog"), exact: true })).toContainText(KJ.reinforcement.proposal.what);
+  expectNoProblems(watch, "insufficient_data");
 });
