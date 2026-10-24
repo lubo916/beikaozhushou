@@ -1,1 +1,149 @@
-{}
+{
+  "page": "测评报告",
+  "sample": "示例数据",
+  "soon": "即将上线",
+  "unit": {
+    "question": "题",
+    "times": "次",
+    "score": "分"
+  },
+  "header": {
+    "eyebrow": "一次测评，一条更清楚的前进路线",
+    "review": "逐题复盘",
+    "redo": "重做本场错题",
+    "back": "返回模考中心",
+    "date": "完成于 {{date}}",
+    "subtitle": "看清分丢在哪，把下一步缩到能开始的一件事。"
+  },
+  "state": {
+    "empty": {
+      "title": "还没有测评报告",
+      "body": "做完一场整卷测评后生成",
+      "action": "去模考"
+    },
+    "error": {
+      "body": "测评报告的数据暂时没取到：网络或服务异常。已保存的内容不受影响，点“重试”即可；连续失败会自动上报。"
+    },
+    "offline": {
+      "title": "当前离线",
+      "body": "显示已生成的报告；评分、重新测评与计划调整需要联网。",
+      "missing": "本机还没有已生成的报告，联网后打开一次即可缓存。"
+    },
+    "restricted": {
+      "title": "总分暂定，主观题还未评分",
+      "body": "还有 {{quantity}} 道主观题待评分，完成评分后才会更新总分。",
+      "action": "去完成评分"
+    },
+    "insufficient_data": {
+      "title": "这场没考完，没出正式分",
+      "body": "已答题目的得分和作答记录仍保留。可以逐题复盘、重做错题，查看知识点诊断和补强清单。"
+    }
+  },
+  "hero": {
+    "score": "本次成绩",
+    "target": "目标线 {{score}}",
+    "above": "高于目标线 {{score}}",
+    "below": "距目标线还差 {{score}}",
+    "on_target": "已到目标线",
+    "screens": "切屏记录",
+    "duration": "整卷用时",
+    "provisional": "暂定总分",
+    "interpretation": "这次最该在意什么",
+    "path": "最短回升路径",
+    "pending": "主观题待评分 {{quantity}}",
+    "rate": "本卷得分率",
+    "raw_score": "已答题目得分"
+  },
+  "loss": {
+    "title": "失分归因",
+    "hint": "按本场失分归因，先补最容易找回的分。",
+    "legend": "查看{{name}}对应题目",
+    "lost": "失分 {{score}} · {{quantity}}",
+    "attribution": "错因与陷阱分布",
+    "causes": "错因分布",
+    "traps": "陷阱分布",
+    "unattributed": "还有 {{quantity}} 道题待归因",
+    "attribute": "去归因"
+  },
+  "analysis": {
+    "types": "题型分析",
+    "points": "知识点诊断",
+    "name": "题型 / 知识点",
+    "score": "得分",
+    "rate": "得分率 / 正确率",
+    "note": "建议",
+    "open_point": "查看{{name}}知识点"
+  },
+  "timing": {
+    "title": "时间策略",
+    "part": "部分",
+    "actual": "实际用时",
+    "suggested": "建议用时",
+    "completion": "完成率",
+    "order": "作答顺序",
+    "note": "策略提示",
+    "tail": "末段完成情况也在表中；用时只与自己的策略比较。"
+  },
+  "confidence": {
+    "title": "把握度校准",
+    "sure_wrong": "确定却做错",
+    "guess_correct": "蒙对",
+    "count": "{{quantity}}，占比 {{ratio}}"
+  },
+  "simulation": {
+    "title": "策略模拟",
+    "before": "本次顺序",
+    "after": "可尝试顺序",
+    "gain": "预计可找回 {{score}}",
+    "hint": "示例模拟，不代表下次实际成绩",
+    "try": "试试这个顺序"
+  },
+  "plan": {
+    "title": "近期补强清单",
+    "days": "接下来 {{days}} 天",
+    "task": "补强任务",
+    "day": "安排",
+    "duration": "预计用时",
+    "tier": "性价比阶梯",
+    "reason": "为什么先做",
+    "propose": "查看加入计划的提议",
+    "dialog": "补强计划提议",
+    "note": "待确认的提议；不会自动改动你的学习计划。",
+    "later": "稍后再看",
+    "today": "回到今日",
+    "plan": "查看学习计划",
+    "source": "来源：测评"
+  },
+  "review": {
+    "title": "逐题复盘",
+    "filtered": "已筛选：{{filter}}",
+    "all": "全部题目",
+    "empty": "没有符合筛选条件的题目",
+    "number": "第 {{number}} 题",
+    "answer": "我的作答",
+    "expected": "参考答案",
+    "analysis": "解析",
+    "time": "用时",
+    "confidence": "把握度",
+    "score": "得分",
+    "cause": "错因",
+    "trap": "陷阱",
+    "correct": "答对",
+    "wrong": "答错",
+    "pending": "待评分",
+    "unattributed": "待归因",
+    "grade": "完成评分",
+    "attribute": "补充归因",
+    "close": "收起复盘",
+    "open": "打开这题解析",
+    "none": "未记录",
+    "choice": "已选选项 {{options}}",
+    "confidence_value": {
+      "sure": "确定",
+      "vague": "模糊",
+      "guess": "蒙的",
+      "off": "未开启"
+    },
+    "sample_note": "以下为本报告的代表性示例题目，用于体验复盘流程；统计卡展示整卷的示例汇总。"
+  }
+}
