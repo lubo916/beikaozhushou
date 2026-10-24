@@ -55,8 +55,11 @@ class B08PrerequisiteTests(unittest.TestCase):
             {"id": "U99", "status": "todo", "deps": []},
         ]})
         self.cfg = copy.deepcopy(bk.DEFAULT_CONFIG)
+        self.cfg["_acceptance_protocol_fixture"] = True
         self.task = {"id": "B08", "kind": "backend", "rule": "diagnosis-start", "deps": [], "title": "入门流程"}
         self.write("tools/bk.py", (ROOT / "tools/bk.py").read_text(encoding="utf-8"))
+        self.write("tools/bk_acceptance.py", (ROOT / "tools/bk_acceptance.py").read_text(encoding="utf-8"))
+        self.write("AGENTS.md", "# 前置闸门测试 V4；入口 tools/bk.py\n")
         self.write(".gitignore", ".bk/\n")
         self.git("init", "-q", "-b", "main")
         self.git("config", "user.name", "前置闸门测试")
