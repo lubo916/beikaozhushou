@@ -1,0 +1,128 @@
+{
+  "exam_id": "junior-accounting",
+  "exam_name": "初级会计职称",
+  "activation": "manual",
+  "video_analysis_allowed": true,
+  "scenarios": [
+    {
+      "id": "structured",
+      "title": "结构化问答",
+      "description": "抽题、思考、作答与追问",
+      "duration_seconds": 600
+    },
+    {
+      "id": "discussion",
+      "title": "小组讨论",
+      "description": "观点表达与回应他人",
+      "duration_seconds": 900
+    },
+    {
+      "id": "interview",
+      "title": "复试与答辩",
+      "description": "围绕经历与思路展开回答",
+      "duration_seconds": 600
+    }
+  ],
+  "flow": [
+    "选择场景与抽题",
+    "阅读题目，整理思路",
+    "限时口头作答",
+    "回应考官追问",
+    "查看评估与逐字稿"
+  ],
+  "assessment": {
+    "available": true,
+    "title": "谈谈你如何处理团队中的不同意见",
+    "day": "2026-10-21",
+    "score": 72,
+    "score_total": 100,
+    "summary": "立场清楚，也照顾到了合作；还可以补充具体行动和结果。",
+    "dimensions": [
+      {
+        "id": "content",
+        "label": "内容",
+        "score": 7,
+        "description": "观点明确，例子还可以更具体"
+      },
+      {
+        "id": "logic",
+        "label": "逻辑",
+        "score": 8,
+        "description": "层次清楚，转折自然"
+      },
+      {
+        "id": "expression",
+        "label": "表达",
+        "score": 6,
+        "description": "减少口头禅，让句子更简洁"
+      },
+      {
+        "id": "time",
+        "label": "时间",
+        "score": 7,
+        "description": "结尾需要留出总结时间"
+      }
+    ],
+    "follow_up": "如果对方仍然坚持自己的方案，你会怎样推进？",
+    "transcript": [
+      {
+        "id": "line-1",
+        "at_seconds": 12,
+        "text": "我觉得，嗯，首先应该听清楚对方的想法……",
+        "annotation": "口头禅：用短暂停顿替代填充词。"
+      },
+      {
+        "id": "line-2",
+        "at_seconds": 53,
+        "text": "然后我们可以沟通一下，找到比较好的办法。",
+        "annotation": "表述偏泛：补充沟通的对象、行动与判断依据。"
+      },
+      {
+        "id": "line-3",
+        "at_seconds": 106,
+        "text": "最后再一起看看结果。",
+        "annotation": "收尾：说清怎样检验结果，并回应最初的目标。"
+      }
+    ],
+    "reconstruction": [
+      "先回应目标：分歧本身不可怕，关键是围绕共同目标作判断。",
+      "再说具体行动：分别听取理由，用事实比较方案，并约定试行方式。",
+      "最后交代闭环：按事先约定的标准复盘结果，及时调整并向团队反馈。"
+    ],
+    "ai_generated": true
+  },
+  "radar": {
+    "sufficient": true,
+    "sample_count": 4,
+    "minimum_samples": 3,
+    "score_total": 10,
+    "dimensions": [
+      {
+        "id": "content",
+        "label": "内容",
+        "score": 7,
+        "description": "观点明确，例子还可以更具体"
+      },
+      {
+        "id": "logic",
+        "label": "逻辑",
+        "score": 8,
+        "description": "层次清楚，转折自然"
+      },
+      {
+        "id": "expression",
+        "label": "表达",
+        "score": 6,
+        "description": "减少口头禅，让句子更简洁"
+      },
+      {
+        "id": "time",
+        "label": "时间",
+        "score": 7,
+        "description": "结尾需要留出总结时间"
+      }
+    ]
+  },
+  "next_stage": "下一站：先补具体例子，再重答同一道题。",
+  "data_source": "sample"
+}
