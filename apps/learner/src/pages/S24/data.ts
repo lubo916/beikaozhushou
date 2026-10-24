@@ -1,6 +1,6 @@
 // S24 只经生成钩子读业务数字；七态由接口结果映射，不按地址里的测试状态改页面。
 // 离线只显示身份已确认的目标的旧结果与原计算时间（R06 R2、R12）；地址里的演示别名不代表当前目标。
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   getGetS24ProgressQueryKey,
   getGetMeContextQueryKey,
@@ -9,7 +9,6 @@ import {
   useGetS24Progress,
   type S24Progress,
 } from "@exam-prep/contract";
-import { getS24ProgressResponse } from "@exam-prep/contract/zod";
 
 const RETRIES = 1;
 const SERVER_ERROR = 500;
@@ -97,27 +96,51 @@ function sessionStore(): CacheStore | undefined {
 }
 
 /** 缓存只认已确认的真实考试 ID，且 payload 身份必须相符。第三参兼容旧的地址槽调用方式。 */
-export function readCachedProgress(
+export async function readCachedProgress(
   slot: string,
   store: CacheStore | undefined = sessionStore(),
   expectedExamId = slot,
-): S24Progress | undefined {
+): Promise<S24Progress | undefined> {
   if (store === undefined || expectedExamId === CURRENT_SLOT || expectedExamId.trim() === "") return undefined;
   const key = PROGRESS_CACHE_PREFIX + expectedExamId;
+  let raw: string | null;
   try {
-    const raw = store.getItem(key);
-    if (raw === null) return undefined;
-    const result = getS24ProgressResponse.safeParse(JSON.parse(raw) as unknown);
-    if (result.success && result.data.exam_id === expectedExamId) return result.data as S24Progress;
+    raw = store.getItem(key);
   } catch {
-    /* 损坏、旧版本或身份不符都按没有本目标缓存处理。 */
+    return undefined;
+  }
+  if (raw === null) return undefined;
+  let payload: unknown;
+  try {
+    payload = JSON.parse(raw) as unknown;
+  } catch {
+    discardCachedProgress(store, key, raw);
+    return undefined;
+  }
+  // 全量生成校验器只在确有离线缓存待核对时加载，不阻塞在线查询或500出错态。
+  let validate: typeof import("@exam-prep/contract/zod").getS24ProgressResponse;
+  try {
+    ({ getS24ProgressResponse: validate } = await import("@exam-prep/contract/zod"));
+  } catch {
+    // 模块暂时不可达不等于缓存损坏；保留原raw，不显示未经校验的业务数字。
+    return undefined;
   }
   try {
-    store.removeItem(key);
+    const result = validate.safeParse(payload);
+    if (result.success && result.data.exam_id === expectedExamId) return result.data as S24Progress;
+  } catch {
+    /* 损坏或旧形状仍按无可用缓存处理。 */
+  }
+  discardCachedProgress(store, key, raw);
+  return undefined;
+}
+
+function discardCachedProgress(store: CacheStore, key: string, original: string): void {
+  try {
+    if (store.getItem(key) === original) store.removeItem(key);
   } catch {
     /* 浏览器禁用缓存时不处理。 */
   }
-  return undefined;
 }
 
 /** 保留 slot 参数以兼容旧调用；实际键只使用响应 exam_id，原样保存 computed_at。 */
@@ -131,12 +154,15 @@ export function writeCachedProgress(_slot: string, data: S24Progress, store: Cac
 }
 
 export function useProgress() {
+  const [cachedProgress, setCachedProgress] = useState<{ readonly examId: string; readonly data: S24Progress }>();
   // 不读开发工具条或 mocks；成功身份保留到失效，进入本页重新确认。
   const context = useGetMeContext({
     query: { queryKey: getGetMeContextQueryKey(), retry: shouldRetry, staleTime: Number.POSITIVE_INFINITY, refetchOnMount: "always" },
   });
   const contextExamId = confirmedExamId(context);
   const query = useGetS24Progress({
+    // 目标确认会更换queryKey；查询仍丢弃旧结果，只读GET继续完成，避免把取消竞态传给Service Worker。
+    request: { signal: null },
     query: {
       queryKey: [...getGetS24ProgressQueryKey(), contextExamId ?? CURRENT_SLOT],
       retry: shouldRetry,
@@ -155,12 +181,26 @@ export function useProgress() {
       query.data?.exam_id === expectedExamId
     ) {
       writeCachedProgress(expectedExamId, query.data);
+      // 在线成功后后台预热，保持后续真实断网时可校验缓存；不等待它才显示页面。
+      void import("@exam-prep/contract/zod").catch(() => undefined);
     }
   }, [expectedExamId, query.status, query.fetchStatus, query.data]);
   // 尚未确认身份的旧 success 等待本次请求；网络/服务出错仍保留本页请求本身的七态。
   const source: ProgressQuery =
     expectedExamId === undefined && query.status === "success" ? { ...query, data: undefined, status: "pending" } : query;
-  const cached = expectedExamId !== undefined && isOffline(source) ? readCachedProgress(expectedExamId) : undefined;
+  const offline = isOffline(source);
+  useEffect(() => {
+    // 每次effect独立失效，A→B→A和断网→联网时也不能接回旧的异步结果。
+    let active = true;
+    const pending = offline && expectedExamId !== undefined ? readCachedProgress(expectedExamId) : Promise.resolve(undefined);
+    void pending.then((data) => {
+      if (active) setCachedProgress(data && expectedExamId !== undefined ? { examId: expectedExamId, data } : undefined);
+    });
+    return () => {
+      active = false;
+    };
+  }, [offline, expectedExamId]);
+  const cached = offline && expectedExamId !== undefined && cachedProgress?.examId === expectedExamId ? cachedProgress.data : undefined;
   return {
     ...progressForTarget(source, expectedExamId, cached),
     retry: () => {

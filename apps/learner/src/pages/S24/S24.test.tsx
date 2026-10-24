@@ -207,23 +207,23 @@ describe("S24 离线缓存（R06：离线只显示上次的结果和计算时间
     const store = memoryStore();
     const kj = await load("kj");
     writeCachedProgress("kj", kj, store);
-    expect(readCachedProgress(kj.exam_id, store)?.computed_at).toBe(kj.computed_at);
-    expect(readCachedProgress(kj.exam_id, store)?.exam_id).toBe(kj.exam_id);
-    expect(readCachedProgress("en", store)).toBeUndefined();
-    expect(readCachedProgress(CURRENT_SLOT, store)).toBeUndefined();
-    expect(readCachedProgress(CURRENT_SLOT, store, kj.exam_id)?.computed_at).toBe(kj.computed_at);
+    expect((await readCachedProgress(kj.exam_id, store))?.computed_at).toBe(kj.computed_at);
+    expect((await readCachedProgress(kj.exam_id, store))?.exam_id).toBe(kj.exam_id);
+    expect(await readCachedProgress("en", store)).toBeUndefined();
+    expect(await readCachedProgress(CURRENT_SLOT, store)).toBeUndefined();
+    expect((await readCachedProgress(CURRENT_SLOT, store, kj.exam_id))?.computed_at).toBe(kj.computed_at);
   });
 
   it("缓存损坏或是旧版本时丢掉，回到没有缓存的离线态", async () => {
     const store = memoryStore();
     store.setItem(PROGRESS_CACHE_PREFIX + "kj", "{坏掉的缓存");
-    expect(readCachedProgress("kj", store)).toBeUndefined();
+    expect(await readCachedProgress("kj", store)).toBeUndefined();
     expect(store.map.has(PROGRESS_CACHE_PREFIX + "kj")).toBe(false);
     const kj = await load("kj");
     store.setItem(PROGRESS_CACHE_PREFIX + "en", JSON.stringify({ ...kj, metrics: { ...kj.metrics, verdict: "steady" } }));
-    expect(readCachedProgress("en", store)).toBeUndefined();
+    expect(await readCachedProgress("en", store)).toBeUndefined();
     const offline = { status: "error" as const, fetchStatus: "idle" as const, error: new TypeError("offline") };
-    expect(progressView(offline, readCachedProgress("en", store)).state).toBe("offline");
+    expect(progressView(offline, await readCachedProgress("en", store)).state).toBe("offline");
   });
 });
 
