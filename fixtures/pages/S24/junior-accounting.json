@@ -1,0 +1,373 @@
+{
+  "exam_id": "junior-accounting",
+  "exam_name": "初级会计职称",
+  "headline_subject": "初级会计实务",
+  "computed_at": "2026-10-22T08:00:00Z",
+  "time_zone": "Asia/Shanghai",
+  "data_source": "sample",
+  "has_progress": true,
+  "map_check": "passed",
+  "blocked_reasons": [],
+  "importance_estimated": false,
+  "evidence_count": 36,
+  "metrics": {
+    "workload": 0.46,
+    "weighted": 0.58,
+    "recent_daily": 1.71,
+    "required_daily": 1.4,
+    "health": 1.22,
+    "verdict": "ok",
+    "health_state": "normal"
+  },
+  "forecasts": {
+    "today": {
+      "conservative": 57,
+      "likely": 61,
+      "optimistic": 65,
+      "target_line": 70,
+      "gap": 9,
+      "pass_probability": 0.62,
+      "low_confidence": false,
+      "confidence": "medium",
+      "estimated_score_ratio": 0,
+      "weekly_change": 2
+    },
+    "target": {
+      "conservative": 63,
+      "likely": 68,
+      "optimistic": 72,
+      "target_line": 70,
+      "gap": 2,
+      "pass_probability": 0.86,
+      "low_confidence": false,
+      "confidence": "medium",
+      "estimated_score_ratio": 0
+    }
+  },
+  "trend": [
+    {
+      "day": "2026-09-03",
+      "conservative": 52,
+      "likely": 56,
+      "optimistic": 60
+    },
+    {
+      "day": "2026-09-10",
+      "conservative": 53,
+      "likely": 57,
+      "optimistic": 61
+    },
+    {
+      "day": "2026-09-17",
+      "conservative": 53,
+      "likely": 57,
+      "optimistic": 61
+    },
+    {
+      "day": "2026-09-24",
+      "conservative": 54,
+      "likely": 58,
+      "optimistic": 62
+    },
+    {
+      "day": "2026-10-01",
+      "conservative": 55,
+      "likely": 59,
+      "optimistic": 63
+    },
+    {
+      "day": "2026-10-08",
+      "conservative": 55,
+      "likely": 59,
+      "optimistic": 63
+    },
+    {
+      "day": "2026-10-15",
+      "conservative": 56,
+      "likely": 59,
+      "optimistic": 64
+    },
+    {
+      "day": "2026-10-22",
+      "conservative": 57,
+      "likely": 61,
+      "optimistic": 65
+    }
+  ],
+  "subjects": [
+    {
+      "id": "019a0124-0000-7000-8000-000000000001",
+      "name": "初级会计实务",
+      "completion": 0.46,
+      "passed": false,
+      "actual_minutes": 1260,
+      "suggested_minutes": 1500,
+      "gap": 9
+    },
+    {
+      "id": "019a0124-0000-7000-8000-000000000002",
+      "name": "经济法基础",
+      "completion": 0.53,
+      "passed": false,
+      "actual_minutes": 960,
+      "suggested_minutes": 1080,
+      "gap": 3
+    }
+  ],
+  "time": {
+    "effective_minutes": 402,
+    "present_minutes": 534,
+    "pending_minutes": 96
+  },
+  "score_bands": [
+    {
+      "kind": "secured",
+      "score": 42
+    },
+    {
+      "kind": "potential",
+      "score": 18
+    },
+    {
+      "kind": "recoverable",
+      "score": 12
+    },
+    {
+      "kind": "outside",
+      "score": 28
+    }
+  ],
+  "points": [
+    {
+      "id": "019a0103-0000-7000-8000-000000000001",
+      "name": "会计基本假设",
+      "expected_score": 6,
+      "exam_probability": 0.85,
+      "current_level": 2,
+      "personal_difficulty": "easier",
+      "minutes": 25,
+      "roi_grade": "S",
+      "roi_score": 92,
+      "rank": 1,
+      "reason": "考察概率 85%，从已熟悉升到已掌握约需 25 分钟，预计多拿 6 分。"
+    },
+    {
+      "id": "019a0103-0000-7000-8000-000000000006",
+      "name": "固定资产折旧方法",
+      "expected_score": 5,
+      "exam_probability": 0.8,
+      "current_level": 2,
+      "personal_difficulty": "typical",
+      "minutes": 40,
+      "roi_grade": "A",
+      "roi_score": 81,
+      "rank": 2,
+      "reason": "近 6 年考了 5 次，补齐几种折旧方法的比较约需 40 分钟，预计多拿 5 分。"
+    },
+    {
+      "id": "019a0103-0000-7000-8000-000000000002",
+      "name": "会计信息质量要求",
+      "expected_score": 4,
+      "exam_probability": 0.7,
+      "current_level": 1,
+      "personal_difficulty": "typical",
+      "minutes": 35,
+      "roi_grade": "A",
+      "roi_score": 76,
+      "rank": 3,
+      "reason": "概念题常考，回顾辨析卡约需 35 分钟，预计多拿 4 分。"
+    },
+    {
+      "id": "019a0103-0000-7000-8000-000000000003",
+      "name": "借贷记账法",
+      "expected_score": 3,
+      "exam_probability": 0.65,
+      "current_level": 3,
+      "personal_difficulty": "typical",
+      "minutes": 20,
+      "roi_grade": "B",
+      "roi_score": 63,
+      "rank": 4,
+      "reason": "已经掌握，再练一组分录题到能应用约需 20 分钟，预计多拿 3 分。"
+    }
+  ],
+  "path": [
+    {
+      "id": "019a0103-0000-7000-8000-000000000001",
+      "name": "会计基本假设",
+      "expected_score": 6,
+      "exam_probability": 0.85,
+      "current_level": 2,
+      "personal_difficulty": "easier",
+      "minutes": 25,
+      "roi_grade": "S",
+      "roi_score": 92,
+      "rank": 1,
+      "reason": "考察概率 85%，从已熟悉升到已掌握约需 25 分钟，预计多拿 6 分。"
+    },
+    {
+      "id": "019a0103-0000-7000-8000-000000000006",
+      "name": "固定资产折旧方法",
+      "expected_score": 5,
+      "exam_probability": 0.8,
+      "current_level": 2,
+      "personal_difficulty": "typical",
+      "minutes": 40,
+      "roi_grade": "A",
+      "roi_score": 81,
+      "rank": 2,
+      "reason": "近 6 年考了 5 次，补齐几种折旧方法的比较约需 40 分钟，预计多拿 5 分。"
+    },
+    {
+      "id": "019a0103-0000-7000-8000-000000000002",
+      "name": "会计信息质量要求",
+      "expected_score": 4,
+      "exam_probability": 0.7,
+      "current_level": 1,
+      "personal_difficulty": "typical",
+      "minutes": 35,
+      "roi_grade": "A",
+      "roi_score": 76,
+      "rank": 3,
+      "reason": "概念题常考，回顾辨析卡约需 35 分钟，预计多拿 4 分。"
+    }
+  ],
+  "gaps": [
+    {
+      "source": "not_learned",
+      "score": 4,
+      "action": "先学存货发出计价方法等还没学的知识点"
+    },
+    {
+      "source": "forgot",
+      "score": 3,
+      "action": "按时做完到期复习，先补固定资产折旧方法"
+    },
+    {
+      "source": "slip",
+      "score": 1,
+      "action": "错题回炉两轮，重点看分录方向"
+    },
+    {
+      "source": "time_short",
+      "score": 1,
+      "action": "每周做一次限时练习"
+    }
+  ],
+  "weaknesses": [
+    {
+      "dimension": "chapter",
+      "name": "资产",
+      "ratio": 0.42,
+      "action": "存货与固定资产两节正确率最低，先各做一组针对练习"
+    },
+    {
+      "dimension": "question_type",
+      "name": "不定项",
+      "ratio": 0.38,
+      "action": "不定项漏选多，练习时逐项判断"
+    },
+    {
+      "dimension": "error_pattern",
+      "name": "审题失误",
+      "ratio": 0.31,
+      "action": "做题时先圈出题干里的时间与主体"
+    }
+  ],
+  "layers": [
+    {
+      "kind": "investment",
+      "ratio": 0.72,
+      "note": "本周有效学习 6.7 小时，在场 8.9 小时"
+    },
+    {
+      "kind": "mastery",
+      "ratio": 0.46,
+      "note": "已到手 6 档，共 13 档"
+    },
+    {
+      "kind": "memory",
+      "ratio": 0.63,
+      "note": "到期复习按时完成 63%"
+    },
+    {
+      "kind": "application",
+      "ratio": 0.35,
+      "note": "综合题得分率 35%"
+    }
+  ],
+  "methods": [
+    {
+      "name": "做题练习",
+      "ratio": 0.78
+    },
+    {
+      "name": "卡片复习",
+      "ratio": 0.64
+    },
+    {
+      "name": "阅读讲义",
+      "ratio": 0.41
+    }
+  ],
+  "periods": [
+    {
+      "name": "早上 7–9 点",
+      "ratio": 0.74
+    },
+    {
+      "name": "晚上 8–10 点",
+      "ratio": 0.66
+    },
+    {
+      "name": "午休",
+      "ratio": 0.38
+    }
+  ],
+  "confidence": {
+    "overconfident": 3,
+    "underconfident": 2,
+    "note": "自评已掌握、检验题没过的有 3 个知识点，建议先做一次检验题"
+  },
+  "calibration": {
+    "samples": 126,
+    "mean_error": 4.6,
+    "interval_coverage": 0.83,
+    "history": [
+      {
+        "day": "2026-09-20",
+        "label": "阶段模考",
+        "low": 52,
+        "high": 64,
+        "actual": 59
+      }
+    ]
+  },
+  "scenarios": {
+    "insufficient_data": {
+      "evidence_count": 2,
+      "forecasts": {
+        "today": {
+          "conservative": 49,
+          "optimistic": 73,
+          "estimated_score_ratio": 0.7
+        },
+        "target": {
+          "conservative": 55,
+          "optimistic": 80,
+          "estimated_score_ratio": 0.7
+        }
+      },
+      "health_sample": {
+        "observed_days": 4,
+        "advanced_levels": 3
+      }
+    },
+    "restricted": {
+      "blocked_reasons": [
+        "有 3 个知识点缺少目标档"
+      ]
+    }
+  },
+  "qualification_line": 60
+}

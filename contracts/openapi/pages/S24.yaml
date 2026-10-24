@@ -1,0 +1,456 @@
+# S24 只读展示契约；所有业务指标和无比值状态由接口提供，页面不重算。
+paths:
+  /learner/progress:
+    get:
+      operationId: getS24Progress
+      x-owner: learner
+      x-action: learner.mastery.read
+      summary: 进度与预测；业务数字已算好，开发返回示例数据
+      responses:
+        '200':
+          description: 四个视图与地图体检结果；阻断时不下发预测、分值和阶梯
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/S24Progress'
+        '403':
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    S24Metric:
+      type: object
+      required:
+      - workload
+      - weighted
+      - health_state
+      properties:
+        workload:
+          type: number
+        weighted:
+          type: number
+        recent_daily:
+          type: number
+        required_daily:
+          type: number
+        health:
+          type: number
+          description: 健康度＝近期速度 ÷ 需要速度，两位小数（R06 R21）
+        verdict:
+          type: string
+          description: 判词（R06 R21）；ok 来得及、tight 有点紧、short 来不及，代码同 R06 例子表
+          enum:
+          - ok
+          - tight
+          - short
+        health_state:
+          type: string
+          enum:
+          - normal
+          - insufficient_data
+          - all_reached
+          - target_passed
+          - no_available_days
+          description: 健康度显示状态由接口判定（R06 R22）；非normal不下发比值和速度
+        observed_days:
+          type: integer
+          minimum: 0
+          description: 可用观察天数，仅展示原始计数
+        advanced_levels:
+          type: integer
+          minimum: 0
+          description: 观察期已推进的档数，仅展示原始计数
+    S24Forecast:
+      type: object
+      required:
+      - conservative
+      - likely
+      - optimistic
+      - target_line
+      - gap
+      - pass_probability
+      - low_confidence
+      - confidence
+      - estimated_score_ratio
+      properties:
+        conservative:
+          type: number
+        likely:
+          type: number
+        optimistic:
+          type: number
+        target_line:
+          type: number
+          description: 学员自己的目标分，不是合格线（R06 R9）
+        gap:
+          type: number
+          description: 差额＝目标分 − 最可能值（取整）；不大于 0 时页面写“已过目标线”，不显示负数
+        pass_probability:
+          type: number
+        low_confidence:
+          type: boolean
+        confidence:
+          type: string
+          enum:
+          - high
+          - medium
+          - low
+          description: 接口判定的预测置信度，页面不按宽度重算
+        estimated_score_ratio:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: 用同类数据或默认估计代替的分值占比（R06 R11）
+        weekly_change:
+          type: number
+          description: 与上周最后一条按今天的水平记录相比；无可比记录或锁定时不给（R06 R13）
+    S24Forecasts:
+      type: object
+      properties:
+        today:
+          $ref: '#/components/schemas/S24Forecast'
+        target:
+          $ref: '#/components/schemas/S24Forecast'
+    S24Trend:
+      type: object
+      required:
+      - day
+      - conservative
+      - likely
+      - optimistic
+      properties:
+        day:
+          $ref: '#/components/schemas/LearningDay'
+        conservative:
+          type: number
+        likely:
+          type: number
+        optimistic:
+          type: number
+    S24Subject:
+      type: object
+      required:
+      - id
+      - name
+      - completion
+      - passed
+      - actual_minutes
+      - suggested_minutes
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+        completion:
+          type: number
+        passed:
+          type: boolean
+          description: 这一科的最可能值已到目标分（R06 R4）；预测锁定时为 false
+        actual_minutes:
+          type: number
+        suggested_minutes:
+          type: number
+        gap:
+          type: number
+          description: 这一科的差额（目标分 − 最可能值）；预测锁定时不给
+    S24Time:
+      type: object
+      required:
+      - effective_minutes
+      - present_minutes
+      - pending_minutes
+      properties:
+        effective_minutes:
+          type: number
+        present_minutes:
+          type: number
+        pending_minutes:
+          type: number
+    S24ScoreBand:
+      type: object
+      required:
+      - kind
+      - score
+      properties:
+        kind:
+          type: string
+          enum:
+          - secured
+          - potential
+          - recoverable
+          - outside
+        score:
+          type: number
+    S24Point:
+      type: object
+      required:
+      - id
+      - name
+      - expected_score
+      - exam_probability
+      - current_level
+      - personal_difficulty
+      - minutes
+      - roi_grade
+      - roi_score
+      - rank
+      - reason
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+        expected_score:
+          type: number
+        exam_probability:
+          type: number
+        current_level:
+          type: number
+        personal_difficulty:
+          type: string
+          enum:
+          - easier
+          - typical
+          - harder
+        minutes:
+          type: number
+        roi_grade:
+          type: string
+          enum:
+          - S
+          - A
+          - B
+          - C
+          - D
+        roi_score:
+          type: number
+        rank:
+          type: number
+        reason:
+          type: string
+    S24Gap:
+      type: object
+      required:
+      - source
+      - score
+      - action
+      properties:
+        source:
+          type: string
+          enum:
+          - not_learned
+          - forgot
+          - slip
+          - time_short
+        score:
+          type: number
+        action:
+          type: string
+    S24Weak:
+      type: object
+      required:
+      - dimension
+      - name
+      - ratio
+      - action
+      properties:
+        dimension:
+          type: string
+          enum:
+          - chapter
+          - question_type
+          - error_pattern
+        name:
+          type: string
+        ratio:
+          type: number
+        action:
+          type: string
+    S24Layer:
+      type: object
+      required:
+      - kind
+      - ratio
+      - note
+      properties:
+        kind:
+          type: string
+          enum:
+          - investment
+          - mastery
+          - memory
+          - application
+        ratio:
+          type: number
+        note:
+          type: string
+    S24Efficiency:
+      type: object
+      required:
+      - name
+      - ratio
+      properties:
+        name:
+          type: string
+        ratio:
+          type: number
+    S24Confidence:
+      type: object
+      required:
+      - overconfident
+      - underconfident
+      - note
+      properties:
+        overconfident:
+          type: number
+        underconfident:
+          type: number
+        note:
+          type: string
+    S24CalibrationHistory:
+      type: object
+      required:
+      - day
+      - label
+      - low
+      - high
+      - actual
+      properties:
+        day:
+          $ref: '#/components/schemas/LearningDay'
+        label:
+          type: string
+        low:
+          type: number
+        high:
+          type: number
+        actual:
+          type: number
+    S24Calibration:
+      type: object
+      required:
+      - samples
+      - mean_error
+      - interval_coverage
+      - history
+      properties:
+        samples:
+          type: number
+        mean_error:
+          type: number
+        interval_coverage:
+          type: number
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24CalibrationHistory'
+    S24Progress:
+      type: object
+      required:
+      - exam_id
+      - exam_name
+      - computed_at
+      - time_zone
+      - data_source
+      - has_progress
+      - map_check
+      - blocked_reasons
+      - importance_estimated
+      - evidence_count
+      - metrics
+      - forecasts
+      - trend
+      - subjects
+      - time
+      - score_bands
+      - points
+      - path
+      - gaps
+      - weaknesses
+      - layers
+      - methods
+      - periods
+      - confidence
+      - calibration
+      properties:
+        exam_id:
+          type: string
+          description: 考试 ID，即 fixtures/exams 的目录名（与其他接口的 exam_id 一致，不是 UUID）
+        exam_name:
+          type: string
+        headline_subject:
+          type: string
+          description: 头部三个数所属科目（R06 R4：每科都要过的考试取差距最大的一科）；只有一科或不分科计分时不给
+        computed_at:
+          $ref: '#/components/schemas/Timestamp'
+        time_zone:
+          type: string
+        data_source:
+          $ref: '#/components/schemas/DataSource'
+        has_progress:
+          type: boolean
+        map_check:
+          type: string
+          enum:
+          - passed
+          - blocked
+        blocked_reasons:
+          type: array
+          items:
+            type: string
+        importance_estimated:
+          type: boolean
+        evidence_count:
+          type: number
+        metrics:
+          $ref: '#/components/schemas/S24Metric'
+        forecasts:
+          $ref: '#/components/schemas/S24Forecasts'
+        trend:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24Trend'
+        subjects:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24Subject'
+        time:
+          $ref: '#/components/schemas/S24Time'
+        score_bands:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24ScoreBand'
+        points:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24Point'
+        path:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24Point'
+        gaps:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24Gap'
+        weaknesses:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24Weak'
+        layers:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24Layer'
+        methods:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24Efficiency'
+        periods:
+          type: array
+          items:
+            $ref: '#/components/schemas/S24Efficiency'
+        confidence:
+          $ref: '#/components/schemas/S24Confidence'
+        calibration:
+          $ref: '#/components/schemas/S24Calibration'
+        qualification_line:
+          type: number
+          description: 考试合格线，独立于个人目标线；不适用或没有可参考合格线时不给

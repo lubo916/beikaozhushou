@@ -1,1 +1,223 @@
-{}
+{
+  "title": "进度与预测",
+  "description": "看清走了多远、来不来得及，再决定下一步。",
+  "tabs": {
+    "label": "进度视图",
+    "overview": "总览",
+    "value": "提分地图",
+    "diagnosis": "诊断",
+    "calibration": "校准"
+  },
+  "header": {
+    "simulate": "情景模拟",
+    "export": "导出",
+    "sample": "示例数据",
+    "updated": "上次计算：{{time}}"
+  },
+  "common": {
+    "soon": "即将上线",
+    "score": "分",
+    "close": "关闭",
+    "today": "查看今日清单",
+    "plan": "查看学习计划",
+    "ai_note": "预测仅供学习决策参考，不作成绩承诺。",
+    "retry": "重试"
+  },
+  "metrics": {
+    "completion": "完成度",
+    "completion_question": "走了多远",
+    "health": "健康度",
+    "health_question": "来不来得及",
+    "forecast": "预测与差额",
+    "forecast_question": "够不够",
+    "workload": "按工作量",
+    "weighted": "按分值",
+    "basis": "完成度口径",
+    "completion_note": "学习范围内的工作量已完成多少。",
+    "subject": "三个数按“{{subject}}”这一科显示。",
+    "health_hint": "{{verdict}}：按期需要每天 {{required}} 档，近期每天 {{actual}} 档。",
+    "verdict": {
+      "ok": "来得及",
+      "tight": "有点紧",
+      "short": "来不及"
+    },
+    "health_raw": "{{days}} 天推进了 {{levels}} 档；样本不足，暂不提供健康度比值。",
+    "health_state": {
+      "insufficient_data": "数据不足",
+      "all_reached": "都已到目标档"
+    },
+    "health_reason": {
+      "insufficient_data": "还没有足够的可学日记录，先保留原始学习数据。",
+      "all_reached": "当前范围内的知识点都已达到目标档。",
+      "target_passed": "目标日已过，暂不提供健康度比值。",
+      "no_available_days": "没有剩余可学日，暂不提供健康度比值。"
+    }
+  },
+  "forecast": {
+    "today": "按今天的水平",
+    "target": "按计划学到目标日",
+    "basis": "预测时点",
+    "conservative": "保守",
+    "likely": "最可能",
+    "optimistic": "乐观",
+    "target_line": "目标线",
+    "gap": "离目标线",
+    "pass": "过线概率",
+    "trend": "预测走势",
+    "trend_note": "阴影为保守到乐观的区间；“按计划学到目标日”是照计划做完的情景，不给通过承诺。",
+    "date": "日期",
+    "low": "低置信",
+    "evidence_label": "作答与复习证据",
+    "chart_label": "预测走势，阴影为保守至乐观区间，实线为最可能值",
+    "chart_data": "查看走势原始数据",
+    "short": "离目标线还差 {{value}}",
+    "reached": "已过目标线",
+    "today_hint": "按今天的水平，最可能 {{likely}}；",
+    "locked": "预测已锁定",
+    "none": "暂无预测",
+    "confidence": {
+      "high": "置信度高",
+      "medium": "置信度中",
+      "low": "低置信"
+    },
+    "estimated_share": "估计代替的分值占比 {{ratio}}",
+    "weekly_change": "较上周 {{value}}",
+    "qualification_line": "合格线",
+    "history_basis": "历史走势按每次计算时“今天的水平”记录；下方数值可切换预测情景。"
+  },
+  "overview": {
+    "subjects": "各科进度与目标线",
+    "subject": "科目",
+    "completion": "完成度",
+    "status": "离目标线",
+    "time": "有效与在场",
+    "effective": "有效学习时长",
+    "present": "在场时长",
+    "pending_time": "待检测",
+    "time_note": "只计产生证据的片段；在场不等于有效学习，补做检测后可转为有效。",
+    "verify": "补做检测",
+    "suggested": "建议时长",
+    "actual": "已投入",
+    "short": "差 {{value}}",
+    "locked": "预测已锁定"
+  },
+  "value": {
+    "map": "分值地图",
+    "map_note": "每个知识点的预期贡献分；按接口给出的优先次序显示。",
+    "path": "推荐路径",
+    "path_note": "按性价比阶梯与当前轮次策略排列；点击查看排位理由。",
+    "reason": "排位理由",
+    "point": "知识点",
+    "expected": "预期分",
+    "probability": "考察概率",
+    "mastery": "当前档",
+    "difficulty": "个人难度",
+    "minutes": "预计用时",
+    "grade": "性价比阶梯",
+    "rating": "评分",
+    "rank": "排位 {{rank}}",
+    "ladder_note": "S、A、B、C、D 五级；相邻两次重算最多跳 {{levels}} 级。",
+    "estimated": "考情数据不足，当前按重要度估算；不把估算当作真题统计。",
+    "bands": {
+      "secured": "已稳住",
+      "potential": "可提升",
+      "recoverable": "可找回",
+      "outside": "范围外"
+    },
+    "difficulty_values": {
+      "easier": "偏易",
+      "typical": "适中",
+      "harder": "偏难"
+    },
+    "levels": {
+      "0": "未学",
+      "1": "已了解",
+      "2": "已熟悉",
+      "3": "已掌握",
+      "4": "能应用",
+      "5": "能迁移"
+    },
+    "estimated_short": "按重要度估算"
+  },
+  "diagnosis": {
+    "gap": "差距从哪来",
+    "proposal": "生成计划提议",
+    "proposal_note": "仅生成待确认提议，确认前不改变计划。",
+    "weak": "薄弱点雷达",
+    "add_today": "提议加入今日",
+    "layers": "四层学情",
+    "layer_detail": "查看 {{name}}",
+    "methods": "学习方式效率",
+    "periods": "时段效率",
+    "confidence": "信心校准",
+    "overconfident": "自以为会",
+    "underconfident": "会但不自信",
+    "points": "{{amount}} 个知识点",
+    "source": {
+      "not_learned": "没学过",
+      "forgot": "学过忘了",
+      "slip": "会但做错",
+      "time_short": "没做完"
+    },
+    "dimension": {
+      "chapter": "章节",
+      "question_type": "题型",
+      "error_pattern": "错因模式"
+    },
+    "layer": {
+      "investment": "投入",
+      "mastery": "掌握",
+      "memory": "记忆",
+      "application": "应用"
+    },
+    "add_note": "只生成待你确认的提议，确认前不改变今日清单。",
+    "ai_note": "依据你的作答与复习证据生成"
+  },
+  "calibration": {
+    "global": "全站预测校准公示",
+    "samples": "回填样本",
+    "error": "平均绝对误差",
+    "coverage": "区间覆盖率",
+    "note": "仅展示单独同意回填的匿名样本；当前均为演示数据。",
+    "personal": "个人往期预测与成绩",
+    "register": "登记成绩",
+    "date": "考试日期",
+    "exam": "考试",
+    "predicted": "往期预测",
+    "actual": "回填成绩",
+    "empty": "还没有回填成绩，登记后可核对往期预测。",
+    "target": "目标 {{ratio}}"
+  },
+  "simulation": {
+    "title": "情景模拟",
+    "body": "选择一种学习安排，查看假设条件。模拟结果不自动修改计划。",
+    "option": "模拟方案",
+    "current": "保持当前节奏",
+    "more": "增加可用学习时间",
+    "focus": "集中补薄弱点",
+    "run": "查看模拟结果",
+    "note": "模拟计算待预测接口接通后开放。"
+  },
+  "state": {
+    "empty": {
+      "title": "还没有进度数据",
+      "body": "完成摸底后出现三个数",
+      "action": "去摸底"
+    },
+    "offline": {
+      "title": "正在显示上次计算的结果",
+      "body": "离线时可查看已缓存的内容与计算时间；重新计算、导出与提交需要联网。",
+      "missing": "目前没有可确认的本目标缓存，联网后点“重试”即可。",
+      "none_title": "当前目标尚未确认，暂不显示进度"
+    },
+    "restricted": {
+      "title": "地图体检未通过，预测已锁定",
+      "body": "预测、分值地图与性价比阶梯暂不可用。完成度、健康度和今日清单照常。",
+      "action": "去修复地图"
+    },
+    "insufficient_data": {
+      "title": "证据不足，预测为低置信",
+      "body": "预测区间已加宽。补充作答、复习或模考证据后再查看。"
+    }
+  }
+}

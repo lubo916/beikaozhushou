@@ -1,0 +1,135 @@
+{
+  "exam_id": "ds-final-custom",
+  "exam_name": "《数据结构》期末考",
+  "computed_at": "2026-10-22T08:00:00Z",
+  "time_zone": "Asia/Shanghai",
+  "data_source": "sample",
+  "has_progress": true,
+  "map_check": "blocked",
+  "blocked_reasons": [
+    "有 4 个知识点缺少目标档",
+    "“图”一章有 2 组疑似重复的知识点"
+  ],
+  "importance_estimated": true,
+  "evidence_count": 24,
+  "metrics": {
+    "workload": 0.41,
+    "weighted": 0.38,
+    "recent_daily": 1.5,
+    "required_daily": 2.2,
+    "health": 0.68,
+    "verdict": "short",
+    "health_state": "normal"
+  },
+  "forecasts": {},
+  "trend": [],
+  "subjects": [
+    {
+      "id": "019a0424-0000-7000-8000-000000000001",
+      "name": "数据结构",
+      "completion": 0.41,
+      "passed": false,
+      "actual_minutes": 780,
+      "suggested_minutes": 1320
+    }
+  ],
+  "time": {
+    "effective_minutes": 264,
+    "present_minutes": 372,
+    "pending_minutes": 48
+  },
+  "score_bands": [],
+  "points": [],
+  "path": [],
+  "gaps": [],
+  "weaknesses": [
+    {
+      "dimension": "chapter",
+      "name": "图",
+      "ratio": 0.38,
+      "action": "最短路径与存储结构先各练一组"
+    },
+    {
+      "dimension": "question_type",
+      "name": "算法设计",
+      "ratio": 0.3,
+      "action": "先写思路再写代码"
+    },
+    {
+      "dimension": "error_pattern",
+      "name": "方法不会",
+      "ratio": 0.34,
+      "action": "先看例题示范，再换一组数据自己走一遍"
+    }
+  ],
+  "layers": [
+    {
+      "kind": "investment",
+      "ratio": 0.55,
+      "note": "本周有效学习 4.4 小时，在场 6.2 小时"
+    },
+    {
+      "kind": "mastery",
+      "ratio": 0.41,
+      "note": "已到手 9 档，共 22 档"
+    },
+    {
+      "kind": "memory",
+      "ratio": 0.5,
+      "note": "到期复习按时完成 50%"
+    },
+    {
+      "kind": "application",
+      "ratio": 0.3,
+      "note": "算法设计题得分率 30%"
+    }
+  ],
+  "methods": [
+    {
+      "name": "做题练习",
+      "ratio": 0.66
+    },
+    {
+      "name": "阅读讲义",
+      "ratio": 0.52
+    },
+    {
+      "name": "卡片复习",
+      "ratio": 0.47
+    }
+  ],
+  "periods": [
+    {
+      "name": "晚上 8–10 点",
+      "ratio": 0.7
+    },
+    {
+      "name": "下午 2–4 点",
+      "ratio": 0.55
+    },
+    {
+      "name": "早上 7–9 点",
+      "ratio": 0.42
+    }
+  ],
+  "confidence": {
+    "overconfident": 2,
+    "underconfident": 2,
+    "note": "自评与检验大体一致，二叉树遍历可以少花时间复看"
+  },
+  "calibration": {
+    "samples": 37,
+    "mean_error": 6.2,
+    "interval_coverage": 0.76,
+    "history": []
+  },
+  "scenarios": {
+    "insufficient_data": {
+      "evidence_count": 3,
+      "health_sample": {
+        "observed_days": 4,
+        "advanced_levels": 3
+      }
+    }
+  }
+}

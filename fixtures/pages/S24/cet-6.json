@@ -1,0 +1,361 @@
+{
+  "exam_id": "cet-6",
+  "exam_name": "大学英语六级",
+  "computed_at": "2026-10-22T08:00:00Z",
+  "time_zone": "Asia/Shanghai",
+  "data_source": "sample",
+  "has_progress": true,
+  "map_check": "passed",
+  "blocked_reasons": [],
+  "importance_estimated": false,
+  "evidence_count": 42,
+  "metrics": {
+    "workload": 0.58,
+    "weighted": 0.61,
+    "recent_daily": 2.1,
+    "required_daily": 1.9,
+    "health": 1.11,
+    "verdict": "ok",
+    "health_state": "normal"
+  },
+  "forecasts": {
+    "today": {
+      "conservative": 430,
+      "likely": 468,
+      "optimistic": 506,
+      "target_line": 520,
+      "gap": 52,
+      "pass_probability": 0.86,
+      "low_confidence": false,
+      "confidence": "medium",
+      "estimated_score_ratio": 0
+    },
+    "target": {
+      "conservative": 488,
+      "likely": 528,
+      "optimistic": 566,
+      "target_line": 520,
+      "gap": -8,
+      "pass_probability": 0.96,
+      "low_confidence": false,
+      "confidence": "medium",
+      "estimated_score_ratio": 0
+    }
+  },
+  "trend": [
+    {
+      "day": "2026-09-03",
+      "conservative": 392,
+      "likely": 428,
+      "optimistic": 466
+    },
+    {
+      "day": "2026-09-10",
+      "conservative": 398,
+      "likely": 434,
+      "optimistic": 472
+    },
+    {
+      "day": "2026-09-17",
+      "conservative": 405,
+      "likely": 441,
+      "optimistic": 479
+    },
+    {
+      "day": "2026-09-24",
+      "conservative": 411,
+      "likely": 447,
+      "optimistic": 485
+    },
+    {
+      "day": "2026-10-01",
+      "conservative": 416,
+      "likely": 452,
+      "optimistic": 490
+    },
+    {
+      "day": "2026-10-08",
+      "conservative": 421,
+      "likely": 458,
+      "optimistic": 496
+    },
+    {
+      "day": "2026-10-15",
+      "conservative": 426,
+      "likely": 463,
+      "optimistic": 501
+    },
+    {
+      "day": "2026-10-22",
+      "conservative": 430,
+      "likely": 468,
+      "optimistic": 506
+    }
+  ],
+  "subjects": [
+    {
+      "id": "019a0324-0000-7000-8000-000000000001",
+      "name": "大学英语六级",
+      "completion": 0.58,
+      "passed": false,
+      "actual_minutes": 1440,
+      "suggested_minutes": 1620,
+      "gap": 52
+    }
+  ],
+  "time": {
+    "effective_minutes": 486,
+    "present_minutes": 612,
+    "pending_minutes": 54
+  },
+  "score_bands": [
+    {
+      "kind": "secured",
+      "score": 300
+    },
+    {
+      "kind": "potential",
+      "score": 130
+    },
+    {
+      "kind": "recoverable",
+      "score": 90
+    },
+    {
+      "kind": "outside",
+      "score": 190
+    }
+  ],
+  "points": [
+    {
+      "id": "019a0303-0000-7000-8000-000000000001",
+      "name": "高频学术词汇 A 组",
+      "expected_score": 28,
+      "exam_probability": 0.92,
+      "current_level": 2,
+      "personal_difficulty": "easier",
+      "minutes": 40,
+      "roi_grade": "S",
+      "roi_score": 93,
+      "rank": 1,
+      "reason": "阅读与翻译都离不开，背熟这一组约需 40 分钟，预计多拿 28 分。"
+    },
+    {
+      "id": "019a0303-0000-7000-8000-000000000006",
+      "name": "听力：态度与转折",
+      "expected_score": 24,
+      "exam_probability": 0.8,
+      "current_level": 2,
+      "personal_difficulty": "typical",
+      "minutes": 45,
+      "roi_grade": "A",
+      "roi_score": 82,
+      "rank": 2,
+      "reason": "近 10 次考了 8 次，练转折信号约需 45 分钟，预计多拿 24 分。"
+    },
+    {
+      "id": "019a0303-0000-7000-8000-000000000007",
+      "name": "阅读：主旨题定位",
+      "expected_score": 21,
+      "exam_probability": 0.85,
+      "current_level": 1,
+      "personal_difficulty": "typical",
+      "minutes": 50,
+      "roi_grade": "A",
+      "roi_score": 77,
+      "rank": 3,
+      "reason": "主旨题每次都有，练定位方法约需 50 分钟，预计多拿 21 分。"
+    },
+    {
+      "id": "019a0303-0000-7000-8000-000000000003",
+      "name": "长难句：非谓语结构",
+      "expected_score": 14,
+      "exam_probability": 0.7,
+      "current_level": 3,
+      "personal_difficulty": "harder",
+      "minutes": 35,
+      "roi_grade": "B",
+      "roi_score": 61,
+      "rank": 4,
+      "reason": "已经掌握，再练一组长句到能应用约需 35 分钟，预计多拿 14 分。"
+    }
+  ],
+  "path": [
+    {
+      "id": "019a0303-0000-7000-8000-000000000001",
+      "name": "高频学术词汇 A 组",
+      "expected_score": 28,
+      "exam_probability": 0.92,
+      "current_level": 2,
+      "personal_difficulty": "easier",
+      "minutes": 40,
+      "roi_grade": "S",
+      "roi_score": 93,
+      "rank": 1,
+      "reason": "阅读与翻译都离不开，背熟这一组约需 40 分钟，预计多拿 28 分。"
+    },
+    {
+      "id": "019a0303-0000-7000-8000-000000000006",
+      "name": "听力：态度与转折",
+      "expected_score": 24,
+      "exam_probability": 0.8,
+      "current_level": 2,
+      "personal_difficulty": "typical",
+      "minutes": 45,
+      "roi_grade": "A",
+      "roi_score": 82,
+      "rank": 2,
+      "reason": "近 10 次考了 8 次，练转折信号约需 45 分钟，预计多拿 24 分。"
+    },
+    {
+      "id": "019a0303-0000-7000-8000-000000000007",
+      "name": "阅读：主旨题定位",
+      "expected_score": 21,
+      "exam_probability": 0.85,
+      "current_level": 1,
+      "personal_difficulty": "typical",
+      "minutes": 50,
+      "roi_grade": "A",
+      "roi_score": 77,
+      "rank": 3,
+      "reason": "主旨题每次都有，练定位方法约需 50 分钟，预计多拿 21 分。"
+    }
+  ],
+  "gaps": [
+    {
+      "source": "not_learned",
+      "score": 20,
+      "action": "先学议论文结构、让步状语从句"
+    },
+    {
+      "source": "forgot",
+      "score": 14,
+      "action": "高频学术词汇按时复习"
+    },
+    {
+      "source": "slip",
+      "score": 10,
+      "action": "听力在转折处做标记再选"
+    },
+    {
+      "source": "time_short",
+      "score": 8,
+      "action": "阅读每周两次限时训练"
+    }
+  ],
+  "weaknesses": [
+    {
+      "dimension": "chapter",
+      "name": "写作",
+      "ratio": 0.4,
+      "action": "议论文结构还没学，先学一篇范文的结构"
+    },
+    {
+      "dimension": "question_type",
+      "name": "听力",
+      "ratio": 0.48,
+      "action": "态度题错得多，先练转折信号"
+    },
+    {
+      "dimension": "error_pattern",
+      "name": "时间不够",
+      "ratio": 0.35,
+      "action": "阅读每篇限时 8 分钟练习"
+    }
+  ],
+  "layers": [
+    {
+      "kind": "investment",
+      "ratio": 0.7,
+      "note": "本周有效学习 8.1 小时，在场 10.2 小时"
+    },
+    {
+      "kind": "mastery",
+      "ratio": 0.58,
+      "note": "已到手 15 档，共 26 档"
+    },
+    {
+      "kind": "memory",
+      "ratio": 0.66,
+      "note": "到期复习按时完成 66%"
+    },
+    {
+      "kind": "application",
+      "ratio": 0.44,
+      "note": "写作与翻译得分率 44%"
+    }
+  ],
+  "methods": [
+    {
+      "name": "卡片复习",
+      "ratio": 0.76
+    },
+    {
+      "name": "听力精听",
+      "ratio": 0.68
+    },
+    {
+      "name": "做题练习",
+      "ratio": 0.62
+    }
+  ],
+  "periods": [
+    {
+      "name": "早上 7–9 点",
+      "ratio": 0.79
+    },
+    {
+      "name": "晚上 8–10 点",
+      "ratio": 0.58
+    },
+    {
+      "name": "午休",
+      "ratio": 0.4
+    }
+  ],
+  "confidence": {
+    "overconfident": 4,
+    "underconfident": 1,
+    "note": "听力有 4 个知识点自评已掌握、实际正确率偏低，先做一次检验题"
+  },
+  "calibration": {
+    "samples": 412,
+    "mean_error": 21.4,
+    "interval_coverage": 0.82,
+    "history": [
+      {
+        "day": "2026-06-13",
+        "label": "2026 年 6 月六级",
+        "low": 418,
+        "high": 476,
+        "actual": 452
+      }
+    ]
+  },
+  "scenarios": {
+    "insufficient_data": {
+      "evidence_count": 4,
+      "forecasts": {
+        "today": {
+          "conservative": 360,
+          "optimistic": 576,
+          "estimated_score_ratio": 0.7
+        },
+        "target": {
+          "conservative": 410,
+          "optimistic": 640,
+          "estimated_score_ratio": 0.7
+        }
+      },
+      "health_sample": {
+        "observed_days": 4,
+        "advanced_levels": 3
+      }
+    },
+    "restricted": {
+      "blocked_reasons": [
+        "有 4 个知识点缺少目标档"
+      ]
+    }
+  }
+}

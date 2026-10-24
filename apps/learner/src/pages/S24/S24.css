@@ -1,0 +1,10 @@
+/* S24 页内布局：使用既有间距令牌，不修改公共统计卡与卡片组件。 */
+.s24-metrics {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--size-space-12) * 4)), 1fr));
+}
+.s24-trend-card > .ui-card__head {
+  flex-wrap: wrap;
+}
+.s24-trend-card > .ui-card__head > .ui-card__titles {
+  flex-basis: 100%;
+}
