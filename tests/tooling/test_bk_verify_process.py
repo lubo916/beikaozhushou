@@ -38,6 +38,10 @@ class VerifyProcessTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory(prefix="bk-verify-process-")
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
+        subprocess.run(["git", "init", "-q", "-b", "main"], cwd=self.root, check=True)
+        subprocess.run(["git", "config", "user.name", "验收进程测试"], cwd=self.root, check=True)
+        subprocess.run(["git", "config", "user.email", "acceptance-test@bk.local"], cwd=self.root, check=True)
+        (self.root / ".gitignore").write_text(".bk/\n*.pid\nstarted\nrelease\nmust-not-run\n")
         self.addCleanup(self.cleanup_own_processes)
 
     def cleanup_own_processes(self):
@@ -51,7 +55,7 @@ class VerifyProcessTests(unittest.TestCase):
                 except ProcessLookupError:
                     pass
 
-    def run_script(self, source, timeout=1, following=None):
+    def run_script(self, source, timeout=1, following=None, diagnostic=False):
         script = self.root / "command.py"
         script.write_text(source, encoding="utf-8")
         commands = ["cmd:" + shlex.join([sys.executable, "-u", str(script)])]
@@ -59,6 +63,8 @@ class VerifyProcessTests(unittest.TestCase):
             second = self.root / "following.py"
             second.write_text(following, encoding="utf-8")
             commands.append("cmd:" + shlex.join([sys.executable, "-u", str(second)]))
+        subprocess.run(["git", "add", "-A"], cwd=self.root, check=True)
+        subprocess.run(["git", "commit", "-q", "-m", "受测命令"], cwd=self.root, check=True)
         cfg = copy.deepcopy(bk.DEFAULT_CONFIG)
         cfg["verify"] = {"quick": commands}
         cfg["timeouts"] = {"default": timeout}
@@ -69,7 +75,7 @@ class VerifyProcessTests(unittest.TestCase):
              mock.patch.object(bk, "script_runner", return_value=[]), \
              mock.patch.object(bk, "env_kind", return_value="local"), \
              redirect_stdout(console):
-            summary = bk.do_verify(self.root, cfg, "quick", caps={"ready": True})
+            summary = bk.do_verify(self.root, cfg, "quick", caps={"ready": True}, diagnostic=diagnostic)
         return summary, console.getvalue()
 
     def test_timeout_preserves_stdout_stderr_and_remains_failure(self):
@@ -126,9 +132,9 @@ class VerifyProcessTests(unittest.TestCase):
             "assert not alive, f'前一个检查遗留进程：{alive}'\n"
             "print('FOLLOWING_CHECK_HAS_NO_LEAKS',flush=True)\n"
         )
-        summary, _ = self.run_script(command, following=following)
+        summary, _ = self.run_script(command, following=following, diagnostic=True)
         self.assertTrue((self.root / "detached.pid").exists(), "必须真正生成脱离进程组且父进程已退出的后代")
-        self.assertEqual(summary["verdict"], "fail")
+        self.assertEqual(summary["verdict"], "diagnostic")
         self.assertEqual(summary["results"][0]["result"], "fail")
         self.assertEqual(summary["results"][1]["result"], "pass", "超时清理必须在下一项检查前完成")
         for path in self.root.glob("*.pid"):
@@ -159,7 +165,7 @@ class VerifyProcessTests(unittest.TestCase):
             deadline = time.monotonic() + 3
             found = False
             while time.monotonic() < deadline:
-                logs = list((self.root / ".bk/logs").glob("verify-*.log"))
+                logs = list((self.root / ".bk/acceptance/runs").glob("*/*.log"))
                 if (logs and "LIVE_PROGRESS_BEFORE_EXIT" in logs[0].read_text()
                         and isinstance(sys.stdout, io.StringIO)
                         and "LIVE_PROGRESS_BEFORE_EXIT" in sys.stdout.getvalue()):
@@ -237,7 +243,7 @@ class VerifyProcessTests(unittest.TestCase):
         self.assertTrue(identity and identity[0] == data["start"] and identity[1] != "Z",
                         "必须真正保留一个尚未清理的本用例进程")
         self.assertEqual(summary["verdict"], "fail")
-        self.assertEqual(len(summary["results"]), 1, "清理失败必须停止，不能继续污染下一项检查")
+        self.assertEqual(summary["results"][1]["result"], "not_run", "清理失败必须停止，并明确保留未运行项")
         self.assertFalse((self.root / "must-not-run").exists())
         log = (self.root / summary["results"][0]["log"]).read_text()
         self.assertIn("UNCLEAN_TIMEOUT_STDOUT", log)
