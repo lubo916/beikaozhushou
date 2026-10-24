@@ -88,7 +88,7 @@ function TrainingHome({ data, stale, retry }: { data: S21OralTrainingHome; stale
   const activeLabel = enabled ? (data.activation === "automatic" ? "auto" : "manual") : "disabled";
 
   return (
-    <div className="flex min-w-0 flex-col gap-4" data-testid="s21-home" data-view="main">
+    <div className="flex min-w-[0] flex-col gap-4" data-testid="s21-home" data-view="main">
       {stale && (
         <Banner tone="warning" title={t("state.offline.stale")} action={<Button onClick={retry}>{t("state.offline.retry")}</Button>}>
           {t("state.offline.body")}
@@ -142,7 +142,7 @@ function TrainingHome({ data, stale, retry }: { data: S21OralTrainingHome; stale
           </Card>
           <ol aria-label={t("flow.steps")} className="flex overflow-hidden rounded-sm bg-brand-primary-soft text-small font-medium">
             {data.flow.map((step) => (
-              <li key={step} className="min-w-0 flex-1 border-r border-bg-surface p-2">
+              <li key={step} className="min-w-[0] flex-1 border-r border-bg-surface p-2">
                 {step}
               </li>
             ))}
@@ -220,7 +220,7 @@ function TrainingHome({ data, stale, retry }: { data: S21OralTrainingHome; stale
 function ScenarioCard({ scenario, disabled, onOpen }: { scenario: S21Scenario; disabled: boolean; onOpen: () => void }) {
   const { t } = useTranslation("S21");
   return (
-    <div className="flex min-w-0 flex-1 basis-full @tablet:basis-1/4 flex-col items-start gap-2 rounded-sm border border-line-soft bg-bg-sunk p-4">
+    <div className="flex min-w-[0] flex-1 basis-full @tablet:basis-1/4 flex-col items-start gap-2 rounded-sm border border-line-soft bg-bg-sunk p-4">
       <h3 className="font-medium">{scenario.title}</h3>
       <p className="text-small text-ink-secondary">{scenario.description}</p>
       <ScenarioDuration seconds={scenario.duration_seconds} />
