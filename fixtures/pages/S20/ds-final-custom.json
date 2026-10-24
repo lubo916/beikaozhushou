@@ -1,0 +1,56 @@
+{
+  "exam_id": "ds-final-custom",
+  "exam_name": "自建《数据结构》期末",
+  "data_source": "sample",
+  "availability": "normal",
+  "submission": {
+    "id": "019a0ba0-0000-7000-8000-000000000002",
+    "question_type": "algorithm_proof",
+    "title": "遍历算法与证明",
+    "prompt": "说明算法遍历的过程，并解释为什么每个结点只被访问一次。",
+    "original": "用队列保存待访问的结点。每次取出一个结点，访问它的相邻结点。",
+    "submitted_at": "2026-10-22T02:00:00Z"
+  },
+  "rubric": {
+    "available": true,
+    "source": "reference_answer",
+    "title": "从个人参考答案提取的练习要点",
+    "consistent": false
+  },
+  "score": null,
+  "points": [
+    {
+      "id": "point-0",
+      "title": "队列与遍历过程",
+      "status": "hit",
+      "feedback": "说明了队列的用途。"
+    },
+    {
+      "id": "point-1",
+      "title": "已访问标记",
+      "status": "partial",
+      "feedback": "写出了访问过程，但没有说明已访问标记。"
+    },
+    {
+      "id": "point-2",
+      "title": "正确性说明",
+      "status": "missed",
+      "feedback": "还缺少不重复访问的证明。"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "sentence-0",
+      "quote": "用队列保存待访问的结点。",
+      "status": "hit",
+      "feedback": "说明了队列的用途。"
+    },
+    {
+      "id": "sentence-1",
+      "quote": "每次取出一个结点，访问它的相邻结点。",
+      "status": "partial",
+      "feedback": "写出了访问过程，但没有说明已访问标记。"
+    }
+  ],
+  "time_zone": "Asia/Shanghai"
+}

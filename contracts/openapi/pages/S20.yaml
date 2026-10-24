@@ -1,0 +1,92 @@
+# S20 简版只读工作区；提交、上传、语音与评分写操作等待后端权限登记。
+paths:
+  /grading/workspace:
+    get:
+      operationId: getGradingWorkspace
+      x-owner: grading
+      x-action: content.question.read
+      summary: 主观题作答、逐句批注与得分点示例
+      responses:
+        "200":
+          description: 页面示例数据，所有业务数字由接口返回
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S20Workspace"}
+        "403": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S20QuestionType:
+      type: string
+      enum: [short_answer, essay, case, composition, translation, calculation, algorithm_proof]
+    S20PointStatus:
+      type: string
+      enum: [hit, partial, missed]
+    S20Workspace:
+      type: object
+      required: [exam_id, exam_name, data_source, time_zone, availability, submission, rubric, score, points, annotations]
+      properties:
+        exam_id: {type: string, description: 演示考试目录 ID}
+        exam_name: {type: string}
+        time_zone: {type: string, description: 用户 IANA 时区}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+        availability: {type: string, enum: [normal, restricted, insufficient_data]}
+        submission:
+          oneOf:
+            - {$ref: "#/components/schemas/S20Submission"}
+            - {type: "null"}
+        rubric: {$ref: "#/components/schemas/S20Rubric"}
+        score:
+          oneOf:
+            - {$ref: "#/components/schemas/S20Score"}
+            - {type: "null"}
+        points:
+          type: array
+          items: {$ref: "#/components/schemas/S20Point"}
+        annotations:
+          type: array
+          items: {$ref: "#/components/schemas/S20Annotation"}
+    S20Submission:
+      type: object
+      required: [id, question_type, title, prompt, original, submitted_at]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        question_type: {$ref: "#/components/schemas/S20QuestionType"}
+        title: {type: string}
+        prompt: {type: string}
+        original: {type: string}
+        submitted_at: {$ref: "#/components/schemas/Timestamp"}
+    S20Rubric:
+      type: object
+      required: [available, source, title, consistent]
+      properties:
+        available: {type: boolean}
+        source: {type: string, enum: [official, template_author, institution, reference_answer]}
+        title: {type: string}
+        consistent: {type: boolean}
+    S20Score:
+      type: object
+      description: 仅在细则齐备且多次独立评分一致时返回；否则为 null
+      required: [low, high, full, confidence, independent_reviews]
+      properties:
+        low: {type: number}
+        high: {type: number}
+        full: {type: number}
+        confidence: {type: string, enum: [high, medium, low]}
+        independent_reviews: {type: integer, minimum: 1}
+    S20Point:
+      type: object
+      required: [id, title, status, feedback]
+      properties:
+        id: {type: string}
+        title: {type: string}
+        status: {$ref: "#/components/schemas/S20PointStatus"}
+        feedback: {type: string}
+    S20Annotation:
+      type: object
+      description: quote 必须为用户原文中的连续句子；不替写全文
+      required: [id, quote, status, feedback]
+      properties:
+        id: {type: string}
+        quote: {type: string}
+        status: {$ref: "#/components/schemas/S20PointStatus"}
+        feedback: {type: string}

@@ -1,0 +1,68 @@
+{
+  "exam_id": "junior-accounting",
+  "exam_name": "初级会计职称",
+  "data_source": "sample",
+  "availability": "normal",
+  "submission": {
+    "id": "019a0ba0-0000-7000-8000-000000000003",
+    "question_type": "case",
+    "title": "存货采购成本案例",
+    "prompt": "说明采购存货时哪些支出计入成本，并说明处理理由。",
+    "original": "采购价款计入成本。运输费用也计入。相关税费都计入成本。",
+    "submitted_at": "2026-10-22T02:00:00Z"
+  },
+  "rubric": {
+    "available": true,
+    "source": "official",
+    "title": "官方考试大纲与评分要点",
+    "consistent": true
+  },
+  "score": {
+    "low": 8,
+    "high": 10,
+    "full": 12,
+    "confidence": "medium",
+    "independent_reviews": 3
+  },
+  "points": [
+    {
+      "id": "point-0",
+      "title": "采购价款与相关支出",
+      "status": "hit",
+      "feedback": "已经指出采购价款与运输费用。"
+    },
+    {
+      "id": "point-1",
+      "title": "可抵扣税额的处理",
+      "status": "partial",
+      "feedback": "已提到税费，但没有区分可抵扣税额。"
+    },
+    {
+      "id": "point-2",
+      "title": "异常损耗的处理",
+      "status": "missed",
+      "feedback": "还需说明异常损耗不计入采购成本。"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "sentence-0",
+      "quote": "采购价款计入成本。",
+      "status": "hit",
+      "feedback": "已经指出采购价款计入成本。"
+    },
+    {
+      "id": "sentence-1",
+      "quote": "运输费用也计入。",
+      "status": "hit",
+      "feedback": "已经指出运输费用计入成本，可进一步说明是合理的运输支出。"
+    },
+    {
+      "id": "sentence-2",
+      "quote": "相关税费都计入成本。",
+      "status": "partial",
+      "feedback": "税费不能一概计入成本，还需区分可抵扣税额。"
+    }
+  ],
+  "time_zone": "Asia/Shanghai"
+}

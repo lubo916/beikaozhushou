@@ -1,0 +1,62 @@
+{
+  "exam_id": "teacher-qualification",
+  "exam_name": "中学教师资格笔试",
+  "data_source": "sample",
+  "availability": "normal",
+  "submission": {
+    "id": "019a0ba0-0000-7000-8000-000000000004",
+    "question_type": "essay",
+    "title": "学生观论述",
+    "prompt": "结合教学情境，论述教师如何尊重学生的主体地位。",
+    "original": "学生是学习的主体。教师应尊重学生的差异，安排不同的学习任务。",
+    "submitted_at": "2026-10-22T02:00:00Z"
+  },
+  "rubric": {
+    "available": true,
+    "source": "template_author",
+    "title": "教学模板作者整理的评分要点",
+    "consistent": true
+  },
+  "score": {
+    "low": 9,
+    "high": 11,
+    "full": 15,
+    "confidence": "medium",
+    "independent_reviews": 3
+  },
+  "points": [
+    {
+      "id": "point-0",
+      "title": "学生的主体地位",
+      "status": "hit",
+      "feedback": "已明确提出学生是主体。"
+    },
+    {
+      "id": "point-1",
+      "title": "尊重个体差异",
+      "status": "partial",
+      "feedback": "写出了差异，但支持措施还不够具体。"
+    },
+    {
+      "id": "point-2",
+      "title": "联系教学情境",
+      "status": "missed",
+      "feedback": "还需结合题目中的课堂情境举例。"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "sentence-0",
+      "quote": "学生是学习的主体。",
+      "status": "hit",
+      "feedback": "已明确提出学生是主体。"
+    },
+    {
+      "id": "sentence-1",
+      "quote": "教师应尊重学生的差异，安排不同的学习任务。",
+      "status": "partial",
+      "feedback": "写出了差异，但支持措施还不够具体。"
+    }
+  ],
+  "time_zone": "Asia/Shanghai"
+}

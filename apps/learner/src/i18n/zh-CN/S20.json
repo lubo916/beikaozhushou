@@ -1,1 +1,127 @@
-{}
+{
+  "title": "主观题批改",
+  "description": "给区间，只改你写的句子。先看要点，再完善自己的表达。",
+  "sample": "示例数据",
+  "submit": "提交新答案",
+  "expressions": "规范表述本",
+  "soon": "即将上线",
+  "tabs": {
+    "mine": "我的练习",
+    "institution": "机构作业",
+    "label": "批改来源"
+  },
+  "question": {
+    "title": "题目与作答",
+    "original": "我的原文",
+    "submitted": "提交时间",
+    "type": "题型",
+    "prompt": "题目",
+    "answer": "作答内容"
+  },
+  "types": {
+    "short_answer": "简答",
+    "essay": "论述",
+    "case": "案例",
+    "composition": "作文",
+    "translation": "翻译",
+    "calculation": "计算大题",
+    "algorithm_proof": "算法与证明"
+  },
+  "draft": {
+    "title": "提交新答案",
+    "description": "先选择题型与输入方式。当前为示例体验，提交与批改即将上线。",
+    "question": "题目内容",
+    "questionPlaceholder": "粘贴题目或材料",
+    "answer": "我的答案",
+    "placeholder": "在这里写下自己的答案",
+    "method": "输入方式",
+    "keyboard": "键入",
+    "photo": "手写拍照",
+    "voice": "语音",
+    "photoHint": "选择手写照片；识别与上传即将上线。",
+    "file": "选择手写照片",
+    "voiceHint": "语音转文字即将上线。你可以先用键入保留表达。",
+    "record": "开始语音输入",
+    "cancel": "保留草稿并关闭",
+    "action": "提交并批改",
+    "offline": "可先在此作答。当前草稿仅保留在本次打开的页面中，联网后才能提交批改。"
+  },
+  "annotation": {
+    "title": "逐句批注",
+    "description": "批注对应你的原句，不替写全文。",
+    "quote": "原句"
+  },
+  "points": {
+    "title": "得分点对照",
+    "point": "采分点",
+    "status": "命中情况",
+    "feedback": "对照说明",
+    "hit": "命中",
+    "partial": "部分命中",
+    "missed": "遗漏"
+  },
+  "method": {
+    "title": "评分方式",
+    "label": "选择评分方式",
+    "mentor": "导师批改",
+    "self": "对照得分点自己打分",
+    "none": "暂不评分",
+    "mentorHint": "导师批改每次消耗 AI 点数，执行前会告知消耗。",
+    "selfHint": "对照采分点自行检查，不消耗 AI 点数；当前自评记录即将上线。",
+    "noneHint": "暂不评分不消耗 AI 点数；可以先保留作答。",
+    "pending": "待评分题不计入正确率。",
+    "preview": "当前展示已完成的导师批改示例；所选方式用于提交新答案。"
+  },
+  "rubric": {
+    "title": "评分细则来源",
+    "official": "官方",
+    "template_author": "模板作者",
+    "institution": "机构",
+    "reference_answer": "由参考答案提取",
+    "unavailable": "暂无评分细则"
+  },
+  "score": {
+    "title": "分数区间与把握度",
+    "range": "参考分数区间",
+    "full": "满分 {{score}}",
+    "confidence": "评分把握度：{{value}}",
+    "high": "高",
+    "medium": "中",
+    "low": "低",
+    "reviews": "来自 {{reviews}} 次独立评分",
+    "hint": "区间仅用于练习反馈，以正式考试评分为准。",
+    "noScore": "只给要点反馈",
+    "inconsistent": "独立评分一致性不足，只给要点反馈，不给分数区间。",
+    "self": "对照得分点自评，不自动换算分数。",
+    "none": "暂不评分，不显示分数区间。"
+  },
+  "next": {
+    "title": "下一步",
+    "body": "先补遗漏的采分点，再用自己的话重新作答。",
+    "practice": "回到做题与解析"
+  },
+  "state": {
+    "empty": {
+      "title": "还没有提交",
+      "body": "键入、拍照或语音提交一道主观题",
+      "action": "提交新答案"
+    },
+    "offline": {
+      "title": "可离线作答",
+      "body": "可离线作答，批改在联网后进行"
+    },
+    "restricted": {
+      "title": "导师批改需 AI 点数",
+      "body": "导师批改每次消耗 AI 点数；对照得分点自评与暂不评分不消耗",
+      "action": "改用对照得分点自评"
+    },
+    "insufficient_data": {
+      "title": "只给要点反馈",
+      "body": "没有评分细则时只给要点反馈，不给分数区间"
+    }
+  },
+  "institution": {
+    "title": "机构作业批改即将上线",
+    "body": "老师复核前，只展示“批改中”与 AI 要点，不显示分数。"
+  }
+}
