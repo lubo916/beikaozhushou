@@ -8,7 +8,7 @@ export function CalendarMain({ data }: { data: S25Calendar }) {
   const { t } = useTranslation("S25");
   const toast = useToast();
   return (
-    <div className="flex min-w-0 flex-col gap-4">
+    <div className="flex min-w-[0] flex-col gap-4">
       {/* feat:S25-03 两种倒计时均由接口提供，不在页面按日期计算。 */}
       <Card>
         <StatGroup>
@@ -101,7 +101,7 @@ export function CalendarAside({ data, restricted }: { data: S25Calendar; restric
   const { t } = useTranslation("S25");
   const toast = useToast();
   return (
-    <div className="flex min-w-0 flex-col gap-4">
+    <div className="flex min-w-[0] flex-col gap-4">
       {/* feat:S25-10 完整考试详情与官网；沿用公共考试画像名称。 */}
       <Card title={t("details")} meta={data.exam.name}>
         <KeyValueList
