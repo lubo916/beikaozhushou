@@ -1,0 +1,306 @@
+{
+  "analysis": {
+    "data_source": "sample",
+    "exam_name": "初级会计职称",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "total_count": 1268,
+    "source_counts": [
+      {
+        "source": "official_public",
+        "count": 1180
+      },
+      {
+        "source": "licensed",
+        "count": 64
+      },
+      {
+        "source": "recalled",
+        "count": 24
+      }
+    ],
+    "questions": [
+      {
+        "question_id": "019a0501-0000-7000-8000-000000000001",
+        "year": 2025,
+        "subject": "实务",
+        "number": 12,
+        "source": "official_public",
+        "knowledge_point": {
+          "kp_id": "019a0103-0000-7000-8000-000000000005",
+          "name": "交易性金融资产的后续计量",
+          "confidence": 0.93,
+          "status": "confirmed"
+        },
+        "distractors": [
+          {
+            "option": "B",
+            "trap": "concept_swap"
+          },
+          {
+            "option": "C",
+            "trap": "boundary_break"
+          }
+        ],
+        "review_status": "reviewed",
+        "ai_draft": false
+      },
+      {
+        "question_id": "019a0501-0000-7000-8000-000000000002",
+        "year": 2025,
+        "subject": "实务",
+        "number": 31,
+        "source": "official_public",
+        "knowledge_point": {
+          "kp_id": "019a0103-0000-7000-8000-000000000004",
+          "name": "存货发出计价方法",
+          "confidence": 0.81,
+          "status": "suggested"
+        },
+        "distractors": [
+          {
+            "option": "D",
+            "trap": "partially_true"
+          }
+        ],
+        "review_status": "pending",
+        "ai_draft": true
+      },
+      {
+        "question_id": "019a0501-0000-7000-8000-000000000003",
+        "year": 2024,
+        "subject": "实务",
+        "number": 45,
+        "source": "licensed",
+        "knowledge_point": {
+          "kp_id": "019a0103-0000-7000-8000-000000000006",
+          "name": "固定资产折旧方法",
+          "confidence": 0.88,
+          "status": "confirmed"
+        },
+        "distractors": [
+          {
+            "option": "A",
+            "trap": "over_inference"
+          },
+          {
+            "option": "C",
+            "trap": "ignore_exception"
+          }
+        ],
+        "review_status": "reviewed",
+        "ai_draft": false
+      },
+      {
+        "question_id": "019a0501-0000-7000-8000-000000000004",
+        "year": 2024,
+        "subject": "实务",
+        "number": 18,
+        "source": "recalled",
+        "knowledge_point": {
+          "kp_id": "019a0103-0000-7000-8000-000000000007",
+          "name": "应付职工薪酬",
+          "confidence": 0.62,
+          "status": "suggested"
+        },
+        "distractors": [
+          {
+            "option": "B",
+            "trap": "subject_confusion"
+          }
+        ],
+        "review_status": "pending",
+        "ai_draft": true
+      },
+      {
+        "question_id": "019a0501-0000-7000-8000-000000000005",
+        "year": 2023,
+        "subject": "实务",
+        "number": 27,
+        "source": "official_public",
+        "knowledge_point": {
+          "kp_id": "019a0103-0000-7000-8000-000000000008",
+          "name": "增值税的核算",
+          "confidence": 0.9,
+          "status": "confirmed"
+        },
+        "distractors": [
+          {
+            "option": "A",
+            "trap": "scope_widen"
+          },
+          {
+            "option": "D",
+            "trap": "true_but_irrelevant"
+          }
+        ],
+        "review_status": "reviewed",
+        "ai_draft": false
+      },
+      {
+        "question_id": "019a0501-0000-7000-8000-000000000006",
+        "year": 2025,
+        "subject": "实务",
+        "number": 52,
+        "source": "recalled",
+        "knowledge_point": {
+          "kp_id": "019a0103-0000-7000-8000-00000000000a",
+          "name": "收入确认五步法",
+          "confidence": 0.57,
+          "status": "suggested"
+        },
+        "distractors": [
+          {
+            "option": "C",
+            "trap": "absolutize"
+          }
+        ],
+        "review_status": "pending",
+        "ai_draft": true
+      }
+    ],
+    "maturity": {
+      "level": "mature",
+      "question_count": 1268,
+      "year_count": 6
+    },
+    "maturity_tiers": [
+      {
+        "level": "cold",
+        "learner_display": "hidden"
+      },
+      {
+        "level": "maturing",
+        "learner_display": "raw_counts"
+      },
+      {
+        "level": "usable",
+        "learner_display": "reference_only"
+      },
+      {
+        "level": "mature",
+        "learner_display": "full"
+      }
+    ],
+    "profile": {
+      "sample_sufficient": true,
+      "question_count": 1268,
+      "minimum_question_count": 60,
+      "entries": [
+        {
+          "kp_id": "019a0103-0000-7000-8000-000000000005",
+          "name": "交易性金融资产的后续计量",
+          "appearance_count": 6,
+          "year_count": 6,
+          "total_score": 14.5,
+          "question_types": [
+            "单项选择题",
+            "不定项选择题"
+          ],
+          "angles": [
+            "公允价值变动的处理",
+            "出售时的损益确认"
+          ],
+          "trend": "steady",
+          "traps": [
+            "concept_swap",
+            "boundary_break"
+          ],
+          "status": "published",
+          "ai_draft": false
+        },
+        {
+          "kp_id": "019a0103-0000-7000-8000-000000000006",
+          "name": "固定资产折旧方法",
+          "appearance_count": 6,
+          "year_count": 6,
+          "total_score": 11,
+          "question_types": [
+            "单项选择题",
+            "多项选择题"
+          ],
+          "angles": [
+            "双倍余额递减法的计算"
+          ],
+          "trend": "steady",
+          "traps": [
+            "ignore_exception",
+            "time_confusion"
+          ],
+          "status": "published",
+          "ai_draft": false
+        },
+        {
+          "kp_id": "019a0103-0000-7000-8000-000000000004",
+          "name": "存货发出计价方法",
+          "appearance_count": 5,
+          "year_count": 6,
+          "total_score": 9,
+          "question_types": [
+            "单项选择题",
+            "判断题"
+          ],
+          "angles": [
+            "先进先出与加权平均的对比"
+          ],
+          "trend": "rising",
+          "traps": [
+            "partially_true"
+          ],
+          "status": "draft",
+          "ai_draft": true
+        },
+        {
+          "kp_id": "019a0103-0000-7000-8000-00000000000a",
+          "name": "收入确认五步法",
+          "appearance_count": 4,
+          "year_count": 6,
+          "total_score": 8,
+          "question_types": [
+            "不定项选择题"
+          ],
+          "angles": [
+            "履约义务的识别"
+          ],
+          "trend": "new",
+          "traps": [
+            "absolutize",
+            "cause_reversal"
+          ],
+          "status": "draft",
+          "ai_draft": true
+        }
+      ],
+      "recomputed_at": "2026-10-22T18:30:00Z",
+      "new_question_count": 12
+    }
+  },
+  "insufficient": {
+    "total_count": 6,
+    "source_counts": [
+      {
+        "source": "official_public",
+        "count": 3
+      },
+      {
+        "source": "licensed",
+        "count": 1
+      },
+      {
+        "source": "recalled",
+        "count": 2
+      }
+    ],
+    "maturity": {
+      "level": "cold",
+      "question_count": 6,
+      "year_count": 3
+    },
+    "profile": {
+      "sample_sufficient": false,
+      "question_count": 6,
+      "minimum_question_count": 60,
+      "entries": []
+    }
+  }
+}

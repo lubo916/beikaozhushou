@@ -1,0 +1,54 @@
+{
+  "impact": {
+    "data_source": "sample",
+    "exam_name": "《数据结构》期末考",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "total_count": 1,
+    "kind_counts": [
+      {
+        "kind": "syllabus",
+        "count": 1
+      },
+      {
+        "kind": "textbook",
+        "count": 0
+      },
+      {
+        "kind": "rule",
+        "count": 0
+      }
+    ],
+    "events": [
+      {
+        "event_id": "019a0604-0000-7000-8000-000000000001",
+        "title": "课程大纲新增“B 树与 B+ 树”一节",
+        "kind": "syllabus",
+        "official_document": "《数据结构》课程教学大纲（2026 秋季修订）",
+        "effective_on": "2026-11-02",
+        "stage": "updating",
+        "impact": {
+          "knowledge_point_count": 2,
+          "question_count": 15,
+          "card_count": 12,
+          "template_count": 1
+        },
+        "pending_update": {
+          "marked": true,
+          "item_count": 27
+        },
+        "progress": 0.5
+      }
+    ],
+    "analysis": {
+      "sample_sufficient": false,
+      "learning_record_count": 3200,
+      "minimum_learning_record_count": 50000
+    }
+  },
+  "insufficient_analysis": {
+    "sample_sufficient": false,
+    "learning_record_count": 3200,
+    "minimum_learning_record_count": 50000
+  }
+}

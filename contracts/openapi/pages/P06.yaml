@@ -1,0 +1,98 @@
+# P06 变更影响分析：大纲、教材、规则变更事件，受影响范围与“待更新”标注（阶段 1 只有假数据层，不接真实服务）。
+# x-action 用地图版本所属 map 领域已登记的读取动作 map.knowledge_point.read（没有借用别的领域的动作）。它对游客与学员也开放，
+# 接真实服务前必须由整合任务登记平台后台专用的 admin.change_impact.read 并替换（见 W03 交接单“风险与提醒”）。
+paths:
+  /admin/change-impact:
+    get:
+      operationId: getP06ChangeImpact
+      x-owner: map
+      x-action: map.knowledge_point.read
+      summary: 变更影响分析（示例数据：变更事件、影响范围、处理进度与“待更新”标注；业务数字由接口给）
+      description: exam、state 只在开发与测试时由假数据层使用（演示考试与强制页面状态）；按变更类型筛选由接口完成。
+      parameters:
+        - name: exam
+          in: query
+          schema: {type: string}
+        - name: state
+          in: query
+          schema: {type: string}
+        - name: kind
+          in: query
+          schema: {$ref: "#/components/schemas/P06ChangeKind"}
+      responses:
+        "200":
+          description: 当前考试的变更事件与影响范围（按类型筛选后）
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/P06ChangeImpact"}
+        "403": {$ref: "#/components/responses/Error"}
+        "500": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    P06ChangeKind:
+      type: string
+      description: 变更类型：大纲、教材、规则
+      enum: [syllabus, textbook, rule]
+    P06ChangeStage:
+      type: string
+      description: 处理阶段：影响分析中、内容更新中、页码映射中、处理完成
+      enum: [analyzing, updating, mapping, done]
+    P06ChangeImpact:
+      type: object
+      required: [data_source, exam_name, generated_at, time_zone, total_count, kind_counts, events, analysis]
+      properties:
+        data_source: {$ref: "#/components/schemas/DataSource"}
+        exam_name: {type: string}
+        generated_at: {$ref: "#/components/schemas/Timestamp"}
+        time_zone: {type: string}
+        total_count: {type: integer, minimum: 0, description: 变更事件总数（不受筛选影响）}
+        kind_counts:
+          type: array
+          items: {$ref: "#/components/schemas/P06KindCount"}
+        events:
+          type: array
+          items: {$ref: "#/components/schemas/P06ChangeEvent"}
+        analysis: {$ref: "#/components/schemas/P06AnalysisSample"}
+    P06KindCount:
+      type: object
+      required: [kind, count]
+      properties:
+        kind: {$ref: "#/components/schemas/P06ChangeKind"}
+        count: {type: integer, minimum: 0}
+    P06ChangeEvent:
+      type: object
+      required: [event_id, title, kind, official_document, effective_on, stage, impact, pending_update]
+      properties:
+        event_id: {$ref: "#/components/schemas/Id"}
+        title: {type: string}
+        kind: {$ref: "#/components/schemas/P06ChangeKind"}
+        official_document: {type: string, description: 所附官方文件}
+        effective_on: {$ref: "#/components/schemas/LearningDay"}
+        stage: {$ref: "#/components/schemas/P06ChangeStage"}
+        progress: {type: number, minimum: 0, maximum: 1, description: 当前阶段的完成比例；处理完成时不返回}
+        impact: {$ref: "#/components/schemas/P06ImpactScope"}
+        pending_update: {$ref: "#/components/schemas/P06PendingUpdate"}
+        impact_summary: {type: string, description: AI 生成的影响范围摘要（界面须带 AI 标识）；样本不足时不返回}
+    P06ImpactScope:
+      type: object
+      required: [knowledge_point_count, question_count, card_count, template_count]
+      properties:
+        knowledge_point_count: {type: integer, minimum: 0}
+        question_count: {type: integer, minimum: 0}
+        card_count: {type: integer, minimum: 0}
+        template_count: {type: integer, minimum: 0}
+        mapped_page_count: {type: integer, minimum: 0, description: 教材改版时的页码映射数}
+        learner_count: {type: integer, minimum: 0, description: 受影响学员数；学习记录样本不足时不返回}
+    P06PendingUpdate:
+      type: object
+      required: [marked, item_count]
+      properties:
+        marked: {type: boolean, description: 处理完成前，受影响内容是否正对学员标“待更新”}
+        item_count: {type: integer, minimum: 0, description: 正标着“待更新”的内容数}
+    P06AnalysisSample:
+      type: object
+      required: [sample_sufficient, learning_record_count, minimum_learning_record_count]
+      properties:
+        sample_sufficient: {type: boolean, description: 学习记录是否足以估算受影响学员；不足时只给原始计数}
+        learning_record_count: {type: integer, minimum: 0}
+        minimum_learning_record_count: {type: integer, minimum: 0, description: 出结论至少需要的学习记录数（服务端参数）}

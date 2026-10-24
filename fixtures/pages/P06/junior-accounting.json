@@ -1,0 +1,98 @@
+{
+  "impact": {
+    "data_source": "sample",
+    "exam_name": "初级会计职称",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "total_count": 3,
+    "kind_counts": [
+      {
+        "kind": "syllabus",
+        "count": 1
+      },
+      {
+        "kind": "textbook",
+        "count": 1
+      },
+      {
+        "kind": "rule",
+        "count": 1
+      }
+    ],
+    "events": [
+      {
+        "event_id": "019a0601-0000-7000-8000-000000000001",
+        "title": "2027 年初级会计职称考试大纲新增 2 个知识点",
+        "kind": "syllabus",
+        "official_document": "《2027 年度初级会计专业技术资格考试大纲》",
+        "effective_on": "2026-11-15",
+        "stage": "updating",
+        "impact": {
+          "knowledge_point_count": 2,
+          "question_count": 46,
+          "card_count": 38,
+          "template_count": 14,
+          "learner_count": 31200
+        },
+        "pending_update": {
+          "marked": true,
+          "item_count": 98
+        },
+        "progress": 0.6,
+        "impact_summary": "新增的两个知识点都在“负债”一章，牵涉 46 道题和 38 张卡；考期最近、受影响人数最多的学员先更新。"
+      },
+      {
+        "event_id": "019a0601-0000-7000-8000-000000000002",
+        "title": "《初级会计实务》教材改版",
+        "kind": "textbook",
+        "official_document": "出版社改版说明（2027 版）",
+        "effective_on": "2026-10-01",
+        "stage": "done",
+        "impact": {
+          "knowledge_point_count": 0,
+          "question_count": 0,
+          "card_count": 0,
+          "template_count": 3,
+          "mapped_page_count": 388,
+          "learner_count": 8650
+        },
+        "pending_update": {
+          "marked": false,
+          "item_count": 0
+        },
+        "impact_summary": "页码映射已全部完成，学员资料里的页码引用已换成新版。"
+      },
+      {
+        "event_id": "019a0601-0000-7000-8000-000000000003",
+        "title": "合格标准说明更新",
+        "kind": "rule",
+        "official_document": "《关于 2027 年度初级会计专业技术资格考试合格标准的通知》",
+        "effective_on": "2027-01-10",
+        "stage": "analyzing",
+        "impact": {
+          "knowledge_point_count": 0,
+          "question_count": 0,
+          "card_count": 0,
+          "template_count": 2,
+          "learner_count": 31200
+        },
+        "pending_update": {
+          "marked": true,
+          "item_count": 4
+        },
+        "progress": 0.3,
+        "impact_summary": "只牵涉预测与报考决策里的合格线说明，题和卡不受影响。"
+      }
+    ],
+    "analysis": {
+      "sample_sufficient": true,
+      "learning_record_count": 1840000,
+      "minimum_learning_record_count": 50000
+    }
+  },
+  "insufficient_analysis": {
+    "sample_sufficient": false,
+    "learning_record_count": 3200,
+    "minimum_learning_record_count": 50000
+  }
+}

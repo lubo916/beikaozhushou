@@ -1,1 +1,95 @@
-{}
+{
+  "title": "变更影响分析",
+  "description": "大纲或教材一变，先算清影响谁，再分批通知。",
+  "sample": "示例数据",
+  "scope": "考试范围：{{exam}}",
+  "soon": "即将上线",
+  "actions": {
+    "register": "登记变更事件",
+    "assign": "分派任务"
+  },
+  "filters": {
+    "label": "按变更类型筛选",
+    "all": "全部"
+  },
+  "kinds": {
+    "syllabus": "大纲",
+    "textbook": "教材",
+    "rule": "规则"
+  },
+  "events": {
+    "title": "变更事件",
+    "caption": "变更事件：受影响范围与处理进度",
+    "summary": "共 {{n}} 个变更事件；处理完成前，受影响内容对学员标“待更新”。",
+    "columns": {
+      "event": "事件",
+      "impact": "受影响",
+      "progress": "处理进度"
+    },
+    "document": "官方文件：{{name}}",
+    "effective": "{{date}} 生效",
+    "aiNote": "影响范围分析，仅供参考",
+    "separator": "；"
+  },
+  "impact": {
+    "learner_count": "学员 {{n}}",
+    "template_count": "模板 {{n}} 个",
+    "knowledge_point_count": "知识点 {{n}} 个",
+    "question_count": "题 {{n}} 道",
+    "card_count": "卡片 {{n}} 张",
+    "mapped_page_count": "页码映射 {{n}} 页",
+    "none": "暂未发现受影响内容"
+  },
+  "stage": {
+    "analyzing": "影响分析",
+    "updating": "内容更新",
+    "mapping": "页码映射",
+    "done": "处理完成"
+  },
+  "stageProgress": "{{stage}} {{percent}}",
+  "pending": {
+    "marked": "待更新",
+    "markedCount": "{{n}} 项内容对学员标着“待更新”",
+    "cleared": "“待更新”标注已撤下"
+  },
+  "notices": {
+    "title": "通知",
+    "learners": "学员",
+    "learnersBody": "分批推送，写明对你意味着什么；计划以提议调整，确认后生效",
+    "authors": "模板作者",
+    "authorsBody": "同步收到“待更新”提醒",
+    "notifyLearners": "通知学员",
+    "notifyAuthors": "提醒模板作者"
+  },
+  "analysis": {
+    "records": "学习记录",
+    "minimum": "出结论至少需要",
+    "count": "{{n}} 条",
+    "missing": "学习记录够了以后再估算受影响学员；现在只显示内容层面的原始计数。"
+  },
+  "state": {
+    "empty": {
+      "title": "变更影响分析暂无数据",
+      "body": "当前筛选下没有记录，换个筛选条件试试",
+      "action": "清除筛选"
+    },
+    "error": {
+      "body": "服务暂时异常，已保存的内容不受影响；重试或稍后再来。"
+    },
+    "offline": {
+      "title": "后台需要联网",
+      "body": "变更事件与影响范围要联网才能取到，恢复网络后点“重新连接”。",
+      "action": "重新连接",
+      "stale": "网络断开了，下面是断网前取到的数据。"
+    },
+    "restricted": {
+      "title": "需要相应的后台角色",
+      "body": "须相应后台角色；敏感操作先重验身份，再按风险分档确认，只有不可逆操作双人复核",
+      "action": "去系统、参数与权限"
+    },
+    "insufficient_data": {
+      "title": "样本不足，暂不出结论",
+      "body": "样本不足时不出结论，只显示原始计数"
+    }
+  }
+}

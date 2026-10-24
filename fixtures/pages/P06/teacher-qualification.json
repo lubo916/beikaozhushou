@@ -1,0 +1,78 @@
+{
+  "impact": {
+    "data_source": "sample",
+    "exam_name": "中学教师资格（笔试）",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "total_count": 2,
+    "kind_counts": [
+      {
+        "kind": "syllabus",
+        "count": 1
+      },
+      {
+        "kind": "textbook",
+        "count": 1
+      },
+      {
+        "kind": "rule",
+        "count": 0
+      }
+    ],
+    "events": [
+      {
+        "event_id": "019a0602-0000-7000-8000-000000000001",
+        "title": "2026 年下半年笔试大纲调整",
+        "kind": "syllabus",
+        "official_document": "《中小学教师资格考试笔试大纲（2026 年修订）》",
+        "effective_on": "2026-12-01",
+        "stage": "updating",
+        "impact": {
+          "knowledge_point_count": 3,
+          "question_count": 72,
+          "card_count": 55,
+          "template_count": 9,
+          "learner_count": 12400
+        },
+        "pending_update": {
+          "marked": true,
+          "item_count": 130
+        },
+        "progress": 0.45,
+        "impact_summary": "调整集中在“中学生学习心理”一章，牵涉 72 道题和 55 张卡。"
+      },
+      {
+        "event_id": "019a0602-0000-7000-8000-000000000002",
+        "title": "《教育知识与能力》教材改版",
+        "kind": "textbook",
+        "official_document": "出版社改版说明（2026 秋季版）",
+        "effective_on": "2026-08-20",
+        "stage": "mapping",
+        "impact": {
+          "knowledge_point_count": 0,
+          "question_count": 0,
+          "card_count": 0,
+          "template_count": 4,
+          "mapped_page_count": 256,
+          "learner_count": 5300
+        },
+        "pending_update": {
+          "marked": true,
+          "item_count": 41
+        },
+        "progress": 0.8,
+        "impact_summary": "页码映射还剩约两成，未映射的页码引用先标“待更新”。"
+      }
+    ],
+    "analysis": {
+      "sample_sufficient": true,
+      "learning_record_count": 620000,
+      "minimum_learning_record_count": 50000
+    }
+  },
+  "insufficient_analysis": {
+    "sample_sufficient": false,
+    "learning_record_count": 3200,
+    "minimum_learning_record_count": 50000
+  }
+}

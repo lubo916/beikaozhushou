@@ -1,0 +1,56 @@
+{
+  "impact": {
+    "data_source": "sample",
+    "exam_name": "大学英语六级",
+    "generated_at": "2026-10-23T04:00:00Z",
+    "time_zone": "Asia/Shanghai",
+    "total_count": 1,
+    "kind_counts": [
+      {
+        "kind": "syllabus",
+        "count": 0
+      },
+      {
+        "kind": "textbook",
+        "count": 0
+      },
+      {
+        "kind": "rule",
+        "count": 1
+      }
+    ],
+    "events": [
+      {
+        "event_id": "019a0603-0000-7000-8000-000000000001",
+        "title": "写作评分说明更新",
+        "kind": "rule",
+        "official_document": "《全国大学英语四、六级考试大纲（2026 年修订版）》",
+        "effective_on": "2026-12-12",
+        "stage": "analyzing",
+        "impact": {
+          "knowledge_point_count": 2,
+          "question_count": 18,
+          "card_count": 0,
+          "template_count": 6,
+          "learner_count": 20800
+        },
+        "pending_update": {
+          "marked": true,
+          "item_count": 20
+        },
+        "progress": 0.2,
+        "impact_summary": "影响写作两个知识点的评分要点说明，牵涉 18 道写作题的参考范文。"
+      }
+    ],
+    "analysis": {
+      "sample_sufficient": true,
+      "learning_record_count": 910000,
+      "minimum_learning_record_count": 50000
+    }
+  },
+  "insufficient_analysis": {
+    "sample_sufficient": false,
+    "learning_record_count": 3200,
+    "minimum_learning_record_count": 50000
+  }
+}
