@@ -40,10 +40,10 @@ const identity: GoalQuery = {
 };
 
 describe("S24 缓存的目标身份", () => {
-  it("合法的初级会计响应放进其他考试格子也不能读出", () => {
+  it("合法的初级会计响应放进其他考试格子也不能读出", async () => {
     const store = memoryStore();
     store.setItem(PROGRESS_CACHE_PREFIX + "en", JSON.stringify(data));
-    expect(readCachedProgress("en", store)).toBeUndefined();
+    expect(await readCachedProgress("en", store)).toBeUndefined();
     expect(store.map.has(PROGRESS_CACHE_PREFIX + "en")).toBe(false);
   });
   it("写缓存使用响应中的真实考试身份，不使用 current 或地址别名", () => {
@@ -52,13 +52,13 @@ describe("S24 缓存的目标身份", () => {
     expect(store.map.has(PROGRESS_CACHE_PREFIX + data.exam_id)).toBe(true);
     expect(store.map.has(PROGRESS_CACHE_PREFIX + "current")).toBe(false);
   });
-  it("已确认考试可读取自己的缓存，且保留原计算时间", () => {
+  it("已确认考试可读取自己的缓存，且保留原计算时间", async () => {
     const store = memoryStore();
     writeCachedProgress("kj", data, store);
-    expect(readCachedProgress(data.exam_id, store)?.computed_at).toBe(data.computed_at);
-    expect(readCachedProgress("kj", store, data.exam_id)?.exam_id).toBe(data.exam_id);
-    expect(readCachedProgress("cet-6", store)).toBeUndefined();
-    expect(readCachedProgress(CURRENT_SLOT, store)).toBeUndefined();
+    expect((await readCachedProgress(data.exam_id, store))?.computed_at).toBe(data.computed_at);
+    expect((await readCachedProgress("kj", store, data.exam_id))?.exam_id).toBe(data.exam_id);
+    expect(await readCachedProgress("cet-6", store)).toBeUndefined();
+    expect(await readCachedProgress(CURRENT_SLOT, store)).toBeUndefined();
   });
   it("仅新鲜、成功且未刷新中的公开上下文能确认目标", () => {
     expect(confirmedExamId(identity)).toBe(data.exam_id);
@@ -192,4 +192,15 @@ describe("S24 身份与查询的实际缓存行为", () => {
       client.clear();
     }
   });
+});
+
+it("S24 旧缓存异步校验不能删除刚写入的新缓存", async () => {
+  const store = memoryStore();
+  const key = PROGRESS_CACHE_PREFIX + data.exam_id;
+  store.setItem(key, JSON.stringify({ exam_id: data.exam_id }));
+  const pending = readCachedProgress(data.exam_id, store);
+  writeCachedProgress(data.exam_id, data, store);
+  await expect(pending).resolves.toBeUndefined();
+  expect(store.getItem(key)).toBe(JSON.stringify(data));
+  expect((await readCachedProgress(data.exam_id, store))?.computed_at).toBe(data.computed_at);
 });
