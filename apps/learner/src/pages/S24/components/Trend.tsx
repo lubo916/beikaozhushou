@@ -38,7 +38,7 @@ export function Trend({ data }: { data: S24Progress }) {
     ...rows.map((row, index) => x(index) + "," + y(row.optimistic)).reverse(),
   ].join(" ");
   return (
-    <div className="flex min-w-0 flex-col gap-3">
+    <div className="flex min-w-[0] flex-col gap-3">
       <svg viewBox="0 0 600 240" className="w-full" role="img" aria-label={t("forecast.chart_label")}>
         <polygon points={band} fill="var(--color-brand-primary-soft)" />
         <polyline points={line} fill="none" stroke="var(--color-brand-primary)" strokeWidth="2" />
