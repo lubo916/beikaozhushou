@@ -1,0 +1,169 @@
+{
+  "data_source": "sample",
+  "availability": "normal",
+  "timezone": "Asia/Shanghai",
+  "target_date": "2027-03-13",
+  "nearest_days": 50,
+  "target_days": 141,
+  "events": [
+    {
+      "id": "019a0800-0000-7000-8000-000000000001",
+      "title": "报名开放",
+      "target": "中学教师资格笔试",
+      "date": "2026-11-02",
+      "status": "estimated",
+      "basis": "参考上一年度安排，官方尚未公布",
+      "kind": "registration"
+    },
+    {
+      "id": "019a0800-0000-7000-8000-000000000002",
+      "title": "缴费截止",
+      "target": "中学教师资格笔试",
+      "date": "2026-11-08",
+      "status": "estimated",
+      "basis": "演示样例；请等待当期官方通知",
+      "kind": "payment"
+    },
+    {
+      "id": "019a0800-0000-7000-8000-000000000003",
+      "title": "准考证下载",
+      "target": "中学教师资格笔试",
+      "date": "2026-12-05",
+      "status": "estimated",
+      "basis": "参考上一年度安排，官方尚未公布",
+      "kind": "admission"
+    },
+    {
+      "id": "019a0800-0000-7000-8000-000000000004",
+      "title": "考试日",
+      "target": "中学教师资格笔试",
+      "date": "2026-12-12",
+      "status": "estimated",
+      "basis": "演示日期，未作官方认定",
+      "kind": "exam"
+    },
+    {
+      "id": "019a0800-0000-7000-8000-000000000005",
+      "title": "课程复盘",
+      "target": "个人辅助目标",
+      "date": "2026-12-13",
+      "status": "custom",
+      "basis": "个人设置的辅助目标节点",
+      "kind": "custom"
+    },
+    {
+      "id": "019a0800-0000-7000-8000-000000000006",
+      "title": "成绩查询",
+      "target": "中学教师资格笔试",
+      "date": "2027-01-15",
+      "status": "estimated",
+      "basis": "参照往年公布窗口，实际以官方通知为准",
+      "kind": "result"
+    }
+  ],
+  "sessions": [
+    {
+      "id": "019a0800-0000-7000-8000-000000000011",
+      "subject": "综合素质",
+      "date": "2026-12-12",
+      "start_at": "2026-12-12T01:00:00Z",
+      "end_at": "2026-12-12T03:00:00Z",
+      "location": "考点待准考证公布"
+    },
+    {
+      "id": "019a0800-0000-7000-8000-000000000012",
+      "subject": "教育知识与能力",
+      "date": "2026-12-12",
+      "start_at": "2026-12-12T06:00:00Z",
+      "end_at": "2026-12-12T08:00:00Z",
+      "location": "同日另一场，场次以准考证为准"
+    },
+    {
+      "id": "019a0800-0000-7000-8000-000000000013",
+      "subject": "课程实操（自定目标）",
+      "date": "2026-12-13",
+      "start_at": "2026-12-13T01:00:00Z",
+      "end_at": "2026-12-13T02:30:00Z",
+      "location": "个人辅助目标的分天安排"
+    }
+  ],
+  "announcements": [
+    {
+      "id": "019a0800-0000-7000-8000-000000000021",
+      "title": "报名安排与材料核对提醒（演示）",
+      "source": "教育部教育考试院",
+      "url": "https://ntce.neea.edu.cn/",
+      "published_on": "2026-10-20",
+      "verified": true,
+      "summary": "样例公告已经人工对照示例原文；请在正式报名时重新核对官方材料清单。",
+      "impact": "先核对报名材料与地区要求。当前学习范围无需直接修改；如需调整，先查看待确认的提议。",
+      "ai_generated": true,
+      "plan_proposal": true
+    }
+  ],
+  "details": {
+    "authority": "教育部教育考试院",
+    "requirements": "学历、户籍等条件请核对当地当期报名公告",
+    "subjects": "综合素质、教育知识与能力",
+    "question_types": "选择、简答、材料分析、写作",
+    "standard": "以当期官方合格标准为准",
+    "validity": "各科有效期以官方成绩记录为准",
+    "official_url": "https://ntce.neea.edu.cn/"
+  },
+  "reminders": {
+    "offset_days": [
+      7,
+      3,
+      1
+    ],
+    "channels": [
+      "in_app"
+    ],
+    "sms_bound": false,
+    "exam_day_only": true
+  },
+  "validity": [
+    {
+      "id": "019a0800-0000-7000-8000-000000000031",
+      "subject": "综合素质",
+      "expires_on": "2026-12-31",
+      "warning": true,
+      "note": "滚动有效期临期样例，请以官方成绩记录核验。"
+    }
+  ],
+  "checklist": [
+    {
+      "id": "019a0800-0000-7000-8000-000000000041",
+      "category": "documents",
+      "content": "有效身份证件、准考证；核对姓名与考点",
+      "checked": false
+    },
+    {
+      "id": "019a0800-0000-7000-8000-000000000042",
+      "category": "stationery",
+      "content": "按当地考务要求准备文具",
+      "checked": false
+    },
+    {
+      "id": "019a0800-0000-7000-8000-000000000043",
+      "category": "prohibited",
+      "content": "核对手机、智能设备等禁带规定",
+      "checked": false
+    },
+    {
+      "id": "019a0800-0000-7000-8000-000000000044",
+      "category": "route",
+      "content": "查看考点路线并预留出行时间",
+      "checked": false
+    }
+  ],
+  "accumulation": [
+    {
+      "id": "019a0800-0000-7000-8000-000000000051",
+      "title": "本期行业与政策变化速览（演示）",
+      "relevance": "关联当前目标的开放域素材；作为积累资料，不代表考试范围变化。",
+      "source": "教育部教育考试院",
+      "url": "https://ntce.neea.edu.cn/"
+    }
+  ]
+}

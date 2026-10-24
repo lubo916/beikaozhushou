@@ -1,0 +1,21 @@
+{
+  "available": true,
+  "exam_name": "初级会计职称",
+  "data_year": "2026",
+  "source_name": "演示考试信息库（非官方数据）",
+  "source_url": "https://kzp.mof.gov.cn/",
+  "updated_day": "2026-10-21",
+  "profile_complete": true,
+  "access_limited": false,
+  "items": [
+    {
+      "id": "019bc4a0-2000-7000-8000-000000000001",
+      "name": "初级会计资格 · 演示选项",
+      "category": "证书报考信息",
+      "region": "按目标地区公告",
+      "requirements": "演示信息：请对照当年官方公告核验学历、地区与报名资格。",
+      "note": "只展示平台已挂载的信息，本页不判断是否符合报考条件，也不会修改备考目标。"
+    }
+  ],
+  "data_source": "sample"
+}

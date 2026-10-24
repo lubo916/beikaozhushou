@@ -1,1 +1,93 @@
-{}
+{
+  "title": "考试日历与资讯",
+  "description": "只看与你有关的考试节点与变化",
+  "sample": "示例数据",
+  "sample_note": "以下日期、公告与科目安排均为演示样例，请以官方原文和准考证为准。",
+  "add_node": "加自定节点",
+  "goals": "管理备考目标",
+  "timeline": "多目标合并时间线",
+  "sessions": "多科目日程",
+  "nearest": "距最近一场",
+  "target": "距目标日",
+  "target_on": "目标日：{{date}}",
+  "status": {
+    "official": "已公布",
+    "estimated": "预计",
+    "custom": "自定"
+  },
+  "basis": "依据：{{basis}}",
+  "for_target": "所属目标：{{target}}",
+  "session_time": "{{start}} 至 {{end}}",
+  "announcements": "与你相关的公告",
+  "verified": "已核验",
+  "unverified": "待核验",
+  "source": "来源：{{source}}",
+  "original": "查看原文",
+  "meaning": "对你意味着什么",
+  "pending": "待确认的提议",
+  "proposal": "查看计划调整提议",
+  "details": "考试详情",
+  "detail": {
+    "authority": "主管机构",
+    "requirements": "报考条件",
+    "subjects": "考试科目",
+    "question_types": "科目与题型",
+    "standard": "合格标准",
+    "validity": "成绩有效期"
+  },
+  "official": "前往官网",
+  "reminders": "递进提醒",
+  "reminder_before": "节点前 {{days}} 提醒",
+  "exam_day": "考试当天只保留考务提醒",
+  "channels": {
+    "in_app": "站内提醒",
+    "sms": "短信提醒"
+  },
+  "configure": "设置提醒",
+  "bind": "绑定手机号",
+  "validity": "成绩有效期",
+  "expiry": "有效至 {{date}}",
+  "expiring": "临期提醒",
+  "no_validity": "当前没有滚动成绩记录；有效期规则见考试详情。",
+  "checklist": "考前清单",
+  "checklist_hint": "按准考证与当地考务要求逐项核对",
+  "category": {
+    "documents": "证件",
+    "stationery": "文具",
+    "prohibited": "禁带物品",
+    "route": "路线"
+  },
+  "check": "核对{{category}}",
+  "checked": "已核对",
+  "unchecked": "待核对",
+  "accumulation": "动态积累",
+  "material": "加入素材",
+  "card": "生成积累卡片",
+  "soon": "即将上线",
+  "soon_node": "自定节点即将上线；目前未新增节点。",
+  "soon_reminder": "提醒设置即将上线；目前未修改订阅。",
+  "soon_proposal": "计划调整提议即将上线；确认前不会修改计划。",
+  "state": {
+    "empty": {
+      "title": "还没有考试节点",
+      "body": "目标日已设，官方节点公布后自动加入"
+    },
+    "offline": {
+      "title": "日历可离线查看",
+      "body": "已缓存的日历可离线查看；公告更新与提醒订阅需要联网。",
+      "stale": "当前离线，正在显示已缓存的日历"
+    },
+    "restricted": {
+      "title": "短信提醒需要绑定手机号",
+      "body": "站内提醒可继续使用，绑定手机号后可开通短信提醒。"
+    },
+    "insufficient": {
+      "title": "官方未公布的日期标“预计”并写依据",
+      "body": "先按预计节点安排准备，正式公布后再核对日期。"
+    }
+  },
+  "session_date": "日期",
+  "session_slot": "场次",
+  "session_location": "考点",
+  "retry": "重试"
+}

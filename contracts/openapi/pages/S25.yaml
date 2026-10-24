@@ -1,0 +1,128 @@
+# S25 考试日历与资讯；数字与日期状态均由接口提供，页面不做业务推算。
+paths:
+  /exam/calendar:
+    get:
+      operationId: getExamCalendar
+      x-owner: exam
+      x-action: exam.profile.read
+      summary: 读取个人多目标考试时间线与经核验资讯
+      responses:
+        "200":
+          description: 示例考试日历
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/S25Calendar"}
+        "403": {$ref: "#/components/responses/Error"}
+components:
+  schemas:
+    S25Calendar:
+      type: object
+      required: [exam, data_source, availability, timezone, target_date, nearest_days, target_days, events, sessions, announcements, details, reminders, validity, checklist, accumulation]
+      properties:
+        exam: {$ref: "#/components/schemas/ExamProfile"}
+        data_source: {$ref: "#/components/schemas/DataSource"}
+        availability: {type: string, enum: [normal, empty, restricted, insufficient_data]}
+        timezone: {type: string}
+        target_date: {type: string, format: date}
+        nearest_days: {type: integer}
+        target_days: {type: integer}
+        events:
+          type: array
+          items: {$ref: "#/components/schemas/S25Event"}
+        sessions:
+          type: array
+          items: {$ref: "#/components/schemas/S25Session"}
+        announcements:
+          type: array
+          items: {$ref: "#/components/schemas/S25Announcement"}
+        details: {$ref: "#/components/schemas/S25Details"}
+        reminders: {$ref: "#/components/schemas/S25Reminders"}
+        validity:
+          type: array
+          items: {$ref: "#/components/schemas/S25Validity"}
+        checklist:
+          type: array
+          items: {$ref: "#/components/schemas/S25ChecklistItem"}
+        accumulation:
+          type: array
+          items: {$ref: "#/components/schemas/S25Accumulation"}
+    S25Event:
+      type: object
+      required: [id, title, target, date, status, basis, kind]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        title: {type: string}
+        target: {type: string}
+        date: {type: string, format: date}
+        status: {type: string, enum: [official, estimated, custom]}
+        basis: {type: string}
+        kind: {type: string, enum: [registration, payment, admission, exam, result, custom]}
+    S25Session:
+      type: object
+      required: [id, subject, date, start_at, end_at, location]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        subject: {type: string}
+        date: {type: string, format: date}
+        start_at: {$ref: "#/components/schemas/Timestamp"}
+        end_at: {$ref: "#/components/schemas/Timestamp"}
+        location: {type: string}
+    S25Announcement:
+      type: object
+      required: [id, title, source, url, published_on, verified, summary, impact, ai_generated, plan_proposal]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        title: {type: string}
+        source: {type: string}
+        url: {type: string, format: uri}
+        published_on: {type: string, format: date}
+        verified: {type: boolean}
+        summary: {type: string}
+        impact: {type: string}
+        ai_generated: {type: boolean}
+        plan_proposal: {type: boolean}
+    S25Details:
+      type: object
+      required: [authority, requirements, subjects, question_types, standard, validity, official_url]
+      properties:
+        authority: {type: string}
+        requirements: {type: string}
+        subjects: {type: string}
+        question_types: {type: string}
+        standard: {type: string}
+        validity: {type: string}
+        official_url: {type: string, format: uri}
+    S25Reminders:
+      type: object
+      required: [offset_days, channels, sms_bound, exam_day_only]
+      properties:
+        offset_days: {type: array, items: {type: integer}}
+        channels: {type: array, items: {type: string, enum: [in_app, sms]}}
+        sms_bound: {type: boolean}
+        exam_day_only: {type: boolean}
+    S25Validity:
+      type: object
+      required: [id, subject, expires_on, warning, note]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        subject: {type: string}
+        expires_on: {type: string, format: date}
+        warning: {type: boolean}
+        note: {type: string}
+    S25ChecklistItem:
+      type: object
+      required: [id, category, content, checked]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        category: {type: string, enum: [documents, stationery, prohibited, route]}
+        content: {type: string}
+        checked: {type: boolean}
+    S25Accumulation:
+      type: object
+      required: [id, title, relevance, source, url]
+      properties:
+        id: {$ref: "#/components/schemas/Id"}
+        title: {type: string}
+        relevance: {type: string}
+        source: {type: string}
+        url: {type: string, format: uri}
