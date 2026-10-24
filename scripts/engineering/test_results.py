@@ -83,7 +83,8 @@ def vitest_records(data: dict, root: Path = ROOT) -> list[dict]:
         for a in cases:
             title = a.get("fullName") or " ".join([*(a.get("ancestorTitles") or []), a.get("title") or ""]).strip()
             out.append({"title": title, "status": VITEST_STATUS.get(a.get("status"), "failed"), "runner": "vitest", "file": rel})
-        if not cases and f.get("status") == "failed":
+        # Vitest JSON 把未执行的文件也记为 passed（断言为空），不能按文件 status 判断
+        if not cases:
             out.append({"title": f"{rel}：测试文件未能运行", "status": "failed", "runner": "vitest", "file": rel})
     return out
 
