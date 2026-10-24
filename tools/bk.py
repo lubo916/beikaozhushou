@@ -33,12 +33,16 @@ import socket
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import urllib.request
 import zipfile
 from pathlib import Path
 
-TOOL_VERSION = "4.1.1"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bk_acceptance as acceptance
+
+TOOL_VERSION = "4.2.0"
 PAGE_STATUS = ["todo", "shell", "ui", "api", "ok"]
 PAGE_STATUS_CN = {"todo": "未开始", "shell": "空壳", "ui": "前端完成（假数据）", "api": "已接后端", "ok": "已验收"}
 TASK_STATUS_CN = {"todo": "未开始", "doing": "进行中", "fixing": "修复中", "done": "完成",
@@ -101,6 +105,8 @@ class BkError(Exception):
 
 
 def say(msg: str = "") -> None:
+    if Path(__file__).resolve().parent.name == "BK_RUNTIME":
+        msg = msg.replace("python3 tools/bk.py", "python3 ../BK_RUNTIME/bk.py")
     print(msg, flush=True)
 
 
@@ -931,64 +937,239 @@ def run_verify_process(cmd, root: Path, env: dict, timeout: float, log: Path, sh
     return (proc.returncode if clean else 1), timed_out, clean
 
 
-def do_verify(root: Path, cfg: dict, level: str, caps: dict | None = None) -> dict:
-    caps = caps or load_json(root / ".bk" / "env.json", {}) or {}
-    pj = load_json(root / "package.json", {}) or {}
-    scripts = pj.get("scripts", {})
-    runner = script_runner(root)
-    envx = dict(os.environ, CI="1")
+def verification_environment(run_id: str) -> dict:
+    environment = dict(os.environ, CI="1", BK_ACCEPTANCE_RUN_ID=run_id)
     chromium = find_chromium()
     if chromium:
-        envx["BK_CHROMIUM"] = chromium
-    web = env_kind() == "web"
-    results = []
-    say(f"· 验证（{level}）：{'、'.join(cfg['verify'][level])}")
-    for name in cfg["verify"][level]:
-        is_cmd = name.startswith("cmd:")
-        if not is_cmd and name not in scripts:
-            results.append({"name": name, "result": "skip", "note": "未配置"})
-            continue
-        if not is_cmd and not (shutil.which("pnpm") or shutil.which("npm")):
-            results.append({"name": name, "result": "skip" if web else "env", "note": "没有安装 Node/npm"})
-            continue
-        if name in cfg["needs_browser"] and web and not chromium:
-            results.append({"name": name, "result": "skip", "note": "网页端没有浏览器"})
-            continue
-        if name in cfg["needs_db"] and not db_reachable(root):
-            results.append({"name": name, "result": "skip" if web else "env",
-                            "note": "没有数据库" if web else "数据库没启动（先开 Docker Desktop，再运行 bk run --real 或 docker compose up -d）"})
-            continue
-        log = bkdir(root, "logs") / ("verify-" + re.sub(r"[^\w.-]+", "_", name)[:60] + ".log")
-        t0 = time.time()
-        timeout = cfg["timeouts"].get(name, cfg["timeouts"]["default"])
-        code, timed_out, clean = run_verify_process(name[4:] if is_cmd else runner + [name],
-                                             root, envx, timeout, log, is_cmd)
-        outtext = log.read_text(encoding="utf-8", errors="replace")
-        ok = code == 0 and not timed_out
-        note = f"超时（{timeout} 秒）" if timed_out else f"{int(time.time() - t0)} 秒"
-        results.append({"name": name, "result": "pass" if ok else "fail", "note": note,
-                        "log": str(log.relative_to(root))})
-        say(f"  {'✓' if ok else '✗'} {name}（{note}）")
-        if not ok:
-            say("    ── 日志末尾 ──\n" + "\n".join("    " + x for x in tail(outtext, 30).splitlines()))
-        if not clean:
-            say("  ✗ 自有进程未确认清理完成，停止后续检查，保留日志供复查。")
-            break
-    for r in results:
-        if r["result"] == "skip":
-            say(f"  - {r['name']}：跳过（{r['note']}）")
-        if r["result"] == "env":
-            say(f"  ! {r['name']}：环境问题（{r['note']}）")
-    verdict = "fail" if any(r["result"] == "fail" for r in results) else (
-        "env" if any(r["result"] == "env" for r in results) else "pass")
-    summary = {"level": level, "verdict": verdict, "time": now(), "results": results}
-    save_json(bkdir(root) / "last-verify.json", summary)
-    say({"pass": "✓ 验证通过", "fail": "✗ 验证没通过", "env": "! 验证被环境问题卡住（不是代码问题）"}[verdict])
+        environment["BK_CHROMIUM"] = chromium
+    return environment
+
+
+def do_verify(root: Path, cfg: dict, level: str, caps: dict | None = None, *, diagnostic: bool = False) -> dict:
+    """默认失败即停；诊断运行保留更多线索，但永远不能用于正式放行。"""
+    task = None
+    pending = load_json(root / ".bk/pending.json", {}) or {}
+    session = load_json(root / ".bk/session.json", {}) or {}
+    branch = current_branch(root) if (root / ".git").exists() else None
+    if branch == "bk/integrate" and pending.get("merged"):
+        task = pending.get("task")
+    elif branch and session.get("branch") == branch:
+        task = session.get("task")
+    with acceptance.serial_queue(root, "verify", task=task) as queue:
+        return _do_verify(root, cfg, level, caps, diagnostic=diagnostic, queue=queue, task=task)
+
+
+def _do_verify(root: Path, cfg: dict, level: str, caps: dict | None = None, *, diagnostic: bool = False,
+               queue: dict | None = None, task: str | None = None) -> dict:
+    commands = list(cfg["verify"][level])
+    run = acceptance.new_run(root, "verify", task=task)
+    run_id, run_dir = run["id"], Path(run["path"])
+    summary = {"run_id": run_id, "policy_version": acceptance.POLICY_VERSION,
+               "task": task, "queue": {key: (queue or {}).get(key) for key in ("request_id", "wait_seconds", "operation", "queue_path", "legacy_lock_borrowed")},
+               "identity": {}, "mode": "diagnostic" if diagnostic else "normal",
+               "status": "running", "level": level, "verdict": "running", "time": now(),
+               "started_at": dt.datetime.now(dt.timezone.utc).isoformat(), "finished_at": None,
+               "results": [{"name": n, "result": "not_run", "note": "等待本轮执行"} for n in commands]}
+    result_file = run_dir / "summary.json"
+
+    def persist():
+        acceptance.atomic_json(result_file, summary)
+        # 旧 reader 仍能读 level/verdict/results；启动即覆盖，绝不暴露上轮 pass。
+        acceptance.atomic_json(bkdir(root) / "last-verify.json", summary)
+
+    persist()
+    started = time.monotonic()
+    previous_term = None
+    if threading.current_thread() is threading.main_thread():
+        previous_term = signal.getsignal(signal.SIGTERM)
+        def interrupt_owned_run(signum, frame):
+            raise KeyboardInterrupt("验证收到终止信号")
+        signal.signal(signal.SIGTERM, interrupt_owned_run)
+    try:
+        summary["identity"] = acceptance.fingerprint(root, cfg, commands, run_id, environment=verification_environment(run_id))
+        persist()
+        caps = caps or load_json(root / ".bk" / "env.json", {}) or {}
+        pj = load_json(root / "package.json", {}) or {}
+        scripts = pj.get("scripts", {})
+        runner = script_runner(root)
+        envx = verification_environment(run_id)
+        chromium = find_chromium()
+        if chromium:
+            envx["BK_CHROMIUM"] = chromium
+        web = env_kind() == "web"
+        # 只读体检；不清理共享产物、不安装依赖、不终止其他任务进程。
+        preflight = []
+        for name in commands:
+            issue = None
+            if not name.startswith("cmd:"):
+                if name not in scripts:
+                    issue = "未配置必需的检查脚本"
+                elif not (shutil.which("pnpm") or shutil.which("npm")):
+                    issue = "没有安装 Node/npm"
+                elif name in cfg.get("needs_browser", []) and web and not chromium:
+                    issue = "网页端没有浏览器"
+                elif name in cfg.get("needs_db", []) and not db_reachable(root):
+                    issue = "数据库不可用；先恢复本地数据库，再重新验收"
+            if issue:
+                preflight.append({"name": name, "reason": issue})
+        summary["preflight"] = {"readonly": True, "issues": preflight}
+        if preflight:
+            problems = {x["name"]: x["reason"] for x in preflight}
+            for item in summary["results"]:
+                if item["name"] in problems:
+                    item.update(result="env", note=problems[item["name"]],
+                                triage={"category": "environment", "reason": problems[item["name"]], "auto_retry": False})
+                else:
+                    item["note"] = "环境体检未通过，未运行"
+            summary["verdict"] = "env"
+        else:
+            say(f"· 验证（{level}{'，仅诊断' if diagnostic else '，失败即停'}）：{'、'.join(commands)}")
+            blocked = False
+            for index, name in enumerate(commands):
+                if blocked:
+                    summary["results"][index]["note"] = "前项未通过，未运行"
+                    continue
+                is_cmd = name.startswith("cmd:")
+                log = run_dir / (f"{index + 1:02d}-" + re.sub(r"[^\w.-]+", "_", name)[:60] + ".log")
+                entry = {"name": name, "result": "running", "note": "执行中",
+                         "started_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+                         "log": str(log.relative_to(root))}
+                summary["results"][index] = entry
+                persist()
+                t0 = time.monotonic()
+                timeout = cfg["timeouts"].get(name, cfg["timeouts"]["default"])
+                browser_report = root / ".test-results" / "playwright.json"
+                report_required = name in cfg.get("needs_browser", []) and (root / "playwright.config.ts").exists()
+                before_report = (browser_report.stat().st_mtime_ns, hashlib.sha256(browser_report.read_bytes()).hexdigest()) if browser_report.is_file() else None
+                code, timed_out, clean = run_verify_process(name[4:] if is_cmd else runner + [name],
+                                                           root, envx, timeout, log, is_cmd)
+                outbytes = log.read_bytes()
+                outtext = outbytes.decode("utf-8", errors="replace")
+                elapsed = time.monotonic() - t0
+                ok = code == 0 and not timed_out and clean
+                note = f"超时（{timeout} 秒）" if timed_out else f"{elapsed:.3f} 秒"
+                classification = acceptance.triage(outtext, code) if not ok else None
+                if report_required:
+                    try:
+                        if not browser_report.is_file():
+                            raise ValueError("缺本轮浏览器 JSON 报告")
+                        raw_report = browser_report.read_bytes()
+                        after_report = (browser_report.stat().st_mtime_ns, hashlib.sha256(raw_report).hexdigest())
+                        if before_report == after_report:
+                            raise ValueError("浏览器 JSON 报告未更新，不能沿用上一阶段或旧轮结果")
+                        evidence = run_dir / f"{index + 1:02d}-playwright.json"
+                        evidence.write_bytes(raw_report)
+                        entry["browser_report"] = str(evidence.relative_to(root))
+                        entry["browser_report_sha256"] = hashlib.sha256(raw_report).hexdigest()
+                        parsed_report = json.loads(raw_report)
+                        stats = parsed_report.get("stats") if isinstance(parsed_report, dict) else None
+                        if not isinstance(stats, dict) or any(not isinstance(stats.get(key), int) or stats[key] < 0 for key in ("expected", "unexpected", "flaky", "skipped")):
+                            raise ValueError("浏览器 JSON 报告缺完整计数，不能据退出码放行")
+                        suites = parsed_report.get("suites")
+                        if not isinstance(suites, list) or not suites:
+                            raise ValueError("浏览器 JSON 报告没有测试集合")
+                        tested = []
+                        def collect_tests(items):
+                            for suite in items:
+                                if not isinstance(suite, dict):
+                                    raise ValueError("浏览器测试集合格式不完整")
+                                for spec in suite.get("specs", []):
+                                    if isinstance(spec, dict):
+                                        tested.extend(test for test in spec.get("tests", []) if isinstance(test, dict))
+                                collect_tests(suite.get("suites", []))
+                        collect_tests(suites)
+                        executed = [result for test in tested for result in test.get("results", [])
+                                    if isinstance(result, dict) and result.get("status") in ("passed", "failed", "timedOut", "interrupted")]
+                        if not executed:
+                            raise ValueError("浏览器 JSON 报告没有实际执行记录")
+                        flaky, skipped, unexpected = stats["flaky"], stats["skipped"], stats["unexpected"]
+                        if parsed_report.get("errors") or any(test.get("status") == "unexpected" for test in tested):
+                            unexpected = max(1, unexpected)
+                        entry.update(flaky_count=flaky, skipped_count=skipped, unexpected_count=unexpected, expected_count=stats["expected"])
+                        if skipped or unexpected or stats["expected"] + flaky < 1:
+                            ok = False
+                            classification = {"category": "unknown", "reason": "浏览器报告存在失败、跳过或无实际运行用例", "auto_retry": False}
+                        if flaky:
+                            ok = False
+                            classification = {"category": "flaky", "reason": f"本轮 {flaky} 项重试后通过，根因未确认", "auto_retry": False}
+                    except (OSError, ValueError, TypeError) as error:
+                        ok = False
+                        classification = {"category": "report", "reason": str(error), "auto_retry": False}
+                if not clean:
+                    classification = {"category": "interrupted", "reason": "自有进程未确认退出", "auto_retry": False}
+                entry.update(result="pass" if ok else "fail", note=note,
+                             finished_at=dt.datetime.now(dt.timezone.utc).isoformat(), duration_seconds=elapsed,
+                             log_sha256=hashlib.sha256(outbytes).hexdigest(), exit_code=code,
+                             timed_out=timed_out, processes_clean=clean, triage=classification)
+                say(f"  {'✓' if ok else '✗'} {name}（{note}）")
+                if not ok:
+                    say("    ── 日志末尾 ──\n" + "\n".join("    " + x for x in tail(outtext, 30).splitlines()))
+                # 即使诊断模式也不能在自有进程未清理时继续污染下一阶段。
+                blocked = not clean or (not ok and not diagnostic)
+                persist()
+            results = summary["results"]
+            summary["verdict"] = "pass" if results and all(x["result"] == "pass" for x in results) else "fail"
+        current = acceptance.fingerprint(root, cfg, commands, run_id, environment=verification_environment(run_id))
+        if current != summary["identity"]:
+            summary["verdict"] = "fail"
+            summary["identity_changed"] = True
+            summary["identity_after"] = current
+        summary["status"] = "completed"
+        if diagnostic:
+            summary["verdict"] = "diagnostic"
+    except BaseException as error:
+        summary.update(status="interrupted" if isinstance(error, KeyboardInterrupt) else "error",
+                       verdict="fail", error=f"{type(error).__name__}: {error}")
+        for item in summary["results"]:
+            if item["result"] == "running":
+                item.update(result="fail", note="运行异常或中断，不能放行", triage={"category": "interrupted", "reason": type(error).__name__, "auto_retry": False})
+        raise
+    finally:
+        if previous_term is not None:
+            signal.signal(signal.SIGTERM, previous_term)
+        summary["finished_at"] = dt.datetime.now(dt.timezone.utc).isoformat()
+        summary["duration_seconds"] = time.monotonic() - started
+        persist()
+    say({"pass": "✓ 验证通过", "fail": "✗ 验证没通过", "env": "! 环境未就绪，未放行",
+         "diagnostic": "! 诊断运行完成，不能用于正式放行"}[summary["verdict"]])
     return summary
 
 
+def require_verified_candidate(root: Path, cfg: dict, summary: dict) -> None:
+    """最终合并前核对当前候选、完整正常结果及日志，拒绝旧格式或变更后沿用。"""
+    identity = acceptance.fingerprint(root, cfg, cfg["verify"]["full"], summary.get("run_id", ""), environment=verification_environment(summary.get("run_id", "")))
+    issues = acceptance.validate_summary(summary, identity)
+    if not identity.get("git_available") or not worktree_clean(root):
+        issues.append("正式候选必须来自干净的 Git 工作树")
+    if git(root, "rev-parse", "bk/integrate", check=False) != identity.get("head"):
+        issues.append("待合入分支与受测提交不一致")
+    if summary.get("level") != "full":
+        issues.append("最终候选没有完成 full")
+    if [x.get("name") for x in summary.get("results", [])] != list(cfg["verify"]["full"]):
+        issues.append("检查清单与当前 full 不一致")
+    expected_run_dir = (root / ".bk" / "acceptance" / "runs" / summary.get("run_id", "")).resolve()
+    for item in summary.get("results", []):
+        rel = item.get("log")
+        log = (root / rel).resolve() if isinstance(rel, str) else None
+        if not log or not log.is_relative_to(expected_run_dir) or not log.is_file():
+            issues.append(f"{item.get('name')} 缺本轮日志")
+        elif hashlib.sha256(log.read_bytes()).hexdigest() != item.get("log_sha256"):
+            issues.append(f"{item.get('name')} 日志摘要不一致")
+        browser_report = item.get("browser_report")
+        if browser_report:
+            report_path = (root / browser_report).resolve()
+            if not report_path.is_relative_to(expected_run_dir) or not report_path.is_file() or hashlib.sha256(report_path.read_bytes()).hexdigest() != item.get("browser_report_sha256"):
+                issues.append(f"{item.get('name')} 浏览器报告摘要不一致")
+        if item.get("flaky_count", 0) or item.get("skipped_count", 0) or item.get("unexpected_count", 0):
+            issues.append(f"{item.get('name')} 存在未解决波动、跳过或失败")
+        if item.get("processes_clean") is not True:
+            issues.append(f"{item.get('name')} 自有进程未确认清理")
+    if issues:
+        raise BkError("候选验证证据无效，不能合并；重新运行完整验证：\n  " + "\n  ".join(issues))
+
+
 def checks_brief(summary: dict) -> str:
-    sym = {"pass": "✓", "fail": "✗", "skip": "–", "env": "!"}
+    sym = {"pass": "✓", "fail": "✗", "skip": "–", "env": "!", "not_run": "·", "running": "…"}
     return " ".join(f"{r['name']}{sym[r['result']]}" for r in summary.get("results", [])) or "（无可运行的检查）"
 
 
@@ -1085,17 +1266,19 @@ START_TASK = """# 从这里开始
 ## 1. 解压并开工（照抄运行）
 
 ```bash
-mkdir -p /home/claude/work && cd /home/claude/work && rm -rf repo START_HERE.md VERSION.txt FIX.md
+mkdir -p /home/claude/work && cd /home/claude/work && rm -rf repo BK_RUNTIME START_HERE.md VERSION.txt FIX.md
 unzip -q -o "$(ls -t /mnt/user-data/uploads/{stem}*.zip | head -1)"
-cd repo && python3 tools/bk.py start {task}
+cd repo && python3 ../BK_RUNTIME/bk.py start {task}
 ```
 
 `bk start` 会检查环境、安装依赖、建好任务分支，并打印**任务简报**。之后一切以任务简报为准。{fixline}
 
+本包的权威运行工具在 `BK_RUNTIME/`。所有 bk 命令均从 `repo/` 运行 `python3 ../BK_RUNTIME/bk.py`；任务 Git 树内的旧工具与规则仅保留来源，不作为本轮执行入口。先读包外 `BK_RUNTIME/AGENTS.md` 与 `BK_RUNTIME/acceptance-flow.md`，运行时和规则摘要见 `BK_RUNTIME/runtime.json`。
+
 ## 2. 读什么
 
 - 只读任务简报「必读」里列出的文件；「按需查」的先用 `grep -rn`（或 `rg`）搜到位置再看局部；「不要读」的一律不看。不要通读仓库。
-- 原型不要打开 HTML 源码读：用 `python3 tools/bk.py spec <页ID>` 看页面说明，用 `python3 tools/bk.py proto <页ID> --views` 截图后看图。
+- 原型不要打开 HTML 源码读：用 `python3 ../BK_RUNTIME/bk.py spec <页ID>` 看页面说明，用 `python3 ../BK_RUNTIME/bk.py proto <页ID> --views` 截图后看图。
 - 看一眼包根目录的 RECENT.md：最近做了什么、哪些任务正在并行（别改它们的范围）。
 - 动手前，在对话里用 5 行以内说清你打算怎么做（不用等确认，说完就做）。
 - `bk done` 会拦下：越界改动、改热点文件、删除或跳过测试、数据结构冻结前写迁移文件。
@@ -1103,15 +1286,15 @@ cd repo && python3 tools/bk.py start {task}
 ## 3. 做完怎么交
 
 1. 每做完一个能运行的小步就 `git commit`。
-2. 自查：`python3 tools/bk.py verify --level web`
+2. 自查：`python3 ../BK_RUNTIME/bk.py verify --level web`
 3. 填交接单：`progress/reports/{task}-r{round}.md`（模板已生成，全部大白话）。
-4. 收工：`python3 tools/bk.py done` —— 检查改动范围、跑验证、把结果包放到 `/mnt/user-data/outputs/`。把这个结果包提供给用户下载。
+4. 收工：`python3 ../BK_RUNTIME/bk.py done` —— 检查改动范围、跑验证、把结果包放到 `/mnt/user-data/outputs/`。把这个结果包提供给用户下载。
 5. 在对话里用大白话告诉用户：做了什么；在本地怎么看效果；需要他拍板的问题（每条给选项、你的推荐、你先按哪个做了）。
 
 ## 4. 意外情况
 
-- 沙箱重置、文件不见了：重新运行第 1 步，最后一条命令改成 `python3 tools/bk.py start {task} --resume`。
-- 任务做了 40 分钟以上：先运行 `python3 tools/bk.py done --checkpoint`，把检查点包给用户下载，再继续。
+- 沙箱重置、文件不见了：重新运行第 1 步，最后一条命令改成 `python3 ../BK_RUNTIME/bk.py start {task} --resume`。
+- 任务做了 40 分钟以上：先运行 `python3 ../BK_RUNTIME/bk.py done --checkpoint`，把检查点包给用户下载，再继续。
 - 依赖装不上：多半是网络关了。照常写代码，只跑能跑的检查，在交接单「风险与提醒」里写明，并提醒用户：设置 → 功能（Capabilities）→ 打开「代码执行与文件创建」和网络访问。
 - 业务上拿不准：按「原型 → docs/baseline → 最保守的做法」取一个默认，先做下去，把问题写进交接单「需要你拍板」。不要停下来等。
 """
@@ -1121,12 +1304,14 @@ START_CONTINUE = """# 从这里开始（接续）
 这是任务 **{task}　{title}** 的{kind}（基于 {ver}，第 {round} 轮）。用来在新对话里接着做，或沙箱重置后恢复。
 
 ```bash
-mkdir -p /home/claude/work && cd /home/claude/work && rm -rf repo START_HERE.md VERSION.txt FIX.md RESULT.md
+mkdir -p /home/claude/work && cd /home/claude/work && rm -rf repo BK_RUNTIME START_HERE.md VERSION.txt FIX.md RESULT.md
 unzip -q -o "$(ls -t /mnt/user-data/uploads/{stem}*.zip | head -1)"
-cd repo && python3 tools/bk.py start {task} --resume
+cd repo && python3 ../BK_RUNTIME/bk.py start {task} --resume
 ```
 
-然后先读 `progress/reports/{task}-r{round}.md`（上一轮的交接单），再按任务简报继续。其余规则与任务包相同：只读「必读」，小步提交，`python3 tools/bk.py done` 出结果包，最后用大白话汇报。
+本包继续使用包外 `BK_RUNTIME/` 权威工具；先读其 `AGENTS.md`、`acceptance-flow.md` 和 `runtime.json`。所有 bk 命令均为 `python3 ../BK_RUNTIME/bk.py`。
+
+然后先读 `progress/reports/{task}-r{round}.md`（上一轮的交接单），再按任务简报继续。其余规则与任务包相同：只读「必读」，小步提交，`python3 ../BK_RUNTIME/bk.py done` 出结果包，最后用大白话汇报。
 """
 
 START_VERSION = """# 从这里开始
@@ -1134,13 +1319,63 @@ START_VERSION = """# 从这里开始
 这是「{project}」的版本包 **{ver}**（完整仓库，含进度与历史）。用户会告诉你要做的任务编号。
 
 ```bash
-mkdir -p /home/claude/work && cd /home/claude/work && rm -rf repo START_HERE.md VERSION.txt FIX.md
+mkdir -p /home/claude/work && cd /home/claude/work && rm -rf repo BK_RUNTIME START_HERE.md VERSION.txt FIX.md
 unzip -q -o "$(ls -t /mnt/user-data/uploads/{stem}*.zip | head -1)"
-cd repo && python3 tools/bk.py status
+cd repo && python3 ../BK_RUNTIME/bk.py status
 ```
 
-拿到任务编号后运行 `python3 tools/bk.py start <任务编号>`，之后按它打印的任务简报做，规则与任务包相同：只读「必读」，小步提交，填交接单，`python3 tools/bk.py done` 出结果包给用户下载，最后用大白话汇报。临时修复用 `python3 tools/bk.py start fix --title "一句话描述"`。
+先读包外 `BK_RUNTIME/AGENTS.md`、`BK_RUNTIME/acceptance-flow.md`，运行工具及规则摘要在 `BK_RUNTIME/runtime.json`；所有 bk 命令均走该包外入口。
+
+拿到任务编号后运行 `python3 ../BK_RUNTIME/bk.py start <任务编号>`，之后按它打印的任务简报做，规则与任务包相同：只读「必读」，小步提交，填交接单，`python3 ../BK_RUNTIME/bk.py done` 出结果包给用户下载，最后用大白话汇报。临时修复用 `python3 ../BK_RUNTIME/bk.py start fix --title "一句话描述"`。
 """
+
+
+def runtime_directory_manifest(directory: Path) -> dict:
+    manifest = load_json(directory / "runtime.json", {}) or {}
+    required = {"bk.py", "bk_acceptance.py", "AGENTS.md", "acceptance-flow.md"}
+    if manifest.get("policy_version") != acceptance.POLICY_VERSION or set(manifest.get("files", {})) != required:
+        raise BkError("包外运行时缺少当前策略及完整文件清单，保留现场并从新包 START_HERE 重新进入。")
+    for name in required:
+        path = directory / name
+        expected = manifest["files"][name]
+        if not path.is_file() or path.is_symlink() or path.stat().st_size != expected.get("size_bytes") or hashlib.sha256(path.read_bytes()).hexdigest() != expected.get("sha256"):
+            raise BkError("包外运行时文件摘要不一致：" + name)
+    return manifest
+
+
+def add_package_runtime(zf: zipfile.ZipFile, root: Path, cfg: dict) -> dict:
+    """包外携带当前驱动；协议固定权威主干，网页续包继承已核验外层。"""
+    driver = Path(__file__).resolve()
+    files = {"bk.py": driver.read_bytes(), "bk_acceptance.py": Path(acceptance.__file__).resolve().read_bytes()}
+    authority = None
+    if driver.parent.name == "BK_RUNTIME":
+        inherited = runtime_directory_manifest(driver.parent)
+        for name in ("AGENTS.md", "acceptance-flow.md"):
+            files[name] = (driver.parent / name).read_bytes()
+        source = "verified_parent_runtime"
+        authority = inherited.get("authority_commit")
+    else:
+        authority = git(root, "rev-parse", "refs/heads/" + cfg["main_branch"])
+        source = "pinned_main_protocol"
+        for name, rel in (("AGENTS.md", "AGENTS.md"), ("acceptance-flow.md", "docs/engineering/acceptance-flow.md")):
+            result = sh(["git", "show", f"{authority}:{rel}"], cwd=root, check=False)
+            if result.returncode == 0:
+                files[name] = result.stdout.encode("utf-8")
+            elif cfg.get("_acceptance_protocol_fixture") is True:
+                source = "explicit_test_fixture"
+                path = root / rel
+                files[name] = path.read_bytes() if path.is_file() else (
+                    f"# V4 测试夹具协议\n\n入口 tools/bk.py；包外执行 python3 ../BK_RUNTIME/bk.py；策略 {acceptance.POLICY_VERSION}。"
+                    "失败即停；诊断不能放行；最终完整验证；无自动续跑、合批或缩减。\n").encode("utf-8")
+            else:
+                raise BkError("权威主干缺验收协议，不能从旧任务规则静默降级出包：" + rel)
+    manifest = {"tool_version": TOOL_VERSION, "policy_version": acceptance.POLICY_VERSION,
+                "entry": "python3 ../BK_RUNTIME/bk.py", "source": source, "authority_commit": authority,
+                "files": {name: {"sha256": hashlib.sha256(data).hexdigest(), "size_bytes": len(data)} for name, data in files.items()}}
+    for name, data in files.items():
+        zf.writestr("BK_RUNTIME/" + name, data)
+    zf.writestr("BK_RUNTIME/runtime.json", json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
+    return manifest
 
 
 def make_package(root: Path, cfg: dict, kind: str, task: dict | None, rnd: int, ref: str,
@@ -1181,16 +1416,30 @@ def make_package(root: Path, cfg: dict, kind: str, task: dict | None, rnd: int, 
                 (tmp / "FIX.md").write_text(fix_text, encoding="utf-8")
             (tmp / "RECENT.md").write_text(recent_text(root, cfg, task), encoding="utf-8")
             zpath = out_dir / name
-            if zpath.exists():
-                zpath.unlink()
-            with zipfile.ZipFile(zpath, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as zf:
+            out_dir.mkdir(parents=True, exist_ok=True)
+            fd, temporary_name = tempfile.mkstemp(prefix=f".{name}.", suffix=".tmp", dir=out_dir)
+            os.close(fd)
+            staged = Path(temporary_name)
+            with zipfile.ZipFile(staged, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as zf:
                 for f in ("START_HERE.md", "VERSION.txt", "FIX.md", "RECENT.md"):
                     if (tmp / f).exists():
                         zf.write(tmp / f, f)
                 add_tree(zf, repo, "repo/", cfg["exclude"], cfg.get("keep_env_files", []))
-            size_mb = zpath.stat().st_size / 1024 / 1024
+                add_package_runtime(zf, root, cfg)
+            size_mb = staged.stat().st_size / 1024 / 1024
             if size_mb <= cfg["zip_limit_mb"]:
+                try:
+                    package_evidence = acceptance.check_zip(staged, expected_task=task["id"] if task else None,
+                                                           expected_version=base_ver, expected_baseline=base_commit)
+                    with staged.open("rb") as stream:
+                        os.fsync(stream.fileno())
+                    os.replace(staged, zpath)
+                    package_evidence["path"] = str(zpath)
+                    acceptance.atomic_json(zpath.with_suffix(zpath.suffix + ".manifest.json"), package_evidence)
+                finally:
+                    staged.unlink(missing_ok=True)
                 return zpath
+            staged.unlink(missing_ok=True)
             say(f"  包有 {size_mb:.1f} MB，超过 {cfg['zip_limit_mb']} MB，改为只带最近 1 个提交再试……")
         raise BkError(f"包仍然超过 {cfg['zip_limit_mb']} MB（claude.ai 单个文件上限 30 MB）。"
                       "请检查仓库里是否提交了大文件（截图、视频、数据集），把它们移出仓库或加入 .gitignore。")
@@ -1327,7 +1576,10 @@ def brief(root: Path, cfg: dict, task: dict, rnd: int, base_ver: str, base: str,
     else:
         L.append("【收工】python3 tools/bk.py done   （本地会跑完整验证，通过后自动并入主干、打版本号、出版本包）")
     L.append(bar)
-    return "\n".join(L)
+    result = "\n".join(L)
+    if Path(__file__).resolve().parent.name == "BK_RUNTIME":
+        result = result.replace("python3 tools/bk.py", "python3 ../BK_RUNTIME/bk.py")
+    return result
 
 
 # ───────────────────────── 命令：start / task ─────────────────────────
@@ -1346,7 +1598,10 @@ def resume_from_outputs(task_id: str) -> Path | None:
 
 def cmd_start(args) -> None:
     task_id = args.task
-    require_prerequisites(find_root(), task_id, authoritative=True)
+    initial_root = find_root()
+    if (initial_root / ".bk/pending.json").exists():
+        die("有待定收包或发布恢复，先运行 bk in --continue 或 bk in --abort；不能覆盖候选开新任务。")
+    require_prerequisites(initial_root, task_id, authoritative=True)
     if args.resume and env_kind() == "web":
         here = find_root()
         sess = load_json(here / ".bk" / "session.json", None)
@@ -1356,11 +1611,26 @@ def cmd_start(args) -> None:
         if z and not sess and cur.get("kind") in ("task", "version", "fix", None):
             say(f"· 从 {z.name} 接续（沙箱里没有进行中的会话）")
             tmp = Path(tempfile.mkdtemp(prefix="bkresume-"))
+            acceptance.check_zip(z)
             safe_extract(z, tmp)
+            restored_runtime = runtime_directory_manifest(tmp / "BK_RUNTIME")
+            active_runtime = Path(__file__).resolve().parent
+            if active_runtime.name != "BK_RUNTIME":
+                raise BkError("接续包附有权威外置工具，请从该包 START_HERE 的包外入口重新进入；尚未改动仓库。")
+            active_manifest = runtime_directory_manifest(active_runtime)
+            if restored_runtime["files"] != active_manifest["files"]:
+                raise BkError("接续包与当前包外工具或协议不同，请解压该新包按 START_HERE 重新进入；尚未改动仓库。")
             if (tmp / "repo" / ".git").exists():
                 for child in list(here.iterdir()):
+                    if child.name == ".bk":
+                        continue  # 保留正在持有的队列记录与锁inode，不能边持锁边删锁目录。
                     shutil.rmtree(child) if child.is_dir() and not child.is_symlink() else child.unlink()
                 for child in list((tmp / "repo").iterdir()):
+                    if child.name == ".bk":
+                        restored_meta = load_json(child / "package.json", None)
+                        if restored_meta:
+                            acceptance.atomic_json(here / ".bk/package.json", restored_meta)
+                        continue
                     shutil.move(str(child), str(here / child.name))
             shutil.rmtree(tmp, ignore_errors=True)
     root = find_root()
@@ -1444,12 +1714,44 @@ def cmd_task(args) -> None:
 
 # ───────────────────────── 命令：verify ─────────────────────────
 
+def cmd_acceptance(args) -> None:
+    root = find_root()
+    action = args.action
+    if action == "policy":
+        data = {"tool_version": TOOL_VERSION, "policy_version": acceptance.POLICY_VERSION,
+                "default_fail_fast": True, "full_required_for_merge": True,
+                "diagnostic_can_release": False, "unknown_flaky_blocks": True,
+                "automatic_resume": False, "batch_merge": False, "reduced_suite": False}
+    elif action == "triage":
+        if not args.log:
+            die("triage 需要 --log <日志路径>；只分类，不自动修复或放行。")
+        data = acceptance.triage(Path(args.log).read_text(encoding="utf-8", errors="replace"), args.exit_code)
+    elif action == "metrics":
+        runs = []
+        for path in sorted((root / ".bk" / "acceptance" / "runs").glob("*/summary.json")):
+            item = load_json(path, {}) or {}
+            runs.append({key: item.get(key) for key in ("run_id", "task", "queue", "mode", "status", "verdict", "level", "started_at", "finished_at", "duration_seconds")})
+            runs[-1]["stages"] = [{key: result.get(key) for key in ("name", "result", "duration_seconds", "triage", "note")} for result in item.get("results", [])]
+        data = {"policy_version": acceptance.POLICY_VERSION, "runs": runs,
+                "note": "运行时长不是任务端到端交付时长，诊断轮单独标记。"}
+    else:
+        directory = acceptance.common_repo_root(root) / ".bk" / "acceptance" / "queue"
+        queue = [load_json(path, {}) for path in sorted(directory.glob("*.json"))]
+        data = {"tool_version": TOOL_VERSION, "policy_version": acceptance.POLICY_VERSION,
+                "worktree": str(root), "pending": load_json(root / ".bk" / "pending.json", None),
+                "last_verify": load_json(root / ".bk" / "last-verify.json", None),
+                "queue": [item for item in queue if item and item.get("status") in ("waiting", "running")],
+                "queue_note": "进程身份在取队列时核实；中断遗留条目不代表活进程。"}
+    say(json.dumps(data, ensure_ascii=False, indent=2))
+
+
 def cmd_verify(args) -> None:
     root = find_root()
     cfg = load_config(root)
     level = args.level or ("web" if env_kind() == "web" else "full")
-    s = do_verify(root, cfg, level)
-    sys.exit(0 if s["verdict"] == "pass" else (3 if s["verdict"] == "env" else 1))
+    s = do_verify(root, cfg, level, diagnostic=args.diagnostic)
+    if s["verdict"] != "pass":
+        sys.exit(3 if s["verdict"] == "env" else (2 if s["verdict"] == "diagnostic" else 1))
 
 
 # ───────────────────────── 范围检查 ─────────────────────────
@@ -1558,7 +1860,7 @@ def cmd_done(args) -> None:
             summary = {"level": "full（并入主干时运行）", "verdict": "pass", "results": [], "time": now()}
         else:
             summary = do_verify(root, cfg, level)
-        if summary["verdict"] == "fail" and not args.force:
+        if summary["verdict"] != "pass" and not args.force:
             die("验证没通过：先修好再收工（或在交接单写明原因后用 --force 交出半成品，状态写 partial）。")
     if not args.checkpoint:
         data, _ = read_report(rp)
@@ -1570,6 +1872,8 @@ def cmd_done(args) -> None:
                      "changed": {"added": [f for s, f in files if s == "A"],
                                  "modified": [f for s, f in files if s in "MR"],
                                  "deleted": [f for s, f in files if s == "D"]}})
+        if summary["verdict"] != "pass":
+            data["status"] = "partial"
         write_report_data(rp, data)
         git(root, "add", "-A")
         if git(root, "status", "--porcelain"):
@@ -1592,7 +1896,10 @@ def cmd_done(args) -> None:
         tmp = Path(tempfile.mkdtemp(prefix="bkdone-"))
         try:
             z = od / name
-            with zipfile.ZipFile(z, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as zf:
+            fd, staged_name = tempfile.mkstemp(prefix=f".{name}.", suffix=".tmp", dir=od)
+            os.close(fd)
+            staged = Path(staged_name)
+            with zipfile.ZipFile(staged, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as zf:
                 zf.write(rp, "RESULT.md")
                 meta = {"kind": "checkpoint" if args.checkpoint else "result", "version": sess["version"],
                         "base": sess["base"], "task": task["id"], "title": task.get("title", ""),
@@ -1605,7 +1912,17 @@ def cmd_done(args) -> None:
                     task=task["id"], title=task.get("title", ""), kind="检查点包" if args.checkpoint else "结果包",
                     ver=sess["version"], round=sess["round"], stem=name[:-4]))
                 add_tree(zf, root, "repo/", cfg["exclude"], cfg.get("keep_env_files", []))
+                add_package_runtime(zf, root, cfg)
+            evidence = acceptance.check_zip(staged, expected_task=task["id"], expected_version=sess["version"],
+                                            expected_baseline=sess["base"])
+            with staged.open("rb") as stream:
+                os.fsync(stream.fileno())
+            os.replace(staged, z)
+            evidence["path"] = str(z)
+            acceptance.atomic_json(z.with_suffix(z.suffix + ".manifest.json"), evidence)
         finally:
+            if "staged" in locals():
+                staged.unlink(missing_ok=True)
             shutil.rmtree(tmp, ignore_errors=True)
         size = z.stat().st_size / 1024 / 1024
         say(f"\n✓ {'检查点包' if args.checkpoint else '结果包'}：{z}（{size:.1f} MB）")
@@ -1625,6 +1942,12 @@ def cmd_done(args) -> None:
 # ───────────────────────── 集成（in / 本地 done 共用） ─────────────────────────
 
 def integrate(root: Path, cfg: dict, ref: str, report_rel: str, zip_name: str | None, task: dict,
+              sess: dict, zpath: Path | None = None, resume: bool = False) -> bool:
+    with acceptance.serial_queue(root, "integrate", task=task["id"]):
+        return _integrate(root, cfg, ref, report_rel, zip_name, task, sess, zpath, resume)
+
+
+def _integrate(root: Path, cfg: dict, ref: str, report_rel: str, zip_name: str | None, task: dict,
               sess: dict, zpath: Path | None = None, resume: bool = False) -> bool:
     require_prerequisites(root, task["id"], authoritative=True)
     main = cfg["main_branch"]
@@ -1671,18 +1994,32 @@ def integrate(root: Path, cfg: dict, ref: str, report_rel: str, zip_name: str | 
             (root / "package.json").exists() and not (root / "node_modules").exists()):
         caps = {}
         ensure_deps(root, caps, force=True)
-    summary = do_verify(root, cfg, "full")
-    if summary["verdict"] == "env":
-        save_json(bkdir(root) / "pending.json", {"ref": ref, "report": report_rel, "zip": zip_name,
-                                                 "task": task["id"], "sess": sess, "merged": True,
-                                                 "zpath": str(zpath) if zpath else None})
-        say("! 被环境问题卡住了（不是代码问题）。按上面的提示处理好环境后运行：python3 tools/bk.py in --continue")
-        return False
-    if summary["verdict"] == "fail":
+    pending = {"ref": ref, "report": report_rel, "zip": zip_name, "task": task["id"],
+               "sess": sess, "merged": True, "verified": False,
+               "zpath": str(zpath) if zpath else None, "state": "verifying"}
+    acceptance.atomic_json(bkdir(root) / "pending.json", pending)
+    try:
+        summary = do_verify(root, cfg, "full")
+    except BaseException as error:
+        pending.update(state="interrupted" if isinstance(error, KeyboardInterrupt) else "error",
+                       error=f"{type(error).__name__}: {error}")
+        acceptance.atomic_json(bkdir(root) / "pending.json", pending)
+        raise
+    if summary["verdict"] != "pass":
+        failures = [r for r in summary["results"] if r["result"] in ("fail", "env")]
+        categories = {(r.get("triage") or {}).get("category", "unknown") for r in failures}
+        if not categories or not categories.issubset({"product", "test", "guard"}):
+            pending.update(state="blocked", summary=summary, categories=sorted(categories))
+            acceptance.atomic_json(bkdir(root) / "pending.json", pending)
+            say("! 本轮未放行；环境、工具、中断或原因未明，保留候选与日志，不生成产品修复包。")
+            say("  查明并恢复后运行 bk in --continue（重新完整验证）；或 bk in --abort 放弃。")
+            return False
         git(root, "checkout", "--quiet", "-f", main)
         git(root, "branch", "-D", "bk/integrate", check=False)
+        (bkdir(root) / "pending.json").unlink(missing_ok=True)
         make_fix_package(root, cfg, ref, task, sess, summary, zip_name)
         return False
+    require_verified_candidate(root, cfg, summary)
     gate = task.get("gate")
     if gate in ("look", "review"):
         save_json(bkdir(root) / "pending.json", {"ref": ref, "report": report_rel, "zip": zip_name, "task": task["id"],
@@ -1704,14 +2041,24 @@ def integrate(root: Path, cfg: dict, ref: str, report_rel: str, zip_name: str | 
 def complete_merge(root: Path, cfg: dict, ref: str, report_rel: str, summary: dict, task: dict, sess: dict,
                    zip_name: str | None, zpath: Path | None) -> None:
     require_prerequisites(root, task["id"], authoritative=True)  # 最终合并前再查，防凭据过期
+    require_verified_candidate(root, cfg, summary)
     main = cfg["main_branch"]
     git(root, "checkout", "--quiet", main)
     git(root, "merge", "--quiet", "--ff-only", "bk/integrate")
     git(root, "branch", "-D", "bk/integrate", check=False)
     if ref.startswith("task/"):
         git(root, "branch", "-d", ref, check=False)
-    (bkdir(root) / "pending.json").unlink(missing_ok=True)
-    finalize(root, cfg, report_rel, summary, task, sess, zip_name, zpath)
+    release_pending = {"state": "finalizing", "merged_to_main": True, "candidate_commit": summary["identity"]["head"],
+                       "ref": ref, "report": report_rel, "summary": summary, "task": task["id"], "sess": sess,
+                       "zip": zip_name, "zpath": str(zpath) if zpath else None}
+    acceptance.atomic_json(bkdir(root) / "pending.json", release_pending)
+    try:
+        finalize(root, cfg, report_rel, summary, task, sess, zip_name, zpath)
+    except BaseException as error:
+        retained = load_json(bkdir(root) / "pending.json", release_pending) or release_pending
+        retained.update(error=f"{type(error).__name__}: {error}")
+        acceptance.atomic_json(bkdir(root) / "pending.json", retained)
+        raise
 
 
 def make_fix_package(root: Path, cfg: dict, ref: str, task: dict, sess: dict, summary: dict, zip_name: str | None,
@@ -1766,6 +2113,10 @@ def bump_page(cur: str, new: str) -> str:
 def finalize(root: Path, cfg: dict, report_rel: str, summary: dict, task: dict, sess: dict,
              zip_name: str | None, zpath: Path | None) -> None:
     data, text = read_report(root / report_rel)
+    data.update(checks={item["name"]: item["result"] for item in summary["results"]}, verify_level=summary["level"],
+                verification={"run_id": summary["run_id"], "policy_version": summary["policy_version"],
+                              "summary": f".bk/acceptance/runs/{summary['run_id']}/summary.json"})
+    write_report_data(root / report_rel, data)
     newv = current_version(root) + 1
     vs = vstr(newv)
     # 任务
@@ -1826,19 +2177,12 @@ def finalize(root: Path, cfg: dict, report_rel: str, summary: dict, task: dict, 
     inflight = load_json(bkdir(root) / "inflight.json", {}) or {}
     inflight.pop(task["id"], None)
     save_json(bkdir(root) / "inflight.json", inflight)
-    snap = make_package(root, cfg, "version", None, 0, cfg["main_branch"], git(root, "rev-parse", "HEAD"), vs,
-                        handoff(root, cfg, "versions"), f"bk-{vs}.zip")
-    if zpath and zpath.exists():
-        dest = handoff(root, cfg, "applied") / zpath.name
-        try:
-            shutil.move(str(zpath), str(dest))
-        except OSError:
-            pass
-    sess_file = bkdir(root) / "session.json"
-    if sess_file.exists():
-        s = load_json(sess_file, {})
-        if s.get("task") == task["id"]:
-            sess_file.unlink()
+    pending_release = load_json(bkdir(root) / "pending.json", {}) or {}
+    pending_release.update(state="release_pending", merged_to_main=True, release_version=vs,
+                           release_commit=git(root, "rev-parse", "HEAD"), task=task["id"], sess=sess,
+                           summary=summary, zip=zip_name, zpath=str(zpath) if zpath else None)
+    acceptance.atomic_json(bkdir(root) / "pending.json", pending_release)
+    snap = finish_release_package(root, cfg, pending_release)
     # 汇报
     say("")
     say(f"✓ 已并入主干，新版本 {vs}（{zip_name or '本地任务'}）")
@@ -1870,6 +2214,34 @@ def finalize(root: Path, cfg: dict, report_rel: str, summary: dict, task: dict, 
     say("  看效果：python3 tools/bk.py run    上传 GitHub：python3 tools/bk.py ship")
 
 
+
+def finish_release_package(root: Path, cfg: dict, pending: dict) -> Path:
+    """主干已完成后只恢复同一版本的制品，不重复合并、记进度或递增版本。"""
+    commit, version = pending["release_commit"], pending["release_version"]
+    if current_branch(root) != cfg["main_branch"] or not worktree_clean(root) or git(root, "rev-parse", "HEAD") != commit:
+        raise BkError("制品恢复要求主干干净且仍为记录的发布提交；先核查，不自动回滚。")
+    if git(root, "rev-parse", f"bk-{version}^{{}}", check=False) != commit:
+        raise BkError("制品恢复时版本标签不一致，停止并核查。")
+    snap = make_package(root, cfg, "version", None, 0, cfg["main_branch"], commit, version,
+                        handoff(root, cfg, "versions"), f"bk-{version}.zip")
+    summary = pending.get("summary", {})
+    acceptance.atomic_json(bkdir(root) / "last-release.json", {
+        "version": version, "candidate_run_id": summary.get("run_id"),
+        "candidate_identity": summary.get("identity"), "release_commit": commit,
+        "package": str(snap), "package_sha256": hashlib.sha256(snap.read_bytes()).hexdigest(),
+        "time": dt.datetime.now(dt.timezone.utc).isoformat(), "remote_verified": False})
+    zpath = Path(pending["zpath"]) if pending.get("zpath") else None
+    if zpath and zpath.exists():
+        dest = handoff(root, cfg, "applied") / zpath.name
+        if not dest.exists():
+            shutil.move(str(zpath), str(dest))
+    sess_file = bkdir(root) / "session.json"
+    if sess_file.exists() and (load_json(sess_file, {}) or {}).get("task") == pending.get("task"):
+        sess_file.unlink()
+    (bkdir(root) / "pending.json").unlink(missing_ok=True)
+    return snap
+
+
 # ───────────────────────── 命令：in ─────────────────────────
 
 def inbox_dirs(root: Path, cfg: dict) -> list[Path]:
@@ -1899,6 +2271,9 @@ def cmd_in(args) -> None:
     root = find_root()
     cfg = load_config(root)
     if args.abort:
+        pending = load_json(bkdir(root) / "pending.json", {}) or {}
+        if pending.get("merged_to_main"):
+            die("该候选已并入主干，不能当作未合入任务放弃；使用 bk in --continue 恢复制品或先核查。")
         sh(["git", "merge", "--abort"], cwd=root, check=False)
         git(root, "checkout", "--quiet", "-f", cfg["main_branch"])
         git(root, "branch", "-D", "bk/integrate", check=False)
@@ -1921,11 +2296,29 @@ def cmd_in(args) -> None:
         p = load_json(bkdir(root) / "pending.json", None)
         if not p:
             die("没有待继续的收包。")
+        if p.get("state") == "release_pending":
+            snap = finish_release_package(root, cfg, p)
+            say(f"✓ 已恢复同一版本制品：{win_path(snap)}；接着 bk ship 核对远端。")
+            return
+        if p.get("merged_to_main"):
+            if p.get("state") == "finalizing" and worktree_clean(root) and git(root, "rev-parse", "HEAD") == p.get("candidate_commit"):
+                task = get_task(root, cfg, p["task"], p["sess"].get("title", ""))
+                finalize(root, cfg, p["report"], p["summary"], task, p["sess"], p.get("zip"),
+                         Path(p["zpath"]) if p.get("zpath") else None)
+                return
+            die("主干已经推进，且进度收尾状态需要核查；保留现场，不能重复合入或递增版本。")
         if p.get("verified"):
             task = get_task(root, cfg, p["task"], p["sess"].get("title", ""))
-            complete_merge(root, cfg, p["ref"], p["report"], p.get("summary") or {"results": []}, task, p["sess"],
-                           p.get("zip"), Path(p["zpath"]) if p.get("zpath") else None)
-            return
+            try:
+                require_verified_candidate(root, cfg, p.get("summary") or {})
+            except (BkError, acceptance.AcceptanceError) as error:
+                p.update(verified=False, state="evidence_invalid", invalidation_reason=str(error))
+                acceptance.atomic_json(bkdir(root) / "pending.json", p)
+                say("! 原放行证据已失效；保留旧日志，重新完整验证，并再次执行原复核闸门。")
+            else:
+                complete_merge(root, cfg, p["ref"], p["report"], p["summary"], task, p["sess"],
+                               p.get("zip"), Path(p["zpath"]) if p.get("zpath") else None)
+                return
         if git(root, "diff", "--name-only", "--diff-filter=U", check=False):
             die("还有没解决的冲突文件（git status 查看）。")
         if git(root, "status", "--porcelain"):
@@ -1991,6 +2384,7 @@ def apply_zip(root: Path, cfg: dict, z: Path) -> bool:
     if "-ckpt" in z.name:
         say(f"跳过检查点包 {z.name}（只用于网页端接续）")
         return True
+    acceptance.check_zip(z)
     say(f"· 收包：{z.name}")
     tmp = bkdir(root, "inbox") / z.stem
     if tmp.exists():
@@ -2429,8 +2823,8 @@ def cmd_run(args) -> None:
     if args.fg:
         show_urls()
         say("停止：按 Ctrl+C")
-        os.chdir(root)
-        os.execvp("bash", ["bash", "-lc", cmd])
+        # 在队列内完成启动，主入口释放启动锁后才等待，避免前台预览永久占锁。
+        return subprocess.Popen(["bash", "-lc", cmd], cwd=root, start_new_session=True)
     log = bkdir(root, "logs") / "dev.log"
     proc = subprocess.Popen(["bash", "-lc", cmd], cwd=root, stdout=open(log, "w"), stderr=subprocess.STDOUT,
                             start_new_session=True)
@@ -2453,15 +2847,48 @@ def cmd_ship(args) -> None:
     root = find_root()
     cfg = load_config(root)
     if not git(root, "remote", check=False):
-        die("还没有连 GitHub：先在 GitHub 网页上建一个私有仓库，然后运行\n"
-            "  git remote add origin git@github.com:<你的账号>/exam-prep.git\n（或用 https 地址）再 bk ship。")
+        die("还没有连 GitHub：先配置 origin，再 bk ship。")
     if current_branch(root) != cfg["main_branch"]:
         die(f"请在 {cfg['main_branch']} 分支上运行。")
-    r = sh(["git", "push", "origin", cfg["main_branch"], "--follow-tags"], cwd=root, check=False)
+    if not worktree_clean(root) or (bkdir(root) / "pending.json").exists():
+        die("有未提交改动或待定收包，不能发布。")
+    branch = cfg["main_branch"]
+    head = git(root, "rev-parse", "HEAD")
+    tag = "bk-" + vstr(current_version(root))
+    tag_ref = git(root, "rev-parse", "--verify", f"refs/tags/{tag}", check=False)
+    if not tag_ref or git(root, "rev-parse", f"{tag}^{{}}") != head:
+        die("当前版本标签未指向待发布提交，不能发布。")
+    version = vstr(current_version(root))
+    release = load_json(bkdir(root) / "last-release.json", {}) or {}
+    matching = release.get("release_commit") == head and release.get("version") == version and release.get("package")
+    package = Path(release["package"]) if matching else handoff(root, cfg, "versions") / f"bk-{version}.zip"
+    package_evidence = acceptance.check_zip(package, expected_version=version, expected_baseline=head)
+    if package_evidence["metadata"].get("kind") != "version" or package_evidence["metadata"].get("task") is not None:
+        die("发布制品不是当前正式版本包，不能推送。")
+    digest = hashlib.sha256(package.read_bytes()).hexdigest()
+    if matching and digest != release.get("package_sha256"):
+        die("版本包与发布记录不一致，不能推送。")
+    if not matching:
+        release = {"version": version, "release_commit": head, "package": str(package), "package_sha256": digest,
+                   "receipt_recovered": True, "time": dt.datetime.now(dt.timezone.utc).isoformat()}
+    release["remote_verified"] = False
+    acceptance.atomic_json(bkdir(root) / "last-release.json", release)
+    # 不强推，只推此次分支与版本标签，避免把无关本地标签一并上传。
+    r = sh(["git", "push", "--atomic", "origin", f"HEAD:refs/heads/{branch}", f"refs/tags/{tag}:refs/tags/{tag}"],
+           cwd=root, check=False)
     if r.returncode != 0:
-        die("推送失败：\n" + tail(r.stderr, 15))
-    sh(["git", "push", "origin", "--tags"], cwd=root, check=False)
-    say(f"✓ 已推送到 GitHub（{vstr(current_version(root))}）。在仓库的 Actions 页能看到自动检查结果。")
+        die("推送失败，保留本地版本和制品，核查远端后重试：\n" + tail(r.stderr, 15))
+    remote = sh(["git", "ls-remote", "origin", f"refs/heads/{branch}", f"refs/tags/{tag}", f"refs/tags/{tag}^{{}}"],
+                cwd=root, check=False)
+    if remote.returncode != 0:
+        die("推送后无法核对远端引用；尚未确认发布完成。")
+    refs = {line.split()[1]: line.split()[0] for line in remote.stdout.splitlines() if len(line.split()) == 2}
+    if refs.get(f"refs/heads/{branch}") != head or refs.get(f"refs/tags/{tag}") != tag_ref or refs.get(f"refs/tags/{tag}^{{}}", refs.get(f"refs/tags/{tag}")) != head:
+        die("远端分支或版本标签与本地不一致；停止发布并核查，不自动回滚。")
+    release.update(release_commit=head, version=vstr(current_version(root)), remote_verified=True,
+                   remote_verified_at=dt.datetime.now(dt.timezone.utc).isoformat())
+    acceptance.atomic_json(bkdir(root) / "last-release.json", release)
+    say(f"✓ 已推送并核对 GitHub 分支与标签（{release['version']}）。Actions 结果按现有 CI 规则处理。")
 
 
 def cmd_init(args) -> None:
@@ -2733,7 +3160,9 @@ def cmd_selftest(args) -> None:
     (tmp / "downloads").mkdir()
 
     def run(args_, cwd, env=None, expect=0):
-        r = subprocess.run([py, "tools/bk.py", *args_], cwd=cwd, capture_output=True, text=True, env=env or base_env)
+        runtime = Path(cwd).parent / "BK_RUNTIME/bk.py"
+        driver = str(runtime) if runtime.is_file() else "tools/bk.py"
+        r = subprocess.run([py, driver, *args_], cwd=cwd, capture_output=True, text=True, env=env or base_env)
         if r.returncode != expect:
             print(r.stdout[-3000:], r.stderr[-3000:])
             raise SystemExit(f"自检失败：bk {' '.join(args_)} 返回 {r.returncode}，期望 {expect}")
@@ -2745,8 +3174,9 @@ def cmd_selftest(args) -> None:
     try:
         (hub / "tools").mkdir()
         shutil.copy2(me, hub / "tools" / "bk.py")
+        shutil.copy2(me.with_name("bk_acceptance.py"), hub / "tools" / "bk_acceptance.py")
         save_json(hub / "tools" / "bk.config.json", {
-            "project": "自检项目", "pack_depth": 1,
+            "project": "自检项目", "pack_depth": 1, "_acceptance_protocol_fixture": True,
             "verify": {"quick": ["cmd:python3 -c pass"], "web": ["cmd:python3 -c pass"], "full": ["cmd:python3 check.py"]},
             "kinds": {"page": {"owns": ["app/{page}/**"], "reads": ["AGENTS.md"], "accept": ["页面 {page} 能显示"]}}})
         save_json(hub / "progress" / "tasks.json", {"tasks": [
@@ -2756,8 +3186,8 @@ def cmd_selftest(args) -> None:
             {"id": "B09", "title": "后端示例", "stage": 2, "level": "A", "tool": "claude", "kind": "backend", "rule": "demo-rule", "deps": [], "status": "todo", "owns": ["**"]}]})
         save_json(hub / "progress" / "pages.json", {"pages": [{"id": "S01", "name": "一", "status": "todo"},
                                                               {"id": "S02", "name": "二", "status": "todo"}]})
-        (hub / "AGENTS.md").write_text("# 自检\n", encoding="utf-8")
-        (hub / "check.py").write_text("import os, sys\nsys.exit(1 if os.path.exists('FAIL') else 0)\n", encoding="utf-8")
+        (hub / "AGENTS.md").write_text("# 自检 V4；入口 tools/bk.py\n", encoding="utf-8")
+        (hub / "check.py").write_text("import os\nassert not os.path.exists('FAIL'), '自检产品断言失败'\n", encoding="utf-8")
         (hub / "tests").mkdir()
         (hub / "tests" / "sample.test.ts").write_text("test('a', () => {})\n", encoding="utf-8")
         (hub / "docs" / "baseline" / "rule-cards").mkdir(parents=True)
@@ -2772,7 +3202,7 @@ def cmd_selftest(args) -> None:
             p = hub / rel
             p.parent.mkdir(parents=True, exist_ok=True)
             p.write_text(content, encoding="utf-8")
-        (hub / ".gitignore").write_text("generated/\n", encoding="utf-8")
+        (hub / ".gitignore").write_text("generated/\n__pycache__/\n*.pyc\n", encoding="utf-8")
         (hub / "scripts").mkdir()
         (hub / "scripts" / "spec_tool.py").write_text("print('v3-reference')\n", encoding="utf-8")
         g("init", "-q", "-b", "main")
@@ -2786,6 +3216,56 @@ def cmd_selftest(args) -> None:
         g("commit", "-q", "-m", "移走旧流程")
         run(["init"], hub)
         assert g("tag", "-l", "bk-v0001") == "bk-v0001"
+        # 老任务Git树保留旧工具；新发修复包通过外置运行时接入当前策略。
+        g("checkout", "-q", "-b", "legacy-runtime-fixture")
+        (hub / "tools/bk.py").write_text('TOOL_VERSION = "4.0.0"\nraise SystemExit("旧工具不应执行")\n')
+        g("rm", "-q", "tools/bk_acceptance.py")
+        old_cfg = load_config(hub)
+        old_cfg["verify"]["full"] = ["cmd:python3 legacy-check.py", "cmd:python3 legacy-after.py"]
+        save_json(hub / "tools/bk.config.json", old_cfg)
+        (hub / "legacy-check.py").write_text("raise AssertionError('旧候选失败')\n")
+        (hub / "legacy-after.py").write_text("from pathlib import Path\nPath('.bk/legacy-second').touch()\n")
+        g("add", "-A")
+        g("commit", "-q", "-m", "旧运行工具夹具")
+        old_head = g("rev-parse", "HEAD")
+        g("checkout", "-q", "main")
+        runtime_task = task_map(tasks_doc(hub))["U01"]
+        old_pack = make_package(hub, load_config(hub), "fix", runtime_task, 1, old_head, old_head, "v0001",
+                                hub / ".bk/old-runtime", "bk-v0001-U01-r1-fix.zip", branch="task/U01-r1")
+        legacy_home = tmp / "legacy-runtime"
+        safe_extract(old_pack, legacy_home)
+        old_repo = legacy_home / "repo"
+        assert g("rev-parse", "HEAD", cwd=old_repo) == old_head and not g("status", "--porcelain", cwd=old_repo)
+        assert '旧工具不应执行' in (old_repo / "tools/bk.py").read_text()
+        run(["verify", "--level", "full"], old_repo, expect=1)
+        old_summary = load_json(old_repo / ".bk/last-verify.json")
+        assert [item["result"] for item in old_summary["results"]] == ["fail", "not_run"]
+        assert not (old_repo / ".bk/legacy-second").exists(), "外置入口必须真正失败即停"
+        legacy_outputs = tmp / "legacy-outputs"
+        legacy_env = dict(base_env, BK_ENV="web", BK_OUTPUTS=str(legacy_outputs), BK_UPLOADS=str(old_pack.parent))
+        run(["start", "U01", "--no-install"], old_repo, legacy_env)
+        legacy_report = report_path(old_repo, "U01", 1)
+        content = legacy_report.read_text()
+        for sec in ("一句话", "怎么看效果", "做了什么"):
+            content = re.sub(rf"(## {sec}\s*\n)（待填[^\n]*）", rf"\1旧分支：{sec}", content)
+        legacy_report.write_text(content)
+        run(["done", "--checkpoint"], old_repo, legacy_env)
+        checkpoint = legacy_outputs / "bk-v0001-U01-r1-ckpt.zip"
+        checkpoint_home = tmp / "legacy-checkpoint"
+        safe_extract(checkpoint, checkpoint_home)
+        runtime_directory_manifest(checkpoint_home / "BK_RUNTIME")
+        resume_home = tmp / "legacy-resume-from-original"
+        safe_extract(old_pack, resume_home)
+        run(["start", "U01", "--resume", "--no-install"], resume_home / "repo", legacy_env)
+        assert (resume_home / "repo/progress/reports/U01-r1.md").read_text() == legacy_report.read_text(), "原始包应能就地采用检查点且保留相符运行时"
+        run(["done"], resume_home / "repo", legacy_env)
+        result = legacy_outputs / "bk-v0001-U01-r1-done.zip"
+        result_home = tmp / "legacy-result"
+        safe_extract(result, result_home)
+        run(["start", "U01", "--resume", "--no-install"], result_home / "repo", legacy_env)
+        assert '旧工具不应执行' in (result_home / "repo/tools/bk.py").read_text(), "接续不得向旧任务树注入共享工具"
+        runtime_directory_manifest(result_home / "BK_RUNTIME")
+        say("✓ 旧ref工具保留、包外failfast、网页开工/检查点/结果包接续自检通过。")
         # 两个并行任务包
         run(["pack", "U01"], hub)
         run(["pack", "U02"], hub)
@@ -2798,6 +3278,8 @@ def cmd_selftest(args) -> None:
             check_dir = tmp / f"check-normal-{label}"
             safe_extract(zpath, check_dir)
             check_repo = check_dir / "repo"
+            runtime_directory_manifest(check_dir / "BK_RUNTIME")
+            assert "python3 ../BK_RUNTIME/bk.py" in (check_dir / "START_HERE.md").read_text()
             meta = load_json(check_repo / ".bk" / "package.json")
             assert g("tag", "-l", "v3-final", cwd=check_repo) == "", "普通包不应携带 V3 标签"
             assert (check_repo / ".git" / "shallow").is_file(), "普通包应保留浅克隆"
@@ -2902,6 +3384,7 @@ def cmd_selftest(args) -> None:
                 with zipfile.ZipFile(tmp / "downloads" / f"bk-v0001-{task}-r1-{suffix}.zip") as zf:
                     for rel, content in generated_files.items():
                         assert zf.read("repo/" + rel).decode("utf-8") == content
+                    assert {"BK_RUNTIME/bk.py", "BK_RUNTIME/bk_acceptance.py", "BK_RUNTIME/runtime.json"}.issubset(zf.namelist())
                     generated_names = {n for n in zf.namelist() if "/generated/" in n}
                     assert generated_names == {"repo/" + rel for rel in generated_files}, "结果包或检查点混入未跟踪的生成物"
             return repo
@@ -2911,6 +3394,7 @@ def cmd_selftest(args) -> None:
             names = zf.namelist()
         assert not any("node_modules" in n or n.endswith("/.env") for n in names), "结果包里混进了 node_modules 或 .env"
         assert "repo/.bk/package.json" in names and "RESULT.md" in names
+        assert {"BK_RUNTIME/bk.py", "BK_RUNTIME/bk_acceptance.py", "BK_RUNTIME/runtime.json", "BK_RUNTIME/AGENTS.md", "BK_RUNTIME/acceptance-flow.md"}.issubset(names), "结果包必须携带权威运行时"
         time.sleep(1.1)
         r2 = web_session("bk-v0001-U02.zip", "U02", {"app/S02/index.ts": "export const b = 2;\n"}, fail=True)
         # 先收 U01（取最早的一个）
@@ -2918,6 +3402,9 @@ def cmd_selftest(args) -> None:
         out = run(["in", str(z1)], hub)
         assert "v0002" in out, out
         assert (hub / "app" / "S01" / "index.ts").exists()
+        merged_report, _ = read_report(hub / "progress/reports/U01-r1.md")
+        assert merged_report["verify_level"] == "full" and merged_report["checks"], "正式full结果必须回填既有交接单"
+        assert merged_report["verification"]["run_id"] and merged_report["verification"]["policy_version"] == acceptance.POLICY_VERSION
         # 收 U02：网页端验证被跳过时 FAIL 文件会让本地验证失败 → 出修复包
         z2 = tmp / "downloads" / "bk-v0001-U02-r1-done.zip"
         assert z2.exists(), "U02 结果包没生成"
@@ -3046,7 +3533,13 @@ def main() -> None:
     s.set_defaults(fn=cmd_prereq)
     s = sub.add_parser("verify", help="跑检查：quick / web / full")
     s.add_argument("--level", choices=["quick", "web", "full"])
+    s.add_argument("--diagnostic", action="store_true", help="收集失败线索，结果不能用于正式放行")
     s.set_defaults(fn=cmd_verify)
+    s = sub.add_parser("acceptance", help="查看验收策略、运行状态、计时和失败分类")
+    s.add_argument("action", choices=["status", "policy", "metrics", "triage"], nargs="?", default="status")
+    s.add_argument("--log", default="")
+    s.add_argument("--exit-code", type=int, default=None)
+    s.set_defaults(fn=cmd_acceptance)
     s = sub.add_parser("done", help="收工")
     s.add_argument("--checkpoint", action="store_true", help="只出检查点包")
     s.add_argument("--allow-hot", nargs="?", const="未写理由", default=None, help="确需改热点文件时写理由")
@@ -3103,8 +3596,24 @@ def main() -> None:
     s.set_defaults(fn=cmd_selftest)
     args = ap.parse_args()
     try:
-        args.fn(args)
-    except BkError as e:
+        mutations = {"verify", "in", "done", "pack", "ship", "start", "confirm", "answer", "accept", "board", "init", "proto", "run"}
+        needs_queue = args.cmd in mutations or (args.cmd == "prereq" and bool(args.accept))
+        if needs_queue:
+            root = find_root()
+            with acceptance.serial_queue(root, args.cmd):
+                foreground = args.fn(args)
+            if args.cmd == "run" and isinstance(foreground, subprocess.Popen):
+                try:
+                    code = foreground.wait()
+                except KeyboardInterrupt:
+                    os.killpg(foreground.pid, signal.SIGINT)
+                    foreground.wait()
+                    raise
+                if code:
+                    sys.exit(code)
+        else:
+            args.fn(args)
+    except (BkError, acceptance.AcceptanceError) as e:
         die(str(e))
     except subprocess.TimeoutExpired as e:
         die(f"命令超时：{e}")
