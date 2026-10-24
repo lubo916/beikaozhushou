@@ -111,6 +111,7 @@ function TrainingHome({ data, stale, retry }: { data: S21OralTrainingHome; stale
         meta={
           <>
             <Tag tone="brand">{t(`header.${activeLabel}`)}</Tag>
+            <Tag tone="outline">{t("header.extension")}</Tag>
             <Tag tone="outline">{t("header.preview")}</Tag>
             {data.data_source === "sample" && <Tag tone="warning">{t("sample")}</Tag>}
           </>

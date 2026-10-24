@@ -154,6 +154,7 @@ describe("S21 真实页面链路", () => {
     try {
       await settle(() => host.querySelector('[data-testid="s21-home"]') !== null);
       expect(heading(host)).toBe(copy.title);
+      expect(host.textContent).toContain("扩展包");
       for (const title of [copy.assessment.title, copy.transcript.title, copy.reconstruction.title, copy.privacy.title])
         expect(host.textContent).toContain(title);
       await click(button(host, copy.header.start));

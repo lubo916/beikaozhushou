@@ -8,6 +8,7 @@
     "manual": "已手动开启",
     "disabled": "当前考试尚未开启",
     "exam": "当前目标：{{exam}}",
+    "extension": "扩展包",
     "preview": "简版预览"
   },
   "activation": {
