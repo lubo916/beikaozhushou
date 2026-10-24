@@ -44,7 +44,12 @@ export default defineConfig({
         test: {
           name: "browser",
           include: ["apps/{learner,org,admin}/src/**/*.test.tsx", "packages/ui/src/**/*.test.tsx"],
-          browser: { enabled: true, headless: true, provider: playwright(), instances: [{ browser: "chromium" }] },
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright({ launchOptions: { channel: "chromium" } }),
+            instances: [{ browser: "chromium" }],
+          },
         },
       },
     ],

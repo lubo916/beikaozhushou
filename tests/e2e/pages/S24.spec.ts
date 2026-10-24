@@ -1,5 +1,6 @@
-import type { QueryClient } from "@tanstack/react-query";
-import type { S24Progress } from "@exam-prep/contract";
+import type { queryClient } from "../../../apps/learner/src/api/query-client.ts";
+import type { S24Progress } from "../../../packages/contract/src/generated/api/endpoints.schemas.ts";
+type QueryClient = typeof queryClient;
 import { createServer, request as httpRequest, type ClientRequest, type IncomingMessage, type ServerResponse } from "node:http";
 import type { Socket } from "node:net";
 // S24 的页面冒烟：直接打开四个视图，核对三档布局、七态、四种考试及核心按钮。
@@ -424,7 +425,9 @@ interface S24SchemaGateProxy {
 }
 
 function s24Error(stage: string, error: unknown): S24ProxyError {
-  return error instanceof Error ? { stage, message: error.message, stack: error.stack } : { stage, message: String(error) };
+  return error instanceof Error
+    ? { stage, message: error.message, ...(error.stack === undefined ? {} : { stack: error.stack }) }
+    : { stage, message: String(error) };
 }
 
 /**
@@ -935,6 +938,11 @@ test("S24 出错态不等待离线缓存校验模块", async ({ page, context, b
               message: "释放后校验模块必须真实返回200且响应体完成，才能确认后台预热恢复",
             })
             .toBe(true);
+          // 顶层200/body完成后，传递依赖（如zod）还可能在途；同一import完整求值后才能关闭代理。
+          await page.evaluate(async (path) => {
+            await import(path);
+          }, S24_PROXY_SCHEMA_PATH);
+          event("schema-module-evaluated");
           expect(probe.errors, "代理运行错误必须为空").toEqual([]);
           probe.normalRestored = true;
           event("normal-restored");
