@@ -993,8 +993,8 @@
         0
       ],
       "extension": false,
-      "status": "shell",
-      "updated": "v0012"
+      "status": "ui",
+      "updated": "v0050"
     },
     {
       "id": "P06",
@@ -1010,8 +1010,8 @@
         0
       ],
       "extension": false,
-      "status": "shell",
-      "updated": "v0012"
+      "status": "ui",
+      "updated": "v0050"
     },
     {
       "id": "P07",
