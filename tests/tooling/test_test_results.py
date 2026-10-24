@@ -20,6 +20,14 @@ class TestResultsTest(unittest.TestCase):
                           ("apps/api/src/broken.test.ts：测试文件未能运行", "failed")])
         self.assertEqual(recs[0]["file"], "apps/api/src/app.test.ts")
 
+    def test_vitest_file_never_ran(self):
+        """浏览器连接中断后未执行的文件：Vitest JSON 记 passed 但没有断言，也要记为未能运行"""
+        data = {"testResults": [{"name": str(ROOT / "apps/learner/src/pages/S30/S30.test.tsx"), "status": "passed",
+                                 "message": "", "startTime": 1, "endTime": 1, "assertionResults": []}]}
+        recs = results.vitest_records(data, ROOT)
+        self.assertEqual([(r["title"], r["status"]) for r in recs],
+                         [("apps/learner/src/pages/S30/S30.test.tsx：测试文件未能运行", "failed")])
+
     def test_playwright(self):
         """Playwright 的 JSON 结果按套件、用例与浏览器项目记入"""
         data = {"suites": [{"title": "smoke/learner.spec.ts", "file": "smoke/learner.spec.ts", "specs": [], "suites": [

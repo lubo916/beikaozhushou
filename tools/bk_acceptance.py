@@ -238,7 +238,7 @@ def triage(output, returncode=None):
          "Explicit report/controller failure"),
         ("guard", ("禁止零值", "零值类名", "zero-value class", "no-restricted-imports"),
          "Explicit guard failure"),
-        ("test", ("assertionerror", "expect(received)", "expected:", "assert " ),
+        ("test", ("assertionerror", "expect(received)", "expected:"),
          "Explicit assertion failure; product versus test error still needs diagnosis"),
     ]
     # Process signals, broad timeouts and a passing retry are not environment diagnoses.

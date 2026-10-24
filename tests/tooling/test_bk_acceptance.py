@@ -140,6 +140,16 @@ class AcceptanceTests(unittest.TestCase):
         self.assertEqual(acceptance.triage("JSONDecodeError: malformed report", 1)["category"], "report")
         self.assertEqual(acceptance.triage("AssertionError: actual != expected", 1)["category"], "test")
 
+    def test_triage_ignores_react_act_warning_comment(self):
+        """React act() 警告正文里的 /* assert on the output */ 不是断言失败（U24 浏览器断连日志曾被误标）"""
+        output = ("An update to Probe inside a test was not wrapped in act(...).\n/* assert on the output */\n"
+                  "Error: [vitest] Browser connection was closed while running tests. Was the page closed unexpectedly?\n"
+                  "Caused by: Error: [birpc] rpc is closed, cannot call \"createTesters\"\n")
+        classified = acceptance.triage(output, 1)
+        self.assertEqual(classified["category"], "unknown")
+        self.assertFalse(classified["auto_retry"])
+        self.assertFalse(classified["can_release"])
+
     def make_zip(self, path, *, tool="4.1.1", task="U01"):
         meta = {"kind": "task", "tool": tool, "version": "v0052", "base": "a" * 40, "task": task}
         with zipfile.ZipFile(path, "w") as archive:
