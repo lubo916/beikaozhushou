@@ -125,7 +125,7 @@ export function RedemptionCard({ data, offline }: { data: S31Membership; offline
         <label className="flex flex-col gap-2 text-small">
           {t("redemption.label")}
           <input
-            className="min-w-0 rounded-sm border border-line-strong bg-bg-surface p-2 text-body"
+            className="min-w-[0] rounded-sm border border-line-strong bg-bg-surface p-2 text-body"
             value={code}
             onChange={(event) => setCode(event.target.value)}
             placeholder={t("redemption.placeholder")}
@@ -155,7 +155,7 @@ export function ReminderCard({ data }: { data: S31Membership }) {
       {/* feat:S31-19 自动续费改称“将自动续期”，最后一档说明到期后保留的权益。 */}
       <ul className="flex flex-col gap-3">
         {data.reminders.map((item) => (
-          <li key={item.kind + item.at} className="border-b border-line-soft pb-3 last:border-b-0 last:pb-0">
+          <li key={item.kind + item.at} className="border-b border-line-soft pb-3 last:border-b-0 last:pb-[0]">
             <p className="text-small font-medium">{t(`reminders.${item.kind}`, { days: formatCount(item.days_before) })}</p>
             <p className="mt-1 text-small text-ink-tertiary">
               {t("reminders.at", { date: formatDateTime(item.at, data.time_zone, { year: true }) })}

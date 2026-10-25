@@ -40,7 +40,7 @@ export function OrdersCard({ data, offline }: { data: S31Membership; offline: bo
         )}
         <ul className="flex flex-col gap-4">
           {data.orders.map((order) => (
-            <li key={order.id} className="min-w-0 border-b border-line-soft pb-4 last:border-b-0 last:pb-0">
+            <li key={order.id} className="min-w-[0] border-b border-line-soft pb-4 last:border-b-0 last:pb-[0]">
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <h3 className="font-medium">{order.product}</h3>
                 <Tag size="sm" tone={order.status === "paid" ? "success" : "neutral"}>
@@ -189,7 +189,7 @@ export function PaymentCard({ data, offline }: { data: S31Membership; offline: b
       <label className="flex flex-col gap-2 text-small">
         {t("payment.reason")}
         <select
-          className="min-w-0 rounded-sm border border-line-strong bg-bg-surface p-2"
+          className="min-w-[0] rounded-sm border border-line-strong bg-bg-surface p-2"
           value={reason}
           onChange={(event) => setReason(event.target.value as typeof reason)}
         >

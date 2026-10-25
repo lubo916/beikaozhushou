@@ -18,8 +18,8 @@ export function PurchaseCard({ data, offline }: { data: S31Membership; offline: 
     <>
       {/* feat:S31-03 两种买法与互转；不发起真实支付。 */}
       <Card title={t("purchase.title")}>
-        <div className="grid min-w-0 gap-3 @tablet:grid-cols-2">
-          <section className="flex min-w-0 flex-col gap-3 rounded-md border border-line-strong p-4">
+        <div className="grid min-w-[0] gap-3 @tablet:grid-cols-2">
+          <section className="flex min-w-[0] flex-col gap-3 rounded-md border border-line-strong p-4">
             <h3 className="font-medium">{t("purchase.pass")}</h3>
             <p className="font-serif text-title text-brand-primary">{purchase.pass.price_text}</p>
             <p className="text-small text-ink-secondary">{t("purchase.pass_body")}</p>
@@ -30,7 +30,7 @@ export function PurchaseCard({ data, offline }: { data: S31Membership; offline: 
               {t("purchase.pass_buy")}
             </Button>
           </section>
-          <section className="flex min-w-0 flex-col gap-3 rounded-md border border-line-strong p-4">
+          <section className="flex min-w-[0] flex-col gap-3 rounded-md border border-line-strong p-4">
             <h3 className="font-medium">{t("purchase.subscription")}</h3>
             <p className="font-serif text-title text-brand-primary">
               {t("purchase.period", { months: formatCount(purchase.subscription.period_months), amount: purchase.subscription.price_text })}
