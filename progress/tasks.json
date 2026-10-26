@@ -1223,7 +1223,16 @@
       ],
       "title": "S31 会员与权益（前端，假数据）",
       "goal": "照原型做出 S31 会员与权益：所有视图、七态、三档宽度，数据来自假数据层。",
-      "status": "todo"
+      "status": "done",
+      "history": [
+        {
+          "round": 1,
+          "version": "v0058",
+          "tool": "local",
+          "date": "2026-10-26 08:00",
+          "status": "done"
+        }
+      ]
     },
     {
       "id": "U32",
