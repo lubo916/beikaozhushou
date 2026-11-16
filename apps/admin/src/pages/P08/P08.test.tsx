@@ -84,9 +84,9 @@ describe("P08 假数据与七态判断", () => {
     expect(questionReviewView({ ...waiting, status: "error", fetchStatus: "idle", error: new ApiError("COMMON_INTERNAL") }).state).toBe(
       "error",
     );
-    expect(
-      questionReviewView({ data: normal, status: "error", fetchStatus: "idle", error: new ApiError("COMMON_FORBIDDEN") }).state,
-    ).toBe("restricted");
+    expect(questionReviewView({ data: normal, status: "error", fetchStatus: "idle", error: new ApiError("COMMON_FORBIDDEN") }).state).toBe(
+      "restricted",
+    );
     expect(questionReviewView(done(normal)).state).toBe("normal");
     expect(questionReviewView(done({ ...normal, tasks: [], checks: [], variant_pools: [], reports: [] })).state).toBe("empty");
     expect(questionReviewView(done({ ...normal, tasks: [] })).state).toBe("normal");
